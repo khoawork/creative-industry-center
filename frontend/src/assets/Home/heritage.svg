@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="680" viewBox="0 0 1000 680">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#710008"/><stop offset="1" stop-color="#000000"/></linearGradient><pattern id="roof" width="25" height="12" patternUnits="userSpaceOnUse"><path d="M0 10h25" stroke="#d49520" stroke-opacity=".4"/></pattern></defs>
+<path fill="url(#sky)" d="M0 0h1000v680H0Z"/><circle cx="790" cy="135" r="58" fill="#d49520"/>
+<g stroke="#d49520" fill="none" opacity=".25"><circle cx="790" cy="135" r="90"/><circle cx="790" cy="135" r="120"/><path d="M0 600h1000M0 625h1000M0 650h1000"/></g>
+<path d="M145 346h710v197H145Z" fill="#710008" stroke="#d49520" stroke-width="3"/><path d="M130 550h740v20H130ZM100 575h800v20H100Z" fill="#d49520"/>
+<path d="M80 350q70-35 90-95 160 47 330-70 170 117 330 70 20 60 90 95Z" fill="#000000" stroke="#d49520" stroke-width="3"/><path d="M80 350q70-35 90-95 160 47 330-70 170 117 330 70 20 60 90 95Z" fill="url(#roof)"/>
+<path d="M260 243q65-22 85-65 73 21 155-73 82 94 155 73 20 43 85 65Z" fill="#710008" stroke="#d49520" stroke-width="3"/><path d="M260 243q65-22 85-65 73 21 155-73 82 94 155 73 20 43 85 65Z" fill="url(#roof)"/>
+<g fill="#d49520"><path d="M184 358h15v183h-15ZM315 358h15v183h-15ZM670 358h15v183h-15ZM801 358h15v183h-15Z"/><path d="M446 397h108v144H446Z"/><path d="M215 403h67v84h-67ZM717 403h67v84h-67Z"/></g>
+<path d="M460 411h80v130h-80Z" fill="#710008"/><g stroke="#710008" stroke-width="6"><path d="M231 403v84m17-84v84m17-84v84M733 403v84m17-84v84m17-84v84"/></g>
+<g fill="#d49520"><path d="M86 387v75m828-75v75" stroke="#d49520"/><ellipse cx="86" cy="457" rx="20" ry="30"/><ellipse cx="914" cy="457" rx="20" ry="30"/></g>
+<g fill="#f4f3f1" font-family="Inter, sans-serif"><text x="45" y="74" font-size="13" letter-spacing="6">DI SẢN &amp; SÁNG TẠO</text><text x="45" y="104" font-size="10" letter-spacing="2" fill="#d49520">TIẾP NỐI TINH HOA · KIẾN TẠO TƯƠNG LAI</text></g>
+</svg>

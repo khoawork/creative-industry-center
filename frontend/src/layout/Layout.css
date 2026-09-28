@@ -1,0 +1,65 @@
+.site-header { position: sticky; top: 0; z-index: 20; background: var(--white); border-bottom: 1px solid var(--line); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 88px; width: min(1360px, calc(100% - 64px)); }
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand strong { display: block; font-size: 11px; font-weight: 750; line-height: 1.5; }
+.brand small { display: block; color: var(--gold); font-size: 7px; letter-spacing: 1px; margin-top: 3px; }
+.brand-mark { flex-shrink: 0; }
+.main-navigation { display: flex; align-items: stretch; gap: 24px; }
+.main-navigation > a { display: flex; align-items: center; flex-shrink: 0; white-space: nowrap; position: relative; font-size: 10px; line-height: 1.7; color: var(--muted); padding: 14px 0; }
+.main-navigation > a:hover, .main-navigation > a[aria-current] { color: var(--wine); }
+.main-navigation > a[aria-current]::after { content: ''; position: absolute; bottom: 4px; left: 0; width: 22px; height: 2px; background: var(--wine); }
+.nav-contact { display: flex; gap: 10px; align-items: center; flex-shrink: 0; white-space: nowrap; padding: 0; background: transparent; font-size: 10px; }
+.nav-contact span { display: grid; place-items: center; border-radius: 50%; width: 30px; height: 30px; background: var(--wine); color: var(--white); }
+.menu-toggle { display: none; }
+.site-footer { padding: 62px 0 0; background: var(--wine); color: var(--white); }
+.footer-grid { display: grid; grid-template-columns: 1.15fr .9fr 1fr 1.2fr; gap: 48px; padding-bottom: 43px; }
+.brand--footer { gap: 10px; }
+.brand--footer .brand-mark { background: var(--white); border-radius: 3px; padding: 5px; width: 46px; height: 46px; }
+.brand--footer strong { font-size: 18px; }
+.brand--footer small { max-width: 140px; font-size: 6px; line-height: 1.7; }
+.footer-grid p { font-size: 11px; line-height: 1.9; color: color-mix(in srgb, var(--white) 80%, var(--wine)); margin-top: 16px; }
+.footer-grid h3 { color: var(--gold); font-size: 12px; font-weight: 650; border-bottom: 1px solid color-mix(in srgb, var(--gold) 35%, var(--wine)); padding-bottom: 12px; margin-bottom: 15px; }
+.footer-grid > div > a, .footer-grid > div > button { display: flex; font-size: 11px; margin-top: 13px; padding: 0; background: transparent; text-align: left; line-height: 1.6; }
+.footer-grid > div > a:hover, .footer-grid > div > button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.footer-grid > div > .brand { margin-top: 0; }
+.footer-motto { color: var(--gold); font-size: 8px; letter-spacing: 1.3px; margin-top: 20px; }
+.footer-contact > strong { font-size: 11px; font-weight: 600; }
+.footer-contact p { margin-top: 8px; }
+.footer-contact-link { gap: 8px; align-items: center; }
+.footer-contact > small { display: block; margin-top: 16px; font-size: 9px; line-height: 1.8; color: color-mix(in srgb, var(--white) 65%, var(--wine)); }
+.footer-bottom { border-top: 1px solid color-mix(in srgb, var(--white) 15%, var(--wine)); padding-block: 23px; display: flex; justify-content: space-between; gap: 20px; font-size: 10px; color: color-mix(in srgb, var(--white) 70%, var(--wine)); }
+@media (max-width: 1180px) {
+  .header-inner { gap: 15px; width: calc(100% - 56px); }
+  .brand { gap: 8px; }
+  .brand strong { font-size: 9px; }
+  .brand small { font-size: 6px; }
+  .brand-mark { width: 40px; height: 40px; }
+  .main-navigation { gap: 12px; }
+  .main-navigation > a { font-size: 9px; }
+  .footer-grid { gap: 30px; }
+}
+@media (max-width: 960px) {
+  .header-inner { min-height: 76px; }
+  .brand strong { font-size: 11px; }
+  .brand small { font-size: 7px; }
+  .menu-toggle { display: grid; }
+  .main-navigation { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--white); border-bottom: 1px solid var(--line); box-shadow: var(--shadow); padding: 20px 28px; max-height: calc(100dvh - 76px); overflow-y: auto; }
+  .main-navigation.is-open { display: flex; flex-direction: column; gap: 0; }
+  .main-navigation > a { font-size: 13px; max-width: none; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .main-navigation > a[aria-current]::after { display: none; }
+  .nav-contact { justify-content: space-between; padding-top: 15px; font-size: 13px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+@media (max-width: 680px) {
+  .header-inner { min-height: 70px; width: calc(100% - 36px); }
+  .brand strong { font-size: 9px; }
+  .brand small { font-size: 5.7px; letter-spacing: .6px; }
+  .brand-mark { width: 34px; height: 34px; }
+  .site-footer { padding-top: 42px; }
+  .footer-grid { gap: 31px 20px; }
+  .footer-about, .footer-contact { grid-column: 1 / -1; }
+  .footer-about p { max-width: 330px; }
+  .brand--footer strong { font-size: 19px; }
+  .footer-grid h3 { font-size: 10px; }
+  .footer-bottom { flex-direction: column; gap: 10px; font-size: 9px; }
+}
