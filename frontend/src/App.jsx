@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 // import Header from "./layouts/header";
 import routes from "./routes";
-
+import "./main.css";
 function App() {
   return (
     <div className="booking-shell min-h-screen">
