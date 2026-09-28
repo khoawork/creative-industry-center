@@ -1,50 +1,115 @@
-import conference from '../../assets/Home/conference.svg'
-import exhibition from '../../assets/Home/exhibition.svg'
-import heritage from '../../assets/Home/heritage.svg'
-import museum from '../../assets/Home/museum.svg'
-import artisan from '../../assets/Home/artisan.svg'
+import aboutImage from '../../assets/Home/about.jpg'
+import gatheringImage from '../../assets/Home/event-gathering.jpg'
+import exhibitionImage from '../../assets/Home/event-exhibition.jpg'
+import forumImage from '../../assets/Home/event-forum.jpg'
+import museumImage from '../../assets/Home/project-museum.jpg'
+import artisanImage from '../../assets/Home/story-artisan.jpg'
+import { sectionIds, site } from '../shared/site.js'
 
-export const navigation = [
-  { label: 'Trang chủ', href: '#trang-chu' },
-  { label: 'Giới thiệu', href: '#gioi-thieu' },
-  { label: 'Kỷ lục & Giải thưởng', href: '#giai-thuong' },
-  { label: 'Dự án sáng nghiệp', href: '#du-an' },
-  { label: 'Chuyện nhà sáng nghiệp', href: '#chuyen-nha-sang-nghiep' },
-  { label: 'Hợp tác & Đào tạo', href: '#dao-tao' },
-]
+export const hero = {
+  badge: 'VIỆN KỶ LỤC VIỆT NAM — VIETKINGS',
+  subtitle: 'NƠI KẾT TINH TRÍ TUỆ, XÁC LẬP KỶ LỤC VÀ TÔN VINH GIÁ TRỊ VIỆT',
+  slogan: '“Chứng thực giá trị — Kiến tạo tài sản — Trao truyền ý chí”',
+}
 
 export const statistics = [
-  { value: '500+', label: 'Kỷ lục được xác lập' },
-  { value: '120+', label: 'Cộng đồng sáng tạo' },
-  { value: '63', label: 'Tỉnh thành kết nối' },
-  { value: '20+', label: 'Năm kiến tạo giá trị' },
+  { value: '500+', label: 'Kỷ lục Gia & Tổ chức' },
+  { value: '120+', label: 'Công trình Sáng tạo' },
+  { value: '63', label: 'Tỉnh Thành Kết Nối' },
+  { value: '20+', label: 'Năm Di Sản Tôn Vinh' },
 ]
 
+export const about = {
+  eyebrow: 'SỨ MỆNH & TẦM NHÌN QUỐC GIA',
+  title: `Về ${site.name}`,
+  image: aboutImage,
+  imageAlt: 'Không gian trưng bày của Viện Kỷ lục Việt Nam',
+  captionTitle: 'Viện Kỷ lục Việt Nam (VietKings)',
+  caption: 'Thành trì kết nối những trí tuệ ưu tú, gìn giữ tinh hoa văn hóa và đổi mới sáng tạo.',
+  missionTitle: 'Tôn chỉ Hoạt động',
+  mission: 'Trung tâm Công nghiệp Sáng tạo được thành lập với mục tiêu trở thành hạt nhân nghiên cứu, bảo tồn, kích hoạt các tiềm năng trí tuệ vô tận của con người Việt Nam. Chúng tôi đóng vai trò cầu nối thể chế và thị trường, biến các ý tưởng và phát minh độc bản thành tài sản sở hữu trí tuệ có giá trị thương mại bền vững.',
+  values: [
+    { icon: 'check', title: 'Xác Lập Chuẩn Mực', description: 'Chứng thực công trình, phát minh, giải pháp đạt tiêu chí kỷ lục và sáng tạo tầm vóc.' },
+    { icon: 'globe', title: 'Vươn Tầm Quốc Tế', description: 'Đưa các kỷ lục gia và sản phẩm tinh hoa dân tộc tiếp cận các thị trường toàn cầu.' },
+  ],
+}
+
 export const events = [
-  { id: 'hoi-ngo', category: 'HOẠT ĐỘNG NỔI BẬT', date: '18 THÁNG 06, 2026', title: 'Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh sáng tạo, giữ gìn giá trị', description: 'Gặp gỡ những con người và câu chuyện truyền cảm hứng trên hành trình khám phá, gìn giữ và lan tỏa các giá trị Việt Nam.', image: conference, imageAlt: 'Minh họa sân khấu hội ngộ và tôn vinh kỷ lục gia', body: 'Chương trình là không gian kết nối các kỷ lục gia, nhà sáng nghiệp và cộng đồng sáng tạo trên cả nước. Những ý tưởng, kinh nghiệm và câu chuyện được sẻ chia để mở ra các cơ hội hợp tác mới. Các hoạt động dự kiến gồm giao lưu, trưng bày sáng kiến và lễ tôn vinh những đóng góp cho cộng đồng.' },
-  { id: 'trien-lam', category: 'TRIỂN LÃM SÁNG TẠO', date: '12 THÁNG 06, 2026', title: 'Không gian trưng bày tinh hoa thủ công mỹ nghệ & di sản Việt', description: 'Khám phá những sản phẩm độc đáo, nơi bàn tay nghệ nhân kết nối tinh hoa truyền thống với tư duy sáng tạo đương đại.', image: exhibition, imageAlt: 'Minh họa không gian triển lãm sản phẩm thủ công', body: 'Không gian trưng bày giới thiệu các chất liệu gần gũi như gốm, tre và sợi tự nhiên qua góc nhìn mới. Khách tham quan có thể tìm hiểu câu chuyện của từng sản phẩm, gặp gỡ người làm nghề và trải nghiệm các hoạt động sáng tạo.' },
-  { id: 'di-san', category: 'TỌA ĐÀM CHUYÊN ĐỀ', date: '05 THÁNG 06, 2026', title: 'Tọa đàm: “Di sản và hành trình đi vào công nghiệp sáng tạo”', description: 'Cùng các chuyên gia trao đổi về hướng đi mới để những giá trị truyền thống trở thành nguồn lực cho tương lai.', image: heritage, imageAlt: 'Minh họa kiến trúc truyền thống và không gian di sản Việt', body: 'Buổi tọa đàm kết nối góc nhìn của nhà nghiên cứu, nghệ nhân và doanh nghiệp. Nội dung tập trung vào bảo tồn tri thức bản địa, thiết kế sản phẩm văn hóa và xây dựng những mô hình phát triển bền vững cho cộng đồng.' },
+  {
+    id: 'hoi-ngo', date: '15 THÁNG 04, 2025', category: 'Đại Hội Thường Niên',
+    title: 'Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia',
+    description: 'Quy tụ hơn 300 kỷ lục gia và các nhà sáng chế trên toàn quốc nhằm đúc kết thành tựu đổi mới trong công nghệ và văn hóa di sản.',
+    image: gatheringImage, imageAlt: 'Lễ công bố và vinh danh kỷ lục gia Việt Nam',
+  },
+  {
+    id: 'trien-lam', date: '28 THÁNG 04, 2025', category: 'Triển Lãm Độc Bản',
+    title: 'Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục',
+    description: 'Khám phá những kiệt tác sơn mài, khảm xà cừ và gốm sứ đạt đỉnh cao nghệ thuật của các nghệ nhân nhân dân kỳ cựu.',
+    image: exhibitionImage, imageAlt: 'Nghệ nhân chế tác tác phẩm sơn mài trong xưởng',
+  },
+  {
+    id: 'toa-dam', date: '10 THÁNG 05, 2025', category: 'Tọa Đàm Kinh Tế',
+    title: 'Tọa đàm: “Tài sản Vô hình & Định giá Thương hiệu Kỷ lục”',
+    description: 'Chia sẻ từ các chuyên gia kinh tế đầu ngành về phương pháp định giá thương quyền sở hữu trí tuệ và mở rộng dòng vốn đầu tư.',
+    image: forumImage, imageAlt: 'Các diễn giả trao đổi tại diễn đàn kinh tế sáng tạo',
+  },
 ]
 
 export const awards = [
-  { id: 'bang-chung-nhan', icon: 'trophy', title: 'Bằng chứng nhận Kỷ lục Sáng tạo Quốc gia', description: 'Ghi nhận những thành tựu xuất sắc, những dấu ấn tiên phong góp phần tạo nên bản sắc và vị thế của trí tuệ Việt Nam.', tag: 'TÔN VINH GIÁ TRỊ SÁNG TẠO' },
-  { id: 'giai-thuong', icon: 'medal', title: 'Giải thưởng “Ngọn lửa Sáng tạo Việt”', description: 'Tôn vinh những cá nhân và tổ chức bền bỉ nuôi dưỡng ý tưởng, lan tỏa tinh thần đổi mới và mang đến giá trị cho cộng đồng.', tag: 'THẮP SÁNG ĐAM MÊ', featured: true },
-  { id: 'huy-hieu', icon: 'star', title: 'Huy hiệu Nhà sáng nghiệp Tiên phong', description: 'Ghi nhận những đóng góp bền bỉ của người sáng nghiệp trên hành trình kết nối tri thức và kiến tạo những giá trị mới.', tag: 'KẾT NỐI & TIẾP BƯỚC' },
+  {
+    id: 'bang-chung-nhan', icon: 'medal', title: 'Bằng Chứng Nhận Kỷ Lục Sáng Tạo Quốc Gia',
+    description: 'Danh vị cao quý trao tặng cho các cá nhân, tập thể phát minh giải pháp đột phá, tạo tác động thực tiễn cho nền kinh tế văn hóa nước nhà.',
+    tag: 'Hội đồng Viện Thẩm Định',
+  },
+  {
+    id: 'giai-thuong', icon: 'trophy', title: 'Giải Thưởng “Ngọn Hải Đăng Sáng Nghiệp”',
+    description: 'Tôn vinh các thủ lĩnh công nghiệp sáng tạo bền bỉ qua năm tháng, gìn giữ đạo đức kinh doanh và lan tỏa giá trị sống cao đẹp cho cộng đồng.',
+    tag: 'Trao tặng hàng năm', featured: true, featuredLabel: 'Biểu Trưng Danh Giá Nhất',
+  },
+  {
+    id: 'huy-hieu', icon: 'star', title: 'Huy Hiệu Tinh Hoa Nghề Truyền Thống',
+    description: 'Ghi nhận công đức các truyền nhân giữ lửa tinh hoa làng nghề, kế thừa kho báu tri thức bản địa và ứng dụng vật liệu sáng tạo mới.',
+    tag: 'Hồ sơ xét duyệt mở',
+  },
 ]
 
 export const projects = [
-  { id: 'bao-tang', category: 'DỰ ÁN TRỌNG ĐIỂM QUỐC GIA', title: 'Bảo tàng Không gian Kỷ lục Sáng tạo Việt Nam (VietSpace)', description: 'Một không gian kết nối các giá trị sáng tạo, lưu giữ di sản tri thức và mang đến những trải nghiệm khám phá mới cho cộng đồng.', image: museum, imageAlt: 'Minh họa kiến trúc bảo tàng không gian sáng tạo', caption: 'NƠI CÁC GIÁ TRỊ VIỆT ĐƯỢC LƯU GIỮ', action: 'Tìm hiểu về dự án', body: 'Dự án mẫu hướng đến xây dựng một điểm hẹn văn hóa, giáo dục và trải nghiệm. Không gian dự kiến bao gồm khu trưng bày kỷ lục, thư viện tri thức sáng tạo và khu tương tác dành cho thế hệ trẻ.' },
-  { id: 'nghe-nhan', category: 'CHUYÊN MỤC ĐƯỢC YÊU THÍCH', title: 'Chuyện nhà sáng nghiệp: Nghệ nhân với hồn làng & hành trình 40 năm giữ lửa đam mê', description: 'Theo chân người nghệ nhân gìn giữ nghề truyền thống, để lắng nghe câu chuyện về lòng kiên trì, sự tận tâm và khát vọng tiếp nối.', image: artisan, imageAlt: 'Minh họa nghệ nhân bên bàn chế tác gốm', caption: 'GIỮ LỬA NGHỀ · LAN TỎA GIÁ TRỊ', action: 'Đọc toàn bộ câu chuyện', body: 'Từ một góc xưởng nhỏ, từng sản phẩm được tạo nên bằng sự kiên nhẫn và tình yêu với chất liệu. Câu chuyện mẫu kể về hành trình một người thợ truyền lại kỹ năng cho thế hệ trẻ, đồng thời thử nghiệm các thiết kế mới để nghề truyền thống tiếp tục sống trong đời sống hôm nay.' },
+  {
+    id: 'bao-tang', icon: 'architecture', category: 'Dự Án Trọng Điểm Quốc Gia',
+    title: 'Bảo Tàng Không Gian Kỷ Lục Sáng Tạo Việt Nam (Giai Đoạn 1)',
+    description: 'Khu phức hợp lưu trữ, bảo tồn và ứng dụng công nghệ thực tế ảo tương tác nhằm tái hiện hành trình xác lập các kỳ tích quốc gia. Công trình tạo điểm đến văn hóa giáo dục tự hào cho thế hệ trẻ.',
+    image: museumImage, imageAlt: 'Phối cảnh bảo tàng không gian kỷ lục sáng tạo Việt Nam',
+    caption: 'Khởi công 2025 - Quy mô 12 Hecta', action: 'Tìm hiểu tiến độ dự án',
+  },
+  {
+    id: 'nghe-nhan', sectionId: sectionIds.stories, icon: 'person', featured: true,
+    category: 'Gương Mặt Kỷ Lục Gia Tiêu Biểu',
+    title: 'Chuyện Nhà Sáng Nghiệp: Nghệ Nhân Vũ Văn Hùng & Hành Trình 40 Năm Giữ Lửa Gốm Dân Tộc',
+    description: 'Từ xưởng gốm thủ công thô mộc đến việc xác lập kỷ lục chiếc bình gốm độc bản khắc họa 54 dân tộc anh em. Câu chuyện về lòng kiên định vượt qua ba lần suy thoái để xây dựng cơ đồ bền vững.',
+    image: artisanImage, imageAlt: 'Nghệ nhân chế tác gốm trong xưởng truyền thống',
+    caption: 'Kỷ Lục Gia Văn Hóa Dân Gian', action: 'Đọc toàn bộ câu chuyện sáng nghiệp',
+  },
 ]
 
 export const programs = [
-  { id: 'quan-tri', icon: 'cap', title: 'Đào tạo Quản trị Tài sản Trí tuệ & Thương quyền Kỷ lục', description: 'Kiến thức nền tảng và thực tiễn dành cho tổ chức, cá nhân trên hành trình xác lập, khai thác và phát triển tài sản trí tuệ.', audience: 'Doanh nghiệp · Nhà sáng nghiệp' },
-  { id: 'uom-tao', icon: 'bulb', title: 'Ươm tạo Doanh nghiệp Công nghiệp Văn hóa Sáng tạo', description: 'Chương trình kết nối ý tưởng sáng tạo với nguồn lực, chuyên gia và cộng đồng, đồng hành từ ý tưởng đến thực tiễn.', audience: 'Startup · Dự án sáng tạo' },
-  { id: 'hop-tac', icon: 'globe', title: 'Liên minh Hợp tác Viện – Doanh nghiệp – Địa phương', description: 'Kết nối nghiên cứu và nguồn lực xã hội để cùng phát triển những mô hình sáng tạo bền vững, gắn với bản sắc địa phương.', audience: 'Viện nghiên cứu · Địa phương' },
+  {
+    id: 'quan-tri', icon: 'cap', title: 'Đào Tạo Quản Trị Tài Sản Trí Tuệ & Thương Quyền Kỷ Lục',
+    description: 'Khóa học chuyên sâu dành cho chủ doanh nghiệp, giúp biến giá trị vô hình thành công cụ tăng trưởng doanh thu vượt bậc.',
+    detail: 'Thời lượng: 6 tuần • Trực tiếp & Trực tuyến', action: 'Đăng ký tham vấn',
+  },
+  {
+    id: 'uom-tao', icon: 'bulb', title: 'Ươm Tạo Doanh Nghiệp Công Nghiệp Văn Hóa Sáng Tạo',
+    description: 'Chương trình cố vấn 1-1 cùng các Kỷ lục gia và chuyên gia công nghệ, hoàn thiện mô hình sản phẩm từ phôi thai đến thị trường.',
+    detail: 'Chỉ tiêu: 20 dự án mỗi khóa', action: 'Đăng ký tham vấn',
+  },
+  {
+    id: 'hop-tac', icon: 'handshake', title: 'Liên Minh Hợp Tác Viện - Doanh Nghiệp - Địa Phương',
+    description: 'Ký kết hợp tác chiến lược nhằm xây dựng hồ sơ kỷ lục chỉ dẫn địa lý, quảng bá văn hóa ẩm thực và thắng cảnh du lịch tỉnh thành.',
+    detail: 'Hỗ trợ pháp lý & Xúc tiến truyền thông', action: 'Liên hệ hợp tác',
+  },
 ]
 
-export const eligibility = [
-  { title: 'Người có tài năng', description: 'Sở hữu tài năng, thành tựu và giá trị khác biệt.' },
-  { title: 'Nhà sáng tạo & nhà sáng nghiệp', description: 'Có ý tưởng, sản phẩm hoặc giải pháp mang lại giá trị.' },
-  { title: 'Cộng đồng & đơn vị', description: 'Đóng góp vào sự phát triển sáng tạo và bản sắc Việt.' },
-]
+export const advisory = {
+  title: 'Cần tư vấn trực tiếp từ Chuyên viên Viện Kỷ lục?',
+  description: 'Đường dây nóng tiếp nhận hồ sơ hoạt động 24/7 sẵn sàng đồng hành cùng quý vị.',
+}

@@ -1,48 +1,38 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { siteLinks } from '../../config/shared/site.js'
 
 export default function useHome() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState(window.location.hash || '#trang-chu')
-  const [dialog, setDialog] = useState(null)
-  const [submitted, setSubmitted] = useState(false)
-  const dialogRef = useRef(null)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const activeSection = location.pathname === '/' ? siteLinks.home.href : location.pathname
 
   useEffect(() => {
-    const onHashChange = () => {
-      setActiveSection(window.location.hash || '#trang-chu')
-      setMenuOpen(false)
-    }
     const onKeyDown = (event) => {
       if (event.key === 'Escape') setMenuOpen(false)
     }
-    window.addEventListener('hashchange', onHashChange)
     window.addEventListener('keydown', onKeyDown)
-    return () => {
-      window.removeEventListener('hashchange', onHashChange)
-      window.removeEventListener('keydown', onKeyDown)
-    }
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
   useEffect(() => {
-    if (dialog && !dialogRef.current.open) dialogRef.current.showModal()
-  }, [dialog])
+    if (location.hash) navigate(location.pathname + location.search, { replace: true })
+  }, [location.hash, location.pathname, location.search, navigate])
 
-  function openDialog(kind, item = null) {
-    setSubmitted(false)
-    setDialog({ kind, item })
+  function selectSection(event, href) {
+    event.preventDefault()
+    navigate(href)
+    if (href === siteLinks.home.href) window.scrollTo({ top: 0, behavior: 'auto' })
     setMenuOpen(false)
   }
 
-  function closeDialog() {
-    dialogRef.current?.close()
-    setDialog(null)
-    setSubmitted(false)
-  }
-
-  function submitDemo(event) {
+  function skipToContent(event) {
     event.preventDefault()
-    setSubmitted(true)
+    const target = document.getElementById('noi-dung')
+    target?.focus({ preventScroll: true })
+    target?.scrollIntoView({ block: 'start' })
   }
 
-  return { menuOpen, setMenuOpen, activeSection, dialog, dialogRef, submitted, openDialog, closeDialog, submitDemo }
+  return { menuOpen, setMenuOpen, activeSection, selectSection, skipToContent }
 }
