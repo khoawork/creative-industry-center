@@ -61,7 +61,6 @@ img, svg { display: block; }
 img { width: 100%; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
 h1, h2, h3, p { margin: 0; }
-::selection { background: var(--gold); color: var(--wine); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }

@@ -16,7 +16,6 @@
 .menu-toggle { display: none; }
 
 .site-footer { border-top: 2px solid color-mix(in srgb, var(--gold) 40%, var(--wine)); background: var(--wine); color: var(--white); line-height: 1.7; }
-.site-footer ::selection { background: var(--cream); color: var(--wine); }
 .footer-container { width: min(1280px, calc(100% - 96px)); margin-inline: auto; padding-block: 64px 48px; }
 .footer-columns { gap: 48px; padding-bottom: 48px; border-bottom: 1px solid color-mix(in srgb, var(--white) 13%, var(--wine)); }
 .brand--footer { align-items: center; gap: 12px; }
