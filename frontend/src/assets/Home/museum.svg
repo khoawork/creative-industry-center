@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+<defs><pattern id="glass" width="55" height="60" patternUnits="userSpaceOnUse"><path d="M0 0h55v60H0Z" fill="#710008" fill-opacity=".75" stroke="#f4f3f1" stroke-width="3"/></pattern><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#f4f3f1"/></linearGradient></defs>
+<path fill="url(#sky)" d="M0 0h1000v600H0Z"/><circle cx="815" cy="118" r="64" fill="#d49520" fill-opacity=".3"/>
+<path d="M0 460h1000v140H0Z" fill="#d49520" fill-opacity=".2"/><path d="M100 270h810v200H100Z" fill="#f4f3f1" stroke="#710008" stroke-opacity=".2"/><path d="M143 299h720v155H143Z" fill="url(#glass)"/>
+<path d="m57 270 136-49h609l145 49Z" fill="#710008"/><path d="M270 197h460v101H270Z" fill="#d49520"/><path d="m240 197 260-96 260 96Z" fill="#710008"/>
+<g stroke="#f4f3f1" stroke-width="6"><path d="M302 220v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64m39-64v64"/></g>
+<path d="M440 351h120v118H440Z" fill="#710008"/><path d="M442 472h116l96 128H346Z" fill="#f4f3f1"/><g fill="#710008" opacity=".9"><path d="M58 488v-97h9v97Zm10-38c-94-14-62-105-20-77-8-79 65-72 55-10 71 1 43 100-35 87ZM927 488v-97h9v97Zm10-38c-94-14-62-105-20-77-8-79 65-72 55-10 71 1 43 100-35 87Z"/></g>
+<g font-family="Inter, sans-serif" fill="#710008"><text x="47" y="68" font-size="30" font-weight="700">VIETSPACE</text><text x="48" y="95" font-size="10" letter-spacing="3">KHÔNG GIAN KỶ LỤC SÁNG TẠO VIỆT NAM</text></g>
+<g fill="#710008"><circle cx="371" cy="458" r="8"/><path d="M361 469h20v31h-20Zm2 29h6v21h-6Zm10 0h6v21h-6Z"/><circle cx="621" cy="478" r="8"/><path d="M611 489h20v31h-20Zm2 29h6v21h-6Zm10 0h6v21h-6Z"/></g>
+</svg>

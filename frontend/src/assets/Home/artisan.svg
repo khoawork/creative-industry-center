@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+<defs><pattern id="slats" width="50" height="600" patternUnits="userSpaceOnUse"><path d="M0 0v600" stroke="#710008" stroke-opacity=".12" stroke-width="2"/></pattern></defs>
+<path fill="#d49520" d="M0 0h1000v600H0Z"/><path fill="#f4f3f1" fill-opacity=".5" d="M0 0h1000v600H0Z"/><path fill="url(#slats)" d="M0 0h1000v600H0Z"/>
+<path d="M55 60h365v310H55Z" fill="#710008"/><path d="M68 74h339v280H68Z" fill="#f4f3f1"/><path d="M238 74v280M68 214h339" stroke="#710008" stroke-width="10"/><path d="M85 328q85-110 150-20 70-150 160-50v95H85Z" fill="#d49520" fill-opacity=".4"/>
+<path d="M590 120h360v15H590Zm0 148h360v15H590Z" fill="#710008"/>
+<g fill="#710008"><path d="M626 64h25v10c0 14 22 21 18 37-3 15-59 15-62 0-4-16 19-23 19-37ZM723 46h30v20c0 15 22 28 19 43-3 16-68 16-71 0-3-15 22-28 22-43ZM835 66h35v20q30 31-17 33t-18-33Z"/></g>
+<g fill="#f4f3f1" stroke="#710008" stroke-width="2"><path d="M619 176h33v15c0 19 22 33 19 59-3 22-67 22-70 0-3-26 18-40 18-59ZM725 202h40v12q50 53-20 53t-20-53ZM846 159h29v19c0 20 26 34 23 67-3 27-75 27-78 0-3-33 26-47 26-67Z"/></g>
+<path d="M250 600v-72q8-151 75-180h148q76 38 88 180v72Z" fill="#710008"/>
+<ellipse cx="397" cy="295" rx="61" ry="75" fill="#f4f3f1"/><path d="M335 284q-7-94 67-88 73 7 58 83-25-45-57-43-31 24-68 48Z" fill="#710008"/><path d="M352 309q18 11 35 0m22 0q18 11 35 0M385 336q18 10 32-2" fill="none" stroke="#710008" stroke-width="3"/>
+<path d="M366 369q35 39 72 0l24 121H345Z" fill="#f4f3f1" fill-opacity=".85"/><path d="m296 394-39 82q-10 43 60 43h152v-23l-156-11 45-63m132-29 66 84q25 34-14 43l-112-17 8-20 71 4-65-65" fill="#f4f3f1"/>
+<path d="M83 530h834v28H83Zm42 28h23v42h-23Zm725 0h23v42h-23Z" fill="#710008"/><ellipse cx="483" cy="522" rx="113" ry="13" fill="#d49520"/><path d="M458 410h52v23c0 22 39 47 33 74-5 24-117 24-122 0-6-27 37-52 37-74Z" fill="#d49520" stroke="#710008" stroke-width="2"/><ellipse cx="484" cy="410" rx="26" ry="7" fill="#710008"/><path d="M432 478q51 18 101 0m-108 20q60 20 118 0" fill="none" stroke="#710008" stroke-opacity=".5"/>
+<g font-family="Inter, sans-serif" fill="#710008"><text x="652" y="381" font-size="31" font-weight="600">GIỮ LỬA NGHỀ</text><text x="655" y="410" font-size="11" letter-spacing="4">TRAO TRUYỀN GIÁ TRỊ</text></g>
+</svg>

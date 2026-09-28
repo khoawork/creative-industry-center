@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="680" viewBox="0 0 1000 680">
+<defs><linearGradient id="wall" x2="0" y2="1"><stop stop-color="#f4f3f1"/><stop offset="1" stop-color="#d49520"/></linearGradient><pattern id="tiles" width="120" height="70" patternUnits="userSpaceOnUse"><path d="M0 0h120v70H0Z" fill="none" stroke="#710008" stroke-opacity=".14"/></pattern></defs>
+<path d="M0 0h1000v680H0Z" fill="#f4f3f1"/><path d="M100 90h800v390H100Z" fill="url(#wall)"/><path d="M0 0 100 90v390L0 680ZM1000 0 900 90v390l100 200Z" fill="#d49520"/>
+<path d="M0 680 100 480h800l100 200Z" fill="#f4f3f1"/><path d="M0 680 100 480h800l100 200Z" fill="url(#tiles)"/>
+<g fill="#710008"><path d="M100 90h800v25H100ZM70 0h20v525H70ZM910 0h20v525h-20Z"/><path d="M160 170h185v215H160ZM655 170h185v215H655Z"/></g>
+<g stroke="#d49520" fill="none" stroke-width="2"><path d="M172 182h161v191H172ZM667 182h161v191H667Z"/><circle cx="250" cy="260" r="53"/><path d="M211 300q39-110 78 0M215 220l70 80m-70 0 70-80"/><path d="M700 310q50-135 98 0ZM713 310q35-90 72 0Z"/></g>
+<g fill="#710008" font-family="Inter, sans-serif" text-anchor="middle"><text x="500" y="166" font-size="11" letter-spacing="5">KHÔNG GIAN</text><text x="500" y="200" font-size="25" font-weight="600">TINH HOA VIỆT</text></g>
+<path d="M420 455h160v140H420Z" fill="#f4f3f1" stroke="#710008" stroke-opacity=".15"/><path d="M237 468h104v100H237ZM678 468h104v100H678Z" fill="#f4f3f1"/>
+<path d="M470 281h60v26c-3 26 48 46 38 99q-7 47-68 47t-68-47c-10-53 41-73 38-99Z" fill="#710008"/><g fill="none" stroke="#d49520" stroke-width="2"><ellipse cx="500" cy="283" rx="30" ry="8"/><path d="M439 367q61 25 122 0m-122 28q61 25 122 0m-113 27q52 23 104 0"/></g>
+<path d="M271 369h36v17c0 16 25 31 24 56-2 34-82 34-84 0-1-25 24-40 24-56Z" fill="#d49520" stroke="#710008" stroke-width="2"/><path d="M710 350h40v30c0 18 31 35 25 62-7 35-83 35-90 0-6-27 25-44 25-62Z" fill="#710008"/>
+<g stroke="#710008" stroke-width="3"><path d="M250 0v100M500 0v70M750 0v100"/></g><g fill="#710008"><path d="m223 100 27-20 27 20ZM473 70l27-20 27 20ZM723 100l27-20 27 20Z"/></g>
+</svg>
