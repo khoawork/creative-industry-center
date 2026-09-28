@@ -1,13 +1,9 @@
-import ProjectCard from "../../components/Projects/project-card"
-import ProjectHeader from "../../components/Projects/project-header"
-
-export function Projects() {
+import React from "react";
+import ProjectLayout from "../../components/Projects/project-layout"; 
+export default function ProjectsPage() {
   return (
-    <div className="text-red-500">
-      <ProjectHeader />
-      <ProjectCard />
+    <div className="min-h-screen bg-[#f4f3f1] font-sans text-gray-900">
+      <ProjectLayout />
     </div>
-  )
+  );
 }
-
-export default Projects
