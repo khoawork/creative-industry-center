@@ -2,11 +2,11 @@ import Brand from '../components/shared/Brand.jsx'
 import Icon from '../components/shared/Icon.jsx'
 import './Layout.css'
 
-export default function Header({ navigation, menuOpen, setMenuOpen, activeSection, openDialog }) {
+export default function Header({ navigation, menuOpen, setMenuOpen, activeSection, selectSection }) {
   return (
     <header className="site-header">
-      <div className="header-inner container">
-        <Brand />
+      <div className="header-inner flex-nowrap">
+        <Brand onNavigate={selectSection} />
         <button
           className="menu-toggle icon-button"
           aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
@@ -25,15 +25,14 @@ export default function Header({ navigation, menuOpen, setMenuOpen, activeSectio
             <a
               key={item.href}
               href={item.href}
+              className={item.icon ? 'nav-contact' : undefined}
               aria-current={activeSection === item.href ? 'location' : undefined}
-              onClick={() => setMenuOpen(false)}
+              onClick={(event) => selectSection(event, item.href)}
             >
-              {item.label}
+              <span className="nav-label">{item.label}</span>
+              {item.icon && <span className="nav-contact-icon"><Icon name={item.icon} size={18} /></span>}
             </a>
           ))}
-          <button className="nav-contact" onClick={() => openDialog('contact')}>
-            Liên hệ <span><Icon name="arrow" size={15} /></span>
-          </button>
         </nav>
       </div>
     </header>
