@@ -26,7 +26,7 @@ export default function ProjectFilter({ activeCategory, setActiveCategory }) {
             <button
               key={index}
               onClick={() => setActiveCategory(cat.name)}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-semibold transition ${
                 isActive
                   ? "bg-[#710008] text-white shadow-sm"
                   : " text-[#710008]  hover:bg-[#710008] hover:bg-opacity-10 hover:text-white"
@@ -45,10 +45,10 @@ export default function ProjectFilter({ activeCategory, setActiveCategory }) {
               {/* Badge số lượng (nếu có) */}
               {cat.count && (
                 <span
-                  className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0 transition ${
+                  className={`ml-1 px-1.5 py-0.5 rounded text-[13px] font-bold shrink-0 transition ${
                     isActive
                       ? "bg-[#4a0000] text-white"
-                      : "bg-[#f4f3f1] text-gray-700 group-hover:bg-[#710008] group-hover:text-white"
+                      : "bg-[#f4f3f1] text-gray-700 group-hover:bg-[#710008] group-hover:text-white  border-1 border-[#710008]"
                   }`}
                 >
                   {cat.count}
@@ -61,103 +61,3 @@ export default function ProjectFilter({ activeCategory, setActiveCategory }) {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

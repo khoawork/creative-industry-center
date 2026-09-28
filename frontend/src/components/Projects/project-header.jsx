@@ -24,18 +24,18 @@ export default function ProjectHeader() {
         </div>
 
         {/* Khối thống kê số lượng */}
-        <div className="flex gap-4 bg-white px-5 py-3 rounded-lg shadow-sm border border-gray-200">
-          <div className=" px-5 py-3  text-center">
-            <span className="text-xs text-[#7d5900] block">
-              DỰ ÁN ĐANG TRIỂN KHAI
+        <div className="flex gap-4 bg-white px-5 py-3 rounded-lg shadow-sm border border-gray-200 max-w-[500px]">
+          <div className=" px-5 py-3  text-left">
+            <span className="text-xl text-[#7d5900] block">
+              DỰ ÁN ĐANG TRIỂN KHAI 
             </span>
-            <span className="text-2xl font-bold text-[#4a0000]">
+            <span className="text-2xl  font-bold text-[#4a0000]">
               24
               <span className="text-sm">+ {""}</span>
             </span>
           </div>
-          <div className=" px-5 py-3  text-center">
-            <span className="text-xs text-[#7d5900] block">
+          <div className=" px-5 py-3   text-left">
+            <span className="text-xl text-[#7d5900] block">
               ĐỊA PHƯƠNG KẾT NỐI
             </span>
             <span className="text-2xl font-bold text-[#4a0000] flex items-baseline gap-1">
