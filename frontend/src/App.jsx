@@ -1,20 +1,25 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-
-import './App.css'
-
-import { Projects } from './pages/Projects' 
+import { Route, Routes } from "react-router-dom";
+// import Header from "./layouts/header";
+import routes from "./routes";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="text-red-500">
-      <Projects />
+    <div className="booking-shell min-h-screen">
+      {/* <Header /> */}
+      <Routes>
+        {routes.map((route, index) => {
+          const Page = route.page;
+          return (
+            <Route
+              key={route.path || index}
+              path={route.path}
+              element={<Page />}
+            />
+          );
+        })}
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
