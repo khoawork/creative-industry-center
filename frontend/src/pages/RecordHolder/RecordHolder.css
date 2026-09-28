@@ -1,0 +1,102 @@
+.record-holder-page, .record-holder-dialog {
+  --record-on-surface: #1a1c1b;
+  --record-on-secondary-container: #704b00;
+  --record-secondary: #805600;
+  --record-tertiary: #480004;
+  --record-on-primary: #ffffff;
+  --record-on-secondary-fixed: #281800;
+  --record-surface-container: #efeeec;
+  --record-on-surface-variant: #58413f;
+  --record-surface: #faf9f7;
+  --record-primary-container: #710008;
+  --record-secondary-fixed-dim: #ffba45;
+  --record-tertiary-container: #6b0f11;
+  --record-primary: #490003;
+  --record-secondary-container: #ffba45;
+  --record-surface-container-high: #e9e8e6;
+  --record-surface-container-low: #f4f3f1;
+  --record-secondary-fixed: #ffddaf;
+  --record-surface-container-lowest: #ffffff;
+}
+
+.record-holder-page .bg-record-primary { background-color: var(--record-primary); }
+.record-holder-page .bg-record-primary-container { background-color: var(--record-primary-container); }
+.record-holder-page .bg-record-secondary-container { background-color: var(--record-secondary-container); }
+.record-holder-page .bg-record-secondary-container\/20 { background-color: color-mix(in srgb, var(--record-secondary-container) 20%, transparent); }
+.record-holder-page .bg-record-secondary-fixed { background-color: var(--record-secondary-fixed); }
+.record-holder-page .bg-record-surface { background-color: var(--record-surface); }
+.record-holder-page .bg-record-surface-container { background-color: var(--record-surface-container); }
+.record-holder-page .bg-record-surface-container-high { background-color: var(--record-surface-container-high); }
+.record-holder-page .bg-record-surface-container-high\/60 { background-color: color-mix(in srgb, var(--record-surface-container-high) 60%, transparent); }
+.record-holder-page .bg-record-surface-container-low { background-color: var(--record-surface-container-low); }
+.record-holder-page .bg-record-surface-container-low\/50 { background-color: color-mix(in srgb, var(--record-surface-container-low) 50%, transparent); }
+.record-holder-page .bg-record-surface-container-lowest { background-color: var(--record-surface-container-lowest); }
+.record-holder-page .bg-record-surface-container-lowest\/10 { background-color: color-mix(in srgb, var(--record-surface-container-lowest) 10%, transparent); }
+.record-holder-page .hover\:bg-record-secondary-fixed:hover { background-color: var(--record-secondary-fixed); }
+.record-holder-page .hover\:bg-record-surface-container-high:hover { background-color: var(--record-surface-container-high); }
+.record-holder-page .hover\:bg-record-tertiary:hover { background-color: var(--record-tertiary); }
+.record-holder-page .hover\:text-record-secondary-container:hover { color: var(--record-secondary-container); }
+.record-holder-page .text-record-on-primary { color: var(--record-on-primary); }
+.record-holder-page .text-record-on-secondary-container { color: var(--record-on-secondary-container); }
+.record-holder-page .text-record-on-secondary-fixed { color: var(--record-on-secondary-fixed); }
+.record-holder-page .text-record-on-surface { color: var(--record-on-surface); }
+.record-holder-page .text-record-on-surface-variant { color: var(--record-on-surface-variant); }
+.record-holder-page .text-record-primary { color: var(--record-primary); }
+.record-holder-page .text-record-primary-container { color: var(--record-primary-container); }
+.record-holder-page .text-record-secondary { color: var(--record-secondary); }
+.record-holder-page .text-record-secondary-container { color: var(--record-secondary-container); }
+.record-holder-page .text-record-secondary-fixed { color: var(--record-secondary-fixed); }
+.record-holder-page .text-record-secondary-fixed-dim { color: var(--record-secondary-fixed-dim); }
+.record-holder-page .text-record-surface-container { color: var(--record-surface-container); }
+.record-holder-page .text-record-surface-container-high { color: var(--record-surface-container-high); }
+.record-holder-page .bg-gradient-to-r.from-record-primary { background-image: linear-gradient(to right, var(--record-primary), var(--record-primary-container), var(--record-tertiary-container)); }
+.record-holder-page .bg-gradient-to-b.from-record-surface-container-low { background-image: linear-gradient(to bottom, var(--record-surface-container-low), var(--record-surface-container)); }
+.record-holder-page .bg-gradient-to-t.from-black\/70 { background-image: linear-gradient(to top, color-mix(in srgb, #000000 70%, transparent), transparent); }
+
+.record-holder-page {
+  font-family: 'Inter', sans-serif;
+  color: var(--record-on-surface);
+  background: var(--record-surface);
+}
+
+.record-holder-page .rounded-lg { border-radius: .25rem; }
+.record-holder-page .rounded-xl { border-radius: .5rem; }
+.record-holder-page .rounded-full { border-radius: .75rem; }
+
+.record-holder-page .text-display-lg { font-size: 3.5rem; line-height: 4.25rem; letter-spacing: -.02em; }
+.record-holder-page .text-headline-lg { font-size: 2rem; line-height: 2.5rem; letter-spacing: -.015em; }
+.record-holder-page .text-headline-md { font-size: 1.375rem; line-height: 1.875rem; }
+.record-holder-page .text-headline-sm { font-size: 1.125rem; line-height: 1.5rem; }
+.record-holder-page .text-body-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.record-holder-page .text-body-md { font-size: 1rem; line-height: 1.625rem; }
+.record-holder-page .text-body-sm { font-size: .875rem; line-height: 1.375rem; }
+.record-holder-page .text-label-md { font-size: .875rem; line-height: 1.25rem; letter-spacing: .02em; }
+.record-holder-page .text-label-sm { font-size: .75rem; line-height: 1rem; letter-spacing: .05em; }
+.record-holder-page .leading-none { line-height: 1; }
+.record-holder-page .leading-tight { line-height: 1.25; }
+.record-holder-page .leading-relaxed { line-height: 1.625; }
+
+.record-holder-page .honoree-filter-btn[aria-pressed='true'] {
+  background: var(--record-primary);
+  color: var(--record-on-primary);
+}
+
+.record-holder-page .honoree-filter-btn[aria-pressed='false'] {
+  background: var(--record-surface-container-high);
+  color: var(--record-on-surface-variant);
+}
+
+.record-holder-page[data-filter='doanh-nhan'] .honoree-card:not([data-category='doanh-nhan']),
+.record-holder-page[data-filter='nghe-nhan'] .honoree-card:not([data-category='nghe-nhan']) {
+  display: none;
+}
+
+.record-holder-dialog {
+  --color-primary: var(--record-primary);
+  --color-gold: var(--record-secondary);
+  --color-cream: var(--record-surface-container-low);
+  font-family: 'Inter', sans-serif;
+}
+
+.record-holder-dialog .rounded-xl { border-radius: .5rem; }
+.record-holder-dialog .rounded-lg { border-radius: .25rem; }
