@@ -1,19 +1,8 @@
 import { useState } from 'react';
-import {
-  Sparkles,
-  Compass,
-  Trophy,
-  Quote,
-  Share2,
-  Bookmark,
-  ChevronRight,
-  CheckCircle2,
-} from 'lucide-react';
+import { Sparkles, Compass, Trophy, Quote } from 'lucide-react';
 
-export const FounderCard = ({ story, onOpenEvaluationModal }) => {
+export const FounderCard = ({ story }) => {
   const [activeTab, setActiveTab] = useState('about'); // 'about' | 'journey' | 'achievements'
-  const [copied, setCopied] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
   const [imgSrc, setImgSrc] = useState(story.image);
 
   const tabsConfig = [
@@ -23,12 +12,6 @@ export const FounderCard = ({ story, onOpenEvaluationModal }) => {
   ];
 
   const currentTabContent = story.tabs[activeTab] || story.tabs.about;
-
-  const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <article className="bg-white rounded-2xl border border-[#e8dfd3] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden relative group">

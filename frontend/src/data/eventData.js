@@ -1,0 +1,166 @@
+
+
+export const EVENT_CATEGORIES = [
+  { id: 'all', label: 'Tất cả sự kiện' },
+  { id: 'upcoming', label: 'Đang diễn ra & Sắp tới' },
+  { id: 'conference', label: 'Hội nghị & Diễn đàn' },
+  { id: 'exhibition', label: 'Triển lãm & Trưng bày' },
+];
+
+export const EVENT_STATS = [
+  {
+    icon: 'calendar',
+    value: '54+ Kỳ',
+    label: 'Hội ngộ Kỷ lục',
+  },
+  {
+    icon: 'users',
+    value: '12,000+',
+    label: 'Đại biểu tham gia',
+  },
+  {
+    icon: 'certificate',
+    value: '3,200+',
+    label: 'Bằng chứng nhận',
+  },
+  {
+    icon: 'building',
+    value: '63 Tỉnh/TP',
+    label: 'Quy mô bảo trợ',
+  },
+];
+
+export const EVENTS_DATA = [
+  {
+    id: 'hoi-ngo-54',
+    title: 'Hội Ngộ Kỷ Lục Gia Sáng Tạo Quốc Gia Lần Thứ 54',
+    day: '15',
+    monthYear: 'THÁNG 08, 2026',
+    status: 'open',
+    statusText: 'ĐANG MỞ ĐĂNG KÝ',
+    location: 'Trung tâm Hội nghị Quốc gia, Hà Nội',
+    category: 'conference',
+    categoryLabel: 'Hội nghị & Diễn đàn',
+    description:
+      'Đại hội quy tụ 500+ kỷ lục gia và các nhà sáng chế toàn quốc, công bố danh mục 20 kỷ lục đột phá thuộc các lĩnh vực công nghệ, thủ công mỹ nghệ và di sản văn hóa.',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'VK',
+      avatarBg: 'bg-[#490003] text-amber-300',
+      name: 'Chủ trì: Hội đồng Xác lập VIETKINGS',
+      role: 'Khách mời: Đại diện Bộ KH&CN, Bộ VHTTDL',
+    },
+    actionText: 'Đăng ký tham dự',
+    actionType: 'primary',
+  },
+  {
+    id: 'trien-lam-tinh-hoa',
+    title: 'Triển Lãm Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục',
+    day: '28',
+    monthYear: 'THÁNG 08, 2026',
+    status: 'upcoming',
+    statusText: 'SẮP DIỄN RA',
+    location: 'Bảo tàng Lịch sử TP. Hồ Chí Minh',
+    category: 'exhibition',
+    categoryLabel: 'Triển lãm & Trưng bày',
+    description:
+      'Không gian trưng bày 80 bảo vật và tuyệt tác thủ công truyền thống xác lập kỷ lục Việt Nam và Kỷ lục châu Á: gốm Bát Tràng, thổ cẩm Chăm, điêu khắc gỗ cổ truyền...',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'NN',
+      avatarBg: 'bg-[#9c6800] text-white',
+      name: 'Diễn giả: NNND. Nguyễn Văn Tròn',
+      role: 'Chủ tịch Hiệp hội Làng nghề Điêu khắc Quốc gia',
+    },
+    actionText: 'Đăng ký vé mời',
+    actionType: 'primary',
+  },
+  {
+    id: 'toa-dam-dinh-gia',
+    title: 'Tọa Đàm Định Giá Thương Hiệu Kỷ Lục & Sở Hữu Trí Tuệ',
+    day: '08',
+    monthYear: 'THÁNG 09, 2026',
+    status: 'open',
+    statusText: 'ĐANG MỞ ĐĂNG KÝ',
+    location: 'Hybrid: Melia Hà Nội & Zoom Trực Tuyến',
+    category: 'conference',
+    categoryLabel: 'Hội nghị & Diễn đàn',
+    description:
+      'Phương pháp thương mại hóa kỷ lục, xác lập tài sản vô hình và đăng ký bảo hộ độc quyền nhãn hiệu sáng tạo trên thị trường quốc tế.',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'GS',
+      avatarBg: 'bg-[#710008] text-white',
+      name: 'GS.TS. Trần Đình Nam',
+      role: 'Viện trưởng Viện Nghiên cứu Tài sản Trí tuệ Toàn cầu',
+    },
+    actionText: 'Đăng ký tham dự',
+    actionType: 'primary',
+  },
+  {
+    id: 'dien-dan-khoi-nghiep',
+    title: 'Diễn Đàn Khởi Nghiệp Sáng Tạo & Bản Quyền Tác Phẩm',
+    day: '22',
+    monthYear: 'THÁNG 09, 2026',
+    status: 'upcoming',
+    statusText: 'SẮP DIỄN RA',
+    location: 'Saigon Innovation Hub, TP. Hồ Chí Minh',
+    category: 'conference',
+    categoryLabel: 'Hội nghị & Diễn đàn',
+    description:
+      'Cầu nối giữa các nhà sáng lập trẻ và quỹ đầu tư di sản kỷ lục, trao 10 suất ươm mầm trị giá 5 tỷ đồng cho các dự án văn hóa khởi nghiệp tiềm năng.',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'CEO',
+      avatarBg: 'bg-[#490003] text-amber-200',
+      name: 'ThS. Lê Hoàng Yến',
+      role: 'Giám đốc Quỹ Sáng tạo & Phát triển Kỷ lục Trẻ',
+    },
+    actionText: 'Đăng ký Pitching',
+    actionType: 'primary',
+  },
+  {
+    id: 'le-trao-chung-nhan-100',
+    title: 'Lễ Trao Chứng Nhận Top 100 Tác Phẩm Nghệ Nhân Việt',
+    day: '12',
+    monthYear: 'THÁNG 10, 2026',
+    status: 'open',
+    statusText: 'ĐANG MỞ ĐĂNG KÝ',
+    location: 'Nhà hát Lớn Hà Nội',
+    category: 'exhibition',
+    categoryLabel: 'Triển lãm & Trưng bày',
+    description:
+      'Đại lễ tôn vinh và trao huy hiệu Kỷ lục Vàng cho 100 tác phẩm điêu khắc, gốm sứ và dệt lụa mang đậm hồn cốt dân tộc, xác lập giá trị văn hóa đỉnh cao.',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'VN',
+      avatarBg: 'bg-[#ffba45] text-[#704b00] font-black',
+      name: 'Ban Thư ký Viện Kỷ lục Việt Nam',
+      role: 'Truyền hình trực tiếp VTV2 & Đài PTTH Hà Nội',
+    },
+    actionText: 'Đăng ký tham dự',
+    actionType: 'primary',
+  },
+  {
+    id: 'hoi-thao-chuyen-doi-so',
+    title: 'Hội Thảo Chuyển Đổi Số Di Sản Kỷ Lục',
+    day: '19',
+    monthYear: 'THÁNG 11, 2026',
+    status: 'planned',
+    statusText: 'DỰ KIẾN QUÝ 4/2026',
+    location: 'Đại học Quốc gia TP. Hồ Chí Minh',
+    category: 'conference',
+    categoryLabel: 'Hội nghị & Diễn đàn',
+    description:
+      'Xây dựng kho lưu trữ số 3D quốc gia cho các hiện vật kỷ lục, ứng dụng trí tuệ nhân tạo và chuỗi khối để minh bạch nguồn gốc và bản quyền di sản.',
+    image: "https://marketplace.canva.com/HCuXc/MAEzXIHCuXc/1/tl/canva--a-beautiful-scenery-of-a-mountain-range-MAEzXIHCuXc.jpg",
+    speaker: {
+      initials: 'TS',
+      avatarBg: 'bg-[#710008] text-white',
+      name: 'TS. Vũ Minh Đức',
+      role: 'Chuyên gia cấp cao Trung tâm Dữ liệu Số Di sản',
+    },
+    actionText: 'Nhận thông báo',
+    actionType: 'notify',
+  },
+];
