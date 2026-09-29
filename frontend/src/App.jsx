@@ -1,3 +1,8 @@
+import { Route, Routes } from "react-router-dom";
+// import Header from "./layouts/header";
+import routes from "./routes";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 import { Route, Routes } from 'react-router-dom'
 import routes from './routes/index.jsx'
 import Home from './pages/Home/Home.jsx'
@@ -9,11 +14,8 @@ import { navigation, siteLinks } from './config/shared/site.js'
 function App() {
   return (
     <div className="booking-shell min-h-screen">
-      {/* <Header /> */}
+      <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
-        {/* Các đường dẫn chưa có trang riêng tạm giữ giao diện Home. */}
-        {navigation.map((item) => <Route key={item.href} path={item.href} element={<Home />} />)}
         {routes.map((route, index) => {
           const Page = route.page;
           return (
@@ -25,6 +27,7 @@ function App() {
           );
         })}
       </Routes>
+      <Footer />
     </div>
   );
 }
