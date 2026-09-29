@@ -13,7 +13,6 @@ import ForumPage from "../pages/ForumPage";
 export const routes = [
   { path: "/", name: "home", page: HomePage },
   { path: "/about", name: "about", page: AboutPage },
-  { path: "/founder-stories", name: "founder-story", page: FounderStory },
   { path: "/stories", name: "stories", page: FounderStory },
   { path: "/projects", name: "projects", page: ProjectsPage },
   { path: "/contact", name: "contact", page: ContactPage },
