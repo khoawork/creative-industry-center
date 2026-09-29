@@ -6,12 +6,11 @@ import useHome from '../../hooks/Home/useHome.js'
 import { navigation } from '../../config/shared/site.js'
 import './Home.css'
 
-export default function Home() {
+export default function HomePage() {
   const home = useHome()
 
   return <>
     <a className="skip-link" href="#noi-dung" onClick={home.skipToContent}>Chuyển đến nội dung</a>
-    <Header navigation={navigation} {...home} />
     <main id="noi-dung" className="home-main" tabIndex={-1}>
       <HomeHero onNavigate={home.selectSection} />
       <AboutSection />

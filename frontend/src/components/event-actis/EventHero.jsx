@@ -1,4 +1,4 @@
-import { Calendar, Users, Award, Building2, Compass, ChevronRight } from 'lucide-react';
+import { Calendar, Users, Award, Building2, Compass } from 'lucide-react';
 import { EVENT_STATS } from '../../data/eventData';
 
 export const EventHero = () => {
