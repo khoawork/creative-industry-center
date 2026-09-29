@@ -3,7 +3,7 @@ import { FiCheckCircle } from "react-icons/fi";
 
 export default function ProjectForm() {
   return (
-    <div className="bg-[#710008] text-white py-16 px-4 md:px-12 mt-16 rounded-xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+    <div className="bg-[#710008] text-white py-16 px-4 md:px-12 mt-16  grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
       {/* Cột trái: Thông tin giới thiệu */}
       <div className="lg:col-span-7">
         <span className="text-2xl uppercase tracking-wider bg-[#ffffff30] text-[#e9c8a3] px-2.5 py-1 rounded font-semibold">

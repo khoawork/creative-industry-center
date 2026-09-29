@@ -40,7 +40,15 @@ export function AboutSection() {
                 </article>
               ))}
             </div>
-            <Button>Xem chi tiết giới thiệu</Button>
+            <Button
+              variant="primary"
+              size="md"
+              icon="arrow"
+              iconPosition="end"
+              className="mt-2 uppercase tracking-wider text-xs md:text-sm font-bold shadow-sm hover:shadow-md"
+            >
+              Tìm hiểu cơ hội
+            </Button>
           </div>
         </div>
       </div>
@@ -52,20 +60,47 @@ export function EventsSection() {
   return (
     <section className="home-section home-section--cream" id={sectionIds.events}>
       <div className="home-container">
-        <div className="home-events-heading">
+        <div className="home-events-heading flex items-center justify-between gap-4 mb-10">
           <SectionHeading eyebrow="DÒNG THỜI GIAN HOẠT ĐỘNG" title="Sự kiện Nổi bật & Hoạt động Mới" left />
-          <Button variant="text">Xem tất cả sự kiện</Button>
+          <Button
+            variant="text-gold"
+            icon="arrow"
+            iconPosition="end"
+            className="text-xs md:text-sm font-bold uppercase tracking-wider hover:translate-x-0.5 transition-transform"
+          >
+            Xem tất cả sự kiện
+          </Button>
         </div>
         <div className="home-events-grid grid min-[900px]:grid-cols-3">
           {events.map((event) => (
-            <article className="home-event-card" key={event.id}>
-              <button className="home-event-photo" aria-label={`Đọc báo cáo: ${event.title}`}>
-                <img src={event.image} alt={event.imageAlt} loading="lazy" />
+            <article className="home-event-card group" key={event.id}>
+              <button
+                type="button"
+                className="home-event-photo relative block w-full overflow-hidden text-left cursor-pointer"
+                aria-label={`Đọc báo cáo: ${event.title}`}
+              >
+                <img
+                  src={event.image}
+                  alt={event.imageAlt}
+                  loading="lazy"
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
                 <span>{event.date}</span>
               </button>
               <div className="home-event-copy">
-                <div><span className="home-event-category">{event.category}</span><h3>{event.title}</h3><p>{event.description}</p></div>
-                <Button variant="text">Đọc báo cáo sự kiện</Button>
+                <div>
+                  <span className="home-event-category">{event.category}</span>
+                  <h3>{event.title}</h3>
+                  <p>{event.description}</p>
+                </div>
+                <Button
+                  variant="text"
+                  icon="arrow"
+                  iconPosition="end"
+                  className="w-full pt-4 border-t border-[#eee9e2] text-xs font-bold uppercase tracking-wider justify-between hover:text-[#b45309]"
+                >
+                  Đọc báo cáo sự kiện
+                </Button>
               </div>
             </article>
           ))}
@@ -82,16 +117,46 @@ export function AwardsSection() {
         <SectionHeading eyebrow="HỆ THỐNG DANH VỊ DANH DỰ" title="Giải thưởng & Tôn vinh Danh hiệu" light />
         <div className="home-awards-grid grid min-[900px]:grid-cols-3" id={sectionIds.records}>
           {awards.map((award) => (
-            <article className={`home-award-card${award.featured ? ' home-award-card--featured' : ''}`} key={award.id}>
+            <article className={`home-award-card${award.featured ? ' home-award-card--featured' : ''} flex flex-col justify-between`} key={award.id}>
               {award.featured && <span className="home-award-featured">{award.featuredLabel}</span>}
               <span className="home-award-icon"><Icon name={award.icon} size={38} /></span>
               <h3>{award.title}</h3>
               <p>{award.description}</p>
-              <span className="home-award-tag">{award.tag}</span>
+              {award.featured ? (
+                <Button
+                  variant="gold"
+                  size="pill-sm"
+                  icon="arrow"
+                  iconPosition="end"
+                  className="mt-4 uppercase tracking-wider text-xs font-bold shadow-md hover:shadow-lg"
+                >
+                  Tiêu chí đề cử
+                </Button>
+              ) : (
+                <Button
+                  variant="gold-outline"
+                  size="pill-sm"
+                  icon="arrow"
+                  iconPosition="end"
+                  className="mt-4 uppercase tracking-wider text-xs font-bold"
+                >
+                  Xem tiêu chí
+                </Button>
+              )}
             </article>
           ))}
         </div>
-        <Button variant="white">Xem chi tiết danh mục giải thưởng</Button>
+        <div className="flex justify-center mt-12">
+          <Button
+            variant="white"
+            size="pill"
+            icon="arrow"
+            iconPosition="end"
+            className="px-8 py-3.5 uppercase tracking-widest text-xs md:text-sm font-bold shadow-lg hover:shadow-xl hover:bg-amber-50"
+          >
+            Xem tất cả giải thưởng & danh hiệu
+          </Button>
+        </div>
       </div>
     </section>
   )
@@ -104,19 +169,103 @@ export function ProjectsSection() {
         <SectionHeading eyebrow="HÀNH TRÌNH THỰC TIỄN" title="Dự án Tiêu biểu & Chuyện Nhà Sáng Nghiệp" />
         <div className="home-projects-grid grid min-[900px]:grid-cols-2">
           {projects.map((project) => (
-            <article className="home-project-card" id={project.sectionId} key={project.id}>
+            <article className="home-project-card group" id={project.sectionId} key={project.id}>
               <div>
-                <span className={`home-project-category${project.featured ? ' home-project-category--featured' : ''}`}><Icon name={project.icon} size={18} />{project.category}</span>
+                <span className={`home-project-category${project.featured ? ' home-project-category--featured' : ''}`}>
+                  <Icon name={project.icon} size={18} />{project.category}
+                </span>
                 <h3>{project.title}</h3>
                 <p>{project.description}</p>
               </div>
-              <button className="home-project-photo" aria-label={project.action}>
-                <img src={project.image} alt={project.imageAlt} loading="lazy" />
+              <button
+                type="button"
+                className="home-project-photo relative block w-full overflow-hidden text-left cursor-pointer"
+                aria-label={project.action}
+              >
+                <img
+                  src={project.image}
+                  alt={project.imageAlt}
+                  loading="lazy"
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
                 <span>{project.caption}</span>
               </button>
-              <Button variant="text">{project.action}</Button>
+              <Button
+                variant="text"
+                icon="arrow"
+                iconPosition="end"
+                className="self-start text-xs md:text-sm font-bold uppercase tracking-wider text-[#680007] hover:text-[#b45309] gap-2 pt-2"
+              >
+                {project.action}
+              </Button>
             </article>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function RecordsForumSection() {
+  return (
+    <section className="home-section home-section--cream" id="de-cu-va-dien-dan">
+      <div className="home-container">
+        <div className="grid lg:grid-cols-12 gap-8 items-center bg-white border border-[#eee9e2] rounded-2xl p-6 md:p-10 shadow-sm">
+          <div className="lg:col-span-7 flex flex-col items-start gap-4">
+            <span className="px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-[#b45309] text-xs font-bold uppercase tracking-widest">
+              Liên Minh Chiến Lược
+            </span>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[#680007] uppercase tracking-tight">
+              Đề cử kỷ lục & Diễn đàn kinh tế kỷ lục
+            </h2>
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+              Viện Kỷ lục Việt Nam mở cổng tiếp nhận hồ sơ đề cử công trình, sáng kiến và phát minh của các tổ chức, doanh nhân, nghệ nhân trên toàn quốc. Đồng thời định kỳ tổ chức Diễn đàn Kinh tế Kỷ lục kết nối chuyển giao công nghệ và hợp tác đầu tư.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 mt-3 w-full">
+              <Button
+                href="/de-cu-ky-luc"
+                variant="primary"
+                size="md"
+                icon="arrow"
+                iconPosition="end"
+                className="w-full sm:w-auto uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg"
+              >
+                Gửi hồ sơ đề cử kỷ lục
+              </Button>
+              <Button
+                href="/forums"
+                variant="outline"
+                size="md"
+                icon="arrow"
+                iconPosition="end"
+                className="w-full sm:w-auto uppercase tracking-wider text-xs md:text-sm font-bold shadow-sm hover:shadow"
+              >
+                Tham gia Diễn đàn kinh tế
+              </Button>
+            </div>
+          </div>
+          <div className="lg:col-span-5 bg-[#faf9f7] border border-[#eee9e2] rounded-xl p-6">
+            <h3 className="text-sm font-bold text-[#680007] uppercase tracking-wider mb-5">
+              Quy trình nộp hồ sơ
+            </h3>
+            <div className="space-y-4">
+              {[
+                { step: 1, title: 'Điền thông tin cơ bản', desc: 'Hoàn thiện hồ sơ trực tuyến theo mẫu quy chuẩn của Viện Kỷ lục.' },
+                { step: 2, title: 'Hội đồng Viện xem xét thẩm định', desc: 'Hội đồng chuyên gia thẩm định hồ sơ thực tế và dữ liệu chứng minh.' },
+                { step: 3, title: 'Công bố và trao bằng kỷ lục', desc: 'Xác lập kỷ lục và tôn vinh tại Đại hội Thường niên Kỷ lục gia.' },
+              ].map((item) => (
+                <div key={item.step} className="flex items-start gap-3.5">
+                  <span className="w-7 h-7 rounded-full bg-[#680007] text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {item.step}
+                  </span>
+                  <div>
+                    <h4 className="text-sm font-bold text-[#1a1c1b] leading-tight">{item.title}</h4>
+                    <p className="text-xs text-gray-500 mt-1 leading-normal">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -131,15 +280,43 @@ export function TrainingSection() {
         <div className="home-programs-grid grid min-[900px]:grid-cols-3">
           {programs.map((program) => (
             <article className="home-program-card" key={program.id}>
-              <div><Icon name={program.icon} size={32} /><h3>{program.title}</h3><p>{program.description}</p></div>
-              <div className="home-program-footer"><strong>{program.detail}</strong><Button variant="text">{program.action}</Button></div>
+              <div>
+                <Icon name={program.icon} size={32} />
+                <h3>{program.title}</h3>
+                <p>{program.description}</p>
+              </div>
+              <div className="home-program-footer">
+                <strong>{program.detail}</strong>
+                <Button
+                  variant="text-gold"
+                  icon="arrow"
+                  iconPosition="end"
+                  className="text-xs font-bold uppercase tracking-wider hover:translate-x-0.5 transition-transform"
+                >
+                  {program.action}
+                </Button>
+              </div>
             </article>
           ))}
         </div>
-        <div className="home-advisory">
-          <Icon name="headset" size={42} />
-          <div><h3>{advisory.title}</h3><p>{advisory.description}</p></div>
-          <Button icon={null}>Kết Nối Ngay</Button>
+        <div className="home-advisory flex flex-col sm:flex-row items-center justify-between gap-6 mt-16 p-8 border border-[#e5e5e5] rounded-2xl bg-[#faf9f7] shadow-sm">
+          <div className="flex items-center gap-5 w-full sm:w-auto">
+            <div className="p-3 bg-amber-50 rounded-xl text-[#d49520] shrink-0">
+              <Icon name="headset" size={40} />
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-bold text-[#680007]">{advisory.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{advisory.description}</p>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            icon={null}
+            className="w-full sm:w-auto shrink-0 uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg whitespace-nowrap"
+          >
+            Kết Nối Ngay
+          </Button>
         </div>
       </div>
     </section>

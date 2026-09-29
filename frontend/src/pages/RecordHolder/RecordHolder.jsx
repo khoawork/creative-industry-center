@@ -34,7 +34,6 @@ export default function RecordHolder() {
       <main id="noi-dung" tabIndex={-1} className="w-full bg-record-surface">
         <RecordHolderBody onNominate={setSelectedAward} />
       </main>
-      <Footer onNavigate={selectSection} />
       {selectedAward && (
         <NominationDialog award={selectedAward} onClose={closeDialog} />
       )}

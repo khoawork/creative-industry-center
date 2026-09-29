@@ -114,7 +114,7 @@ export default function ProjectLayout() {
   const [activeCategory, setActiveCategory] = useState("Tất cả dự án");
 
   return (
-    <div className="max-w">
+    <div className="max-w pb-16">
       {/* 1. Phần Header nội dung trang */}
       <ProjectHeader />
 
