@@ -1,6 +1,11 @@
 :root {
-  --primary-color: #710008;
-  --secondary-color: #d49520;
-  --background-light: #f4f3f1;
-  --font-main: 'Inter', sans-serif;
+  --primary-color: #680007;
+  --secondary-color: #b88628;
+  --background-light: #faf9f7;
+  --font-main: 'Inter', system-ui, sans-serif;
+  --wine: #680007;
+  --gold: #b88628;
+  --line: #e5e5e5;
+  --muted: #4b5563;
+  --white: #ffffff;
 }

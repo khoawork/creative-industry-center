@@ -31,16 +31,16 @@ export const sectionIds = {
 }
 
 export const siteLinks = {
-  home: { label: 'Trang chủ', href: '/trang-chu' },
-  about: { label: 'Giới thiệu', href: '/gioi-thieu' },
-  events: { label: 'Sự kiện', href: '/su-kien' },
-  awards: { label: 'Giải thưởng', href: '/giai-thuong' },
-  projects: { label: 'Dự án nổi bật', href: '/du-an-noi-bat' },
-  stories: { label: 'Chuyện nhà sáng nghiệp', href: '/chuyen-nha-sang-nghiep' },
-  records: { label: 'Đề cử kỷ lục', href: '/de-cu-ky-luc' },
-  training: { label: 'Hợp tác & Đào tạo', href: '/hop-tac-va-dao-tao' },
-  forum: { label: 'Diễn đàn Kinh tế Kỷ lục', href: '/dien-dan-kinh-te-ky-luc' },
-  contact: { label: 'Liên hệ', href: '/lien-he', icon: 'person' },
+  home: { label: 'Trang chủ', href: '/' },
+  about: { label: 'Giới thiệu', href: '/about' },
+  events: { label: 'Sự kiện', href: '/events' },
+  awards: { label: 'Giải thưởng', href: '/awards' },
+  projects: { label: 'Dự án nổi bật', href: '/projects' },
+  stories: { label: 'Chuyện nhà sáng nghiệp', href: '/stories' },
+  records: { label: 'Đề cử kỷ lục', href: '/records' },
+  training: { label: 'Hợp tác & Đào tạo', href: '/training' },
+  forum: { label: 'Diễn đàn Kinh tế Kỷ lục', href: '/forum' },
+  contact: { label: 'Liên hệ', href: '/contact', icon: 'person' },
 }
 
 export const navigation = [
