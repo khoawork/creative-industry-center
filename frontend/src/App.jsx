@@ -2,10 +2,12 @@ import { Route, Routes } from 'react-router-dom'
 import routes from './routes/index.jsx'
 import Home from './pages/Home/Home.jsx'
 import { navigation } from './config/shared/site.js'
+import "./main.css";
 
 function App() {
   return (
     <div className="booking-shell min-h-screen">
+      {/* <Header /> */}
       <Routes>
         <Route path="/" element={<Home />} />
         {/* Các đường dẫn chưa có trang riêng tạm giữ giao diện Home. */}
