@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { site, siteLinks } from '../config/shared/site.js';
 import Brand from '../components/shared/Brand.jsx';
@@ -6,12 +6,25 @@ import Icon from '../components/shared/Icon.jsx';
 
 export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: externalSetMenuOpen }) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
   const isMenuOpen = externalMenuOpen !== undefined ? externalMenuOpen : internalMenuOpen;
   const toggleMenu = externalSetMenuOpen || setInternalMenuOpen;
 
-  // The 10 navigation items in the exact sequence as shown in the mockup:
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navItems = [
     siteLinks.home,
     siteLinks.about,
@@ -25,56 +38,56 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     siteLinks.contact,
   ];
 
-  // Helper to determine if an item is active
   const isLinkActive = (item) => {
     if (!item?.href) return false;
     const currentPath = location.pathname;
 
     if (item === siteLinks.home) {
-      return currentPath === '/' || currentPath === '/trang-chu';
+      return currentPath === '/' ;
     }
     if (item === siteLinks.about) {
-      return currentPath === '/about' || currentPath === '/gioi-thieu';
+      return currentPath === '/about';
     }
     if (item === siteLinks.events) {
-      return currentPath === '/event-active' || currentPath === '/su-kien';
+      return currentPath === '/events';
     }
     if (item === siteLinks.records) {
-      return currentPath === '/de-cu-ky-luc' || currentPath === '/records';
-    }
+      return currentPath === '/records'}
     if (item === siteLinks.projects) {
-      return currentPath === '/projects' || currentPath === '/du-an-noi-bat';
+      return currentPath === '/projects';
     }
     if (item === siteLinks.awards) {
-      return currentPath === '/awards' || currentPath === '/giai-thuong';
+      return currentPath === '/awards';
     }
     if (item === siteLinks.stories) {
-      return currentPath === '/founder-stories' || currentPath === '/chuyen-nha-sang-nghiep';
+      return currentPath === '/stories';
     }
     if (item === siteLinks.forum) {
-      return currentPath === '/dien-dan-kinh-te-ky-luc';
+      return currentPath === '/forum';
     }
     if (item === siteLinks.training) {
-      return currentPath === '/hop-tac-va-dao-tao';
+      return currentPath === '/training';
     }
     if (item === siteLinks.contact) {
-      return currentPath === '/lien-he';
+      return currentPath === '/contact';
     }
 
     return currentPath === item.href || currentPath.startsWith(`${item.href}/`);
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#e5e5e5] shadow-xs transition-all">
+    <header className={`sticky top-0 z-50 bg-white border-b border-[#e5e5e5] shadow-xs transition-all duration-300 ${
+      isScrolled ? 'py-1.5 shadow-md' : 'py-0'
+    }`}>
       <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[76px] md:h-[84px] gap-3 xl:gap-6">
+        <div className={`flex items-center justify-between transition-all duration-300 gap-3 xl:gap-6 ${
+          isScrolled ? 'h-[50px] md:h-[60px]' : 'h-[80px] md:h-[90px]'
+        }`}>
           
-          {/* Brand Logo & Title on Left */}
           <div className="shrink-0 flex items-center">
             <Brand />
           </div>
 
-          {/* Center Navigation Links - all 10 items in a clean single line */}
           <nav
             aria-label="Điều hướng chính"
             className="hidden xl:flex items-center gap-3.5 2xl:gap-5 3xl:gap-6 flex-wrap justify-end"
