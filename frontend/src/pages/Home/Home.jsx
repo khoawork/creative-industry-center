@@ -1,9 +1,6 @@
-import Header from '../../layout/Header.jsx'
-import Footer from '../../layout/Footer.jsx'
 import HomeHero from '../../components/Home/HomeHero.jsx'
-import { AboutSection, EventsSection, AwardsSection, ProjectsSection, TrainingSection } from '../../components/Home/HomeSections.jsx'
+import { AboutSection, EventsSection, AwardsSection, ProjectsSection, RecordsForumSection, TrainingSection } from '../../components/Home/HomeSections.jsx'
 import useHome from '../../hooks/Home/useHome.js'
-import { navigation } from '../../config/shared/site.js'
 import './Home.css'
 
 export default function HomePage() {
@@ -17,8 +14,8 @@ export default function HomePage() {
       <EventsSection />
       <AwardsSection />
       <ProjectsSection />
+      <RecordsForumSection />
       <TrainingSection />
     </main>
-    <Footer onNavigate={home.selectSection} />
   </>
 }
