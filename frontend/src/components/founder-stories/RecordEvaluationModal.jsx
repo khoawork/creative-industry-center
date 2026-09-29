@@ -8,13 +8,11 @@ import {
   Scale,
   Sparkles,
   Download,
-  Send,
   Calendar,
   Layers,
-  ChevronRight,
 } from 'lucide-react';
 
-export const RecordEvaluationModal = ({ isOpen, onClose, onOpenSubmitModal }) => {
+export const RecordEvaluationModal = ({ isOpen, onClose }) => {
   const [activeSection, setActiveSection] = useState('criteria'); // 'criteria' | 'process' | 'dossier' | 'benefits'
 
   if (!isOpen) return null;
