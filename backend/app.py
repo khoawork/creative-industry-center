@@ -3,6 +3,9 @@ from config import Config
 from extensions import db
 from utils.error import register_error_handlers
 from controllers.UserController import user_api
+from controllers.AwardController import award_api
+from controllers.TrainingController import training_api
+
 try:
     from flasgger import Swagger
 except ImportError:
@@ -30,7 +33,8 @@ def create_app():
     register_error_handlers(app)
    
     app.register_blueprint(user_api)
-
+    app.register_blueprint(award_api)
+    app.register_blueprint(training_api)
     return app
 
 app = create_app()
