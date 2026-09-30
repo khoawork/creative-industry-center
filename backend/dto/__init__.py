@@ -1,8 +1,17 @@
-from dto.event_dto import EventCreateDTO, EventUpdateDTO, EventFilterDTO, EventResponseDTO
+from dto.base_schema import BaseSchema
+from dto.training_dto import (
+    TrainingInfoDTO,
+    TrainingCategoryDTO,
+    TrainingReponse,
+    TrainingRequest,
+    TrainingCategoryResponse,
+)
 
 __all__ = [
-    "EventCreateDTO",
-    "EventUpdateDTO",
-    "EventFilterDTO",
-    "EventResponseDTO",
+    "BaseSchema",
+    "TrainingInfoDTO",
+    "TrainingCategoryDTO",
+    "TrainingReponse",
+    "TrainingRequest",
+    "TrainingCategoryResponse",
 ]
