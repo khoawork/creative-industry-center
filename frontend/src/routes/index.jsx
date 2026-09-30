@@ -8,17 +8,25 @@ import HomePage from "../pages/Home/Home";
 import RecordHolder from "../pages/RecordHolder/RecordHolder";
 import ContactPage from "../pages/ContactPage";
 import AwardsPage from "../pages/AwardsPage";
-import TrainingPage from "../pages/TrainingPage";
 import ForumPage from "../pages/ForumPage";
 import AdminLoading from "../components/Admin/AdminLoading.jsx";
-import { adminItemsById, adminModules } from "../config/Admin/adminNavigation.js";
+import TrainingPage from "../pages/Training/index.jsx";
+import {
+  adminItemsById,
+  adminModules,
+} from "../config/Admin/adminNavigation.js";
 import { adminRoot } from "../config/Admin/adminPaths.js";
-import { adminDemoUser, adminUnreadCount } from "../data/Admin/adminDashboardData.js";
+import {
+  adminDemoUser,
+  adminUnreadCount,
+} from "../data/Admin/adminDashboardData.js";
 
 /* oxlint-disable react/only-export-components -- Route configuration exports objects; lazy components are internal route elements. */
 const AdminLayout = lazy(() => import("../layout/Admin/AdminLayout.jsx"));
 const AdminDashboard = lazy(() => import("../pages/Admin/AdminDashboard.jsx"));
-const AdminModulePlaceholder = lazy(() => import("../pages/Admin/AdminModulePlaceholder.jsx"));
+const AdminModulePlaceholder = lazy(
+  () => import("../pages/Admin/AdminModulePlaceholder.jsx"),
+);
 const AdminNotFound = lazy(() => import("../pages/Admin/AdminNotFound.jsx"));
 const AdminContact = lazy(() => import("../pages/Admin/AdminContact.jsx"));
 /* oxlint-enable react/only-export-components */
@@ -34,6 +42,7 @@ export const routes = [
   { path: "/records", name: "records", page: RecordHolder },
   { path: "/training", name: "training", page: TrainingPage },
   { path: "/forum", name: "forum", page: ForumPage },
+  { path: "/training", name: "training", page: TrainingPage },
 ];
 
 export const adminRoute = {
@@ -47,9 +56,17 @@ export const adminRoute = {
     { index: true, element: <AdminDashboard /> },
     ...adminModules.map((item) => ({
       path: item.path.slice(adminRoot.length + 1),
-      element: item.id === 'contact' ? <AdminContact /> : <AdminModulePlaceholder item={item} />,
+      element:
+        item.id === "contact" ? (
+          <AdminContact />
+        ) : (
+          <AdminModulePlaceholder item={item} />
+        ),
     })),
-    { path: "messages", element: <Navigate to={adminItemsById.contact.path} replace /> },
+    {
+      path: "messages",
+      element: <Navigate to={adminItemsById.contact.path} replace />,
+    },
     { path: "*", element: <AdminNotFound /> },
   ],
 };
