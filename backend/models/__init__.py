@@ -3,5 +3,5 @@ from .UserModel import User
 from .AwardModel import Award
 from .EventModel import Event, EventCategory
 from .PageModel import Page
-from .TrainingModel import Training
+from .TrainingModel import Training, TrainingCategory
 from .ProjectModel import Project
