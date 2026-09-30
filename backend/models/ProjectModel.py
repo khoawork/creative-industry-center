@@ -8,5 +8,5 @@ class Project(BaseModel):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     research_info=db.Column(db.JSON, nullable=True)
-    project_info = db.Column(db.JSON, nullanle=True)
+    project_info = db.Column(db.JSON, nullable=True)
     slogan = db.Column(db.String(255), nullable=False)
