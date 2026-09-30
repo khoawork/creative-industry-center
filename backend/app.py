@@ -29,9 +29,11 @@ def create_app():
 
     from controllers.UserController import user_api
     from controllers.TrainingController import training_api
+    from controllers.EventController import event_api
 
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
+    app.register_blueprint(event_api)
 
     return app
 
