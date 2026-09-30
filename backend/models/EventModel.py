@@ -10,12 +10,10 @@ class EventStatus(str, Enum):
     ENDED = "ENDED"
 
 
-event_status = EventStatus
 
 
 class Event(BaseModel):
     __tablename__ = "event"
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -27,3 +25,10 @@ class Event(BaseModel):
         default=EventStatus.PENDING,
         nullable=False
     )
+    btn_action = db.Column(db.String(255), nullable=True)
+    form_url = db.Column(db.String(255), nullable = True)
+    
+class EventCategory(BaseModel):
+    __tablename__ = "event_category"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=False)
