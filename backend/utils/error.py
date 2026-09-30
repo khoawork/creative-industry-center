@@ -47,6 +47,19 @@ class InternalServerError(APIException):
 
 
 def register_error_handlers(app):
+    try:
+        from marshmallow import ValidationError as MarshmallowValidationError
+        @app.errorhandler(MarshmallowValidationError)
+        def handle_marshmallow_error(err):
+            return error_response(
+                message="Dữ liệu đầu vào không hợp lệ",
+                status_code=422,
+                error_code="VALIDATION_ERROR",
+                details=err.messages
+            )
+    except ImportError:
+        pass
+
     @app.errorhandler(APIException)
     def handle_api_exception(err):
         return error_response(
