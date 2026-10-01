@@ -11,7 +11,6 @@ import {
   Square,
 } from 'lucide-react';
 import {
-  CONTENT_TABLES,
   DEFAULT_TABLE_DATA,
   fetchTableItems,
   findItemById,
@@ -24,7 +23,6 @@ export default function ChildrenIdTableSelector({
   initialTableKey = null,
   navContext = null,
 }) {
-  // Tự động nhận diện bảng từ ngữ cảnh chuyên mục hiện tại (link hoặc tên)
   const detectedTableKey = useMemo(() => {
     return detectTableForNav(navContext) || initialTableKey || 'events';
   }, [navContext, initialTableKey]);
@@ -35,7 +33,6 @@ export default function ChildrenIdTableSelector({
   const [showManualInput, setShowManualInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Tải dữ liệu tương ứng với bảng được nhận diện
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
@@ -53,8 +50,6 @@ export default function ChildrenIdTableSelector({
     };
   }, [detectedTableKey]);
 
-  const currentTable =
-    CONTENT_TABLES.find((t) => t.key === detectedTableKey) || CONTENT_TABLES[0];
   const currentItems = tableItemsMap[detectedTableKey] || [];
 
   // Lọc tìm kiếm
@@ -72,39 +67,41 @@ export default function ChildrenIdTableSelector({
 
   // Toggle chọn / bỏ chọn 1 mục
   const handleToggleItem = (itemId) => {
-    const numId = Number(itemId);
-    if (selectedIds.includes(numId)) {
-      onChange(selectedIds.filter((id) => id !== numId));
+    const itemIdKey = String(itemId);
+    if (selectedIds.some((id) => String(id) === itemIdKey)) {
+      onChange(selectedIds.filter((id) => String(id) !== itemIdKey));
     } else {
-      onChange([...selectedIds, numId]);
+      onChange([...selectedIds, itemId]);
     }
   };
 
   // Chọn tất cả các mục đang hiển thị
   const handleSelectAllVisible = () => {
-    const visibleIds = filteredItems.map((it) => Number(it.id));
-    const merged = Array.from(new Set([...selectedIds, ...visibleIds]));
-    onChange(merged);
+    const merged = new Map(
+      [...selectedIds, ...filteredItems.map((item) => item.id)].map((id) => [String(id), id])
+    );
+    onChange(Array.from(merged.values()));
   };
 
   // Bỏ chọn tất cả các mục trong bảng này
   const handleDeselectAll = () => {
-    const currentTableIds = new Set(currentItems.map((it) => Number(it.id)));
-    onChange(selectedIds.filter((id) => !currentTableIds.has(Number(id))));
+    const currentTableIds = new Set(currentItems.map((item) => String(item.id)));
+    onChange(selectedIds.filter((id) => !currentTableIds.has(String(id))));
   };
 
   // Gỡ 1 ID
   const handleRemoveId = (idToRemove) => {
-    onChange(selectedIds.filter((id) => id !== Number(idToRemove)));
+    onChange(selectedIds.filter((id) => String(id) !== String(idToRemove)));
   };
 
   // Nhập ID thủ công
   const handleAddManualId = (e) => {
     if (e) e.preventDefault();
-    const parsed = parseInt(manualIdInput.trim(), 10);
-    if (isNaN(parsed)) return;
-    if (!selectedIds.includes(parsed)) {
-      onChange([...selectedIds, parsed]);
+    const value = manualIdInput.trim();
+    if (!value) return;
+    const itemId = /^\d+$/.test(value) ? Number(value) : value;
+    if (!selectedIds.some((id) => String(id) === String(itemId))) {
+      onChange([...selectedIds, itemId]);
     }
     setManualIdInput('');
   };
@@ -236,7 +233,11 @@ export default function ChildrenIdTableSelector({
 
       {/* 4. Danh sách các thẻ mục kèm Checkbox */}
       <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-        {filteredItems.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-8 px-4 text-gray-500 text-xs">
+            Đang tải dữ liệu từ database...
+          </div>
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-8 px-4 rounded-lg border border-dashed border-(--admin-border) bg-(--admin-surface)/40 text-gray-500 text-xs">
             {searchTerm ? (
               <span>Không tìm thấy mục nào khớp với "{searchTerm}".</span>
@@ -246,7 +247,7 @@ export default function ChildrenIdTableSelector({
           </div>
         ) : (
           filteredItems.map((item) => {
-            const isChecked = selectedIds.includes(Number(item.id));
+            const isChecked = selectedIds.some((id) => String(id) === String(item.id));
 
             return (
               <div

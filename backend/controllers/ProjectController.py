@@ -34,6 +34,7 @@ def get_projects():
     """
     try:
         response = project_services.get_projects()
+        response = project_dto.ProjectResponse(many=True).dump(response)
         return success_response(
             data=response, message="Projects retrieved successfully", status_code=200
         )
@@ -386,6 +387,7 @@ def get_project_categories():
     """
     try:
         response = project_services.get_categories()
+        response = project_dto.ProjectCategoryResponse(many=True).dump(response)
         return success_response(
             data=response,
             message="Project categories retrieved successfully",

@@ -11,6 +11,30 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      '/events': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/projects': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/categories_project': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/pages': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+      '/user': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
     },
   },
 })

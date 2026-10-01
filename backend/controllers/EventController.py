@@ -33,9 +33,32 @@ def get_events():
         description: Failed to retrieve events
     """
     try:
-        response = event_services.get_all_events()
-        return success_response(
-            data=response, message="Events retrieved successfully", status_code=200
+      response = event_services.get_all_events()
+      events = [
+        {
+          "id": event.id,
+          "name": event.name,
+          "description": event.description,
+          "speakers": event.speaker or [],
+          "location": event.location,
+          "image": event.image,
+          "status": getattr(event.status, "value", event.status),
+          "btn_action": event.btn_action,
+          "form_url": event.form_url,
+          "category": (
+            {
+              "id": event.category.id,
+              "name": event.category.name,
+              "description": getattr(event.category, "description", None),
+            }
+            if event.category
+            else None
+          ),
+        }
+        for event in response
+      ]
+      return success_response(
+        data=events, message="Events retrieved successfully", status_code=200
         )
     except ValidationError as e:
         return error_response(

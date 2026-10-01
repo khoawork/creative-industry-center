@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Plus,
   Trash2,
@@ -17,7 +17,7 @@ import ChildrenIdTableSelector from './ChildrenIdTableSelector.jsx';
 import {
   detectTableForNav,
   findItemById,
-  CONTENT_TABLES,
+  fetchTableItems,
 } from '../../../services/contentTablesService.js';
 
 export default function NavSectionsEditor({
@@ -26,6 +26,7 @@ export default function NavSectionsEditor({
   onDeleteSection,
   isSaving,
 }) {
+  const [, setContentDataVersion] = useState(0);
   const [editingId, setEditingId] = useState(null); // null, 'new', or number
   const [activeForm, setActiveForm] = useState({
     id: null,
@@ -36,6 +37,16 @@ export default function NavSectionsEditor({
   });
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    Promise.all(['events', 'projects', 'trainings', 'awards'].map(fetchTableItems)).then(() => {
+      if (isMounted) setContentDataVersion((version) => version + 1);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const startEdit = (nav) => {
     setEditingId(nav.id);
@@ -53,14 +64,17 @@ export default function NavSectionsEditor({
   };
 
   const startCreate = (presetKey = 'events') => {
-    const tbl = CONTENT_TABLES.find((t) => t.key === presetKey) || CONTENT_TABLES[0];
+    const template = navSections.find((section) => detectTableForNav(section) === presetKey);
     setEditingId('new');
     setActiveForm({
       id: null,
-      tag: tbl.defaultTag,
-      title_main: tbl.defaultTitle,
-      action_button: { text: tbl.actionText, link: tbl.defaultLink },
-      children_id: [1, 2],
+      tag: template?.tag || '',
+      title_main: template?.title_main || '',
+      action_button: {
+        text: template?.action_button?.text || '',
+        link: template?.action_button?.link || '',
+      },
+      children_id: template?.children_id ? [...template.children_id] : [],
     });
     setErrors({});
   };
@@ -311,7 +325,6 @@ export default function NavSectionsEditor({
           }
 
           const tableKey = detectTableForNav(nav);
-          const currentTbl = CONTENT_TABLES.find((t) => t.key === tableKey);
 
           return (
             <div
@@ -327,11 +340,6 @@ export default function NavSectionsEditor({
                   <span className="text-[11px] font-bold uppercase tracking-wider text-(--admin-heading)">
                     {nav.tag}
                   </span>
-                  {currentTbl && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                      Nội dung: {currentTbl.shortLabel}
-                    </span>
-                  )}
                 </div>
 
                 <h3 className="text-sm sm:text-base font-bold text-(--admin-title)">

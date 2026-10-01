@@ -52,6 +52,7 @@ def update_project_category(
 
 
 def get_projects() -> list[Project]:
+    
     return project_repo.get_projects()
 
 
