@@ -16,6 +16,8 @@ from dto.home_dto import (
 
 def get_home(idPage=None) -> Dict[str, Any]:
     page = base_repo.getPageById(idPage)
+    if not page:
+        raise NotFoundError(message=f"Không tìm thấy trang với id={idPage}")
     props = dict(page.props or {})
 
     props.pop("forum_section", None)
@@ -28,6 +30,19 @@ def get_home(idPage=None) -> Dict[str, Any]:
         "created_date": page.created_date.isoformat() if hasattr(page, "created_date") and page.created_date else None,
         "updated_date": page.updated_date.isoformat() if hasattr(page, "updated_date") and page.updated_date else None,
     }
+
+
+def update_home(idPage=None, data=None) -> Dict[str, Any]:
+    page = base_repo.getPageById(idPage)
+    if not page:
+        raise NotFoundError(message=f"Không tìm thấy trang với id={idPage}")
+
+    name = data.get("name") if isinstance(data, dict) else getattr(data, "name", None)
+    slug = data.get("slug") if isinstance(data, dict) else getattr(data, "slug", None)
+    props = data.get("props") if isinstance(data, dict) else getattr(data, "props", None)
+
+    page = base_repo.updatePage(page=page, name=name, slug=slug, props=props)
+    return get_home(page.id)
 
 
 # ==========================================
@@ -52,6 +67,11 @@ def update_about_section(data: AboutSectionRequestDTO, idPage=None) -> Dict[str,
 def create_nav(data: NavSectionRequestDTO, idPage=None):
     page = base_repo.getPageById(idPage)
     return home_repository.create_nav(page=page, data=data)
+
+
+def delete_nav(nav_id, idPage):
+    page = base_repo.getPageById(idPage)
+    return home_repository.delete_nav(page=page, nav_id=nav_id)
 
 
 def add_children_to_nav(children_ids, nav_id, idPage):

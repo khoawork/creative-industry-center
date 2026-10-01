@@ -1,6 +1,6 @@
 from marshmallow import ValidationError, fields, validate
 
-from . import BaseSchema
+from dto.base_schema import BaseSchema
 
 
 def _not_blank(value):

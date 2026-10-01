@@ -12,8 +12,8 @@ export default function AboutMission({ section }) {
               <article key={index} className="flex flex-col items-start gap-3 rounded-lg border border-black/10 bg-white p-4 shadow-sm sm:flex-row sm:gap-4 sm:p-5">
                 <AboutIcon code={item.icon} className="rounded-full border border-[#d49520]/40 bg-[#710008] p-3 text-[#d49520]" />
                 <div className="min-w-0">
-                  <h3 className="mb-1 text-xl font-bold text-[#710008]">{item.title}</h3>
-                  <p className="whitespace-pre-line text-lg leading-relaxed text-black/80 sm:text-xl">{item.description}</p>
+                  <h3 className="mb-1 text-lg font-bold text-[#710008]">{item.title}</h3>
+                  <p className="whitespace-pre-line text-base leading-relaxed text-black/80 sm:text-lg">{item.description}</p>
                 </div>
               </article>
             ))}
