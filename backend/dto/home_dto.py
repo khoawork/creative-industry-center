@@ -73,14 +73,14 @@ class NavSectionRequestDTO(BaseSchema):
     tag = fields.Str(required=True, error_messages={"required": "tag là bắt buộc"})
     title_main = fields.Str(required=True, error_messages={"required": "title_main là bắt buộc"})
     action_button = fields.Nested(ButtonDTO, required=True, error_messages={"required": "action_button là bắt buộc"})
-    children_id = fields.List(fields.Int(required=True), required=True, error_messages={"required": "children_id là bắt buộc"})
+    children_id = fields.List(fields.Raw(), required=True, error_messages={"required": "children_id là bắt buộc"})
 
 class NavSectionResponse(BaseSchema):
     id = fields.Int(dump_only=True)
     tag = fields.Str(dump_only=True)
     title_main = fields.Str(dump_only=True)
     action_button = fields.Nested(ButtonDTO, dump_only=True)
-    children_id = fields.List(fields.Int(), dump_only=True)
+    children_id = fields.List(fields.Raw(), dump_only=True)
     
 
 # ==========================================

@@ -115,19 +115,18 @@ def delete_children_to_nav(page, nav_id, children_id):
     if isinstance(children_id, dict):
         raw_ids = children_id.get("children_id", [])
 
-    targets_to_remove = set()
-    if isinstance(raw_ids, (int, str)) and str(raw_ids).isdigit():
-        targets_to_remove.add(int(raw_ids))
+    if isinstance(raw_ids, (int, str)):
+        targets_to_remove = {str(raw_ids)}
     elif isinstance(raw_ids, list):
-        for x in raw_ids:
-            if str(x).isdigit():
-                targets_to_remove.add(int(x))
+        targets_to_remove = {str(x) for x in raw_ids}
+    else:
+        targets_to_remove = set()
 
     nav_found = False
     for nav in current_props["nav_sections"]:
         if nav.get("id") == nav_id:
             current_children = nav.get("children_id", [])
-            nav["children_id"] = [int(x) for x in current_children if int(x) not in targets_to_remove]
+            nav["children_id"] = [x for x in current_children if str(x) not in targets_to_remove]
             
             nav_found = True
             break
