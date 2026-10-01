@@ -10,8 +10,6 @@ class EventStatus(str, Enum):
     ENDED = "ENDED"
 
 
-
-
 class Event(BaseModel):
     __tablename__ = "event"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -23,11 +21,17 @@ class Event(BaseModel):
     status = db.Column(
         db.Enum(EventStatus, name="event_status", native_enum=False),
         default=EventStatus.PENDING,
-        nullable=False
+        nullable=False,
     )
     btn_action = db.Column(db.String(255), nullable=True)
-    form_url = db.Column(db.String(255), nullable = True)
-    
+    form_url = db.Column(db.String(255), nullable=True)
+
+    category_id = db.Column(
+        db.Integer, db.ForeignKey("event_category.id"), nullable=False
+    )
+    category = db.relationship("EventCategory", backref="events")
+
+
 class EventCategory(BaseModel):
     __tablename__ = "event_category"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

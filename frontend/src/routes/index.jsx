@@ -29,6 +29,7 @@ const AdminModulePlaceholder = lazy(
 );
 const AdminNotFound = lazy(() => import("../pages/Admin/AdminNotFound.jsx"));
 const AdminContact = lazy(() => import("../pages/Admin/AdminContact.jsx"));
+const AdminHome = lazy(() => import("../pages/Admin/AdminHome.jsx"));
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
@@ -42,7 +43,6 @@ export const routes = [
   { path: "/records", name: "records", page: RecordHolder },
   { path: "/training", name: "training", page: TrainingPage },
   { path: "/forum", name: "forum", page: ForumPage },
-  { path: "/training", name: "training", page: TrainingPage },
 ];
 
 export const adminRoute = {
@@ -59,6 +59,8 @@ export const adminRoute = {
       element:
         item.id === "contact" ? (
           <AdminContact />
+        ) : item.id === "home" ? (
+          <AdminHome />
         ) : (
           <AdminModulePlaceholder item={item} />
         ),

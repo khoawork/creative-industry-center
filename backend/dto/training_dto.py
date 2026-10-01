@@ -1,6 +1,6 @@
 from marshmallow import Schema, ValidationError, fields, validate, validates
 
-from dto import BaseSchema
+from dto.base_schema import BaseSchema
 from dto.pagination_dto import PaginationFilterDTO
 
 

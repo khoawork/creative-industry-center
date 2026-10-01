@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import typing
 from types import SimpleNamespace
 
@@ -17,3 +18,5 @@ class BaseSchema(Schema):
                 error.messages[field] = message[0]
 
         raise error
+=======
+>>>>>>> 2ac7f1e472adde322eca51d4bb9ff5709f2b51f8
