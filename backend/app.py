@@ -17,7 +17,6 @@ def create_app():
     app.config.from_object(Config)
     app.json.ensure_ascii = False
 
-    # Tắt strict_slashes để tránh Werkzeug tự 308 redirect giữa /events và /events/
     app.url_map.strict_slashes = False
 
     allowed_origins = [
@@ -30,10 +29,8 @@ def create_app():
         supports_credentials=True,
     )
 
-    # 2. Khởi tạo SQLAlchemy
     db.init_app(app)
 
-    # 3. Tự động tạo bảng vào MySQL
     with app.app_context():
         db.create_all()
 

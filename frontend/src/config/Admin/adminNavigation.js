@@ -1,5 +1,5 @@
 import {
-  Award, BookOpen, CalendarDays, FolderKanban, GraduationCap, House,
+  Award, BookOpen, CalendarDays, Database, FolderKanban, GraduationCap, House,
   Info, LayoutDashboard, Mail, Menu, MessageSquare,
   Trophy, UsersRound,
 } from 'lucide-react';
@@ -37,6 +37,8 @@ export const adminGroups = [
   { id: 'content', label: 'Nội dung website', items: adminContentModules },
   {
     id: 'system', label: 'Hệ thống', items: [
+      { id: 'catalog', label: 'Danh mục dữ liệu', path: `${adminRoot}/catalog`, icon: Database,
+        description: 'Quản lý toàn bộ danh mục Sự kiện, Giải thưởng, Đào tạo, Dự án.' },
       { id: 'users', label: 'Tài khoản & Phân quyền', path: `${adminRoot}/users`, icon: UsersRound,
         description: 'Quản lý thành viên và quyền truy cập khu vực quản trị.' },
       { id: 'navigation', label: 'Menu & Điều hướng', path: `${adminRoot}/navigation`, icon: Menu,

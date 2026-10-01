@@ -14,13 +14,25 @@ export const ProjectAPI = {
 		return response.data;
 	},
 
-	createProject: async (data) => {
-		const response = await axios.post(`${API_BASE_URL}/projects`, data);
+	createProject: async (data, imageFile = null) => {
+		let payload = data;
+		if (imageFile) {
+			payload = new FormData();
+			payload.append('data', JSON.stringify(data));
+			payload.append('image', imageFile);
+		}
+		const response = await axios.post(`${API_BASE_URL}/projects`, payload);
 		return response.data;
 	},
 
-	updateProject: async (id, data) => {
-		const response = await axios.put(`${API_BASE_URL}/projects/${id}`, data);
+	updateProject: async (id, data, imageFile = null) => {
+		let payload = data;
+		if (imageFile) {
+			payload = new FormData();
+			payload.append('data', JSON.stringify(data));
+			payload.append('image', imageFile);
+		}
+		const response = await axios.put(`${API_BASE_URL}/projects/${id}`, payload);
 		return response.data;
 	},
 

@@ -13,13 +13,25 @@ export const AwardAPI = {
 		return response.data;
 	},
 
-	createAward: async (data) => {
-		const response = await axios.post(`${API_BASE_URL}/api/awards`, data);
+	createAward: async (data, imageFile = null) => {
+		let payload = data;
+		if (imageFile) {
+			payload = new FormData();
+			payload.append('data', JSON.stringify(data));
+			payload.append('image', imageFile);
+		}
+		const response = await axios.post(`${API_BASE_URL}/api/awards`, payload);
 		return response.data;
 	},
 
-	updateAward: async (id, data) => {
-		const response = await axios.put(`${API_BASE_URL}/api/awards/${id}`, data);
+	updateAward: async (id, data, imageFile = null) => {
+		let payload = data;
+		if (imageFile) {
+			payload = new FormData();
+			payload.append('data', JSON.stringify(data));
+			payload.append('image', imageFile);
+		}
+		const response = await axios.put(`${API_BASE_URL}/api/awards/${id}`, payload);
 		return response.data;
 	},
 

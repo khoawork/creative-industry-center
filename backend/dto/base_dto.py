@@ -5,7 +5,13 @@ from dto.base_schema import BaseSchema
 class PageRequestDTO(BaseSchema):
     name = fields.Str(required=True, error_messages={"required": "Tên trang (name) là bắt buộc"})
     slug = fields.Str(required=True, error_messages={"required": "Đường dẫn (slug) là bắt buộc"})
-    props = fields.Dict(load_default=dict, error_messages={"invalid": "props phải là định dạng JSON object"})
+    props = fields.Dict(required=False, allow_none=True, load_default=dict, error_messages={"invalid": "props phải là định dạng JSON object"})
+
+
+class PageUpdateRequestDTO(BaseSchema):
+    name = fields.Str(required=False, allow_none=True)
+    slug = fields.Str(required=False, allow_none=True)
+    props = fields.Dict(required=False, allow_none=True, load_default=None, error_messages={"invalid": "props phải là định dạng JSON object"})
 
 
 class PageResponseDTO(BaseSchema):

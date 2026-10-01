@@ -4,13 +4,13 @@ from dto.base_schema import BaseSchema
 
 class EventCategoryRequestDTO(BaseSchema):
     name = fields.String(required=True)
-    description = fields.String(required=True)
+    description = fields.String(load_default="", allow_none=True)
 
 
 class EventCategoryResponse(BaseSchema):
     id = fields.Integer(required=True)
     name = fields.String(required=True)
-    description = fields.String(required=True)
+    description = fields.String(allow_none=True)
 
 
 class SpeakerDTO(BaseSchema):
@@ -32,7 +32,10 @@ class EventRequest(BaseSchema):
     )
     btn_action = fields.String(required=True)
     form_url = fields.String(required=True)
-    category = fields.Nested(EventCategoryRequestDTO, required=True)
+    category_id = fields.Integer(required=False, allow_none=True)
+    category = fields.Nested(
+        EventCategoryRequestDTO, required=False, allow_none=True
+    )
 
 
 class EventResponse(BaseSchema):
