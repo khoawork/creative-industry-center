@@ -9,14 +9,20 @@ from utils.pagination import paginate_query
 def get_trainings(search=None, certificate=None, page=1, per_page=None):
     query = Training.query
     if search is not None:
-        query = query.filter(or_(
-            Training.id.icontains(search, autoescape=True),
-            Training.name.icontains(search, autoescape=True),
-            Training.certificate.icontains(search, autoescape=True),
-        ))
+        query = query.filter(
+            or_(
+                Training.id.icontains(search, autoescape=True),
+                Training.name.icontains(search, autoescape=True),
+                Training.certificate.icontains(search, autoescape=True),
+            )
+        )
     if certificate is not None:
-        query = query.filter(func.lower(Training.certificate) == func.lower(certificate))
-    return paginate_query(query.order_by(Training.created_date.desc(), Training.id), page, per_page)
+        query = query.filter(
+            func.lower(Training.certificate) == func.lower(certificate)
+        )
+    return paginate_query(
+        query.order_by(Training.created_date.desc(), Training.id), page, per_page
+    )
 
 
 def get_training(training_id: str):

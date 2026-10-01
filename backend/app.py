@@ -42,18 +42,16 @@ def create_app():
     register_error_handlers(app)
     
 
-
-    # 3. Đăng ký các blueprints
+    from controllers.UserController import user_api
+    from controllers.TrainingController import training_api
+    from controllers.pages.founder_controller import founder_page_api
     from controllers.HomeController import home_api
     from controllers.BaseController import base_api
     from controllers.AwardController import award_api
-
-
-    from controllers.UserController import user_api
-    from controllers.TrainingController import training_api
     from controllers.EventController import event_api
     from controllers.ProjectController import project_api, category_project_api
 
+    app.register_blueprint(founder_page_api)
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
     app.register_blueprint(event_api)
