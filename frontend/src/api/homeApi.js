@@ -18,15 +18,20 @@ export const HomeAPI = {
     return response.data;
   },
 
-  updateAboutSection: async (pageIndex, data) => {
-    const response = await axios.put(`${API_BASE_URL}/home/about/${pageIndex}`, data);
+  updateAboutSection: async (pageIndex, data, imageFile) => {
+    let payload = data;
+    if (imageFile) {
+      payload = new FormData();
+      payload.append('data', JSON.stringify(data));
+      payload.append('featured_image', imageFile);
+    }
+    const response = await axios.put(`${API_BASE_URL}/home/about/${pageIndex}`, payload);
     return response.data;
   },
 
   updateSupportBanner: async (pageIndex, data) => {
     let page = pageIndex;
     let payload = data;
-    // Hỗ trợ cả hai thứ tự tham số: chuẩn (pageIndex, data) hoặc cũ (data, pageIndex)
     if (typeof pageIndex === 'object' && pageIndex !== null) {
       payload = pageIndex;
       page = data;

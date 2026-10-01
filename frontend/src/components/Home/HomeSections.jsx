@@ -1,6 +1,16 @@
 import Button from '../shared/Button.jsx'
 import Icon from '../shared/Icon.jsx'
-import { about, advisory, awards, events, programs, projects } from '../../config/Home/homeData.js'
+import {
+  about,
+  advisory,
+  awards,
+  events,
+  eventsSection,
+  programs,
+  projects,
+  projectsSection,
+  trainingSection,
+} from '../../data/homeData.js'
 import { sectionIds } from '../../config/shared/site.js'
 
 function SectionHeading({ eyebrow, title, light = false, left = false }) {
@@ -40,15 +50,16 @@ export function AboutSection() {
                 </article>
               ))}
             </div>
-            <Button
+            {about.actionButton.text && about.actionButton.href && <Button
+              href={about.actionButton.href}
               variant="primary"
               size="md"
               icon="arrow"
               iconPosition="end"
               className="mt-2 uppercase tracking-wider text-xs md:text-sm font-bold shadow-sm hover:shadow-md"
             >
-              Tìm hiểu cơ hội
-            </Button>
+              {about.actionButton.text}
+            </Button>}
           </div>
         </div>
       </div>
@@ -61,20 +72,21 @@ export function EventsSection() {
     <section className="home-section home-section--cream" id={sectionIds.events}>
       <div className="home-container">
         <div className="home-events-heading flex items-center justify-between gap-4 mb-10">
-          <SectionHeading eyebrow="DÒNG THỜI GIAN HOẠT ĐỘNG" title="Sự kiện Nổi bật & Hoạt động Mới" left />
-          <Button
+          <SectionHeading eyebrow={eventsSection.tag} title={eventsSection.title_main} left />
+          {eventsSection.action_button?.text && eventsSection.action_button?.link && <Button
+            href={eventsSection.action_button.link}
             variant="text-gold"
             icon="arrow"
             iconPosition="end"
             className="text-xs md:text-sm font-bold uppercase tracking-wider hover:translate-x-0.5 transition-transform"
           >
-            Xem tất cả sự kiện
-          </Button>
+            {eventsSection.action_button.text}
+          </Button>}
         </div>
         <div className="home-events-grid grid min-[900px]:grid-cols-3">
           {events.map((event) => (
             <article className="home-event-card group" key={event.id}>
-              <button
+              {event.image && <button
                 type="button"
                 className="home-event-photo relative block w-full overflow-hidden text-left cursor-pointer"
                 aria-label={`Đọc báo cáo: ${event.title}`}
@@ -86,21 +98,22 @@ export function EventsSection() {
                   className="transition-transform duration-500 group-hover:scale-105"
                 />
                 <span>{event.date}</span>
-              </button>
+              </button>}
               <div className="home-event-copy">
                 <div>
                   <span className="home-event-category">{event.category}</span>
                   <h3>{event.title}</h3>
                   <p>{event.description}</p>
                 </div>
-                <Button
+                {event.action && event.href && <Button
+                  href={event.href}
                   variant="text"
                   icon="arrow"
                   iconPosition="end"
                   className="w-full pt-4 border-t border-[#eee9e2] text-xs font-bold uppercase tracking-wider justify-between hover:text-[#b45309]"
                 >
-                  Đọc báo cáo sự kiện
-                </Button>
+                  {event.action}
+                </Button>}
               </div>
             </article>
           ))}
@@ -122,40 +135,18 @@ export function AwardsSection() {
               <span className="home-award-icon"><Icon name={award.icon} size={38} /></span>
               <h3>{award.title}</h3>
               <p>{award.description}</p>
-              {award.featured ? (
-                <Button
-                  variant="gold"
-                  size="pill-sm"
-                  icon="arrow"
-                  iconPosition="end"
-                  className="mt-4 uppercase tracking-wider text-xs font-bold shadow-md hover:shadow-lg"
-                >
-                  Tiêu chí đề cử
-                </Button>
-              ) : (
-                <Button
-                  variant="gold-outline"
-                  size="pill-sm"
-                  icon="arrow"
-                  iconPosition="end"
-                  className="mt-4 uppercase tracking-wider text-xs font-bold"
-                >
-                  Xem tiêu chí
-                </Button>
-              )}
+              {award.action && award.href && <Button
+                href={award.href}
+                variant={award.featured ? 'gold' : 'gold-outline'}
+                size="pill-sm"
+                icon="arrow"
+                iconPosition="end"
+                className="mt-4 uppercase tracking-wider text-xs font-bold"
+              >
+                {award.action}
+              </Button>}
             </article>
           ))}
-        </div>
-        <div className="flex justify-center mt-12">
-          <Button
-            variant="white"
-            size="pill"
-            icon="arrow"
-            iconPosition="end"
-            className="px-8 py-3.5 uppercase tracking-widest text-xs md:text-sm font-bold shadow-lg hover:shadow-xl hover:bg-amber-50"
-          >
-            Xem tất cả giải thưởng & danh hiệu
-          </Button>
         </div>
       </div>
     </section>
@@ -166,7 +157,7 @@ export function ProjectsSection() {
   return (
     <section className="home-section home-section--white" id={sectionIds.projects}>
       <div className="home-container">
-        <SectionHeading eyebrow="HÀNH TRÌNH THỰC TIỄN" title="Dự án Tiêu biểu & Chuyện Nhà Sáng Nghiệp" />
+        <SectionHeading eyebrow={projectsSection.tag} title={projectsSection.title_main} />
         <div className="home-projects-grid grid min-[900px]:grid-cols-2">
           {projects.map((project) => (
             <article className="home-project-card group" id={project.sectionId} key={project.id}>
@@ -177,7 +168,7 @@ export function ProjectsSection() {
                 <h3>{project.title}</h3>
                 <p>{project.description}</p>
               </div>
-              <button
+              {project.image && <button
                 type="button"
                 className="home-project-photo relative block w-full overflow-hidden text-left cursor-pointer"
                 aria-label={project.action}
@@ -189,15 +180,16 @@ export function ProjectsSection() {
                   className="transition-transform duration-500 group-hover:scale-105"
                 />
                 <span>{project.caption}</span>
-              </button>
-              <Button
+              </button>}
+              {project.action && project.href && <Button
+                href={project.href}
                 variant="text"
                 icon="arrow"
                 iconPosition="end"
                 className="self-start text-xs md:text-sm font-bold uppercase tracking-wider text-[#680007] hover:text-[#b45309] gap-2 pt-2"
               >
                 {project.action}
-              </Button>
+              </Button>}
             </article>
           ))}
         </div>
@@ -221,28 +213,6 @@ export function RecordsForumSection() {
             <p className="text-gray-600 text-sm md:text-base leading-relaxed">
               Viện Kỷ lục Việt Nam mở cổng tiếp nhận hồ sơ đề cử công trình, sáng kiến và phát minh của các tổ chức, doanh nhân, nghệ nhân trên toàn quốc. Đồng thời định kỳ tổ chức Diễn đàn Kinh tế Kỷ lục kết nối chuyển giao công nghệ và hợp tác đầu tư.
             </p>
-            <div className="flex flex-wrap items-center gap-4 mt-3 w-full">
-              <Button
-                href="/de-cu-ky-luc"
-                variant="primary"
-                size="md"
-                icon="arrow"
-                iconPosition="end"
-                className="w-full sm:w-auto uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg"
-              >
-                Gửi hồ sơ đề cử kỷ lục
-              </Button>
-              <Button
-                href="/forums"
-                variant="outline"
-                size="md"
-                icon="arrow"
-                iconPosition="end"
-                className="w-full sm:w-auto uppercase tracking-wider text-xs md:text-sm font-bold shadow-sm hover:shadow"
-              >
-                Tham gia Diễn đàn kinh tế
-              </Button>
-            </div>
           </div>
           <div className="lg:col-span-5 bg-[#faf9f7] border border-[#eee9e2] rounded-xl p-6">
             <h3 className="text-sm font-bold text-[#680007] uppercase tracking-wider mb-5">
@@ -276,7 +246,7 @@ export function TrainingSection() {
   return (
     <section className="home-section home-section--white" id={sectionIds.training}>
       <div className="home-container">
-        <SectionHeading eyebrow="BỒI DƯỠNG & LAN TỎA" title="Chương trình Hợp tác & Đào tạo" />
+        <SectionHeading eyebrow={trainingSection.tag} title={trainingSection.title_main} />
         <div className="home-programs-grid grid min-[900px]:grid-cols-3">
           {programs.map((program) => (
             <article className="home-program-card" key={program.id}>
@@ -287,14 +257,15 @@ export function TrainingSection() {
               </div>
               <div className="home-program-footer">
                 <strong>{program.detail}</strong>
-                <Button
+                {program.action && program.href && <Button
+                  href={program.href}
                   variant="text-gold"
                   icon="arrow"
                   iconPosition="end"
                   className="text-xs font-bold uppercase tracking-wider hover:translate-x-0.5 transition-transform"
                 >
                   {program.action}
-                </Button>
+                </Button>}
               </div>
             </article>
           ))}
@@ -309,14 +280,15 @@ export function TrainingSection() {
               <p className="text-sm text-gray-600 mt-1">{advisory.description}</p>
             </div>
           </div>
-          <Button
+          {advisory.actionButton.text && advisory.actionButton.href && <Button
+            href={advisory.actionButton.href}
             variant="primary"
             size="md"
             icon={null}
             className="w-full sm:w-auto shrink-0 uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg whitespace-nowrap"
           >
-            Kết Nối Ngay
-          </Button>
+            {advisory.actionButton.text}
+          </Button>}
         </div>
       </div>
     </section>
