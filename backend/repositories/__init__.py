@@ -1,4 +1,3 @@
-from . import home_repository
-from . import base_repo
+from repositories.event_repository import EventRepository
 
-__all__ = ["home_repository", "base_repo"]
+__all__ = ["EventRepository"]
