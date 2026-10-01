@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { Sparkles, Compass, Trophy, Quote } from 'lucide-react';
+import FounderProfileUnavailable from './FounderProfileUnavailable';
 
 export const FounderCard = ({ story }) => {
-  const [activeTab, setActiveTab] = useState('about'); // 'about' | 'journey' | 'achievements'
+  const initialTab = story.profileFilter === 'projects'
+    ? 'journey'
+    : story.profileFilter === 'achievements'
+      ? 'achievements'
+      : 'about';
+  const [activeTab, setActiveTab] = useState(initialTab); // 'about' | 'journey' | 'achievements'
   const [imgSrc, setImgSrc] = useState(story.image);
 
   const tabsConfig = [
@@ -89,34 +95,38 @@ export const FounderCard = ({ story }) => {
             </div>
 
             <div className="bg-[#fcfbf9] border border-[#e6ddd1] border-t-0 rounded-b-xl p-5 sm:p-6 flex flex-col justify-between shadow-xs">
-              <div>
-                <div className="flex items-start gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-amber-100 text-[#b87d14] shrink-0 mt-0.5">
-                    <Sparkles className="w-4 h-4" />
+              {currentTabContent.isAvailable === false ? (
+                <FounderProfileUnavailable />
+              ) : <>
+                <div>
+                  <div className="flex items-start gap-2.5">
+                    <div className="p-1.5 rounded-lg bg-amber-100 text-[#b87d14] shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <h4 className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
+                      {currentTabContent.title}
+                    </h4>
                   </div>
-                  <h4 className="text-base sm:text-lg font-bold text-gray-900 leading-snug">
-                    {currentTabContent.title}
-                  </h4>
+
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mt-3.5 text-justify font-normal">
+                    {currentTabContent.content}
+                  </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mt-3.5 text-justify font-normal">
-                  {currentTabContent.content}
-                </p>
-              </div>
-
-              <div className="bg-white border-l-4 border-[#d49520] p-4 rounded-r-xl shadow-xs mt-5 transition-all hover:shadow-sm">
-                <div className="flex items-start gap-3">
-                  <Quote className="w-6 h-6 text-[#d49520] shrink-0 fill-amber-100/40" />
-                  <div className="flex flex-col">
-                    <blockquote className="italic text-gray-700 text-xs sm:text-sm leading-relaxed">
-                      "{currentTabContent.quote}"
-                    </blockquote>
-                    <cite className="text-[11px] sm:text-xs font-semibold text-[#710008] not-italic mt-2">
-                      — {currentTabContent.quoteAuthor}
-                    </cite>
+                <div className="bg-white border-l-4 border-[#d49520] p-4 rounded-r-xl shadow-xs mt-5 transition-all hover:shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <Quote className="w-6 h-6 text-[#d49520] shrink-0 fill-amber-100/40" />
+                    <div className="flex flex-col">
+                      <blockquote className="italic text-gray-700 text-xs sm:text-sm leading-relaxed">
+                        "{currentTabContent.quote}"
+                      </blockquote>
+                      <cite className="text-[11px] sm:text-xs font-semibold text-[#710008] not-italic mt-2">
+                        — {currentTabContent.quoteAuthor}
+                      </cite>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>}
             </div>
 
           </div>

@@ -91,10 +91,42 @@ def update_hero_section(slug, founder_hero_data):
     return updated_hero
 
 
+def normalize_founder_section(section_data, existing_section=None, section_index=0):
+    section_data = to_dict(section_data)
+    existing_section = existing_section or {}
+    existing_info = existing_section.get("founder_info", [])
+    founder_info = []
+
+    for index, info in enumerate(section_data.get("founder_info", [])):
+        previous_info = existing_info[index] if index < len(existing_info) else {}
+        founder_info.append(
+            {
+                **previous_info,
+                **to_dict(info),
+                "id": info.get(
+                    "id",
+                    previous_info.get(
+                        "id", f"founder_info_{section_index + index + 1}"
+                    ),
+                ),
+            }
+        )
+
+    profile = {
+        **existing_section.get("founder_profile", {}),
+        **section_data.get("founder_profile", {}),
+    }
+    profile["id"] = profile.get("id", f"profile_{section_index + 1}")
+
+    return {
+        **section_data,
+        "founder_info": founder_info,
+        "founder_profile": profile,
+    }
+
+
 def create_founder_section(slug, founder_section_data):
     page = get_page_by_slug(slug)
-
-    founder_section_data = to_dict(founder_section_data)
 
     props = page.props or {}
     sections = props.get("section", [])
@@ -102,6 +134,10 @@ def create_founder_section(slug, founder_section_data):
     if not isinstance(sections, list):
         raise ValueError("props['section'] must be a list")
 
+    founder_section_data = normalize_founder_section(
+        founder_section_data,
+        section_index=len(sections),
+    )
     founder_section_data["id"] = create_id(props, "section")
 
     page.props = {
@@ -116,8 +152,6 @@ def create_founder_section(slug, founder_section_data):
 
 def update_founder_section(slug, section_id, founder_section_data):
     page = get_page_by_slug(slug)
-
-    founder_section_data = to_dict(founder_section_data)
 
     props = page.props or {}
 
@@ -134,11 +168,16 @@ def update_founder_section(slug, section_id, founder_section_data):
     if not target:
         raise ValueError(f"Founder section '{section_id}' not found")
 
-    updated_section = {
-        **target,
-        **founder_section_data,
-        "id": section_id,
-    }
+    section_index = sections.index(target)
+    updated_section = normalize_founder_section(
+        {
+            **target,
+            **to_dict(founder_section_data),
+            "id": section_id,
+        },
+        existing_section=target,
+        section_index=section_index,
+    )
 
     updated_sections = [
         updated_section if item.get("id") == section_id else item for item in sections
@@ -197,6 +236,17 @@ def create_founder_cta(slug, founder_cta_data):
         raise ValueError("CTA section already exists")
 
     founder_cta_data["id"] = "cta_1"
+    founder_cta_data["form_url"] = founder_cta_data.get("form_url", "/contact")
+    founder_cta_data["certificate"] = [
+        {
+            **to_dict(certificate),
+            "id": certificate.get("id", f"certificate_{index}"),
+        }
+        for index, certificate in enumerate(
+            founder_cta_data.get("certificate", []),
+            start=1,
+        )
+    ]
 
     page.props = {
         **props,
@@ -224,6 +274,10 @@ def update_founder_cta(slug, founder_cta_data):
         **current_cta,
         **founder_cta_data,
         "id": current_cta.get("id", "cta_1"),
+        "form_url": founder_cta_data.get(
+            "form_url",
+            current_cta.get("form_url", "/contact"),
+        ),
     }
 
     page.props = {
