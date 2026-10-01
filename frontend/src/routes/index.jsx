@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
-import AboutPage from "../pages/About";
+import AboutPage from "../pages/AboutPage.jsx";
 import EventActive from "../pages/eventActivePage";
 import FounderStory from "../pages/founder-story";
 import ProjectsPage from "../pages/Projects";

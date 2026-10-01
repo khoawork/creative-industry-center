@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from config import Config
 from extensions import db
 from utils.error import register_error_handlers
@@ -16,6 +17,16 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.json.ensure_ascii = False
+
+    CORS(app, resources={
+        r"/introduce/.*": {
+            "origins": [
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+            ],
+            "methods": ["GET"],
+        }
+    })
 
 
     # 2. Khởi tạo SQLAlchemy

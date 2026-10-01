@@ -1,40 +1,33 @@
-import React from 'react';
-import { HiStar } from 'react-icons/hi';
+import { AboutLink } from './about-shared.jsx';
 
-export default function AboutHero() {
+export default function AboutHero({ section }) {
   return (
-    <section className="relative w-full bg-gradient-to-b from-[#490003] via-[#710008] to-[#490003] text-white py-16 lg:py-24 px-6 lg:px-12 shadow-xl border-b-4 border-[#f4b42c]">
-      <div className="max-w-5xl mx-auto text-center flex flex-col items-center">
-        {/* Breadcrumb Danh Dự */}
-        <nav className="flex items-center gap-2 mb-6 text-[#f4b42c] font-semibold text-sm tracking-wider uppercase">
-          <a href="#" className="hover:underline transition-all">Trang chủ</a>
-          <span className="text-[#f4b42c]/60">/</span>
-          <span className="text-white font-bold">Giới thiệu</span>
-        </nav>
-
-        {/* Họa tiết trục đối xứng trung tâm */}
-        <div className="flex items-center justify-center gap-4 w-full max-w-md mb-6">
-          <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-[#f4b42c] to-[#f4b42c]"></div>
-          <HiStar className="text-[#f4b42c] text-2xl" />
-          <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent via-[#f4b42c] to-[#f4b42c]"></div>
+    <section className="w-full border-b-4 border-[#d49520] bg-[#710008] px-6 py-16 text-white shadow-xl lg:px-12 lg:py-24">
+      <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
+        {section.breadcrumbs.length > 0 && (
+          <nav aria-label="Đường dẫn trang" className="mb-6 text-sm font-semibold text-[#d49520]">
+            <ol className="flex flex-wrap items-center justify-center gap-2">
+              {section.breadcrumbs.map((item, index) => (
+                <li key={index} className="flex min-w-0 items-center gap-2">
+                  {index > 0 && <span aria-hidden="true">/</span>}
+                  {item.link === null
+                    ? <span aria-current="page" className="text-white">{item.text}</span>
+                    : <AboutLink href={item.link} className="hover:underline">{item.text}</AboutLink>}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+        <div aria-hidden="true" className="mb-6 flex w-full max-w-md items-center gap-4 text-[#d49520]">
+          <div className="h-px flex-1 bg-[#d49520]" /><span>★</span><div className="h-px flex-1 bg-[#d49520]" />
         </div>
-
-        {/* Tiêu đề lớn */}
-        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-6 leading-tight max-w-4xl text-center uppercase drop-shadow-md">
-          GIỚI THIỆU TRUNG TÂM CÔNG NGHIỆP SÁNG TẠO
-        </h1>
-
-        {/* Khẳng định sứ mạng & Vị thế */}
-        <div className="bg-[#310002]/85 border border-[#f4b42c]/40 backdrop-blur-md p-8 rounded-xl max-w-3xl shadow-2xl">
-          <p className="text-base md:text-lg text-[#f4b42c] leading-relaxed text-center font-medium italic">
-            “Khởi tạo nền tảng định vị giá trị Việt, kết nối tinh hoa trí tuệ và mở rộng kỷ lục sáng tạo quốc gia vươn tầm thời đại mới.”
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-3 text-[#f4b42c]/90 text-xs uppercase tracking-widest font-semibold">
-            <span className="inline-block w-8 h-px bg-[#f4b42c]"></span>
-            VIỆN KỶ LỤC VIỆT NAM - VIETKINGS
-            <span className="inline-block w-8 h-px bg-[#f4b42c]"></span>
-          </div>
-        </div>
+        <h1 className="max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">{section.title_main}</h1>
+        {section.quote && (
+          <blockquote className="mt-6 w-full max-w-3xl rounded-xl border border-[#d49520]/40 bg-black/20 p-6 shadow-lg sm:p-8">
+            <p className="text-base font-medium italic leading-relaxed text-[#d49520] md:text-lg">{section.quote}</p>
+            {section.quote_author && <footer className="mt-4 text-xs font-semibold tracking-widest text-[#d49520]">{section.quote_author}</footer>}
+          </blockquote>
+        )}
       </div>
     </section>
   );

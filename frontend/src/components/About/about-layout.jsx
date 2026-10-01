@@ -1,41 +1,44 @@
-import React from 'react';
+import { Fragment } from 'react';
 import AboutHero from './about-hero';
 import AboutOverview from './about-overview';
 import AboutVision from './about-vision';
 import AboutMission from './about-mission';
 import AboutPillars from './about-pillars';
 
-export default function AboutLayout() {
+export default function AboutLayout({ sections }) {
+  const contentSections = [
+    { key: 'overview_section', Component: AboutOverview },
+    { key: 'vision_section', Component: AboutVision },
+    { key: 'mission_section', Component: AboutMission },
+  ].filter(({ key }) => sections[key]);
+
   return (
-    <div className="flex flex-col w-full bg-[#faf9f7] text-[#1a1c1b]">
-      {/* 1. Banner Tiêu Đề */}
-      <AboutHero />
+    <div className="flex w-full min-w-0 flex-col bg-[#f4f3f1] [font-family:Inter,sans-serif] text-black [overflow-wrap:anywhere]">
+      {sections.hero_section && <AboutHero section={sections.hero_section} />}
 
-      {/* 2. Nội dung chính đan xen 3 phần */}
-      <div className="max-w-1xl mx-auto px-6 lg:px-12 py-16 lg:py-24 space-y-24">
-        <AboutOverview />
-        
-        {/* Đường kẻ chỉ phân cách trang trọng */}
-        <div className="flex items-center justify-center gap-4 py-4">
-          <div className="h-px flex-1 bg-[#f4b42c]/30"></div>
-          <span className="text-[#f4b42c] text-lg font-bold">★</span>
-          <div className="h-px flex-1 bg-[#f4b42c]/30"></div>
+      {contentSections.length > 0 && (
+        <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-12 sm:space-y-12 sm:px-6 sm:py-16 lg:space-y-16 lg:px-12 lg:py-24">
+          {contentSections.map(({ key, Component }, index) => (
+            <Fragment key={key}>
+              {index > 0 && (
+                <div aria-hidden="true" className="flex items-center justify-center gap-4 py-4">
+                  <div className="h-px flex-1 bg-[#d49520]/30" />
+                  <span className="text-lg font-bold text-[#d49520]">★</span>
+                  <div className="h-px flex-1 bg-[#d49520]/30" />
+                </div>
+              )}
+              <Component section={sections[key]} />
+            </Fragment>
+          ))}
         </div>
+      )}
 
-        <AboutVision />
-
-        {/* Đường kẻ chỉ phân cách trang trọng */}
-        <div className="flex items-center justify-center gap-4 py-4">
-          <div className="h-px flex-1 bg-[#f4b42c]/30"></div>
-          <span className="text-[#f4b42c] text-lg font-bold">★</span>
-          <div className="h-px flex-1 bg-[#f4b42c]/30"></div>
-        </div>
-
-        <AboutMission />
-      </div>
-
-      {/* 3. Phần Tổng kết: 4 Trụ cột giá trị cốt lõi */}
-      <AboutPillars />
+      {(sections.core_values_section || sections.actions_section) && (
+        <AboutPillars
+          coreValues={sections.core_values_section}
+          actions={sections.actions_section}
+        />
+      )}
     </div>
   );
 }
