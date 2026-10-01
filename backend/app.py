@@ -11,19 +11,20 @@ except ImportError:
 from models import *
 
 
-   
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.json.ensure_ascii = False
 
-
-    # 2. Khởi tạo SQLAlchemy
+    # 1. Khởi tạo SQLAlchemy
     db.init_app(app)
 
-    # 3. Tự động tạo bảng vào MySQL
+    # 2. Tự động tạo bảng vào MySQL
     with app.app_context():
+        try:
             db.create_all()
+        except Exception as e:
+            print(f"[CANH BAO] Khong the ket noi Database: {e}")
 
     if Swagger:
         swagger = Swagger(app)  
@@ -32,15 +33,18 @@ def create_app():
     # 3. Đăng ký các blueprints
     from controllers.UserController import user_api
     from controllers.HomeController import home_api
+    from controllers.BaseController import base_api
     from controllers.AwardController import award_api
     from controllers.TrainingController import training_api
-    
+
     app.register_blueprint(user_api)
     app.register_blueprint(award_api)
     app.register_blueprint(training_api)
     app.register_blueprint(home_api)
+    app.register_blueprint(base_api)
 
     return app
+
 
 app = create_app()
 
