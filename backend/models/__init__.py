@@ -5,3 +5,4 @@ from .EventModel import Event, EventCategory
 from .PageModel import Page
 from .TrainingModel import Training, TrainingCategory
 from .ProjectModel import Project
+from .IdCounterModel import IdCounter
