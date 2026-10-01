@@ -1,3 +1,3 @@
-from . import home_service
+from services.event_service import EventService
 
-__all__ = ["home_service"]
+__all__ = ["EventService"]
