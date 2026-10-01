@@ -6,7 +6,7 @@ from flask import current_app
 from utils.error import APIException, InternalServerError
 
 
-def upload(file):
+def upload(file, folder="awards"):
     config = current_app.config
 
     credentials = {
@@ -21,7 +21,7 @@ def upload(file):
     try:
         result = cloudinary.uploader.upload(
             file,
-            public_id=f"awards/{uuid4().hex}",
+            public_id=f"{folder}/{uuid4().hex}",
             resource_type="image",
             allowed_formats=["jpg", "jpeg", "png", "webp"],
             overwrite=False,

@@ -15,7 +15,7 @@ ALLOWED_IMAGE_FORMATS = {
 }
 
 
-def upload_image(file):
+def upload_image(file, folder="awards"):
     if file is None or not file.filename:
         raise ValidationError("Vui lòng chọn ảnh.")
 
@@ -61,7 +61,7 @@ def upload_image(file):
 
     with BytesIO(content) as stream:
         stream.name = f"image.{extension}"
-        image_url = cloudinary_storage.upload(stream)
+        image_url = cloudinary_storage.upload(stream, folder=folder)
 
     if len(image_url) > 255:
         raise InternalServerError(
