@@ -21,10 +21,7 @@ class Config:
     DB_PORT = int(os.getenv("DB_PORT", 3306))
     DB_NAME = os.getenv("DB_NAME", "industry")
 
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-        "?charset=utf8mb4&connect_timeout=5"
-    )
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     IMAGE_STORAGE_PROVIDER = os.getenv("IMAGE_STORAGE_PROVIDER")
@@ -34,6 +31,10 @@ class Config:
     CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
     MAX_IMAGE_SIZE = 5 * 1024 * 1024
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "connect_args": {"connect_timeout": 5},
+    }
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "connect_args": {"connect_timeout": 5},

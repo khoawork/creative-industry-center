@@ -2,6 +2,7 @@ from flask import Flask
 from config import Config
 from extensions import db
 from utils.error import register_error_handlers
+from flask_cors import CORS
 
 try:
     from flasgger import Swagger
@@ -15,6 +16,18 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.json.ensure_ascii = False
+
+    # Tắt strict_slashes để tránh Werkzeug tự 308 redirect giữa /events và /events/
+    app.url_map.strict_slashes = False
+
+    # Cấu hình CORS toàn diện cho frontend
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    )
 
     # 2. Khởi tạo SQLAlchemy
     db.init_app(app)
@@ -31,11 +44,20 @@ def create_app():
     from controllers.TrainingController import training_api
     from controllers.pages.founder_controller import founder_page_api
     from controllers.HomeController import home_api
+    from controllers.BaseController import base_api
+    from controllers.AwardController import award_api
+    from controllers.EventController import event_api
+    from controllers.ProjectController import project_api, category_project_api
 
+    app.register_blueprint(founder_page_api)
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
-    app.register_blueprint(founder_page_api)
+    app.register_blueprint(event_api)
+    app.register_blueprint(project_api)
+    app.register_blueprint(category_project_api)
+    app.register_blueprint(award_api)
     app.register_blueprint(home_api)
+    app.register_blueprint(base_api)
 
     return app
 

@@ -1,19 +1,6 @@
 from .BaseModel import BaseModel
 from extensions import db
 
-training_category_association = db.Table(
-    "training_category_association",
-    db.Column(
-        "training_id", db.Integer, db.ForeignKey("training.id"), primary_key=True
-    ),
-    db.Column(
-        "category_id",
-        db.Integer,
-        db.ForeignKey("training_category.id"),
-        primary_key=True,
-    ),
-)
-
 
 class Training(BaseModel):
     __tablename__ = "training"
@@ -35,3 +22,4 @@ class TrainingCategory(BaseModel):
         secondary="training_category_association",
         backref="categories",
     )
+    certificate = db.Column(db.String(255), nullable=False)
