@@ -30,10 +30,13 @@ def create_app():
     from controllers.UserController import user_api
     from controllers.TrainingController import training_api
     from controllers.pages.founder_controller import founder_page_api
+    from controllers.HomeController import home_api
 
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
     app.register_blueprint(founder_page_api)
+    app.register_blueprint(training_api)
+    app.register_blueprint(home_api)
 
     return app
 

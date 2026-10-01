@@ -1,39 +1,48 @@
-from dto.base_schema import BaseSchema
-from marshmallow import fields, validate
+from marshmallow import Schema, ValidationError, fields, validate, validates
+
+from dto import BaseSchema
+from dto.pagination_dto import PaginationFilterDTO
 
 
-class TrainingCategoryDTO(BaseSchema):
-    name = fields.String(required=True)
-    description = fields.String(required=True)
+def validate_not_blank(value):
+    if not value.strip():
+        raise ValidationError("Không được để trống.")
 
 
-class TrainingCategoryResponse(BaseSchema):
-    id = fields.Integer(required=True)
-    name = fields.String(required=True)
-    description = fields.String(required=True)
-
-
-class TrainingInfoDTO(BaseSchema):
-    subtext = fields.String(required=True)
-    venue = fields.String(required=True)
-
-
-class TrainingRequest(BaseSchema):
-    name = fields.String(required=True)
-    time = fields.String(required=True)
-    certificate = fields.String(required=True)
-    training_info = fields.Nested(TrainingInfoDTO, required=True)
-    categories = fields.List(
-        fields.Nested(TrainingCategoryDTO),
+class TrainingPropsDTO(Schema):
+    target_audience = fields.String(required=True, validate=validate_not_blank)
+    description = fields.String(required=True, validate=validate_not_blank)
+    highlights = fields.List(
+        fields.String(validate=validate_not_blank),
         required=True,
-        validate=validate.Length(min=1, error="At least one category is required"),
+        validate=validate.Length(min=1),
+    )
+    locations = fields.List(
+        fields.String(validate=validate_not_blank),
+        required=True,
+        validate=validate.Length(min=1),
     )
 
 
-class TrainingReponse(BaseSchema):
-    id = fields.Integer(required=True)
-    name = fields.String(required=True)
-    time = fields.String(required=True)
-    certificate = fields.String(required=True)
-    training_info = fields.Nested(TrainingInfoDTO, required=True)
-    categories = fields.List(fields.Nested(TrainingCategoryDTO), required=True)
+class CreateTrainingDTO(BaseSchema):
+    name = fields.String(required=True, validate=validate.Length(min=1, max=255))
+    time = fields.String(required=True, validate=validate.Length(min=1, max=50))
+    certificate = fields.String(required=True, validate=validate.Length(min=1, max=255))
+    props = fields.Nested(TrainingPropsDTO, required=True)
+
+    @validates("name", "time", "certificate")
+    def validate_text(self, value, **kwargs):
+        validate_not_blank(value)
+
+
+class TrainingFilterDTO(PaginationFilterDTO):
+    search = fields.String(
+        validate=[validate.Length(min=1, max=255), validate_not_blank]
+    )
+    certificate = fields.String(
+        validate=[validate.Length(min=1, max=255), validate_not_blank]
+    )
+
+
+class TrainingResponseDTO(CreateTrainingDTO):
+    id = fields.String(dump_only=True)
