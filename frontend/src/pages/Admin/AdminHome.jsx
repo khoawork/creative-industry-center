@@ -10,6 +10,7 @@ import {
 
 import { site } from '../../config/shared/site.js';
 import { HomeAPI } from '../../api/homeApi.js';
+import { fetchNavSections } from '../../services/contentTablesService.js';
 
 // Định nghĩa danh sách các Tab quản trị
 const adminHomeTabs = [
@@ -26,6 +27,7 @@ export default function AdminHome() {
   const activeTab = adminHomeTabs.find((t) => t.id === activeTabId) || adminHomeTabs[0];
 
   const [homeData, setHomeData] = useState(null);
+  const [navSections, setNavSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLiveApi, setIsLiveApi] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,12 +46,18 @@ export default function AdminHome() {
     setLoading(true);
 
     HomeAPI.getHomePage(9)
-      .then((result) => {
-        console.log('Fetched home data from API:', result);
+      .then(async (result) => {
         if (isMounted && result) {
           const dataPayload = result.data || result;
           setHomeData(dataPayload);
           setIsLiveApi(result.isLive ?? true);
+          try {
+            const sections = await fetchNavSections(dataPayload.id);
+            if (isMounted) setNavSections(sections);
+          } catch (error) {
+            console.error('Lỗi khi tải nav sections từ database:', error);
+            if (isMounted) setNavSections(dataPayload.props?.nav_sections || []);
+          }
         }
       })
       .catch((err) => {
@@ -67,71 +75,183 @@ export default function AdminHome() {
     };
   }, []);
 
-  // Hàm xử lý cập nhật props và gửi lên API
+// Helper chuẩn hóa JSON để so sánh sâu (deep compare) dữ liệu
+const canonicalStringify = (obj) => {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+  if (Array.isArray(obj)) {
+    return `[${obj.map(canonicalStringify).join(',')}]`;
+  }
+  const sortedKeys = Object.keys(obj).sort();
+  const entries = sortedKeys.map((key) => `${JSON.stringify(key)}:${canonicalStringify(obj[key])}`);
+  return `{${entries.join(',')}}`;
+};
+
+const isSectionChanged = (currentVal, newVal) => {
+  if (newVal === undefined) return false;
+  return canonicalStringify(currentVal) !== canonicalStringify(newVal);
+};
+
   const handleUpdateProps = async (newPropsSection) => {
     if (!homeData) return;
+
+    const targetProps = newPropsSection?.props || newPropsSection || {};
+    const currentProps = homeData.props || {};
+
+    const updateTasks = [];
+    const updatedSectionNames = [];
+    const mergedProps = { ...currentProps };
+
+    // 1. Kiểm tra Hero Section
+    if (
+      targetProps.hero_section !== undefined &&
+      isSectionChanged(currentProps.hero_section, targetProps.hero_section)
+    ) {
+      updateTasks.push(async () => {
+        const res = await HomeAPI.updateHeroSection(homeData.id, targetProps.hero_section);
+        const savedData = res?.data || targetProps.hero_section;
+        mergedProps.hero_section = savedData;
+        updatedSectionNames.push('Hero Section');
+      });
+    }
+
+    // 2. Kiểm tra About Section
+    if (
+      targetProps.about_section !== undefined &&
+      isSectionChanged(currentProps.about_section, targetProps.about_section)
+    ) {
+      updateTasks.push(async () => {
+        const res = await HomeAPI.updateAboutSection(homeData.id, targetProps.about_section);
+        const savedData = res?.data || targetProps.about_section;
+        mergedProps.about_section = savedData;
+        updatedSectionNames.push('Giới thiệu (About)');
+      });
+    }
+
+    // 3. Kiểm tra Support Banner
+    if (
+      targetProps.support_banner !== undefined &&
+      isSectionChanged(currentProps.support_banner, targetProps.support_banner)
+    ) {
+      updateTasks.push(async () => {
+        const res = await HomeAPI.updateSupportBanner(homeData.id, targetProps.support_banner);
+        const savedData = res?.data || targetProps.support_banner;
+        mergedProps.support_banner = savedData;
+        updatedSectionNames.push('Banner hỗ trợ');
+      });
+    }
+
+    // Nếu không có phần nào thay đổi so với dữ liệu hiện tại
+    if (updateTasks.length === 0) {
+      alert('Không phát hiện thay đổi nào so với dữ liệu hiện tại.');
+      return;
+    }
+
     setIsSaving(true);
-
     try {
-      const updatedProps = {
-        ...(homeData.props || {}),
-        ...newPropsSection,
-      };
-      
-      const payload = {
-        ...homeData,
-        props: updatedProps,
-      };
+      // Thực hiện đồng thời các API cập nhật của các phần đã thay đổi
+      await Promise.all(updateTasks.map((task) => task()));
 
-      // Gọi API cập nhật (Giả định HomeAPI có phương thức update hoặc save)
-      if (typeof HomeAPI.updateHomePage === 'function') {
-        await HomeAPI.updateHomePage(homeData.id, payload);
-      } else if (typeof HomeAPI.saveHomePage === 'function') {
-        await HomeAPI.saveHomePage(payload);
-      } else {
-        console.warn('Chưa cấu hình hàm update trong HomeAPI');
-      }
+      // Cập nhật lại state cục bộ của trang
+      setHomeData((prev) => ({
+        ...prev,
+        props: {
+          ...(prev?.props || {}),
+          ...mergedProps,
+        },
+      }));
 
-      setHomeData(payload);
-      alert('Lưu thay đổi thành công!');
+      alert(`Lưu thay đổi thành công: ${updatedSectionNames.join(', ')}!`);
     } catch (error) {
       console.error('Lỗi khi lưu dữ liệu:', error);
       alert('Có lỗi xảy ra khi lưu dữ liệu lên hệ thống.');
+      throw error;
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleSaveHero = (newHeroData) => {
-    handleUpdateProps({ hero_section: newHeroData });
+    return handleUpdateProps({ hero_section: newHeroData });
   };
 
   const handleSaveAbout = (newAboutData) => {
-    handleUpdateProps({ about_section: newAboutData });
+    return handleUpdateProps({ about_section: newAboutData });
   };
 
-  const handleSaveNavSection = (savedSection) => {
-    const navSections = homeData?.props?.nav_sections || [];
-    const index = navSections.findIndex((sec) => sec.id === savedSection.id);
-    let updatedNavSections;
-    
-    if (index >= 0) {
-      updatedNavSections = navSections.map((sec) => (sec.id === savedSection.id ? savedSection : sec));
-    } else {
-      updatedNavSections = [...navSections, { ...savedSection, id: Date.now() }];
+  const handleSaveNavSection = async (savedSection) => {
+    if (!homeData) return;
+    setIsSaving(true);
+
+    try {
+      const existingSection = navSections.find(
+        (section) => String(section.id) === String(savedSection.id)
+      );
+
+      if (!existingSection) {
+        await HomeAPI.createNav(homeData.id, savedSection);
+      } else {
+        const metadataChanged =
+          existingSection.tag !== savedSection.tag ||
+          existingSection.title_main !== savedSection.title_main ||
+          JSON.stringify(existingSection.action_button) !==
+            JSON.stringify(savedSection.action_button);
+        const childrenChanged =
+          JSON.stringify(existingSection.children_id || []) !==
+          JSON.stringify(savedSection.children_id || []);
+
+        if (metadataChanged) {
+          await HomeAPI.updateNav(homeData.id, existingSection.id, {
+            ...savedSection,
+            children_id: existingSection.children_id || [],
+          });
+        }
+        if (childrenChanged) {
+          await HomeAPI.addNavChildren(homeData.id, existingSection.id, {
+            children_id: savedSection.children_id || [],
+          });
+        }
+      }
+
+      const updatedNavSections = await fetchNavSections(homeData.id);
+      setNavSections(updatedNavSections);
+      setHomeData((current) => ({
+        ...current,
+        props: { ...current.props, nav_sections: updatedNavSections },
+      }));
+      alert('Lưu thay đổi thành công!');
+    } catch (error) {
+      console.error('Lỗi khi lưu nav section:', error);
+      alert('Có lỗi xảy ra khi lưu chuyên mục lên hệ thống.');
+      throw error;
+    } finally {
+      setIsSaving(false);
     }
-    
-    handleUpdateProps({ nav_sections: updatedNavSections });
   };
 
-  const handleDeleteNavSection = (sectionId) => {
-    const navSections = homeData?.props?.nav_sections || [];
-    const updatedNavSections = navSections.filter((sec) => sec.id !== sectionId);
-    handleUpdateProps({ nav_sections: updatedNavSections });
+  const handleDeleteNavSection = async (sectionId) => {
+    if (!homeData) return;
+    setIsSaving(true);
+
+    try {
+      await HomeAPI.deleteNav(homeData.id, sectionId);
+      const updatedNavSections = await fetchNavSections(homeData.id);
+      setNavSections(updatedNavSections);
+      setHomeData((current) => ({
+        ...current,
+        props: { ...current.props, nav_sections: updatedNavSections },
+      }));
+    } catch (error) {
+      console.error('Lỗi khi xóa nav section:', error);
+      alert('Có lỗi xảy ra khi xóa chuyên mục khỏi hệ thống.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSaveSupportBanner = (newSupportData) => {
-    handleUpdateProps({ support_banner: newSupportData });
+    return handleUpdateProps({ support_banner: newSupportData });
   };
 
   // Hiển thị trạng thái đang tải dữ liệu từ API
@@ -275,7 +395,7 @@ export default function AdminHome() {
         >
           {activeTab.id === 'nav' && (
             <NavSectionsEditor
-              navSections={homeData?.props?.nav_sections || []}
+              navSections={navSections}
               onSaveSection={handleSaveNavSection}
               onDeleteSection={handleDeleteNavSection}
               isSaving={isSaving}

@@ -55,7 +55,7 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
     setTimeout(() => setSaveSuccess(false), 3500);
   };
 
-  // Core values actions
+  
   const handleAddCoreValue = () => {
     setFormData((prev) => ({
       ...prev,

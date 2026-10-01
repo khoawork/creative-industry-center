@@ -2,6 +2,7 @@ from flask import Flask
 from config import Config
 from extensions import db
 from utils.error import register_error_handlers
+from flask_cors import CORS
 
 try:
     from flasgger import Swagger
@@ -16,6 +17,18 @@ def create_app():
     app.config.from_object(Config)
     app.json.ensure_ascii = False
 
+    # Tắt strict_slashes để tránh Werkzeug tự 308 redirect giữa /events và /events/
+    app.url_map.strict_slashes = False
+
+    # Cấu hình CORS toàn diện cho frontend
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    )
+
     # 2. Khởi tạo SQLAlchemy
     db.init_app(app)
 
@@ -26,6 +39,8 @@ def create_app():
     if Swagger:
         swagger = Swagger(app)
     register_error_handlers(app)
+    
+
 
     # 3. Đăng ký các blueprints
     from controllers.HomeController import home_api

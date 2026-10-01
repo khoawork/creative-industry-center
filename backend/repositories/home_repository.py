@@ -59,7 +59,7 @@ def update_about(page, data):
 
 
 def create_nav(page, data):
-    current_props = dict(page.props )
+    current_props = dict(page.props or {})
     nav_list = list(current_props.get("nav_sections") or [])
 
     new_id = (max([int(n.get("id", 0)) for n in nav_list], default=0) + 1) if nav_list else 1
@@ -79,23 +79,44 @@ def create_nav(page, data):
     }
 
     nav_list.append(new_nav)
-    current_props["nav_section"] = new_nav  # Lưu nav hiện tại / mới nhất
+    current_props["nav_sections"] = nav_list
     page.props = current_props
     flag_modified(page, "props")
     db.session.commit()
     return new_nav
 
 
+def delete_nav(page, nav_id):
+    current_props = dict(page.props or {})
+    nav_sections = current_props.get("nav_sections", [])
+    remaining_sections = [nav for nav in nav_sections if nav.get("id") != nav_id]
+
+    if len(remaining_sections) == len(nav_sections):
+        raise NotFoundError(message=f"Không tìm thấy nav section với ID: {nav_id}")
+
+    current_props["nav_sections"] = remaining_sections
+    page.props = current_props
+    flag_modified(page, "props")
+    db.session.commit()
+    return True
+
+
 
 def add_children_to_nav(page, nav_id, children_ids):
     current_props = dict(page.props) if page.props else {}
     nav_found = False
+    target_nav = None
     
-    for nav in current_props["nav_sections"]:
+    for nav in current_props.get("nav_sections", []):
         if nav.get("id") == nav_id:
             # Hỗ trợ lấy dữ liệu dù truyền vào dict hay list trực tiếp
-            nav["children_id"] = children_ids.get("children_id") if isinstance(children_ids, dict) else children_ids
+            raw_ids = children_ids.get("children_id") if isinstance(children_ids, dict) else children_ids
+            if isinstance(raw_ids, (int, str)):
+                nav["children_id"] = [int(raw_ids)] if str(raw_ids).isdigit() else [raw_ids]
+            elif isinstance(raw_ids, list):
+                nav["children_id"] = raw_ids
             nav_found = True
+            target_nav = nav
             break
 
     if not nav_found:
@@ -105,7 +126,7 @@ def add_children_to_nav(page, nav_id, children_ids):
     flag_modified(page, "props")    
     db.session.commit()    
     
-    return page
+    return target_nav
 
 
 def delete_children_to_nav(page, nav_id, children_id):
@@ -123,12 +144,14 @@ def delete_children_to_nav(page, nav_id, children_id):
         targets_to_remove = set()
 
     nav_found = False
-    for nav in current_props["nav_sections"]:
+    target_nav = None
+    for nav in current_props.get("nav_sections", []):
         if nav.get("id") == nav_id:
             current_children = nav.get("children_id", [])
             nav["children_id"] = [x for x in current_children if str(x) not in targets_to_remove]
             
             nav_found = True
+            target_nav = nav
             break
 
     if not nav_found:
@@ -138,7 +161,7 @@ def delete_children_to_nav(page, nav_id, children_id):
     flag_modified(page, "props")    
     db.session.commit()    
     
-    return page
+    return target_nav
 
 
 def get_nav(page, nav_id):
@@ -166,8 +189,10 @@ def update_nav(page, nav_id, data):
         raise NotFoundError(message="Không tìm thấy danh sách nav_sections trong trang này")
 
     nav_data = data.dict() if hasattr(data, 'dict') else (data.__dict__ if hasattr(data, '__dict__') else data)
+    nav_data = _to_dict(nav_data)
 
     nav_found = False
+    target_nav = None
     for nav in current_props["nav_sections"]:
         if nav.get("id") == nav_id:
             children_id_old = nav.get("children_id", [])
@@ -180,6 +205,7 @@ def update_nav(page, nav_id, data):
                 nav["children_id"] = children_id_old
 
             nav_found = True
+            target_nav = nav
             break
 
     if not nav_found:
@@ -189,7 +215,7 @@ def update_nav(page, nav_id, data):
     flag_modified(page, "props")    
     db.session.commit()    
     
-    return page
+    return target_nav
     
 
 

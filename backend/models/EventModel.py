@@ -29,6 +29,7 @@ class Event(BaseModel):
     category_id = db.Column(
         db.Integer, db.ForeignKey("event_category.id"), nullable=False
     )
+    category = db.relationship("EventCategory", backref="events")
 
 
 class EventCategory(BaseModel):
