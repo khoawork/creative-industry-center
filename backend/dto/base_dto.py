@@ -1,5 +1,5 @@
 from marshmallow import fields
-from dto import BaseSchema
+from dto.base_schema import BaseSchema
 
 
 class PageRequestDTO(BaseSchema):
