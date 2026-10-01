@@ -1,7 +1,21 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../shared/Icon.jsx';
 import { getAboutIconName } from '../../config/About/aboutConfig.js';
-import { getSafeIntroduceUrl } from '../../api/About/introduceApi.js';
+function getSafeUrl(value) {
+  // oxlint-disable-next-line no-control-regex -- Reject characters normalized away by browsers.
+  if (typeof value !== 'string' || !value || /[\s\\\u0000-\u001f\u007f\u0085]/u.test(value)) return null
+  if (value.startsWith('/') && !value.startsWith('//')) return value
+  if (!/^https?:\/\/[^/?#]+/i.test(value)) return null
+  try {
+    const url = new URL(value)
+    return url.hostname ? value : null
+  } catch {
+    return null
+  }
+}
+
+
 
 export function AboutIcon({ code, size = 24, className = '' }) {
   const name = getAboutIconName(code);
@@ -10,7 +24,7 @@ export function AboutIcon({ code, size = 24, className = '' }) {
 }
 
 export function AboutLink({ href, className = '', children }) {
-  const url = getSafeIntroduceUrl(href);
+  const url = getSafeUrl(href);
   if (!url) return null;
   const classes = `focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d49520] ${className}`;
   return url.startsWith('/')
@@ -28,10 +42,20 @@ export function AboutHeading({ tag, title }) {
   );
 }
 
-export function AboutImage({ image, localImage }) {
+export function AboutImage({ image }) {
+  const [failedUrl, setFailedUrl] = useState(null);
+  const url = getSafeUrl(image?.url);
+  const unavailable = !url || failedUrl === url;
   return (
     <figure className="relative isolate grid min-h-72 overflow-hidden rounded-xl border-2 border-[#d49520]/50 bg-[#f4f3f1] shadow-xl sm:min-h-[450px]">
-      <img src={localImage.url} alt={localImage.alt} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      {unavailable ? (
+        <div role="img" aria-label={image?.alt || 'Ảnh chưa có'} className="flex min-h-72 flex-col items-center justify-center gap-2 px-6 py-12 text-center text-black/70">
+          <p className="font-semibold">Không thể hiển thị ảnh</p>
+          {image?.alt && <p className="text-sm">{image.alt}</p>}
+        </div>
+      ) : (
+        <img src={url} alt={image?.alt || ''} loading="lazy" onError={() => setFailedUrl(url)} className="absolute inset-0 h-full w-full object-cover" />
+      )}
       {(image?.tag || image?.caption_title) && (
         <figcaption className="relative self-end space-y-1 bg-linear-to-t from-black via-black/80 to-black/0 px-5 pt-16 pb-6 text-white sm:px-6">
           {image.tag && <p className="text-xs font-bold uppercase tracking-wider text-[#d49520]">{image.tag}</p>}

@@ -1,10 +1,9 @@
 import { AboutHeading, AboutIcon, AboutImage } from './about-shared.jsx';
-import { aboutImages } from '../../data/About/aboutImages.js';
 
 export default function AboutVision({ section }) {
   return (
     <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
-      <div className="order-2 min-w-0 lg:order-1 lg:col-span-5"><AboutImage image={section.featured_image} localImage={aboutImages.vision} /></div>
+      <div className="order-2 min-w-0 lg:order-1 lg:col-span-5"><AboutImage image={section.featured_image} /></div>
       <div className="order-1 min-w-0 space-y-6 lg:order-2 lg:col-span-7">
         <AboutHeading tag={section.tag} title={section.title_main} />
         {section.paragraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line text-lg leading-relaxed text-black/80 sm:text-xl">{paragraph}</p>)}

@@ -1,7 +1,7 @@
 import { iconPaths } from '../shared/iconPaths.js'
 
-// Validate when requesting the page so a missing setting does not break other routes.
-export const INTRODUCE_PAGE_ID = Number(import.meta.env.VITE_INTRODUCE_PAGE_ID)
+// Shared by the public page and admin; update here if the database Page ID changes.
+export const INTRODUCE_PAGE_ID = 1
 
 export const aboutIconNames = {
   globe: 'globe',

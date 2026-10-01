@@ -1,15 +1,12 @@
 import datetime
 
-from app import create_app
 from extensions import db
 from models import (
     Award,
     Event,
     EventCategory,
-    EventStatus,
     Page,
     Project,
-    RoleEnum,
     Training,
     User,
 )
@@ -20,6 +17,90 @@ from dto.home_dto import (
     SupportBannerRequestDTO,
 )
 from repositories.id_counter_repository import generate_id
+from models.EventModel import EventStatus
+from models.UserModel import RoleEnum
+from dto import introduce_dto
+
+
+# Seed images are served from frontend/public/images/about/.
+INTRODUCE_SECTIONS = {
+    "hero_section": {
+        "breadcrumbs": [{"text": "Trang chủ", "link": "/"}, {"text": "Giới thiệu", "link": None}],
+        "title_main": "Trung tâm Công nghiệp Sáng tạo",
+        "quote": "Kết nối tri thức, khơi nguồn sáng tạo, lan tỏa giá trị Việt.",
+        "quote_author": "",
+    },
+    "overview_section": {
+        "tag": "Tổng quan", "title_main": "Không gian kết nối và sáng tạo",
+        "paragraphs": ["Trung tâm Công nghiệp Sáng tạo kết nối cộng đồng sáng tạo, doanh nghiệp và chuyên gia để cùng phát triển các giá trị văn hóa, tri thức và đổi mới."],
+        "featured_image": {
+            "url": "/images/about/overview.jpg",
+            "alt": "Hội trường VietKings với khu vực trưng bày biểu trưng danh dự",
+            "tag": "Kết nối", "caption_title": "Nơi hội tụ những giá trị sáng tạo",
+        },
+        "statistics": [],
+    },
+    "vision_section": {
+        "tag": "Tầm nhìn", "title_main": "Lan tỏa giá trị sáng tạo Việt",
+        "paragraphs": ["Xây dựng cộng đồng hợp tác bền vững, đưa tri thức và bản sắc Việt đến gần hơn với đời sống."],
+        "featured_image": {
+            "url": "/images/about/vision.jpg", "alt": "Các diễn giả trao đổi tại diễn đàn kinh tế sáng tạo",
+            "caption_title": "Cùng định hướng tương lai",
+        },
+        "items": [{"icon": "globe", "title": "Kết nối rộng mở", "description": "Thúc đẩy trao đổi tri thức và hợp tác giữa các cộng đồng sáng tạo."}],
+    },
+    "mission_section": {
+        "tag": "Sứ mệnh", "title_main": "Đồng hành cùng cộng đồng sáng tạo",
+        "featured_image": {
+            "url": "/images/about/mission.jpg", "alt": "Lễ công bố và vinh danh kỷ lục Việt Nam",
+            "caption_title": "Tôn vinh những đóng góp cho cộng đồng",
+        },
+        "items": [{"icon": "lightbulb", "title": "Khơi nguồn ý tưởng", "description": "Tạo điều kiện để ý tưởng được chia sẻ, phát triển và ứng dụng."}],
+    },
+    "core_values_section": {
+        "tag": "Giá trị cốt lõi", "title_main": "Tri thức, sáng tạo và hợp tác",
+        "description": "Lấy con người và giá trị cộng đồng làm nền tảng cho các hoạt động.",
+        "items": [{"icon": "handshake", "title": "Hợp tác", "description": "Cùng chia sẻ nguồn lực và phát triển những giá trị lâu dài."}],
+    },
+    "actions_section": {"buttons": [
+        {"text": "Liên hệ hợp tác", "link": "/contact", "icon": "handshake"},
+        {"text": "Khám phá chương trình", "link": "/training", "icon": "graduation_cap"},
+    ]},
+}
+
+
+def seed_introduce():
+    """Chỉ bổ sung section chưa có; không sửa nội dung hiện hữu hoặc Home."""
+    schemas = {
+        "hero_section": introduce_dto.HeroSectionRequestDTO,
+        "overview_section": introduce_dto.OverviewSectionRequestDTO,
+        "vision_section": introduce_dto.VisionSectionRequestDTO,
+        "mission_section": introduce_dto.MissionSectionRequestDTO,
+        "core_values_section": introduce_dto.CoreValuesSectionRequestDTO,
+        "actions_section": introduce_dto.ActionsSectionRequestDTO,
+    }
+    try:
+        page = Page.query.filter_by(slug="introduce").one_or_none()
+        if page is not None and not isinstance(page.props, dict):
+            raise ValueError("Page introduce có props sai kiểu; cần sửa dữ liệu trước khi seed.")
+        props = dict(page.props) if page is not None else {}
+        missing = [key for key in schemas if key not in props]
+        # Validate ALL additions before changing the session; dump applies DTO defaults.
+        additions = {}
+        for key in missing:
+            schema = schemas[key]()
+            additions[key] = schema.dump(schema.load(INTRODUCE_SECTIONS[key]))
+        if page is None:
+            page = Page(name="Giới thiệu", slug="introduce", props=additions)
+            db.session.add(page)
+        elif additions:
+            page.props = {**props, **additions}
+        if additions:
+            db.session.commit()
+        return page
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def normalize_date(value):
@@ -37,6 +118,7 @@ def seed_database():
     print("=" * 60)
 
     db.create_all()
+    seed_introduce()
 
     # ========================================================
     # BƯỚC 1: NGƯỜI DÙNG QUẢN TRỊ
@@ -217,7 +299,7 @@ def seed_database():
     print("\n[5/6] Đang seed Header navigation items (Hình 1)...")
     for p in [
         {"name": "Trang chủ", "slug": "home"},
-        {"name": "Giới thiệu", "slug": "about"},
+        {"name": "Giới thiệu", "slug": "introduce"},
         {"name": "Sự kiện", "slug": "events"},
         {"name": "Giải thưởng", "slug": "awards"},
         {"name": "Dự án nổi bật", "slug": "projects"},
@@ -319,6 +401,18 @@ def seed_database():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Khởi tạo dữ liệu mẫu.")
+    parser.add_argument("--introduce-only", action="store_true",
+                        help="Chỉ bổ sung Giới thiệu; giữ nguyên Home và nội dung đã sửa.")
+    args = parser.parse_args()
+    from app import create_app
+
     app = create_app()
     with app.app_context():
-        seed_database()
+        if args.introduce_only:
+            page = seed_introduce()
+            print(f"Giới thiệu: ID={page.id}, slug={page.slug}")
+        else:
+            seed_database()

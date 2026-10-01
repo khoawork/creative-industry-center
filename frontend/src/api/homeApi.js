@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+import { API_BASE_URL } from '../config/config.js';
 
 export const HomeAPI = {
   getHomePage: async (pageIndex = 9) => {
