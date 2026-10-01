@@ -32,3 +32,7 @@ class Config:
     CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
 
     MAX_IMAGE_SIZE = 5 * 1024 * 1024
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "connect_args": {"connect_timeout": 5},
+    }

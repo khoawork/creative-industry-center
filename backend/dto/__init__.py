@@ -1,8 +1,24 @@
+from dto.base_schema import BaseSchema
+from dto.training_dto import (
+    TrainingInfoDTO,
+    TrainingCategoryDTO,
+    TrainingReponse,
+    TrainingRequest,
+    TrainingCategoryResponse,
+)
 import typing
 from types import SimpleNamespace
 
 from marshmallow import Schema, post_load, ValidationError
 
+__all__ = [
+    "BaseSchema",
+    "TrainingInfoDTO",
+    "TrainingCategoryDTO",
+    "TrainingReponse",
+    "TrainingRequest",
+    "TrainingCategoryResponse",
+]
 
 class BaseSchema(Schema):
     @post_load
