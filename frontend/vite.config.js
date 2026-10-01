@@ -35,6 +35,10 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
+      '/founder-page': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
     },
   },
 })

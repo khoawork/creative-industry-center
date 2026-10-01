@@ -102,11 +102,14 @@ def seed_founder_page():
         },
     }
 
-    # Tránh seed trùng
+    # Tạo mới hoặc cập nhật dữ liệu Founder hiện có.
     existing_page = Page.query.filter_by(slug=founder_seed_data["slug"]).first()
 
     if existing_page:
-        print("Founder page already exists!")
+        existing_page.name = founder_seed_data["name"]
+        existing_page.props = founder_seed_data["props"]
+        db.session.commit()
+        print("Founder page updated successfully!")
         return
 
     page = Page(

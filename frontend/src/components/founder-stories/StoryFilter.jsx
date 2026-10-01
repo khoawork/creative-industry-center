@@ -3,6 +3,7 @@ import { Filter, Search, ChevronRight, Home } from 'lucide-react';
 import { CATEGORIES } from '../../data/founderStoriesData';
 
 export const StoryFilter = ({
+  categories = CATEGORIES,
   activeCategory,
   onSelectCategory,
   searchTerm,
@@ -76,7 +77,7 @@ export const StoryFilter = ({
                 }
               `}</style>
 
-              {CATEGORIES.map((cat) => {
+              {categories.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 return (
                   <button
@@ -128,7 +129,7 @@ export const StoryFilter = ({
               <>
                 <ChevronRight className="w-3 h-3 text-gray-400" />
                 <span className="bg-amber-100 text-[#710008] px-2 py-0.5 rounded font-medium text-[11px]">
-                  {CATEGORIES.find((c) => c.id === activeCategory)?.label}
+                  {categories.find((c) => c.id === activeCategory)?.label}
                 </span>
               </>
             )}
