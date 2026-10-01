@@ -1,0 +1,497 @@
+swagger: "2.0"
+
+info:
+  title: Founder Page API
+  description: Founder page management APIs
+  version: "1.0.0"
+
+basePath: /
+
+tags:
+  - name: Founder Page
+    description: Founder page management APIs
+
+paths:
+
+  /founder-page/:
+    get:
+      tags:
+        - Founder Page
+      summary: Get founder page
+      description: Retrieve the complete founder page.
+      responses:
+        200:
+          description: Founder page retrieved successfully
+        404:
+          description: Founder page not found
+        500:
+          description: Internal server error
+
+  /founder-page/hero:
+    post:
+      tags:
+        - Founder Page
+      summary: Create hero section
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderHeroSection'
+      responses:
+        200:
+          description: Founder hero section created successfully
+        400:
+          description: Validation error
+        404:
+          description: Page not found
+        500:
+          description: Internal server error
+
+    patch:
+      tags:
+        - Founder Page
+      summary: Update hero section
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderHeroSection'
+      responses:
+        200:
+          description: Founder hero section updated successfully
+        400:
+          description: Validation error
+        404:
+          description: Hero section not found
+        500:
+          description: Internal server error
+
+    delete:
+      tags:
+        - Founder Page
+      summary: Delete hero section
+      responses:
+        200:
+          description: Founder hero section deleted successfully
+        404:
+          description: Hero section not found
+        500:
+          description: Internal server error
+
+  /founder-page/sections:
+    get:
+      tags:
+        - Founder Page
+      summary: Get founder sections
+      responses:
+        200:
+          description: Founder sections retrieved successfully
+        404:
+          description: Founder page not found
+        500:
+          description: Internal server error
+
+    post:
+      tags:
+        - Founder Page
+      summary: Create founder section
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderSection'
+      responses:
+        200:
+          description: Founder section created successfully
+        400:
+          description: Validation error
+        404:
+          description: Page not found
+        500:
+          description: Internal server error
+
+  /founder-page/sections/{section_id}:
+    patch:
+      tags:
+        - Founder Page
+      summary: Update founder section
+      parameters:
+        - name: section_id
+          in: path
+          required: true
+          type: string
+          example: section_1
+
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderSection'
+
+      responses:
+        200:
+          description: Founder section updated successfully
+        400:
+          description: Validation error
+        404:
+          description: Founder section not found
+        500:
+          description: Internal server error
+
+    delete:
+      tags:
+        - Founder Page
+      summary: Delete founder section
+      description: Delete a founder section and reindex remaining section IDs.
+      parameters:
+        - name: section_id
+          in: path
+          required: true
+          type: string
+          example: section_1
+
+      responses:
+        200:
+          description: Founder section deleted successfully
+        404:
+          description: Founder section not found
+        500:
+          description: Internal server error
+
+  /founder-page/cta:
+    get:
+      tags:
+        - Founder Page
+      summary: Get founder CTA
+      responses:
+        200:
+          description: Founder CTA retrieved successfully
+        404:
+          description: CTA section not found
+        500:
+          description: Internal server error
+
+    post:
+      tags:
+        - Founder Page
+      summary: Create founder CTA
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderCTA'
+      responses:
+        200:
+          description: Founder CTA created successfully
+        400:
+          description: Validation error
+        404:
+          description: Page not found
+        500:
+          description: Internal server error
+
+    patch:
+      tags:
+        - Founder Page
+      summary: Update founder CTA
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderCTA'
+      responses:
+        200:
+          description: Founder CTA updated successfully
+        400:
+          description: Validation error
+        404:
+          description: CTA section not found
+        500:
+          description: Internal server error
+
+    delete:
+      tags:
+        - Founder Page
+      summary: Delete founder CTA
+      responses:
+        200:
+          description: Founder CTA deleted successfully
+        404:
+          description: CTA section not found
+        500:
+          description: Internal server error
+
+  /founder-page/cta/certificates:
+    get:
+      tags:
+        - Founder Page
+      summary: Get founder certificates
+      responses:
+        200:
+          description: Founder certificates retrieved successfully
+        404:
+          description: CTA section not found
+        500:
+          description: Internal server error
+
+    post:
+      tags:
+        - Founder Page
+      summary: Create founder certificate
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderCertificate'
+      responses:
+        200:
+          description: Founder certificate created successfully
+        400:
+          description: Validation error
+        404:
+          description: CTA section not found
+        500:
+          description: Internal server error
+
+  /founder-page/cta/certificates/{certificate_id}:
+    patch:
+      tags:
+        - Founder Page
+      summary: Update founder certificate
+      parameters:
+        - name: certificate_id
+          in: path
+          required: true
+          type: string
+          example: certificate_1
+
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/FounderCertificate'
+
+      responses:
+        200:
+          description: Founder certificate updated successfully
+        400:
+          description: Validation error
+        404:
+          description: Certificate not found
+        500:
+          description: Internal server error
+
+    delete:
+      tags:
+        - Founder Page
+      summary: Delete founder certificate
+      description: Delete a certificate and reindex remaining certificate IDs.
+      parameters:
+        - name: certificate_id
+          in: path
+          required: true
+          type: string
+          example: certificate_1
+
+      responses:
+        200:
+          description: Founder certificate deleted successfully
+        404:
+          description: Certificate not found
+        500:
+          description: Internal server error
+
+
+definitions:
+
+  FounderHeroSection:
+    type: object
+    required:
+      - title
+      - description
+      - name
+      - number_of_founders
+      - subtitle
+      - subdescription
+    properties:
+      title:
+        type: string
+        example: Người đứng sau thương hiệu
+
+      description:
+        type: string
+        example: Khám phá câu chuyện và hành trình của những người sáng lập.
+
+      name:
+        type: string
+        example: Đội ngũ sáng lập
+
+      number_of_founders:
+        type: integer
+        example: 2
+
+      subtitle:
+        type: string
+        example: Những người đứng sau thương hiệu
+
+      subdescription:
+        type: string
+        example: Hai nhà sáng lập cùng chung tầm nhìn
+
+
+  FounderInfo:
+    type: object
+    required:
+      - label
+      - value
+    properties:
+      label:
+        type: string
+        example: Chức danh
+
+      value:
+        type: string
+        example: Founder & CEO
+
+
+  FounderProfile:
+    type: object
+    required:
+      - filter
+      - title
+      - description
+      - slogan
+      - sub_slogan
+    properties:
+      filter:
+        type: string
+        enum:
+          - bio
+          - projects
+          - achievements
+        example: bio
+
+      title:
+        type: string
+        example: Tiểu sử & Triết lý
+
+      description:
+        type: string
+        example: Tôi tin rằng công nghệ cần được xây dựng dựa trên những giá trị thực tế.
+
+      slogan:
+        type: string
+        example: Build with purpose.
+
+      sub_slogan:
+        type: string
+        example: Kiến tạo hôm nay, hướng đến tương lai.
+
+
+  FounderSection:
+    type: object
+    required:
+      - major
+      - name
+      - description
+      - founder_info
+      - is_verified
+      - image
+      - founder_profile
+    properties:
+      major:
+        type: string
+        example: Founder & CEO
+
+      name:
+        type: string
+        example: Nguyễn Văn A
+
+      description:
+        type: string
+        example: Với hơn 10 năm kinh nghiệm trong lĩnh vực công nghệ.
+
+      founder_info:
+        type: array
+        items:
+          $ref: '#/definitions/FounderInfo'
+
+      is_verified:
+        type: boolean
+        example: true
+
+      image:
+        type: string
+        example: /images/founder/founder-1.jpg
+
+      founder_profile:
+        $ref: '#/definitions/FounderProfile'
+
+
+  FounderCertificate:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        example: ISO 9001
+
+
+  FounderCTA:
+    type: object
+    required:
+      - subtitle
+      - title
+      - description
+      - btn_cta
+      - sub_btn_cta
+      - form_url
+      - certificate
+    properties:
+      subtitle:
+        type: string
+        example: Cùng chúng tôi tạo nên giá trị
+
+      title:
+        type: string
+        example: Bắt đầu hành trình mới
+
+      description:
+        type: string
+        example: Hãy kết nối với chúng tôi để cùng khám phá những cơ hội hợp tác.
+
+      btn_cta:
+        type: string
+        example: Liên hệ ngay
+
+      sub_btn_cta:
+        type: string
+        example: Tìm hiểu thêm về chúng tôi
+
+      form_url:
+        type: string
+        example: /contact
+
+      certificate:
+        type: array
+        items:
+          $ref: '#/definitions/FounderCertificate'
