@@ -28,15 +28,29 @@ def get(idPage=None):
     )
 
 
+@home_api.route('/<int:idPage>', methods=['PUT'])
+def update_page(idPage=None):
+    """Cập nhật thông tin toàn bộ trang Home"""
+    json_data = request.get_json() or {}
+    response = home_service.update_home(idPage, json_data)
+    result = HomeResponse().dump(response)
+    return success_response(
+        data=result,
+        message="Cập nhật trang Home thành công",
+        status_code=200
+    )
+
+
 # ==========================================
 # 2. HERO SECTION
 # ==========================================
 
 @home_api.route('/hero/<int:idPage>', methods=['POST', 'PUT'])
+@home_api.route('/hero', methods=['POST', 'PUT'])
 def update_hero(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
-        idPage = json_data.get("id") or json_data.get("idPage")
+        idPage = request.args.get('idPage', type=int) or json_data.get("id") or json_data.get("idPage")
 
     data = HeroSectionRequestDTO().load(json_data)
     response = home_service.update_hero_section(data, idPage)
@@ -53,10 +67,11 @@ def update_hero(idPage=None):
 # ==========================================
 
 @home_api.route('/about/<int:idPage>', methods=['POST', 'PUT'])
+@home_api.route('/about', methods=['POST', 'PUT'])
 def update_about(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
-        idPage = json_data.get("id") or json_data.get("idPage")
+        idPage = request.args.get('idPage', type=int) or json_data.get("id") or json_data.get("idPage")
 
     data = AboutSectionRequestDTO().load(json_data)
     response = home_service.update_about_section(data, idPage)
@@ -72,9 +87,12 @@ def update_about(idPage=None):
 # 4. NAV SECTION (TẠO MỚI & THÊM ID NAV CON)
 # ==========================================
 
+@home_api.route('/<int:idPage>/nav', methods=['POST'])
 @home_api.route('/nav/<int:idPage>', methods=['POST'])
-def create_nav(idPage):
+def create_nav(idPage=None):
     json_data = request.get_json() or {}
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int) or json_data.get("idPage") or json_data.get("id")
 
     data = NavSectionRequestDTO().load(json_data)
     response = home_service.create_nav(data, idPage)
@@ -88,7 +106,8 @@ def create_nav(idPage):
 
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>/children', methods=['POST'], endpoint='add_nav_children')
-def add_children_to_nav( idPage, nav_id):
+@home_api.route('/nav/<int:nav_id>/children', methods=['POST'])
+def add_children_to_nav(nav_id, idPage=None):
     """
     Thêm ID nav con vào nav đã chọn.
     Chấp nhận payload:
@@ -97,6 +116,8 @@ def add_children_to_nav( idPage, nav_id):
       - {"children_ids": [5, 6]}
       - [5, 6]
     """
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int) or (request.get_json() or {}).get("idPage")
     json_data = request.get_json() or {}
     children_ids = json_data
     response = home_service.add_children_to_nav(children_ids, nav_id, idPage)
@@ -108,15 +129,18 @@ def add_children_to_nav( idPage, nav_id):
     )
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>/children', methods=['DELETE'], endpoint='delete_nav_children')
-def delete_children_to_nav( idPage, nav_id):
+@home_api.route('/nav/<int:nav_id>/children', methods=['DELETE'])
+def delete_children_to_nav(nav_id, idPage=None):
     """
-    Thêm ID nav con vào nav đã chọn.
+    Xóa ID nav con khỏi nav đã chọn.
     Chấp nhận payload:
       - {"child_id": 5}
       - {"children_id": [5, 6]}
       - {"children_ids": [5, 6]}
       - [5, 6]
     """
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int) or (request.get_json() or {}).get("idPage")
     json_data = request.get_json() or {}
     children_ids = json_data
     response = home_service.delete_children_to_nav(children_ids, nav_id, idPage)
@@ -128,7 +152,10 @@ def delete_children_to_nav( idPage, nav_id):
     )
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['GET'])
-def get_nav(nav_id,idPage ):
+@home_api.route('/nav/<int:nav_id>', methods=['GET'])
+def get_nav(nav_id, idPage=None):
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int)
     response = home_service.get_nav(nav_id, idPage)
     result = NavSectionResponse().dump(response)
     return success_response(
@@ -139,7 +166,11 @@ def get_nav(nav_id,idPage ):
 
 
 @home_api.route('/<int:idPage>/nav/all', methods=['GET'])
-def get_all_navs(idPage):
+@home_api.route('/nav/all/<int:idPage>', methods=['GET'])
+@home_api.route('/nav/all', methods=['GET'])
+def get_all_navs(idPage=None):
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int)
     response = home_service.get_all_navs(idPage)
     result = NavSectionResponse(many=True).dump(response)
     return success_response(
@@ -149,10 +180,12 @@ def get_all_navs(idPage):
     )
 
 
+@home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['PUT'])
 @home_api.route('/nav/<int:nav_id>', methods=['PUT'])
-def update_nav(nav_id=None):
+def update_nav(nav_id=None, idPage=None):
     json_data = request.get_json() or {}
-    idPage = request.args.get('idPage', type=int) or json_data.get("idPage")
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int) or json_data.get("idPage") or json_data.get("id")
 
     data = NavSectionRequestDTO().load(json_data)
     response = home_service.update_nav(data, nav_id, idPage)
@@ -160,6 +193,19 @@ def update_nav(nav_id=None):
     return success_response(
         data=result,
         message="Cập nhật Nav thành công",
+        status_code=200
+    )
+
+
+@home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['DELETE'])
+@home_api.route('/nav/<int:nav_id>', methods=['DELETE'])
+def delete_nav(nav_id, idPage=None):
+    if idPage is None:
+        idPage = request.args.get('idPage', type=int) or (request.get_json() or {}).get("idPage")
+    home_service.delete_nav(nav_id, idPage)
+    return success_response(
+        data=None,
+        message="Xóa Nav thành công",
         status_code=200
     )
 
@@ -173,7 +219,7 @@ def update_nav(nav_id=None):
 def update_support_banner(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
-        idPage = json_data.get("id") or json_data.get("idPage")
+        idPage = request.args.get('idPage', type=int) or json_data.get("id") or json_data.get("idPage")
 
     data = SupportBannerRequestDTO().load(json_data)
     response = home_service.update_support_banner_section(data, idPage)
