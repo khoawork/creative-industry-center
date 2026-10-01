@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AboutLayout from "../components/About/about-layout";
-import { getIntroducePage, getIntroduceSections } from "../api/About/introduceApi.js";
+import { IntroduceAPI } from "../api/introduceApi.js";
+import { INTRODUCE_PAGE_ID } from "../config/About/aboutConfig.js";
 
 export default function AboutPage() {
   const [attempt, setAttempt] = useState(0);
@@ -9,14 +10,18 @@ export default function AboutPage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    getIntroducePage({ signal: controller.signal })
-      .then((page) => {
+    IntroduceAPI.getIntroducePage(INTRODUCE_PAGE_ID, { signal: controller.signal })
+      .then((response) => {
         if (controller.signal.aborted) return;
-        setState({ status: "success", sections: getIntroduceSections(page.props), error: "" });
+        const page = response?.data;
+        if (response?.success !== true || !page?.props || typeof page.props !== 'object' || Array.isArray(page.props)) {
+          throw new Error(response?.message || 'Dữ liệu trang giới thiệu không hợp lệ.');
+        }
+        setState({ status: "success", sections: page.props, error: "" });
       })
       .catch((error) => {
         if (controller.signal.aborted || error.name === "AbortError") return;
-        setState({ status: "error", sections: {}, error: error.message });
+        setState({ status: "error", sections: {}, error: error.response?.data?.message || error.message || 'Không thể tải nội dung giới thiệu.' });
       });
 
     return () => controller.abort();
@@ -33,7 +38,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[#f4f3f1] [font-family:Inter,sans-serif] antialiased text-black">
       <main className="w-full min-h-[calc(100vh-6rem)]" aria-busy={state.status === "loading"}>
         {hasContent ? (
-          <AboutLayout sections={state.sections} />
+          <AboutLayout props={state.sections} />
         ) : (
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-20 text-center">
             <h1 className="text-3xl font-bold text-[#710008]">Giới thiệu</h1>

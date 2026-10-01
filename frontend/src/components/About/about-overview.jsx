@@ -1,5 +1,4 @@
 import { AboutHeading, AboutIcon, AboutImage } from './about-shared.jsx';
-import { aboutImages } from '../../data/About/aboutImages.js';
 
 export default function AboutOverview({ section }) {
   return (
@@ -21,7 +20,7 @@ export default function AboutOverview({ section }) {
           </dl>
         )}
       </div>
-      <div className="min-w-0 lg:col-span-5"><AboutImage image={section.featured_image} localImage={aboutImages.overview} /></div>
+      <div className="min-w-0 lg:col-span-5"><AboutImage image={section.featured_image} /></div>
     </section>
   );
 }
