@@ -32,8 +32,10 @@ def create_app():
     # 3. Đăng ký các blueprints
     from controllers.UserController import user_api
     from controllers.HomeController import home_api
+    from controllers.IntroduceController import introduce_api
     app.register_blueprint(user_api)
     app.register_blueprint(home_api)
+    app.register_blueprint(introduce_api)
 
     return app
 
