@@ -1,6 +1,7 @@
 from .BaseModel import BaseModel
 from extensions import db
 
+
 class Training(BaseModel):
     __tablename__ = "training"
     id = db.Column(db.String(50), primary_key=True)

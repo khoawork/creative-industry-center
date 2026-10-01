@@ -5,7 +5,6 @@ from dto.training_dto import TrainingFilterDTO, TrainingResponseDTO, CreateTrain
 from services import training_service
 from utils.json import error_response, success_response
 
-
 training_api = Blueprint("training_api", __name__, url_prefix="/api/trainings")
 training_schema = CreateTrainingDTO()
 training_response_schema = TrainingResponseDTO()
@@ -171,7 +170,9 @@ def get_trainings():
     """
     filters = training_filter_schema.load(request.args.to_dict())
     trainings, meta = training_service.get_trainings(**filters)
-    return success_response(data=training_response_schema.dump(trainings, many=True), meta=meta)
+    return success_response(
+        data=training_response_schema.dump(trainings, many=True), meta=meta
+    )
 
 
 @training_api.get("/<string:training_id>")

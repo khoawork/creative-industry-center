@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Introduction = ({ totalStories = 54 }) => {
+export const Introduction = ({ totalStories = 54, hero }) => {
   return (
     <section 
       className="relative overflow-hidden text-white py-14 md:py-20 border-b-4 border-[#d49520]"
@@ -22,7 +22,7 @@ export const Introduction = ({ totalStories = 54 }) => {
 
             {/* Tiêu đề chính */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white uppercase drop-shadow-sm leading-tight">
-              CHUYỆN NHÀ SÁNG NGHIỆP
+              {hero?.name || 'CHUYỆN NHÀ SÁNG NGHIỆP'}
             </h1>
 
             {/* Đường gạch ngang */}
@@ -31,7 +31,7 @@ export const Introduction = ({ totalStories = 54 }) => {
             {/* Khối chứa Paragraph và Thẻ Stats nằm ngang hàng */}
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 pt-2">
               <p className="text-amber-100/90 text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl font-normal">
-                Hành trình khởi nguồn ý chí — Những câu chuyện cống hiến truyền cảm hứng từ các Kỷ lục gia, Nhà khoa học và Doanh nhân tiên phong trong sự nghiệp công nghiệp sáng tạo quốc gia.
+                {hero?.description || 'Hành trình khởi nguồn ý chí — Những câu chuyện cống hiến truyền cảm hứng từ các Kỷ lục gia, Nhà khoa học và Doanh nhân tiên phong trong sự nghiệp công nghiệp sáng tạo quốc gia.'}
               </p>
               
               {/* Thẻ thống kê */}
@@ -43,10 +43,10 @@ export const Introduction = ({ totalStories = 54 }) => {
 
                   <div className="flex flex-col">
                     <span className="text-[#d49520] font-extrabold text-sm sm:text-base tracking-wider uppercase">
-                      NIÊN GIÁM KỶ LỤC GIA
+                      {hero?.subtitle || 'NIÊN GIÁM KỶ LỤC GIA'}
                     </span>
                     <span className="text-xs text-amber-100/80 mt-0.5">
-                      Hồ sơ sáng tạo & cống hiến thực chứng
+                      {hero?.subdescription || 'Hồ sơ sáng tạo & cống hiến thực chứng'}
                     </span>
                   </div>
                 </div>

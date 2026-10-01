@@ -36,8 +36,12 @@ class CreateTrainingDTO(BaseSchema):
 
 
 class TrainingFilterDTO(PaginationFilterDTO):
-    search = fields.String(validate=[validate.Length(min=1, max=255), validate_not_blank])
-    certificate = fields.String(validate=[validate.Length(min=1, max=255), validate_not_blank])
+    search = fields.String(
+        validate=[validate.Length(min=1, max=255), validate_not_blank]
+    )
+    certificate = fields.String(
+        validate=[validate.Length(min=1, max=255), validate_not_blank]
+    )
 
 
 class TrainingResponseDTO(CreateTrainingDTO):
