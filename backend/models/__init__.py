@@ -1,7 +1,7 @@
 from .EventModel import Event
-from .UserModel import User
+from .UserModel import User, RoleEnum
 from .AwardModel import Award
-from .EventModel import Event, EventCategory
+from .EventModel import Event, EventCategory, EventStatus
 from .PageModel import Page
 from .TrainingModel import Training
 from .ProjectModel import Project
