@@ -131,7 +131,7 @@ class FounderRequestPageDto(BaseSchema):
 
 
 class FounderResponsePageDto(BaseSchema):
-    id = fields.Integer(required=True)
+    id = fields.String(required=True)
     name = fields.String(required=True)
     slug = fields.String(required=True)
     props = fields.Nested(FounderPropsResponseDto, required=True)
