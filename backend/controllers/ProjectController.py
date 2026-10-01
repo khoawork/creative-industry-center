@@ -1,7 +1,10 @@
+import json
 from flask import Blueprint, request
 from dto import project_dto
 from utils.json import error_response, success_response
 from services import project_services
+from services.image_storage_service import upload_image
+from utils.error import APIException
 from marshmallow import ValidationError
 
 project_api = Blueprint("project_api", __name__, url_prefix="/projects")
@@ -126,20 +129,38 @@ def create_project():
         description: Failed to create project
     """
     try:
-        data = request.get_json()
-        data = project_dto.ProjectRequest().load(data)
+        if request.mimetype == "multipart/form-data":
+            json_data = json.loads(request.form.get("data") or "{}")
+            image_file = request.files.get("image") or request.files.get("featured_image")
+            if image_file:
+              json_data["image"] = upload_image(
+                image_file, folder="projects", max_url_length=500
+              )
+        else:
+            json_data = request.get_json() or {}
+
+        data = project_dto.ProjectRequest().load(json_data)
         response = project_services.create_project(data)
         result = project_dto.ProjectResponse().dump(response)
         return success_response(
             data=result, message="Project created successfully", status_code=201
         )
+    except APIException as e:
+      return error_response(
+        message=e.message,
+        details=e.details,
+        status_code=e.status_code,
+        error_code=e.error_code,
+      )
     except ValidationError as e:
         return error_response(
             message="Validation error", details=e.messages, status_code=400
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return error_response(
-            message="Failed to create project", details=str(e), status_code=500
+            message=f"Lỗi: {str(e)}", details=str(e), status_code=500
         )
 
 
@@ -179,8 +200,17 @@ def update_project(project_id: int):
             description: Project not found
     """
     try:
-        data = request.get_json()
-        data = project_dto.ProjectRequest().load(data)
+        if request.mimetype == "multipart/form-data":
+            json_data = json.loads(request.form.get("data") or "{}")
+            image_file = request.files.get("image") or request.files.get("featured_image")
+            if image_file:
+              json_data["image"] = upload_image(
+                image_file, folder="projects", max_url_length=500
+              )
+        else:
+            json_data = request.get_json() or {}
+
+        data = project_dto.ProjectRequest().load(json_data)
         response = project_services.update_project(project_id, data)
         if not response:
             return error_response(message="Project not found", status_code=404)
@@ -188,13 +218,22 @@ def update_project(project_id: int):
         return success_response(
             data=result, message="Project updated successfully", status_code=200
         )
+    except APIException as e:
+      return error_response(
+        message=e.message,
+        details=e.details,
+        status_code=e.status_code,
+        error_code=e.error_code,
+      )
     except ValidationError as e:
         return error_response(
             message="Validation error", details=e.messages, status_code=400
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return error_response(
-            message="Failed to update project", details=str(e), status_code=500
+            message=f"Lỗi: {str(e)}", details=str(e), status_code=500
         )
 
 

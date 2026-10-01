@@ -4,15 +4,15 @@ from models import Project, ProjectCategory
 
 
 def is_unique_name(name: str, project_id: int = None, category_id: int = None) -> bool:
-    existing_project = project_repo.get_project_by_name(name)
-    existing_category = project_repo.get_project_category_by_name(name)
+    if category_id is not None:
+        existing_category = project_repo.get_project_category_by_name(name)
+        if existing_category and existing_category.id != category_id:
+            return False
+        return True
 
-    if existing_project:
-        if not project_id or existing_project.id != project_id:
-            return False
-    if existing_category:
-        if not category_id or existing_category.id != category_id:
-            return False
+    existing_project = project_repo.get_project_by_name(name)
+    if existing_project and (not project_id or existing_project.id != project_id):
+        return False
 
     return True
 
@@ -23,7 +23,7 @@ def create_project_category(
     if not category_data:
         raise ValueError("Project category data is required")
 
-    is_unique = is_unique_name(name=category_data.name)
+    is_unique = is_unique_name(name=category_data.name, category_id=-1)
     if not is_unique:
         raise ValueError("Project category name must be unique")
 

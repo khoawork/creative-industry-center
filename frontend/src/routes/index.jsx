@@ -31,6 +31,8 @@ const AdminNotFound = lazy(() => import("../pages/Admin/AdminNotFound.jsx"));
 const AdminContact = lazy(() => import("../pages/Admin/AdminContact.jsx"));
 const AdminHome = lazy(() => import("../pages/Admin/AdminHome.jsx"));
 const FounderAdminPanel = lazy(() => import("../components/Admin/Founder/FounderAdminPanel.jsx"));
+const AdminNavigation = lazy(() => import("../pages/Admin/AdminNavigation.jsx"));
+const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
@@ -64,10 +66,18 @@ export const adminRoute = {
           <AdminHome />
         ) : item.id === "stories" ? (
           <FounderAdminPanel />
+        ) : item.id === "navigation" ? (
+          <AdminNavigation />
+        ) : item.id === "catalog" || ["events", "awards", "training", "projects"].includes(item.id) ? (
+          <AdminCatalog defaultTab={item.id === "catalog" ? undefined : item.id} />
         ) : (
           <AdminModulePlaceholder item={item} />
         ),
     })),
+    {
+      path: "catalog",
+      element: <AdminCatalog />,
+    },
     {
       path: "messages",
       element: <Navigate to={adminItemsById.contact.path} replace />,

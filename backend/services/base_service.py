@@ -21,15 +21,19 @@ def create_page(data) -> Dict[str, Any]:
     Tạo một Page mới (đồng thời là 1 item trên header).
     Kiểm tra trùng lặp slug trước khi tạo.
     """
-    # Kiểm tra xem slug đã tồn tại chưa
-    existing_page = base_repo.getPageBySlug(data.slug)
-    if existing_page:
-        raise ConflictError(message=f"Trang với đường dẫn (slug) '{data.slug}' đã tồn tại")
+    slug = (getattr(data, "slug", "") or "").strip().strip("/")
+    if not slug:
+        raise ConflictError(message="Đường dẫn (slug) không được để trống")
 
-    props = getattr(data, "props", {}) or {}
+    existing_page = base_repo.getPageBySlug(slug)
+    if existing_page:
+        raise ConflictError(message=f"Trang với đường dẫn (slug) '{slug}' đã tồn tại")
+
+    props = getattr(data, "props", None) or {}
+    name = (getattr(data, "name", "") or "").strip()
     new_page = base_repo.createPage(
-        name=data.name,
-        slug=data.slug,
+        name=name,
+        slug=slug,
         props=props
     )
     return _serialize_page(new_page)
@@ -64,7 +68,8 @@ def get_page_by_id(page_id: int) -> Dict[str, Any]:
 
 def get_page_by_slug(slug: str) -> Dict[str, Any]:
     """Lấy chi tiết trang theo slug (ví dụ: home, events, trainings,...)"""
-    page = base_repo.getPageBySlug(slug)
+    normalized_slug = (slug or "").strip().strip("/")
+    page = base_repo.getPageBySlug(normalized_slug)
     if not page:
         raise NotFoundError(message=f"Không tìm thấy trang với đường dẫn '{slug}'")
     return _serialize_page(page)
@@ -76,14 +81,20 @@ def update_page(page_id: int, data) -> Dict[str, Any]:
     if not page:
         raise NotFoundError(message=f"Không tìm thấy trang với ID {page_id} để cập nhật")
 
-    # Nếu đổi slug, kiểm tra xem có trùng với trang nào khác không
-    if hasattr(data, "slug") and data.slug and data.slug != page.slug:
-        existing = base_repo.getPageBySlug(data.slug)
-        if existing and existing.id != page_id:
-            raise ConflictError(message=f"Đường dẫn (slug) '{data.slug}' đã được sử dụng bởi trang khác")
-
     name = getattr(data, "name", None)
+    if name is not None:
+        name = name.strip()
+
     slug = getattr(data, "slug", None)
+    if slug is not None:
+        slug = slug.strip().strip("/")
+        if not slug:
+            raise ConflictError(message="Đường dẫn (slug) không được để trống")
+        if slug != page.slug:
+            existing = base_repo.getPageBySlug(slug)
+            if existing and existing.id != page_id:
+                raise ConflictError(message=f"Đường dẫn (slug) '{slug}' đã được sử dụng bởi trang khác")
+
     props = getattr(data, "props", None)
 
     updated = base_repo.updatePage(page=page, name=name, slug=slug, props=props)

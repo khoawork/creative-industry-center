@@ -4,13 +4,9 @@ from dto import event_dto
 
 def is_unique_name(name: str, event_id: int = None) -> bool:
     existing_event = event_repo.get_event_by_name(name)
-    existing_event_category = event_repo.get_event_category_by_name(name)
 
     if existing_event:
         if not event_id or existing_event.id != event_id:
-            return False
-    if existing_event_category:
-        if not event_id or existing_event_category.id != event_id:
             return False
 
     return True
@@ -24,6 +20,10 @@ def get_event_by_id(event_id: int) -> event_dto.EventResponse:
 def get_all_events() -> list[event_dto.EventResponse]:
     events = event_repo.get_all_events()
     return events
+
+
+def get_event_categories() -> list[event_dto.EventCategoryResponse]:
+    return event_repo.get_all_event_categories()
 
 
 def create_event(event_data: event_dto.EventRequest) -> event_dto.EventResponse:
@@ -79,8 +79,7 @@ def create_event_category(
     if not category_data:
         raise ValueError("Event category data is required")
 
-    is_unique = is_unique_name(name=category_data.name)
-    if not is_unique:
+    if event_repo.get_event_category_by_name(category_data.name):
         raise ValueError("Event category name must be unique")
 
     category = event_repo.create_event_category(category_data)

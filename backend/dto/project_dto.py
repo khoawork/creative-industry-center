@@ -15,7 +15,7 @@ class ProjectCategoryRequest(BaseSchema):
 class ProjectCategoryResponse(BaseSchema):
     id = fields.Integer(required=True)
     name = fields.String(required=True)
-    description = fields.String(required=True)
+    description = fields.String(allow_none=True)
 
 
 class ProjectInfo(BaseSchema):
@@ -27,7 +27,7 @@ class ProjectRequest(BaseSchema):
     title = fields.String(required=True)
     description = fields.String(required=True)
     research_info = fields.List(fields.Nested(ResearchInfo), required=True)
-    project_info = fields.Nested(ProjectInfo, required=True)
+    project_info = fields.Raw(allow_none=True)
     slogan = fields.String(required=True)
     image = fields.String(required=True)
     category_id = fields.Integer(required=True)
@@ -37,9 +37,9 @@ class ProjectResponse(BaseSchema):
     id = fields.Integer(required=True)
     name = fields.String(required=True)
     title = fields.String(required=True)
-    description = fields.String(required=True)
-    research_info = fields.List(fields.Nested(ResearchInfo), required=True)
-    project_info = fields.Nested(ProjectInfo, required=True)
-    slogan = fields.String(required=True)
-    image = fields.String(required=True)
-    category = fields.Nested(ProjectCategoryResponse, required=True)
+    description = fields.String(allow_none=True)
+    research_info = fields.List(fields.Nested(ResearchInfo), allow_none=True)
+    project_info = fields.Raw(allow_none=True)
+    slogan = fields.String(allow_none=True)
+    image = fields.String(allow_none=True)
+    category = fields.Nested(ProjectCategoryResponse, allow_none=True)

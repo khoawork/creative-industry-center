@@ -1,8 +1,10 @@
+import json
 from flask import Blueprint, request
 from marshmallow import ValidationError as MarshmallowValidationError
 
 from dto.award_dto import AwardFilterDTO, AwardResponseDTO, CreateAwardDTO
 from services import award_service
+from services.image_storage_service import upload_image
 from utils.json import error_response, success_response
 
 
@@ -226,7 +228,15 @@ def create():
       422:
         description: Dữ liệu không hợp lệ.
     """
-    dto = award_schema.load(request.get_json())
+    if request.mimetype == "multipart/form-data":
+        json_data = json.loads(request.form.get("data") or "{}")
+        image_file = request.files.get("image") or request.files.get("featured_image")
+        if image_file:
+            json_data["image"] = upload_image(image_file, folder="awards")
+    else:
+        json_data = request.get_json() or {}
+
+    dto = award_schema.load(json_data)
     award = award_service.create_award(dto)
     response, status = success_response(
         data=award_response_schema.dump(award),
@@ -274,7 +284,15 @@ def update(award_id):
         description: Dữ liệu không hợp lệ.
     """
     partial = request.method == "PATCH"
-    dto = award_schema.load(request.get_json(), partial=partial)
+    if request.mimetype == "multipart/form-data":
+        json_data = json.loads(request.form.get("data") or "{}")
+        image_file = request.files.get("image") or request.files.get("featured_image")
+        if image_file:
+            json_data["image"] = upload_image(image_file, folder="awards")
+    else:
+        json_data = request.get_json() or {}
+
+    dto = award_schema.load(json_data, partial=partial)
     award = award_service.update_award(award_id, dto, partial=partial)
     return success_response(
         data=award_response_schema.dump(award),

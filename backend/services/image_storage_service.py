@@ -15,7 +15,7 @@ ALLOWED_IMAGE_FORMATS = {
 }
 
 
-def upload_image(file, folder="awards"):
+def upload_image(file, folder="awards", max_url_length=255):
     if file is None or not file.filename:
         raise ValidationError("Vui lòng chọn ảnh.")
 
@@ -63,9 +63,9 @@ def upload_image(file, folder="awards"):
         stream.name = f"image.{extension}"
         image_url = cloudinary_storage.upload(stream, folder=folder)
 
-    if len(image_url) > 255:
+    if len(image_url) > max_url_length:
         raise InternalServerError(
-            "URL ảnh vượt quá giới hạn lưu trữ của Award."
+            "URL ảnh vượt quá giới hạn lưu trữ."
         )
 
     return image_url

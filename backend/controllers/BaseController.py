@@ -2,10 +2,11 @@ from flask import Blueprint, request
 from services import base_service
 from dto.base_dto import (
     PageRequestDTO,
+    PageUpdateRequestDTO,
     PageResponseDTO,
     HeaderItemDTO
 )
-from utils.json import success_response
+from utils.json import success_response, error_response
 
 base_api = Blueprint("base_api", __name__, url_prefix="/pages")
 
@@ -141,7 +142,7 @@ def get_page_by_slug(slug: str):
     )
 
 
-@base_api.route("/<int:page_id>", methods=["PUT"])
+@base_api.route("/<int:page_id>", methods=["PUT", "PATCH"])
 def update_page(page_id: int):
     """
     Cập nhật thông tin Page
@@ -170,7 +171,7 @@ def update_page(page_id: int):
         description: Cập nhật thành công
     """
     json_data = request.get_json() or {}
-    data = PageRequestDTO().load(json_data)
+    data = PageUpdateRequestDTO().load(json_data)
     response = base_service.update_page(page_id, data)
     result = PageResponseDTO().dump(response)
     return success_response(
@@ -202,3 +203,23 @@ def delete_page(page_id: int):
         message="Xóa trang thành công",
         status_code=200
     )
+
+
+@base_api.route("/upload", methods=["POST"])
+def upload_image_endpoint():
+    """Tải ảnh lên Cloudinary và trả về URL ảnh"""
+    file = request.files.get("file") or request.files.get("image")
+    if not file:
+        return error_response(message="Không tìm thấy file ảnh tải lên.", status_code=400)
+    folder = request.form.get("folder", "catalog")
+    try:
+        from services.image_storage_service import upload_image
+        image_url = upload_image(file, folder=folder)
+        return success_response(
+            data={"url": image_url},
+            message="Tải ảnh lên thành công",
+            status_code=200
+        )
+    except Exception as e:
+        return error_response(message=str(e), status_code=400)
+

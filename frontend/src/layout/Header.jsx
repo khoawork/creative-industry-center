@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { site, siteLinks } from '../config/shared/site.js';
 import Brand from '../components/shared/Brand.jsx';
 import Icon from '../components/shared/Icon.jsx';
+import { PageAPI } from '../api/pageApi.js';
 
 export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: externalSetMenuOpen }) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
@@ -84,7 +85,7 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     };
   }, [isMenuOpen]);
 
-  const navItems = [
+  const defaultNavItems = [
     siteLinks.home,
     siteLinks.about,
     siteLinks.events,
@@ -97,39 +98,40 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     siteLinks.contact,
   ];
 
+  const [navItems, setNavItems] = useState(defaultNavItems);
+
+  useEffect(() => {
+    let isMounted = true;
+    PageAPI.getHeaderItems()
+      .then((res) => {
+        const items = res?.data || res;
+        if (isMounted && Array.isArray(items) && items.length > 0) {
+          const mapped = items.map((p) => {
+            const isHome = p.slug === 'home' || p.slug === '';
+            return {
+              id: p.id,
+              label: p.name,
+              href: isHome ? '/' : `/${p.slug.replace(/^\/+/, '')}`,
+            };
+          });
+          setNavItems(mapped);
+        }
+      })
+      .catch((err) => {
+        console.debug('Using default navigation items', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const isLinkActive = (item) => {
     if (!item?.href) return false;
     const currentPath = location.pathname;
 
-    if (item === siteLinks.home) {
-      return currentPath === '/';
-    }
-    if (item === siteLinks.about) {
-      return currentPath === '/about';
-    }
-    if (item === siteLinks.events) {
-      return currentPath === '/events';
-    }
-    if (item === siteLinks.records) {
-      return currentPath === '/records';
-    }
-    if (item === siteLinks.projects) {
-      return currentPath === '/projects';
-    }
-    if (item === siteLinks.awards) {
-      return currentPath === '/awards';
-    }
-    if (item === siteLinks.stories) {
-      return currentPath === '/stories';
-    }
-    if (item === siteLinks.forum) {
-      return currentPath === '/forum';
-    }
-    if (item === siteLinks.training) {
-      return currentPath === '/training';
-    }
-    if (item === siteLinks.contact) {
-      return currentPath === '/contact';
+    if (item.href === '/') {
+      return currentPath === '/' || currentPath === '';
     }
 
     return currentPath === item.href || currentPath.startsWith(`${item.href}/`);

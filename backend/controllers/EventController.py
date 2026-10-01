@@ -1,10 +1,58 @@
+import json
 from flask import Blueprint, request
 from dto import event_dto
 from utils.json import error_response, success_response
 from services import event_services
+from services.image_storage_service import upload_image
 from marshmallow import ValidationError
 
 event_api = Blueprint("event_api", __name__, url_prefix="/events")
+
+
+@event_api.route("/categories", methods=["GET"])
+def get_event_categories():
+  try:
+    categories = event_services.get_event_categories()
+    data = [
+      {
+        "id": category.id,
+        "name": category.name,
+        "description": getattr(category, "description", None),
+      }
+      for category in categories
+    ]
+    return success_response(
+      data=data, message="Event categories retrieved successfully", status_code=200
+    )
+  except Exception as e:
+    return error_response(
+      message="Failed to retrieve event categories", details=str(e), status_code=500
+    )
+
+
+@event_api.route("/categories", methods=["POST"])
+def create_event_category():
+  try:
+    category_data = event_dto.EventCategoryRequestDTO().load(
+      request.get_json() or {}
+    )
+    category = event_services.create_event_category(category_data)
+    result = event_dto.EventCategoryResponse().dump(category)
+    return success_response(
+      data=result, message="Event category created successfully", status_code=201
+    )
+  except ValidationError as e:
+    return error_response(
+      message="Validation error", details=e.messages, status_code=400
+    )
+  except ValueError as e:
+    return error_response(
+      message=str(e), details=None, status_code=409
+    )
+  except Exception as e:
+    return error_response(
+      message="Failed to create event category", details=str(e), status_code=500
+    )
 
 
 @event_api.route("/", methods=["GET"])
@@ -141,8 +189,15 @@ def create_event():
         description: Failed to create event
     """
     try:
-        data = request.get_json()
-        data = event_dto.EventRequest().load(data)
+        if request.mimetype == "multipart/form-data":
+            json_data = json.loads(request.form.get("data") or "{}")
+            image_file = request.files.get("image") or request.files.get("featured_image")
+            if image_file:
+                json_data["image"] = upload_image(image_file, folder="events")
+        else:
+            json_data = request.get_json() or {}
+
+        data = event_dto.EventRequest().load(json_data)
         response = event_services.create_event(data)
         result = event_dto.EventResponse().dump(response)
         return success_response(
@@ -191,8 +246,15 @@ def update_event(event_id):
         description: Failed to update event
     """
     try:
-        data = request.get_json()
-        data = event_dto.EventRequest().load(data)
+        if request.mimetype == "multipart/form-data":
+            json_data = json.loads(request.form.get("data") or "{}")
+            image_file = request.files.get("image") or request.files.get("featured_image")
+            if image_file:
+                json_data["image"] = upload_image(image_file, folder="events")
+        else:
+            json_data = request.get_json() or {}
+
+        data = event_dto.EventRequest().load(json_data)
         response = event_services.update_event(event_id, data)
         result = event_dto.EventResponse().dump(response)
         return success_response(
