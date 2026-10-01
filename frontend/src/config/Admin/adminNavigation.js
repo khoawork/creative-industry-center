@@ -3,7 +3,7 @@ import {
   Info, LayoutDashboard, Mail, Menu, MessageSquare,
   Trophy, UsersRound,
 } from 'lucide-react';
-import { siteLinks } from '../shared/site.js';
+import { siteLinks } from '../../config/shared/site.js';
 import { adminRoot } from './adminPaths.js';
 
 export { adminRoot } from './adminPaths.js';

@@ -75,109 +75,50 @@ export default function AdminHome() {
     };
   }, []);
 
-// Helper chuẩn hóa JSON để so sánh sâu (deep compare) dữ liệu
-const canonicalStringify = (obj) => {
-  if (obj === null || typeof obj !== 'object') {
-    return JSON.stringify(obj);
-  }
-  if (Array.isArray(obj)) {
-    return `[${obj.map(canonicalStringify).join(',')}]`;
-  }
-  const sortedKeys = Object.keys(obj).sort();
-  const entries = sortedKeys.map((key) => `${JSON.stringify(key)}:${canonicalStringify(obj[key])}`);
-  return `{${entries.join(',')}}`;
-};
-
-const isSectionChanged = (currentVal, newVal) => {
-  if (newVal === undefined) return false;
-  return canonicalStringify(currentVal) !== canonicalStringify(newVal);
-};
-
-  const handleUpdateProps = async (newPropsSection) => {
+  const handleUpdateProps = async (newPropsSection, aboutImageFile = null) => {
     if (!homeData) return;
-
-    const targetProps = newPropsSection?.props || newPropsSection || {};
-    const currentProps = homeData.props || {};
-
-    const updateTasks = [];
-    const updatedSectionNames = [];
-    const mergedProps = { ...currentProps };
-
-    // 1. Kiểm tra Hero Section
-    if (
-      targetProps.hero_section !== undefined &&
-      isSectionChanged(currentProps.hero_section, targetProps.hero_section)
-    ) {
-      updateTasks.push(async () => {
-        const res = await HomeAPI.updateHeroSection(homeData.id, targetProps.hero_section);
-        const savedData = res?.data || targetProps.hero_section;
-        mergedProps.hero_section = savedData;
-        updatedSectionNames.push('Hero Section');
-      });
-    }
-
-    // 2. Kiểm tra About Section
-    if (
-      targetProps.about_section !== undefined &&
-      isSectionChanged(currentProps.about_section, targetProps.about_section)
-    ) {
-      updateTasks.push(async () => {
-        const res = await HomeAPI.updateAboutSection(homeData.id, targetProps.about_section);
-        const savedData = res?.data || targetProps.about_section;
-        mergedProps.about_section = savedData;
-        updatedSectionNames.push('Giới thiệu (About)');
-      });
-    }
-
-    // 3. Kiểm tra Support Banner
-    if (
-      targetProps.support_banner !== undefined &&
-      isSectionChanged(currentProps.support_banner, targetProps.support_banner)
-    ) {
-      updateTasks.push(async () => {
-        const res = await HomeAPI.updateSupportBanner(homeData.id, targetProps.support_banner);
-        const savedData = res?.data || targetProps.support_banner;
-        mergedProps.support_banner = savedData;
-        updatedSectionNames.push('Banner hỗ trợ');
-      });
-    }
-
-    // Nếu không có phần nào thay đổi so với dữ liệu hiện tại
-    if (updateTasks.length === 0) {
-      alert('Không phát hiện thay đổi nào so với dữ liệu hiện tại.');
-      return;
-    }
-
     setIsSaving(true);
+
     try {
-      // Thực hiện đồng thời các API cập nhật của các phần đã thay đổi
-      await Promise.all(updateTasks.map((task) => task()));
+      const updatedProps = {
+        ...(homeData.props || {}),
+        ...newPropsSection,
+      };
 
-      // Cập nhật lại state cục bộ của trang
-      setHomeData((prev) => ({
-        ...prev,
-        props: {
-          ...(prev?.props || {}),
-          ...mergedProps,
-        },
-      }));
+      let response;
+      if (newPropsSection.hero_section) {
+        response = await HomeAPI.updateHeroSection(homeData.id, newPropsSection.hero_section);
+      } else if (newPropsSection.about_section) {
+        response = await HomeAPI.updateAboutSection(
+          homeData.id,
+          newPropsSection.about_section,
+          aboutImageFile
+        );
+        if (response?.data) updatedProps.about_section = response.data;
+      } else if (newPropsSection.support_banner) {
+        response = await HomeAPI.updateSupportBanner(newPropsSection.support_banner, homeData.id);
+      } else {
+        throw new Error('Không xác định được section Home cần cập nhật.');
+      }
 
-      alert(`Lưu thay đổi thành công: ${updatedSectionNames.join(', ')}!`);
+      setHomeData({ ...homeData, props: updatedProps });
+      alert('Lưu thay đổi thành công!');
+      return newPropsSection.about_section ? updatedProps.about_section : true;
     } catch (error) {
       console.error('Lỗi khi lưu dữ liệu:', error);
       alert('Có lỗi xảy ra khi lưu dữ liệu lên hệ thống.');
-      throw error;
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleSaveHero = (newHeroData) => {
-    return handleUpdateProps({ hero_section: newHeroData });
+    handleUpdateProps({ hero_section: newHeroData });
   };
 
-  const handleSaveAbout = (newAboutData) => {
-    return handleUpdateProps({ about_section: newAboutData });
+  const handleSaveAbout = (newAboutData, imageFile) => {
+    return handleUpdateProps({ about_section: newAboutData }, imageFile);
   };
 
   const handleSaveNavSection = async (savedSection) => {
@@ -251,7 +192,7 @@ const isSectionChanged = (currentVal, newVal) => {
   };
 
   const handleSaveSupportBanner = (newSupportData) => {
-    return handleUpdateProps({ support_banner: newSupportData });
+    handleUpdateProps({ support_banner: newSupportData });
   };
 
   // Hiển thị trạng thái đang tải dữ liệu từ API

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Save, Sparkles, Check, Image as ImageIcon } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Plus, Trash2, Save, Sparkles, Check, Image as ImageIcon, Upload } from 'lucide-react';
 
 export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -19,6 +19,42 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
 
   const [errors, setErrors] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const imageInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!selectedImageFile) {
+      setImagePreviewUrl('');
+      return undefined;
+    }
+
+    const previewUrl = URL.createObjectURL(selectedImageFile);
+    setImagePreviewUrl(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [selectedImageFile]);
+
+  const handleImageSelection = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadError('');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setUploadError('Chỉ hỗ trợ ảnh JPG, PNG hoặc WEBP.');
+      event.target.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Ảnh không được vượt quá 5 MB.');
+      event.target.value = '';
+      return;
+    }
+
+    setSelectedImageFile(file);
+    setUploadError('');
+    event.target.value = '';
+  };
 
   const validate = () => {
     const errs = {};
@@ -50,7 +86,15 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
     e.preventDefault();
     if (!validate()) return;
     setSaveSuccess(false);
-    await onSave(formData);
+    const saved = await onSave(formData, selectedImageFile);
+    if (saved === false) return;
+    if (saved?.featured_image?.url) {
+      setFormData((current) => ({
+        ...current,
+        featured_image: { ...current.featured_image, ...saved.featured_image },
+      }));
+    }
+    setSelectedImageFile(null);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3500);
   };
@@ -151,6 +195,26 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
               <label className="block text-xs font-medium text-gray-600 mb-1">
                 URL Hình ảnh *
               </label>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageSelection}
+                  className="sr-only"
+                />
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={isSaving}
+                  className="inline-flex min-h-10 items-center gap-2 rounded-md border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) disabled:cursor-wait disabled:opacity-60"
+                >
+                  <Upload size={14} />
+                  {selectedImageFile ? 'Đổi ảnh đã chọn' : 'Chọn ảnh'}
+                </button>
+                {selectedImageFile && <span className="text-xs text-gray-500">Ảnh sẽ được upload Cloudinary khi lưu About.</span>}
+              </div>
+              {uploadError && <p role="alert" className="mb-2 text-xs text-red-600">{uploadError}</p>}
               <input
                 type="text"
                 value={formData.featured_image.url}
@@ -374,9 +438,9 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
 
             {/* Photo & Caption */}
             <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-100 h-36">
-              {formData.featured_image.url ? (
+              {imagePreviewUrl || formData.featured_image.url ? (
                 <img
-                  src={formData.featured_image.url}
+                  src={imagePreviewUrl || formData.featured_image.url}
                   alt={formData.featured_image.caption_title}
                   className="w-full h-full object-cover"
                 />

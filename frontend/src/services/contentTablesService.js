@@ -5,9 +5,7 @@ import { ProjectAPI } from '../api/projectApi.js';
 import { TrainingAPI } from '../api/trainingApi.js';
 
 
-/**
- * Giá trị khởi tạo rỗng; dữ liệu được tải trực tiếp từ backend.
- */
+
 export const DEFAULT_TABLE_DATA = {
   events: [],
   projects: [],

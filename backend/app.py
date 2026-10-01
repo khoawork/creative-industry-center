@@ -20,13 +20,14 @@ def create_app():
     # Tắt strict_slashes để tránh Werkzeug tự 308 redirect giữa /events và /events/
     app.url_map.strict_slashes = False
 
-    # Cấu hình CORS toàn diện cho frontend
+    allowed_origins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
     CORS(
         app,
-        resources={r"/*": {"origins": "*"}},
+        resources={r"/*": {"origins": allowed_origins}},
         supports_credentials=True,
-        allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     )
 
     # 2. Khởi tạo SQLAlchemy

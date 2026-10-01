@@ -1,7 +1,7 @@
 import Button from '../shared/Button.jsx'
 import Icon from '../shared/Icon.jsx'
-import { hero, statistics } from '../../config/Home/homeData.js'
-import { sectionIds, siteHeading, siteLinks } from '../../config/shared/site.js'
+import { hero, statistics } from '../../data/homeData.js'
+import { sectionIds } from '../../config/shared/site.js'
 
 export default function HomeHero({ onNavigate }) {
   return (
@@ -15,33 +15,25 @@ export default function HomeHero({ onNavigate }) {
       </svg>
       <div className="home-container home-hero-inner flex flex-col items-center">
         <div className="home-hero-badge"><Icon name="star" size={20} /><span>{hero.badge}</span><Icon name="star" size={20} /></div>
-        <h1 className="home-hero-title uppercase">{siteHeading.lead} {siteHeading.accent}</h1>
+        <h1 className="home-hero-title uppercase">{hero.title}</h1>
         <span className="home-hero-rule" aria-hidden="true" />
         <p className="home-hero-subtitle">{hero.subtitle}</p>
         <p className="home-hero-slogan">{hero.slogan}</p>
         <div className="home-hero-actions flex flex-wrap items-center justify-center gap-4 mt-8 w-full">
-          <Button
-            href={siteLinks.about.href}
-            onClick={(event) => onNavigate(event, siteLinks.about.href)}
-            variant="primary"
-            size="lg"
-            icon="arrow"
-            iconPosition="end"
-            className="w-full sm:w-auto min-w-[240px] uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg"
-          >
-            Khám phá di sản sáng tạo
-          </Button>
-          <Button
-            href={siteLinks.records.href}
-            onClick={(event) => onNavigate(event, siteLinks.records.href)}
-            variant="outline"
-            size="lg"
-            icon="medal"
-            iconPosition="start"
-            className="w-full sm:w-auto min-w-[240px] uppercase tracking-wider text-xs md:text-sm font-bold shadow-sm hover:shadow"
-          >
-            Hồ sơ xét duyệt kỷ lục
-          </Button>
+          {hero.buttons.map((button, index) => (
+            <Button
+              key={`${button.href}-${button.text}`}
+              href={button.href}
+              onClick={(event) => onNavigate(event, button.href)}
+              variant={index === 0 ? 'primary' : 'outline'}
+              size="lg"
+              icon={index === 0 ? 'arrow' : 'medal'}
+              iconPosition={index === 0 ? 'end' : 'start'}
+              className="w-full sm:w-auto min-w-[240px] uppercase tracking-wider text-xs md:text-sm font-bold shadow-md hover:shadow-lg"
+            >
+              {button.text}
+            </Button>
+          ))}
         </div>
         <div className="home-stats grid grid-cols-2 md:grid-cols-4" aria-label="Thành tựu nổi bật">
           {statistics.map((stat) => (
