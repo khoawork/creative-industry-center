@@ -1,5 +1,8 @@
+import json
+
 from flask import Blueprint, request
 from services import home_service
+from services.image_storage_service import upload_image
 from dto.home_dto import (
     HomeResponse,
     HeroSectionRequestDTO, HeroSectionResponse,
@@ -46,7 +49,6 @@ def update_page(idPage=None):
 # ==========================================
 
 @home_api.route('/hero/<int:idPage>', methods=['POST', 'PUT'])
-@home_api.route('/hero', methods=['POST', 'PUT'])
 def update_hero(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
@@ -67,9 +69,16 @@ def update_hero(idPage=None):
 # ==========================================
 
 @home_api.route('/about/<int:idPage>', methods=['POST', 'PUT'])
-@home_api.route('/about', methods=['POST', 'PUT'])
 def update_about(idPage=None):
-    json_data = request.get_json() or {}
+    if request.mimetype == "multipart/form-data":
+        json_data = json.loads(request.form.get("data") or "{}")
+        image_file = request.files.get("featured_image")
+        if image_file:
+            featured_image = json_data.setdefault("featured_image", {})
+            featured_image["url"] = upload_image(image_file, folder="home/about")
+    else:
+        json_data = request.get_json() or {}
+
     if idPage is None:
         idPage = request.args.get('idPage', type=int) or json_data.get("id") or json_data.get("idPage")
 
@@ -88,7 +97,6 @@ def update_about(idPage=None):
 # ==========================================
 
 @home_api.route('/<int:idPage>/nav', methods=['POST'])
-@home_api.route('/nav/<int:idPage>', methods=['POST'])
 def create_nav(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
@@ -106,7 +114,6 @@ def create_nav(idPage=None):
 
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>/children', methods=['POST'], endpoint='add_nav_children')
-@home_api.route('/nav/<int:nav_id>/children', methods=['POST'])
 def add_children_to_nav(nav_id, idPage=None):
     """
     Thêm ID nav con vào nav đã chọn.
@@ -129,7 +136,6 @@ def add_children_to_nav(nav_id, idPage=None):
     )
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>/children', methods=['DELETE'], endpoint='delete_nav_children')
-@home_api.route('/nav/<int:nav_id>/children', methods=['DELETE'])
 def delete_children_to_nav(nav_id, idPage=None):
     """
     Xóa ID nav con khỏi nav đã chọn.
@@ -152,7 +158,6 @@ def delete_children_to_nav(nav_id, idPage=None):
     )
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['GET'])
-@home_api.route('/nav/<int:nav_id>', methods=['GET'])
 def get_nav(nav_id, idPage=None):
     if idPage is None:
         idPage = request.args.get('idPage', type=int)
@@ -166,8 +171,6 @@ def get_nav(nav_id, idPage=None):
 
 
 @home_api.route('/<int:idPage>/nav/all', methods=['GET'])
-@home_api.route('/nav/all/<int:idPage>', methods=['GET'])
-@home_api.route('/nav/all', methods=['GET'])
 def get_all_navs(idPage=None):
     if idPage is None:
         idPage = request.args.get('idPage', type=int)
@@ -181,7 +184,6 @@ def get_all_navs(idPage=None):
 
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['PUT'])
-@home_api.route('/nav/<int:nav_id>', methods=['PUT'])
 def update_nav(nav_id=None, idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
@@ -198,7 +200,6 @@ def update_nav(nav_id=None, idPage=None):
 
 
 @home_api.route('/<int:idPage>/nav/<int:nav_id>', methods=['DELETE'])
-@home_api.route('/nav/<int:nav_id>', methods=['DELETE'])
 def delete_nav(nav_id, idPage=None):
     if idPage is None:
         idPage = request.args.get('idPage', type=int) or (request.get_json() or {}).get("idPage")
@@ -215,7 +216,6 @@ def delete_nav(nav_id, idPage=None):
 # ==========================================
 
 @home_api.route('/support-banner/<int:idPage>', methods=['POST', 'PUT'])
-@home_api.route('/support-banner', methods=['POST', 'PUT'])
 def update_support_banner(idPage=None):
     json_data = request.get_json() or {}
     if idPage is None:
