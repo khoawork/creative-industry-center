@@ -5,7 +5,9 @@ from dto.training_dto import TrainingFilterDTO, TrainingResponseDTO, CreateTrain
 from services import training_service
 from utils.json import error_response, success_response
 
-training_api = Blueprint("training_api", __name__, url_prefix="/api/trainings")
+
+
+training_api = Blueprint("training_api", __name__, url_prefix="/trainings")
 training_schema = CreateTrainingDTO()
 training_response_schema = TrainingResponseDTO()
 training_filter_schema = TrainingFilterDTO()

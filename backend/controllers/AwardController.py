@@ -8,7 +8,7 @@ from services.image_storage_service import upload_image
 from utils.json import error_response, success_response
 
 
-award_api = Blueprint("award_api", __name__, url_prefix="/api/awards")
+award_api = Blueprint("award_api", __name__, url_prefix="/awards")
 award_schema = CreateAwardDTO()
 award_response_schema = AwardResponseDTO()
 award_filter_schema = AwardFilterDTO()

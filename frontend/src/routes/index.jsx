@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
-import AboutPage from "../pages/About";
+import AboutPage from "../pages/AboutPage.jsx";
 import EventActive from "../pages/eventActivePage";
 import FounderStory from "../pages/founder-story";
 import ProjectsPage from "../pages/Projects";
@@ -33,12 +33,14 @@ const AdminHome = lazy(() => import("../pages/Admin/AdminHome.jsx"));
 const FounderAdminPanel = lazy(() => import("../components/Admin/Founder/FounderAdminPanel.jsx"));
 const AdminNavigation = lazy(() => import("../pages/Admin/AdminNavigation.jsx"));
 const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
+const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
+
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
   { path: "/", name: "home", page: HomePage },
-  { path: "/about", name: "about", page: AboutPage },
-  { path: "/stories", name: "stories", page: FounderStory },
+  { path: "/introduce", name: "introduce", page: AboutPage },
+  { path: "/founder", name: "founder", page: FounderStory },
   { path: "/projects", name: "projects", page: ProjectsPage },
   { path: "/contact", name: "contact", page: ContactPage },
   { path: "/awards", name: "awards", page: AwardsPage },
@@ -70,6 +72,8 @@ export const adminRoute = {
           <AdminNavigation />
         ) : item.id === "catalog" || ["events", "awards", "training", "projects"].includes(item.id) ? (
           <AdminCatalog defaultTab={item.id === "catalog" ? undefined : item.id} />
+        ) : item.id === "about" ? (
+          <AdminAbout />
         ) : (
           <AdminModulePlaceholder item={item} />
         ),

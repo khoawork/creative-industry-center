@@ -12,6 +12,7 @@ except ImportError:
 from models import *
 
 
+   
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -43,6 +44,7 @@ def create_app():
     from controllers.TrainingController import training_api
     from controllers.pages.founder_controller import founder_page_api
     from controllers.HomeController import home_api
+    from controllers.IntroduceController import introduce_api
     from controllers.BaseController import base_api
     from controllers.AwardController import award_api
     from controllers.EventController import event_api
@@ -56,10 +58,10 @@ def create_app():
     app.register_blueprint(category_project_api)
     app.register_blueprint(award_api)
     app.register_blueprint(home_api)
+    app.register_blueprint(introduce_api)
     app.register_blueprint(base_api)
 
     return app
-
 
 app = create_app()
 
