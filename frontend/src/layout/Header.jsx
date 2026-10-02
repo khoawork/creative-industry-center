@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { site, siteLinks } from '../config/shared/site.js';
 import Brand from '../components/shared/Brand.jsx';
@@ -8,8 +8,6 @@ import { PageAPI } from '../api/pageApi.js';
 export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: externalSetMenuOpen }) {
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(80);
   const location = useLocation();
 
   const isMenuOpen = externalMenuOpen !== undefined ? externalMenuOpen : internalMenuOpen;
@@ -32,19 +30,6 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Update header height when scroll state changes or window resizes
-  useEffect(() => {
-    const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        setHeaderHeight(headerRef.current.offsetHeight);
-      }
-    };
-
-    updateHeaderHeight();
-    window.addEventListener('resize', updateHeaderHeight);
-    return () => window.removeEventListener('resize', updateHeaderHeight);
-  }, [isScrolled]);
 
   // Lock body scroll when mobile navigation is open
   useEffect(() => {
@@ -72,7 +57,7 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     };
 
     const handleResize = () => {
-      if (window.innerWidth >= 1280 && isMenuOpen) {
+      if (window.innerWidth >= 1536 && isMenuOpen) {
         handleToggleMenu(false);
       }
     };
@@ -139,25 +124,24 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
 
   return (
     <header
-      ref={headerRef}
-      className={`sticky top-0 z-50 bg-white border-b border-[#e5e5e5] shadow-xs transition-all duration-300 ${
+      className={`sticky top-0 z-50 bg-white border-b border-black/10 [font-family:Inter,sans-serif] shadow-xs motion-safe:transition-all motion-safe:duration-300 ${
         isScrolled ? 'py-1.5 shadow-md' : 'py-0'
       }`}
     >
       <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          className={`flex items-center justify-between transition-all duration-300 gap-3 xl:gap-6 ${
-            isScrolled ? 'h-[50px] md:h-[60px]' : 'h-[80px] md:h-[90px]'
+          className={`flex items-center justify-between motion-safe:transition-all motion-safe:duration-300 gap-3 xl:gap-6 ${
+            isScrolled ? 'min-h-[50px] md:min-h-[60px]' : 'min-h-[80px] md:min-h-[90px]'
           }`}
         >
-          <div className="shrink-0 flex items-center">
+          <div className="flex min-w-0 items-center 2xl:shrink-0">
             <Brand />
           </div>
 
-          {/* Desktop Navigation (>= xl) */}
+          {/* Show the full navigation only when all links fit on one row. */}
           <nav
             aria-label="Điều hướng chính"
-            className="hidden xl:flex items-center gap-3.5 2xl:gap-5 3xl:gap-6 flex-wrap justify-end"
+            className="hidden 2xl:flex items-center gap-3.5 min-[1760px]:gap-5 justify-end"
           >
             {navItems.map((item) => {
               const active = isLinkActive(item);
@@ -213,11 +197,11 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
             </button>
           </nav>
 
-          {/* Mobile / Tablet Toggle (< xl) */}
-          <div className="flex xl:hidden items-center gap-2">
+          {/* Compact navigation for smaller screens. */}
+          <div className="flex shrink-0 2xl:hidden items-center gap-1">
             <button
               type="button"
-              className="w-8 h-8 rounded-full bg-[#680007] text-white flex items-center justify-center shrink-0 shadow-xs"
+              className="w-11 h-11 rounded-full bg-[#710008] text-white flex items-center justify-center shrink-0 shadow-xs"
               title="Tài khoản đại biểu"
               aria-label="Tài khoản đại biểu"
             >
@@ -227,12 +211,14 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
             <button
               type="button"
               onClick={() => handleToggleMenu()}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${
+              className={`p-2.5 rounded-lg motion-safe:transition-colors cursor-pointer ${
                 isMenuOpen
-                  ? 'bg-rose-50 text-[#680007]'
-                  : 'text-gray-700 hover:text-[#680007] hover:bg-gray-100'
+                  ? 'bg-[#f4f3f1] text-[#710008]'
+                  : 'text-black hover:text-[#710008] hover:bg-[#f4f3f1]'
               }`}
               aria-label={isMenuOpen ? 'Đóng menu' : 'Mở menu'}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
             >
               <Icon name={isMenuOpen ? 'close' : 'menu'} size={24} />
             </button>
@@ -243,20 +229,14 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
       {/* Mobile / Tablet Fullscreen Overlay Nav */}
       {isMenuOpen && (
         <div
-          style={{
-            top: `${headerHeight}px`,
-            height: `calc(100dvh - ${headerHeight}px)`,
-          }}
-          className="xl:hidden fixed inset-x-0 bottom-0 bg-[#faf9f7] z-50 flex flex-col justify-between overflow-y-auto border-t border-[#e5e5e5] shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200"
+          id="mobile-navigation"
+          className="2xl:hidden absolute inset-x-0 top-full h-[calc(100dvh-100%)] bg-[#f4f3f1] z-50 flex flex-col justify-between overflow-y-auto overscroll-contain border-t border-black/10 shadow-2xl"
         >
           {/* Main Links Container */}
-          <div className="px-4 py-4 sm:px-6 space-y-1.5 flex-1 overflow-y-auto">
+          <div className="min-h-0 px-4 py-4 sm:px-6 space-y-1.5 flex-1 overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-200/80">
               <span className="text-xs font-bold uppercase tracking-wider text-[#680007]">
                 Danh mục điều hướng
-              </span>
-              <span className="text-[11px] text-gray-500 font-medium">
-                {navItems.length} chuyên mục
               </span>
             </div>
 
@@ -273,13 +253,6 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
                   }`}
                 >
                   <span className="truncate">{item.label}</span>
-                  <span
-                    className={`text-xs transition-transform ${
-                      active ? 'text-rose-200' : 'text-gray-400'
-                    }`}
-                  >
-                    →
-                  </span>
                 </div>
               );
 

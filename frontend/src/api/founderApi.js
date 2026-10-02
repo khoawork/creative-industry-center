@@ -8,7 +8,7 @@ const withResponseData = (response) => response.data;
 
 export const FounderAPI = {
   getFounderPage: async () => {
-    const response = await axios.get(`${FOUNDER_PAGE_URL}/`);
+    const response = await axios.get(`${FOUNDER_PAGE_URL}`);
     return withResponseData(response);
   },
 

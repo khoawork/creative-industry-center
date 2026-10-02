@@ -45,7 +45,7 @@ export default function AdminHome() {
     let isMounted = true;
     setLoading(true);
 
-    HomeAPI.getHomePage(9)
+    HomeAPI.getHomePage(1)
       .then(async (result) => {
         if (isMounted && result) {
           const dataPayload = result.data || result;
@@ -304,6 +304,7 @@ export default function AdminHome() {
         >
           {activeTab.id === 'hero' && (
             <HeroSectionEditor
+              key={`hero-${homeData?.id || 'default'}`}
               initialData={homeData?.props?.hero_section}
               onSave={handleSaveHero}
               isSaving={isSaving}
@@ -320,6 +321,7 @@ export default function AdminHome() {
         >
           {activeTab.id === 'about' && (
             <AboutSectionEditor
+              key={`about-${homeData?.id || 'default'}`}
               initialData={homeData?.props?.about_section}
               onSave={handleSaveAbout}
               isSaving={isSaving}
@@ -336,6 +338,7 @@ export default function AdminHome() {
         >
           {activeTab.id === 'nav' && (
             <NavSectionsEditor
+              key={`nav-${homeData?.id || 'default'}-${navSections.length}`}
               navSections={navSections}
               onSaveSection={handleSaveNavSection}
               onDeleteSection={handleDeleteNavSection}
@@ -353,6 +356,7 @@ export default function AdminHome() {
         >
           {activeTab.id === 'support' && (
             <SupportBannerEditor
+              key={`support-${homeData?.id || 'default'}`}
               initialData={homeData?.props?.support_banner}
               onSave={handleSaveSupportBanner}
               isSaving={isSaving}

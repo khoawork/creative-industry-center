@@ -122,7 +122,7 @@ export const awards = awardRecords === null
   ? []
   : awardRecords.map((award) => ({
       id: award.id,
-      icon: award.props?.icon || '',
+      icon: award.props?.icon || 'trophy',
       title: award.name || award.title || '',
       description: award.description || '',
       tag: award.decision_number || '',

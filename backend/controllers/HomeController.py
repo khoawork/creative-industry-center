@@ -19,6 +19,8 @@ home_api = Blueprint('home_api', __name__, url_prefix='/home')
 # 1. TOÀN BỘ TRANG HOME (FULL PAGE)
 # ==========================================
 
+@home_api.route('', methods=['GET'])
+@home_api.route('/', methods=['GET'])
 @home_api.route('/<int:idPage>', methods=['GET'])
 def get(idPage=None):
     """Lấy dữ liệu toàn bộ trang Home"""
@@ -170,6 +172,7 @@ def get_nav(nav_id, idPage=None):
     )
 
 
+@home_api.route('/nav/all', methods=['GET'])
 @home_api.route('/<int:idPage>/nav/all', methods=['GET'])
 def get_all_navs(idPage=None):
     if idPage is None:

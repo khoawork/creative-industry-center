@@ -4,12 +4,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export const AwardAPI = {
 	getAwards: async (params = {}) => {
-		const response = await axios.get(`${API_BASE_URL}/api/awards`, { params });
+		const response = await axios.get(`${API_BASE_URL}/awards`, { params });
 		return response.data;
 	},
 
 	getAward: async (id) => {
-		const response = await axios.get(`${API_BASE_URL}/api/awards/${id}`);
+		const response = await axios.get(`${API_BASE_URL}/awards/${id}`);
 		return response.data;
 	},
 
@@ -20,7 +20,7 @@ export const AwardAPI = {
 			payload.append('data', JSON.stringify(data));
 			payload.append('image', imageFile);
 		}
-		const response = await axios.post(`${API_BASE_URL}/api/awards`, payload);
+		const response = await axios.post(`${API_BASE_URL}/awards`, payload);
 		return response.data;
 	},
 
@@ -31,17 +31,17 @@ export const AwardAPI = {
 			payload.append('data', JSON.stringify(data));
 			payload.append('image', imageFile);
 		}
-		const response = await axios.put(`${API_BASE_URL}/api/awards/${id}`, payload);
+		const response = await axios.put(`${API_BASE_URL}/awards/${id}`, payload);
 		return response.data;
 	},
 
 	patchAward: async (id, data) => {
-		const response = await axios.patch(`${API_BASE_URL}/api/awards/${id}`, data);
+		const response = await axios.patch(`${API_BASE_URL}/awards/${id}`, data);
 		return response.data;
 	},
 
 	deleteAward: async (id) => {
-		const response = await axios.delete(`${API_BASE_URL}/api/awards/${id}`);
+		const response = await axios.delete(`${API_BASE_URL}/awards/${id}`);
 		return response.data;
 	},
 };

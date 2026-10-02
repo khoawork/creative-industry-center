@@ -227,6 +227,7 @@ FOUNDER_CTA_SCHEMA = {
 # =========================================================
 
 
+@founder_page_api.route("", methods=["GET"])
 @founder_page_api.route("/", methods=["GET"])
 @swag_from(
     {
