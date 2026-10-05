@@ -1,5 +1,11 @@
 from flask import Blueprint, request
-from flasgger import swag_from
+try:
+    from flasgger import swag_from
+except Exception:
+    def swag_from(*args, **kwargs):
+        def decorator(f):
+            return f
+        return decorator
 from marshmallow import ValidationError
 
 from dto import founder_dto
