@@ -56,7 +56,7 @@ export default function AdminLayout({ user, unreadCount }) {
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <AdminTopbar label={label} mobileOpen={mobileOpen} onOpenMobile={() => setMobileOpen(true)} theme={theme} onToggleTheme={toggleTheme} />
         <main id="admin-main" ref={contentRef} tabIndex={-1}
-          className={`min-h-0 flex-1 overscroll-contain [scrollbar-width:thin] [scrollbar-color:var(--admin-heading)_var(--admin-background)] outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) ${mobileOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+          className={`min-h-0 flex-1 overscroll-contain [scrollbar-gutter:stable] [scrollbar-width:thin] [scrollbar-color:var(--admin-heading)_var(--admin-background)] outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) ${mobileOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           <div className="mx-auto w-full max-w-[1800px] p-4 sm:p-6 lg:p-8">
             <Outlet />
           </div>

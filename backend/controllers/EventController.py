@@ -9,6 +9,27 @@ from marshmallow import ValidationError
 event_api = Blueprint("event_api", __name__, url_prefix="/events")
 
 
+def _apply_event_image_uploads(json_data):
+    image_file = request.files.get("image") or request.files.get("featured_image")
+    if image_file:
+        json_data["image"] = upload_image(image_file, folder="events")
+
+    speakers = json_data.get("speakers")
+    if not isinstance(speakers, list):
+        return
+
+    prefix = "speaker_image_"
+    for field_name, speaker_file in request.files.items():
+        if not field_name.startswith(prefix) or not speaker_file:
+            continue
+        try:
+            index = int(field_name[len(prefix):])
+        except ValueError:
+            continue
+        if 0 <= index < len(speakers) and isinstance(speakers[index], dict):
+            speakers[index]["image"] = upload_image(speaker_file, folder="events/speakers")
+
+
 @event_api.route("/page/<int:page_id>", methods=["GET"])
 def get_events_page(page_id):
     page = event_services.get_events_page(page_id)
@@ -235,9 +256,7 @@ def create_event():
     try:
         if request.mimetype == "multipart/form-data":
             json_data = json.loads(request.form.get("data") or "{}")
-            image_file = request.files.get("image") or request.files.get("featured_image")
-            if image_file:
-                json_data["image"] = upload_image(image_file, folder="events")
+            _apply_event_image_uploads(json_data)
         else:
             json_data = request.get_json() or {}
 
@@ -292,9 +311,7 @@ def update_event(event_id):
     try:
         if request.mimetype == "multipart/form-data":
             json_data = json.loads(request.form.get("data") or "{}")
-            image_file = request.files.get("image") or request.files.get("featured_image")
-            if image_file:
-                json_data["image"] = upload_image(image_file, folder="events")
+            _apply_event_image_uploads(json_data)
         else:
             json_data = request.get_json() or {}
 

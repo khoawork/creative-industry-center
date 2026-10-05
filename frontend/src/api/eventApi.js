@@ -3,6 +3,19 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config/config.js';
 import { EVENTS_PAGE_ID } from '../config/Events/eventsConfig.js';
 
+function eventPayload(data, imageFile, speakerImageFiles = []) {
+	const files = Array.isArray(speakerImageFiles) ? speakerImageFiles : [];
+	if (!imageFile && !files.some(Boolean)) return data;
+
+	const payload = new FormData();
+	payload.append('data', JSON.stringify(data));
+	if (imageFile) payload.append('image', imageFile);
+	files.forEach((file, index) => {
+		if (file) payload.append(`speaker_image_${index}`, file);
+	});
+	return payload;
+}
+
 export const EventAPI = {
 	subscribeNewsletter: async (pageId, data) => {
 		const response = await axios.post(`${API_BASE_URL}/events/page/newsletter/${pageId}/subscribe`, data);
@@ -49,24 +62,14 @@ export const EventAPI = {
 		return response.data;
 	},
 
-	createEvent: async (data, imageFile = null) => {
-		let payload = data;
-		if (imageFile) {
-			payload = new FormData();
-			payload.append('data', JSON.stringify(data));
-			payload.append('image', imageFile);
-		}
+	createEvent: async (data, imageFile = null, speakerImageFiles = []) => {
+		const payload = eventPayload(data, imageFile, speakerImageFiles);
 		const response = await axios.post(`${API_BASE_URL}/events`, payload);
 		return response.data;
 	},
 
-	updateEvent: async (id, data, imageFile = null) => {
-		let payload = data;
-		if (imageFile) {
-			payload = new FormData();
-			payload.append('data', JSON.stringify(data));
-			payload.append('image', imageFile);
-		}
+	updateEvent: async (id, data, imageFile = null, speakerImageFiles = []) => {
+		const payload = eventPayload(data, imageFile, speakerImageFiles);
 		const response = await axios.put(`${API_BASE_URL}/events/${id}`, payload);
 		return response.data;
 	},

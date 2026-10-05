@@ -151,6 +151,7 @@ class EventPageNewsletterDTO(Schema):
     email_placeholder = fields.String(required=True, validate=_not_blank)
     consent_text = fields.String(required=True, validate=_not_blank)
     success_message = fields.String(required=True, validate=_not_blank)
+    form_fields = fields.List(fields.Dict(), required=False, allow_none=True)
 
 
 class EventNewsletterSubscriptionDTO(Schema):

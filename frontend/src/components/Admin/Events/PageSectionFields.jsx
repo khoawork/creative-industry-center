@@ -1,7 +1,15 @@
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Eye, Plus, Send, Sliders, Trash2 } from 'lucide-react'
 import Field from './EventField.jsx'
 import EventStatusMultiSelect from './EventStatusMultiSelect.jsx'
+import { FormBuilder } from '../Base/index.js'
+import EventNewsletter from '../../event-actis/EventNewsletter.jsx'
 import { adminButton } from '../../../config/Admin/adminEvents.js'
+
+const defaultNewsletterFields = (value) => [
+  { id: 'full_name', label: value.full_name_label || 'Họ và tên', placeholder: value.full_name_placeholder || 'Nguyễn Văn A', type: 'text', options: [], required: true, width: 'half' },
+  { id: 'organization', label: value.organization_label || 'Đơn vị / Doanh nghiệp', placeholder: value.organization_placeholder || 'Tổ chức / Doanh nghiệp', type: 'text', options: [], required: false, width: 'half' },
+  { id: 'email', label: value.email_label || 'Địa chỉ Email đại biểu', placeholder: value.email_placeholder || 'daibieu@tochuc.vn', type: 'email', options: [], required: true, width: 'full' },
+]
 
 export default function PageSectionFields({ section, value, onChange }) {
   const update = (key, next) => onChange({ ...value, [key]: next })
@@ -9,13 +17,15 @@ export default function PageSectionFields({ section, value, onChange }) {
     ? { badge: 'Nhãn đầu trang', title: 'Tiêu đề', description: 'Mô tả' }
     : section === 'filter_section'
       ? {}
-      : { tag: 'Nhãn bản tin', title: 'Tiêu đề', description: 'Mô tả', privacy_text: 'Thông tin bảo mật' }
+      : {}
   const statistics = value.statistics || []
   const breadcrumbs = value.breadcrumbs || []
   const statusFilters = (value.status_filters || []).map((filter) => ({
     ...filter,
     statuses: Array.isArray(filter.statuses) ? filter.statuses : filter.status ? [filter.status] : [],
   }))
+  const newsletterFields = Array.isArray(value.form_fields) ? value.form_fields : []
+  const newsletterPreviewFields = [...defaultNewsletterFields(value), ...newsletterFields]
   const move = (index, direction) => {
     const next = [...statistics]
     ;[next[index], next[index + direction]] = [next[index + direction], next[index]]
@@ -68,19 +78,55 @@ export default function PageSectionFields({ section, value, onChange }) {
       </div>)}
       <button type="button" className={adminButton} disabled={statistics.length >= 8} onClick={() => update('statistics', [...statistics, { icon: 'calendar', value: '', label: '' }])}><Plus size={16} />Thêm thống kê</button>
     </fieldset>}
-    {section === 'newsletter_section' && <fieldset className="space-y-5 border-t border-(--admin-border) pt-5">
-      <legend className="pr-3 font-semibold">Biểu mẫu đăng ký</legend>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Nhãn ô họ và tên" required value={value.full_name_label || ''} onChange={(next) => update('full_name_label', next)} />
-        <Field label="Gợi ý ô họ và tên" required value={value.full_name_placeholder || ''} onChange={(next) => update('full_name_placeholder', next)} />
-        <Field label="Nhãn ô đơn vị / doanh nghiệp" required value={value.organization_label || ''} onChange={(next) => update('organization_label', next)} />
-        <Field label="Gợi ý ô đơn vị / doanh nghiệp" required value={value.organization_placeholder || ''} onChange={(next) => update('organization_placeholder', next)} />
-        <Field label="Nhãn ô email" required value={value.email_label || ''} onChange={(next) => update('email_label', next)} />
-        <Field label="Gợi ý ô email" required value={value.email_placeholder || ''} onChange={(next) => update('email_placeholder', next)} />
+    {section === 'newsletter_section' && <>
+      <div className="space-y-5 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
+        <div className="flex items-center gap-2 border-b border-(--admin-border) pb-3">
+          <Send className="text-(--admin-accent)" size={18} />
+          <h3 className="text-base font-bold text-(--admin-title)">Phần thông tin</h3>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field compact label="Nhãn CTA" labelClassName="text-(--admin-heading)" required value={value.tag || ''} placeholder="Ví dụ: BẢN TIN VIỆN KỶ LỤC" onChange={(next) => update('tag', next)} />
+          <Field compact label="Thông tin bảo mật" labelClassName="text-(--admin-heading)" required value={value.privacy_text || ''} placeholder="Ví dụ: Bảo mật thông tin theo tiêu chuẩn viện nghiên cứu quốc gia." onChange={(next) => update('privacy_text', next)} />
+        </div>
       </div>
-      <Field label="Nội dung đồng ý nhận thông tin" required multiline value={value.consent_text || ''} onChange={(next) => update('consent_text', next)} />
-      <Field label="Nhãn nút đăng ký" required value={value.button_text || ''} onChange={(next) => update('button_text', next)} />
-      <Field label="Thông báo đăng ký thành công" required multiline value={value.success_message || ''} onChange={(next) => update('success_message', next)} />
-    </fieldset>}
+      <div className="space-y-5 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
+        <div className="flex items-center gap-2 border-b border-(--admin-border) pb-3">
+          <div className="flex items-center gap-2"><Sliders className="text-(--admin-accent)" size={18} /><h3 className="text-base font-bold text-(--admin-title)">Cấu hình Khối Form</h3></div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field compact label="Tiêu đề khối Form" labelClassName="text-(--admin-heading)" required value={value.title || ''} placeholder="Ví dụ: Đăng Ký Nhận Thông Báo Sự Kiện Sớm" onChange={(next) => update('title', next)} />
+        </div>
+        <Field compact label="Mô tả thời gian phản hồi / Ghi chú Form" labelClassName="text-(--admin-heading)" required multiline value={value.description || ''} placeholder="Ví dụ: Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức trực tiếp từ Ban Thư ký Trung tâm Công nghiệp Sáng tạo." onChange={(next) => update('description', next)} />
+        <fieldset className="space-y-4 border-t border-(--admin-border) pt-4">
+          <legend className="pr-3 font-semibold text-(--admin-heading)">Các trường hiển thị trên CTA</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field compact label="Nhãn ô họ và tên" labelClassName="text-(--admin-heading)" required value={value.full_name_label || ''} placeholder="Ví dụ: Họ và tên" onChange={(next) => update('full_name_label', next)} />
+            <Field compact label="Gợi ý ô họ và tên" labelClassName="text-(--admin-heading)" required value={value.full_name_placeholder || ''} placeholder="Ví dụ: Nguyễn Văn A" onChange={(next) => update('full_name_placeholder', next)} />
+            <Field compact label="Nhãn ô đơn vị / doanh nghiệp" labelClassName="text-(--admin-heading)" required value={value.organization_label || ''} placeholder="Ví dụ: Đơn vị / Doanh nghiệp" onChange={(next) => update('organization_label', next)} />
+            <Field compact label="Gợi ý ô đơn vị / doanh nghiệp" labelClassName="text-(--admin-heading)" required value={value.organization_placeholder || ''} placeholder="Ví dụ: Tổ chức / Doanh nghiệp" onChange={(next) => update('organization_placeholder', next)} />
+            <Field compact label="Nhãn ô email" labelClassName="text-(--admin-heading)" required value={value.email_label || ''} placeholder="Ví dụ: Địa chỉ Email đại biểu" onChange={(next) => update('email_label', next)} />
+            <Field compact label="Gợi ý ô email" labelClassName="text-(--admin-heading)" required value={value.email_placeholder || ''} placeholder="Ví dụ: daibieu@tochuc.vn" onChange={(next) => update('email_placeholder', next)} />
+          </div>
+          <Field compact label="Nội dung đồng ý nhận thông tin" labelClassName="text-(--admin-heading)" required multiline value={value.consent_text || ''} placeholder="Ví dụ: Tôi đồng ý tiếp nhận các tài liệu và thông tri sự kiện từ VIETKINGS." onChange={(next) => update('consent_text', next)} />
+          <Field compact label="Chữ hiển thị trên Nút gửi" labelClassName="text-(--admin-heading)" required value={value.button_text || ''} placeholder="Ví dụ: Xác Nhận Đăng Ký Thông Báo" onChange={(next) => update('button_text', next)} />
+          <Field compact label="Thông báo đăng ký thành công" labelClassName="text-(--admin-heading)" required multiline value={value.success_message || ''} placeholder="Ví dụ: Cảm ơn Quý vị! Đăng ký nhận thông tin sự kiện đã được ghi nhận." onChange={(next) => update('success_message', next)} />
+        </fieldset>
+          <div className="[&_button:not([title])]:text-(--admin-black) [&_button[title]]:text-(--admin-heading) [&_button[title]]:hover:text-(--admin-accent) [&_button[title]]:hover:bg-(--admin-background)"><FormBuilder
+          value={{ form_fields: newsletterFields }}
+          onChange={(updated) => update('form_fields', Array.isArray(updated.form_fields) ? updated.form_fields : [])}
+          showFormMeta={false}
+          showPreview={false}
+          title="Danh sách Ô Nhập Liệu"
+          description=""
+          previewAccentColor="#710008"
+          /></div>
+      </div>
+      <div className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
+        <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-(--admin-title)"><Eye size={16} className="text-(--admin-accent)" />Xem trước Giao diện Form thực tế</h3>
+        <div className="pointer-events-none overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-background)">
+          <EventNewsletter section={{ ...value, form_fields: newsletterPreviewFields }} />
+        </div>
+      </div>
+    </>}
   </div>
 }

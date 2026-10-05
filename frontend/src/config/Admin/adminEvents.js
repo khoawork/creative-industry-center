@@ -1,7 +1,10 @@
+import { CalendarDays, Layout, ListFilter, Send } from 'lucide-react'
+
 export const eventsAdminTabs = [
-  { key: 'hero_section', label: 'Đầu trang & thống kê' },
-  { key: 'filter_section', label: 'Bộ lọc & chuyên mục' },
-  { key: 'events', label: 'Danh sách sự kiện' },
+  { key: 'hero_section', label: 'Đầu trang & thống kê', icon: Layout },
+  { key: 'filter_section', label: 'Bộ lọc & chuyên mục', icon: ListFilter },
+  { key: 'events', label: 'Danh sách sự kiện', icon: CalendarDays },
+  { key: 'newsletter_section', label: 'CTA Form', icon: Send },
 ]
 export function emptyEventsSection(key) {
   if (key === 'hero_section') return { breadcrumbs: [], badge: '', title: '', description: '', statistics: [] }
@@ -26,7 +29,7 @@ export function eventSectionDraft(key, section = {}) {
   return draft
 }
 
-export const adminContentTheme = '[font-family:Inter,sans-serif] text-(--admin-ink) [--admin-background:var(--color-brand-cream)] [--admin-surface:var(--admin-white)] [--admin-ink:var(--admin-black)] [--admin-heading:var(--admin-primary)] [--admin-title:var(--admin-primary)] [--admin-accent:var(--color-brand-gold)] [--admin-border:rgb(0_0_0/0.15)] [[data-theme=dark]_&]:[--admin-background:var(--admin-black)] [[data-theme=dark]_&]:[--admin-surface:var(--admin-black)] [[data-theme=dark]_&]:[--admin-ink:var(--color-brand-cream)] [[data-theme=dark]_&]:[--admin-heading:var(--admin-accent)] [[data-theme=dark]_&]:[--admin-title:var(--admin-white)] [[data-theme=dark]_&]:[--admin-border:rgb(212_149_32/0.3)]'
+export const adminContentTheme = '[font-family:Inter,sans-serif] text-(--admin-ink)'
 export const adminButton = 'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-sm font-semibold text-(--admin-ink) enabled:hover:bg-(--admin-background) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50'
 export const adminPrimaryButton = 'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-(--admin-primary) px-3 py-2 text-sm font-semibold text-(--admin-white) enabled:hover:bg-(--admin-black) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50'
 export const adminInput = 'w-full min-w-0 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2.5 text-base text-(--admin-ink) placeholder:text-(--admin-ink)/50 focus-visible:outline-2 focus-visible:outline-(--admin-accent)'
