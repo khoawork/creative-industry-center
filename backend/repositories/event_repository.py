@@ -1,5 +1,9 @@
 from models import Event, EventCategory
 from extensions import db
+from dto.event_dto import SpeakerDTO
+from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.exc import IntegrityError
+from models.EventModel import EventNewsletterSubscription
 
 
 def get_all_events() -> list[Event]:
@@ -51,8 +55,9 @@ def create_event(event_data: Event) -> Event:
     event = Event(
         name=event_data.name,
         description=event_data.description,
-        speaker=event_data.speakers,
+        speaker=SpeakerDTO(many=True).dump(event_data.speakers),
         location=event_data.location,
+        event_date=getattr(event_data, "event_date", None),
         image=event_data.image,
         status=event_data.status,
         btn_action=event_data.btn_action,
@@ -73,8 +78,10 @@ def update_event(event_id: int, event_data: Event) -> Event:
 
     event.name = event_data.name
     event.description = event_data.description
-    event.speaker = event_data.speakers
+    event.speaker = SpeakerDTO(many=True).dump(event_data.speakers)
     event.location = event_data.location
+    if hasattr(event_data, "event_date"):
+        event.event_date = event_data.event_date
     event.image = event_data.image
     event.status = event_data.status
     event.btn_action = event_data.btn_action
@@ -120,3 +127,50 @@ def delete_event_category(category_id: int) -> bool:
     db.session.delete(event_category)
     db.session.commit()
     return True
+
+
+def _save_page_section(page, section, data):
+    try:
+        page.props = {**page.props, section: data}
+        flag_modified(page, "props")
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    return page.props[section]
+
+
+def update_hero(page, data):
+    return _save_page_section(page, "hero_section", data)
+
+
+def update_filter(page, data):
+    return _save_page_section(page, "filter_section", data)
+
+
+def update_displayed_events(page, data):
+    return _save_page_section(page, "displayed_events", data)
+
+
+def update_newsletter(page, data):
+    return _save_page_section(page, "newsletter_section", data)
+
+
+def subscribe_newsletter(page_id, data):
+    email = data["email"].strip().lower()
+    existing = EventNewsletterSubscription.query.filter_by(page_id=page_id, email=email).first()
+    if existing:
+        return
+    try:
+        db.session.add(EventNewsletterSubscription(
+            page_id=page_id, email=email, full_name=data["full_name"].strip(),
+            organization=data["organization"].strip(), consent=data["consent"],
+        ))
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        if not EventNewsletterSubscription.query.filter_by(page_id=page_id, email=email).first():
+            raise
+    except Exception:
+        db.session.rollback()
+        raise

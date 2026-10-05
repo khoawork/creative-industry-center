@@ -17,6 +17,7 @@ class Event(BaseModel):
     description = db.Column(db.Text, nullable=True)
     speaker = db.Column(db.JSON, nullable=True)
     location = db.Column(db.String(255), nullable=True)
+    event_date = db.Column(db.Date, nullable=True)
     image = db.Column(db.String(500), nullable=True)
     status = db.Column(
         db.Enum(EventStatus, name="event_status", native_enum=False),
@@ -36,3 +37,14 @@ class EventCategory(BaseModel):
     __tablename__ = "event_category"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
+
+
+class EventNewsletterSubscription(BaseModel):
+    __tablename__ = "event_newsletter_subscription"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    page_id = db.Column(db.Integer, db.ForeignKey("page.id"), nullable=False)
+    full_name = db.Column(db.String(255), nullable=False)
+    organization = db.Column(db.String(255), nullable=False, default="")
+    email = db.Column(db.String(254), nullable=False)
+    consent = db.Column(db.Boolean, nullable=False)
+    __table_args__ = (db.UniqueConstraint("page_id", "email", name="uq_event_newsletter_page_email"),)

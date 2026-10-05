@@ -9,6 +9,49 @@ from marshmallow import ValidationError
 event_api = Blueprint("event_api", __name__, url_prefix="/events")
 
 
+@event_api.route("/page/<int:page_id>", methods=["GET"])
+def get_events_page(page_id):
+    page = event_services.get_events_page(page_id)
+    return success_response(data={
+        "id": page.id, "name": page.name, "slug": page.slug, "props": page.props,
+    })
+
+
+@event_api.route("/page/hero/<int:page_id>", methods=["PUT"])
+def update_page_hero(page_id):
+    data = event_dto.EventPageHeroDTO().load(request.get_json())
+    data = event_services.update_hero_section(data, page_id)
+    return success_response(data=data, message="Đã lưu nội dung đầu trang Sự kiện.")
+
+
+@event_api.route("/page/filter/<int:page_id>", methods=["PUT"])
+def update_page_filter(page_id):
+    data = event_dto.EventPageFilterDTO().load(request.get_json())
+    data = event_services.update_filter_section(data, page_id)
+    return success_response(data=data, message="Đã lưu bộ lọc Sự kiện.")
+
+
+@event_api.route("/page/displayed-events/<int:page_id>", methods=["PUT"])
+def update_page_displayed_events(page_id):
+    data = event_dto.EventPageDisplayDTO().load(request.get_json())
+    data = event_services.update_displayed_events(data, page_id)
+    return success_response(data=data, message="Đã lưu các sự kiện hiển thị.")
+
+
+@event_api.route("/page/newsletter/<int:page_id>", methods=["PUT"])
+def update_page_newsletter(page_id):
+    data = event_dto.EventPageNewsletterDTO().load(request.get_json())
+    data = event_services.update_newsletter_section(data, page_id)
+    return success_response(data=data, message="Đã lưu nội dung trang Sự kiện.")
+
+
+@event_api.route("/page/newsletter/<int:page_id>/subscribe", methods=["POST"])
+def subscribe_newsletter(page_id):
+    data = event_dto.EventNewsletterSubscriptionDTO().load(request.get_json())
+    event_services.subscribe_newsletter(data, page_id)
+    return success_response(message="Đã ghi nhận đăng ký nhận thông tin sự kiện.")
+
+
 @event_api.route("/categories", methods=["GET"])
 def get_event_categories():
   try:
@@ -89,6 +132,7 @@ def get_events():
           "description": event.description,
           "speakers": event.speaker or [],
           "location": event.location,
+          "event_date": event.event_date.isoformat() if event.event_date else None,
           "image": event.image,
           "status": getattr(event.status, "value", event.status),
           "btn_action": event.btn_action,
@@ -147,7 +191,7 @@ def get_event(event_id):
         response = event_services.get_event_by_id(event_id)
         if response:
             return success_response(
-                data=response, message="Event retrieved successfully", status_code=200
+                data=event_dto.EventResponse().dump(response), message="Event retrieved successfully", status_code=200
             )
         else:
             return error_response(
@@ -256,6 +300,8 @@ def update_event(event_id):
 
         data = event_dto.EventRequest().load(json_data)
         response = event_services.update_event(event_id, data)
+        if response is None:
+            return error_response(message="Không tìm thấy sự kiện.", status_code=404)
         result = event_dto.EventResponse().dump(response)
         return success_response(
             data=result, message="Event updated successfully", status_code=200

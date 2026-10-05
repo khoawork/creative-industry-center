@@ -1,80 +1,26 @@
-import { Search, Calendar } from 'lucide-react';
-import { EVENT_CATEGORIES } from '../../data/eventData';
+import { Search, Calendar } from 'lucide-react'
+import { eventPageStatusFilters } from '../../config/Events/eventsConfig.js'
 
-export const EventFilter = ({
-  activeCategory,
-  onSelectCategory,
-  searchTerm,
-  onSearchChange,
-  selectedYear,
-  onSelectYear,
-}) => {
-  return (
-    <div className="relative -mt-7 sm:-mt-8 z-20 max-w-7xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-lg border border-[#e0bfbb]/40 p-3 sm:p-4">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
-          
-          {/* Categories Pill Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none no-scrollbar">
-            {EVENT_CATEGORIES.map((cat) => {
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => onSelectCategory(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? 'bg-[#490003] text-white shadow-sm ring-1 ring-[#710008]'
-                      : 'bg-[#f4f3f1] text-[#1a1c1b] hover:bg-[#efeeec] hover:text-[#490003]'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search Input & Year Selector */}
-          <div className="flex items-center gap-3">
-            {/* Search Input */}
-            <div className="relative flex-1 sm:w-64">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Tìm tên sự kiện..."
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-xl bg-[#f4f3f1] border border-transparent text-[#1a1c1b] placeholder-gray-400 focus:outline-hidden focus:bg-white focus:border-[#8c716e] transition-all"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => onSearchChange('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            {/* Year Selector */}
-            <div className="relative shrink-0">
-              <select
-                value={selectedYear}
-                onChange={(e) => onSelectYear(e.target.value)}
-                className="appearance-none pl-3.5 pr-8 py-2 text-xs sm:text-sm rounded-xl bg-[#f4f3f1] border border-transparent text-[#1a1c1b] font-medium focus:outline-hidden focus:bg-white focus:border-[#8c716e] cursor-pointer"
-              >
-                <option value="2026">Năm 2026 (Toàn bộ)</option>
-                <option value="2025">Năm 2025</option>
-                <option value="all">Tất cả các năm</option>
-              </select>
-              <Calendar className="w-3.5 h-3.5 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-          </div>
-
-        </div>
+export const EventFilter = ({ section, categories, activeCategory, onSelectCategory, searchTerm, onSearchChange, selectedYear, onSelectYear }) => {
+  const statusFilters = eventPageStatusFilters(section)
+  const options = [
+    ...statusFilters.map((filter, index) => ({ id: `status-filter:${index}`, name: filter.label })),
+    ...categories,
+  ]
+  return <div className="relative z-10 mx-auto -mt-7 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col gap-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm lg:flex-row lg:items-start">
+      <div aria-label="Lọc chuyên mục sự kiện" className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1">
+        {options.map((item) => <button key={item.id} aria-pressed={activeCategory === String(item.id)} onClick={() => onSelectCategory(String(item.id))} className={`min-h-10 shrink-0 cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--color-brand-gold) ${activeCategory === String(item.id) ? 'bg-(--color-brand-red) text-white' : 'bg-(--color-brand-cream) text-black hover:text-(--color-brand-red)'}`}>{item.name}</button>)}
+      </div>
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row lg:shrink-0">
+        <label className="flex min-w-0 flex-1 items-center gap-2 rounded-lg bg-(--color-brand-cream) px-3 py-2.5 focus-within:outline-2 focus-within:outline-(--color-brand-gold)"><Search size={17} className="shrink-0" aria-hidden="true" /><span className="sr-only">Tìm kiếm sự kiện</span><input value={searchTerm} onChange={(e) => onSearchChange(e.target.value)} placeholder={section?.search_placeholder || 'Tìm tên sự kiện…'} className="min-w-0 w-full bg-transparent text-sm outline-none lg:w-44" /></label>
+        {section?.show_year_filter !== false && <label className="relative shrink-0 rounded-lg bg-(--color-brand-cream) focus-within:outline-2 focus-within:outline-(--color-brand-gold)">
+          <span className="sr-only">Lọc theo năm tổ chức</span>
+          <input type="number" inputMode="numeric" min="1000" max="9999" value={selectedYear} onChange={(event) => onSelectYear(event.target.value.slice(0, 4))} placeholder="Tất cả các năm" className="min-h-10 w-48 rounded-lg bg-transparent py-2.5 pl-3 pr-9 text-sm text-black outline-none placeholder:text-black/60" />
+          <Calendar size={16} aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black/60" />
+        </label>}
       </div>
     </div>
-  );
-};
-
-export default EventFilter;
+  </div>
+}
+export default EventFilter
