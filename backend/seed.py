@@ -1,5 +1,12 @@
 import datetime
 import argparse
+import sys
+
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 from sqlalchemy.orm.attributes import flag_modified
 from extensions import db
@@ -317,6 +324,123 @@ def seed_founder_page():
         print("  -> Đã tạo mới trang Founder thành công!")
 
 
+def seed_project_page():
+    """Seed hoặc cập nhật thông tin trang Project Page (Dự án nổi bật)."""
+    project_seed_data = {
+        "name": "Dự án nổi bật",
+        "slug": "projects",
+        "props": {
+            "show_in_header": True,
+            "header_order": 5,
+            "header_section": {
+                "badge": "DANH MỤC DỰ ÁN TRỌNG ĐIỂM",
+                "title": "CÁC DỰ ÁN NỔI BẬT",
+                "description": "Hiện thực hóa giá trị sáng tạo Việt — Từ ý tưởng đến công trình thế kỷ. Trung tâm trực tiếp đồng hành, thẩm định giải pháp kỹ nghệ và kết nối nguồn lực cho các công trình mang tầm vóc biểu tượng.",
+                "statistics": [
+                    {"label": "DỰ ÁN ĐANG TRIỂN KHAI", "value": "24+", "sublabel": ""},
+                    {"label": "ĐỊA PHƯƠNG KẾT NỐI", "value": "35+", "sublabel": "Tỉnh thành"}
+                ]
+            },
+            "proposal_section": {
+                "tag": "HỢP TÁC PHÁT TRIỂN & ĐỒNG HÀNH CHIẾN LƯỢC",
+                "title": "ĐỀ XUẤT DỰ ÁN SÁNG TẠO HOẶC ĐĂNG KÝ ĐỒNG HÀNH CÙNG TRUNG TÂM",
+                "description": "Bạn là tổ chức, địa phương hay nhà sáng lập sở hữu công trình, giải pháp nghệ thuật hoặc công nghệ đột phá? Hãy nộp hồ sơ để nhận thẩm định chuyên gia, bảo trợ pháp lý và tiếp cận nguồn lực hệ sinh thái Viện Kỷ lục Việt Nam.",
+                "benefits": [
+                    "Bảo chứng Kỷ lục Quốc gia",
+                    "Tư vấn Sở hữu trí tuệ",
+                    "Kết nối Mạng lưới Chuyên gia"
+                ],
+                "form_title": "Gửi Đề Xuất Dự Án Mới",
+                "form_description": "Ban Thư ký Hội đồng Khoa học sẽ phản hồi văn bản trong vòng 03 ngày làm việc.",
+                "button_text": "Gửi Hồ Sơ Dự Án",
+                "form_fields": [
+                    {
+                        "id": "agency_name",
+                        "label": "TÊN CƠ QUAN / CHỦ NHIỆM DỰ ÁN",
+                        "placeholder": "Ví dụ: Tập đoàn Công nghệ & Di sản Văn hóa...",
+                        "type": "text",
+                        "options": [],
+                        "required": True,
+                        "width": "full"
+                    },
+                    {
+                        "id": "project_name",
+                        "label": "TÊN DỰ ÁN SÁNG TẠO",
+                        "placeholder": "Ví dụ: Khu bảo tồn tương tác nghệ thuật số...",
+                        "type": "text",
+                        "options": [],
+                        "required": True,
+                        "width": "full"
+                    },
+                    {
+                        "id": "phone",
+                        "label": "SỐ ĐIỆN THOẠI",
+                        "placeholder": "0987xxxxxx",
+                        "type": "tel",
+                        "options": [],
+                        "required": True,
+                        "width": "half"
+                    },
+                    {
+                        "id": "region",
+                        "label": "ĐỊA BÀN TRIỂN KHAI",
+                        "placeholder": "Chọn địa bàn",
+                        "type": "select",
+                        "options": ["Miền Bắc", "Miền Trung", "Miền Nam", "Toàn quốc"],
+                        "required": False,
+                        "width": "half"
+                    },
+                    {
+                        "id": "cooperation_need",
+                        "label": "NHU CẦU HỢP TÁC",
+                        "placeholder": "Chọn nhu cầu",
+                        "type": "select",
+                        "options": [
+                            "Đề cử xác lập Kỷ lục Quốc gia & Cố vấn chuyên môn",
+                            "Bảo trợ truyền thông & Phát triển thương hiệu",
+                            "Tư vấn giải pháp công nghệ & Bảo tồn di sản",
+                            "Hỗ trợ tiếp cận quỹ và nguồn lực đầu tư",
+                            "Khác"
+                        ],
+                        "required": False,
+                        "width": "full"
+                    }
+                ]
+            }
+        }
+    }
+
+    existing_page = Page.query.filter_by(slug="projects").first()
+    if existing_page:
+        existing_page.name = project_seed_data["name"]
+        merged_props = dict(existing_page.props or {})
+        for k, v in project_seed_data["props"].items():
+            if k not in merged_props:
+                merged_props[k] = v
+        # Đảm bảo form_fields được cập nhật nếu chưa có
+        if "proposal_section" in merged_props:
+            prop_sec = dict(merged_props["proposal_section"] or {})
+            if "form_fields" not in prop_sec or not prop_sec["form_fields"]:
+                prop_sec["form_fields"] = project_seed_data["props"]["proposal_section"]["form_fields"]
+                prop_sec["button_text"] = project_seed_data["props"]["proposal_section"]["button_text"]
+                merged_props["proposal_section"] = prop_sec
+        merged_props["show_in_header"] = True
+        merged_props["header_order"] = 5
+        existing_page.props = merged_props
+        flag_modified(existing_page, "props")
+        print("  -> Đã cập nhật trang Projects thành công!")
+    else:
+        page = Page(
+            id=5,
+            name=project_seed_data["name"],
+            slug=project_seed_data["slug"],
+            props=project_seed_data["props"],
+        )
+        db.session.add(page)
+        print("  -> Đã tạo mới trang Projects thành công!")
+    db.session.commit()
+
+
 def seed_nav_pages():
     """Cập nhật và sắp xếp lại 10 trang điều hướng trong database đúng thứ tự id từ 1 đến 10."""
     print("\n[Nav] Đang chuẩn hóa thứ tự các trang trong bảng Page (id 1 -> 10)...")
@@ -581,10 +705,11 @@ def seed_database():
     # ========================================================
     seed_nav_pages()
 
-    # Cập nhật chi tiết các sections cho Giới thiệu & Founder
+    # Cập nhật chi tiết các sections cho Giới thiệu, Founder & Projects
     seed_introduce()
     seed_events_page()
     seed_founder_page()
+    seed_project_page()
 
     # ========================================================
     # BƯỚC 6: PROPS TRANG CHỦ
@@ -683,6 +808,8 @@ if __name__ == "__main__":
                         help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).")
     parser.add_argument("--events-only", action="store_true",
                         help="Chỉ bổ sung các trường đầu trang, bộ lọc và bản tin Events chưa có.")
+    parser.add_argument("--project-page-only", action="store_true",
+                        help="Chỉ bổ sung/cập nhật trang Projects.")
     args = parser.parse_args()
     
     app = create_app()
@@ -695,5 +822,7 @@ if __name__ == "__main__":
             seed_introduce()
         elif args.nav_only:
             seed_nav_pages()
+        elif args.project_page_only:
+            seed_project_page()
         else:
             seed_database()
