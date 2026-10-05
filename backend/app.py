@@ -1,4 +1,3 @@
-
 from flask import Flask
 from config import Config
 from extensions import db
@@ -13,7 +12,6 @@ except ImportError:
 from models import *
 
 
-   
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -39,11 +37,11 @@ def create_app():
     if Swagger:
         swagger = Swagger(app)
     register_error_handlers(app)
-    
 
     from controllers.UserController import user_api
     from controllers.TrainingController import training_api
     from controllers.pages.founder_controller import founder_page_api
+    from controllers.pages.award_controller import award_page_api
     from controllers.HomeController import home_api
     from controllers.IntroduceController import introduce_api
     from controllers.BaseController import base_api
@@ -52,6 +50,7 @@ def create_app():
     from controllers.ProjectController import project_api, category_project_api
 
     app.register_blueprint(founder_page_api)
+    app.register_blueprint(award_page_api)
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
     app.register_blueprint(event_api)
@@ -63,6 +62,7 @@ def create_app():
     app.register_blueprint(base_api)
 
     return app
+
 
 app = create_app()
 
