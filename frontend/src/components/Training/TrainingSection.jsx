@@ -28,9 +28,10 @@ export default function TrainingSection({ trainings }) {
 
       <div className="flex flex-col gap-8">
         {trainings.map((training) => (
-          <TrainingCard key={training.code} training={training} />
+          <TrainingCard key={training.id || training.code} training={training} />
         ))}
       </div>
+
     </section>
   );
 }

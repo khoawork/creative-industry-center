@@ -51,6 +51,7 @@ def create_app():
     from controllers.EventController import event_api
     from controllers.ProjectController import project_api, category_project_api
     from controllers.ProjectPageController import project_page_api
+    from controllers.TrainingPageController import training_page_api
 
     app.register_blueprint(founder_page_api)
     app.register_blueprint(user_api)
@@ -63,6 +64,7 @@ def create_app():
     app.register_blueprint(introduce_api)
     app.register_blueprint(base_api)
     app.register_blueprint(project_page_api)
+    app.register_blueprint(training_page_api)
 
     return app
 

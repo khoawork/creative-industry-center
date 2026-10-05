@@ -29,14 +29,15 @@ def get_training(training_id: str):
     return db.session.get(Training, training_id)
 
 
-def create_training(name, time, certificate, props):
+def create_training(name, time, certificate, props, id=None):
     try:
+        custom_id = id.strip() if id and isinstance(id, str) and id.strip() else generate_id("VK")
         training = Training(
-            id=generate_id("VK"),
+            id=custom_id,
             name=name,
             time=time,
             certificate=certificate,
-            props=props,
+            props=props or {},
         )
         db.session.add(training)
         db.session.commit()
@@ -48,13 +49,17 @@ def create_training(name, time, certificate, props):
 
 def update_training(training, changes):
     try:
+        from sqlalchemy.orm.attributes import flag_modified
         for field, value in changes.items():
-            setattr(training, field, value)
+            if field != "id":
+                setattr(training, field, value)
+        flag_modified(training, "props")
         db.session.commit()
         return training
     except Exception:
         db.session.rollback()
         raise
+
 
 
 def delete_training(training):

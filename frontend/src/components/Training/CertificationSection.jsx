@@ -6,7 +6,7 @@ import {
   FaHandshake,
 } from "react-icons/fa";
 
-const certifications = [
+const defaultCertifications = [
   {
     icon: FaAward,
     title: "Chứng nhận Quốc gia",
@@ -33,7 +33,37 @@ const certifications = [
   },
 ];
 
-export default function CertificationSection() {
+const iconMap = {
+  award: FaAward,
+  'id-badge': FaIdBadge,
+  users: FaUsers,
+  handshake: FaHandshake,
+  check: FaCheckCircle,
+};
+
+
+export default function CertificationSection({ certificationData }) {
+  const tag = certificationData?.tag || "Bảo chứng Pháp lý & Học thuật";
+  const title = certificationData?.title || "Cam Kết Chất Lượng Đào Tạo & Giá Trị Chứng Nhận";
+  const description =
+    certificationData?.description ||
+    "Mọi chương trình đào tạo tại Trung tâm Công nghiệp Sáng tạo đều tuân thủ các chuẩn mực nghiêm ngặt của Hội đồng Viện Kỷ lục Việt Nam (VIETKINGS). Học viên sau khi hoàn thành khóa học và bảo vệ đề án thành công sẽ được cấp chứng nhận chính thức có giá trị lưu trữ trong cơ sở dữ liệu quốc gia.";
+  const sealTitle = certificationData?.seal_title || "VIETKINGS SEAL";
+  const sealSubtitle = certificationData?.seal_subtitle || "Hội đồng Xác lập Kỷ lục";
+  const sealDescription =
+    certificationData?.seal_description ||
+    "Mỗi học viên tốt nghiệp là một đại sứ thúc đẩy tinh thần sáng tạo và kỷ lục bền vững trong tổ chức của mình.";
+  const sealBadge = certificationData?.seal_badge || "Tiêu Chuẩn Học Thuật 2024";
+
+  const items =
+    Array.isArray(certificationData?.items) && certificationData.items.length > 0
+      ? certificationData.items.map((it) => ({
+          icon: iconMap[it.icon] || FaAward,
+          title: it.title,
+          description: it.description,
+        }))
+      : defaultCertifications;
+
   return (
     <section className="w-full bg-[#f4f3f1] py-[72px]">
       <div className="mx-auto max-w-[75rem] px-6">
@@ -42,24 +72,22 @@ export default function CertificationSection() {
             <div className="lg:col-span-8">
               <div className="mb-2 inline-flex items-center gap-1 text-[12px] leading-4 font-semibold uppercase text-[#805600]">
                 <FaCheckCircle className="text-[18px]" />
-                Bảo chứng Pháp lý & Học thuật
+                {tag}
               </div>
 
               <h2 className="mb-3 text-[32px] leading-10 font-bold text-[#490003]">
-                Cam Kết Chất Lượng Đào Tạo & Giá Trị Chứng Nhận
+                {title}
               </h2>
 
               <p className="mb-4 text-[16px] leading-[26px] text-[#58413f]">
-                Mọi chương trình đào tạo tại Trung tâm Công nghiệp Sáng tạo
-                đều tuân thủ các chuẩn mực nghiêm ngặt của Hội đồng Viện Kỷ
-                lục Việt Nam (VIETKINGS). Học viên sau khi hoàn thành khóa học
-                và bảo vệ đề án thành công sẽ được cấp chứng nhận chính thức
-                có giá trị lưu trữ trong cơ sở dữ liệu quốc gia.
+                {description}
               </p>
 
+
               <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
-                {certifications.map((item) => {
-                  const Icon = item.icon;
+                {items.map((item, idx) => {
+                  const Icon = item.icon || FaAward;
+
 
                   return (
                     <div
@@ -89,22 +117,22 @@ export default function CertificationSection() {
               </div>
 
               <span className="mb-1 text-[18px] leading-6 font-bold text-[#490003]">
-                VIETKINGS SEAL
+                {sealTitle}
               </span>
 
               <span className="mb-4 text-[12px] leading-4 uppercase tracking-[0.05em] text-[#58413f]">
-                Hội đồng Xác lập Kỷ lục
+                {sealSubtitle}
               </span>
 
               <p className="mb-4 text-[14px] leading-[22px] text-[#58413f]">
-                Mỗi học viên tốt nghiệp là một đại sứ thúc đẩy tinh thần sáng
-                tạo và kỷ lục bền vững trong tổ chức của mình.
+                {sealDescription}
               </p>
 
               <div className="w-full rounded bg-white py-2 text-[14px] leading-5 font-bold text-[#805600] shadow-sm">
-                Tiêu Chuẩn Học Thuật 2024
+                {sealBadge}
               </div>
             </div>
+
           </div>
         </div>
       </div>

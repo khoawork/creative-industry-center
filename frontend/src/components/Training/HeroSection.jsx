@@ -1,6 +1,19 @@
+import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
-export default function HeroSection() {
+export default function HeroSection({ headerData }) {
+  const badge = headerData?.badge || "Chuẩn mực VIETKINGS Quốc tế";
+  const title = headerData?.title || "HỢP TÁC & ĐÀO TẠO";
+  const description =
+    headerData?.description ||
+    "Chương trình phát triển năng lực sáng tạo, kỹ năng xác lập kỷ lục và đồng hành chuyển giao tri thức doanh nghiệp.";
+  const statistics = Array.isArray(headerData?.statistics) && headerData.statistics.length > 0
+    ? headerData.statistics
+    : [
+        { value: "120+", label: "Kỷ lục Gia & Chuyên gia" },
+        { value: "100%", label: "Chứng nhận Pháp lý" },
+      ];
+
   return (
     <section className="relative w-full overflow-hidden bg-[#710008] text-white">
       {/* Gradient */}
@@ -15,40 +28,31 @@ export default function HeroSection() {
             <FaCheckCircle className="text-[18px] text-[#ffba45]" />
 
             <span className="text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffba45]">
-              Chuẩn mực VIETKINGS Quốc tế
+              {badge}
             </span>
           </div>
 
-          <h1 className="mb-3 text-[56px] leading-[68px] font-bold tracking-[-0.02em] text-white">
-            HỢP TÁC & ĐÀO TẠO
+          <h1 className="mb-3 text-[40px] md:text-[56px] leading-[48px] md:leading-[68px] font-bold tracking-[-0.02em] text-white uppercase">
+            {title}
           </h1>
 
-          <p className="max-w-xl text-[18px] leading-7 text-[#ffdad6]">
-            Chương trình phát triển năng lực sáng tạo, kỹ năng xác lập kỷ
-            lục và đồng hành chuyển giao tri thức doanh nghiệp.
+          <p className="max-w-xl text-[16px] md:text-[18px] leading-7 text-[#ffdad6]">
+            {description}
           </p>
         </div>
 
         <div className="grid w-full shrink-0 grid-cols-2 gap-4 md:w-auto">
-          <div className="flex flex-col rounded-lg bg-white/10 p-4 backdrop-blur-md">
-            <span className="text-[32px] leading-10 font-bold text-[#ffba45]">
-              120+
-            </span>
+          {statistics.map((stat, idx) => (
+            <div key={idx} className="flex flex-col rounded-lg bg-white/10 p-4 backdrop-blur-md">
+              <span className="text-[28px] md:text-[32px] leading-10 font-bold text-[#ffba45]">
+                {stat.value}
+              </span>
 
-            <span className="text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffdad6]">
-              Kỷ lục Gia & Chuyên gia
-            </span>
-          </div>
-
-          <div className="flex flex-col rounded-lg bg-white/10 p-4 backdrop-blur-md">
-            <span className="text-[32px] leading-10 font-bold text-[#ffba45]">
-              100%
-            </span>
-
-            <span className="text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffdad6]">
-              Chứng nhận Pháp lý
-            </span>
-          </div>
+              <span className="text-[11px] md:text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffdad6]">
+                {stat.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

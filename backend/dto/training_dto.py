@@ -25,10 +25,12 @@ class TrainingPropsDTO(Schema):
 
 
 class CreateTrainingDTO(BaseSchema):
+    id = fields.String(allow_none=True)
     name = fields.String(required=True, validate=validate.Length(min=1, max=255))
     time = fields.String(required=True, validate=validate.Length(min=1, max=50))
     certificate = fields.String(required=True, validate=validate.Length(min=1, max=255))
-    props = fields.Nested(TrainingPropsDTO, required=True)
+    props = fields.Raw(allow_none=True, load_default={}, dump_default={})
+
 
     @validates("name", "time", "certificate")
     def validate_text(self, value, **kwargs):
@@ -46,3 +48,5 @@ class TrainingFilterDTO(PaginationFilterDTO):
 
 class TrainingResponseDTO(CreateTrainingDTO):
     id = fields.String(dump_only=True)
+    props = fields.Raw(dump_only=True)
+

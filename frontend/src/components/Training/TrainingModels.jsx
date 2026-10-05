@@ -12,11 +12,16 @@ const icons = {
 };
 
 export default function TrainingModels({ models }) {
+  if (!Array.isArray(models) || models.length === 0) {
+    return null;
+  }
+
   return (
     <section className="relative z-10 mx-auto -mt-8 w-full max-w-[75rem] px-6">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {models.map((model) => {
-          const Icon = icons[model.icon];
+          const Icon = icons[model.icon] || FaProjectDiagram;
+
 
           return (
             <div

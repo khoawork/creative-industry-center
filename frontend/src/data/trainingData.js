@@ -1,4 +1,10 @@
+// LƯU Ý: Dữ liệu này đã được đồng bộ vào Database (bảng `training` và bảng `page` với slug `trainings`).
+// Toàn bộ website và trang quản trị hiện đọc trực tiếp 100% từ Database qua các API:
+// - /training-page (thông tin trang, header, models, formBuilder, selected_trainings, certifications)
+// - /trainings (danh sách các khóa đào tạo)
+
 export const trainingModels = [
+
   {
     model: "Mô hình 01",
     icon: "hub",

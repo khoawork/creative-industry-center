@@ -346,6 +346,303 @@ def seed_project_page():
     db.session.commit()
 
 
+def seed_trainings():
+    """Khởi tạo hoặc cập nhật 4 khóa đào tạo chuẩn vào bảng Training"""
+    print("\n  -> Đang đồng bộ danh mục khóa học (Training)...")
+    trainings_data = [
+        {
+            "id": "VK-01",
+            "name": "Nền tảng Công nghiệp Sáng tạo & Kỷ lục",
+            "time": "3 buổi (1 tuần)",
+            "certificate": "Creative Industry Certificate",
+            "props": {
+                "code": "VK-01",
+                "duration": "3 buổi (1 tuần)",
+                "audience": "Doanh nghiệp, Nhà sáng tạo",
+                "description": "Trang bị kiến thức nền tảng về công nghiệp sáng tạo, đổi mới và xây dựng giá trị kỷ lục.",
+                "benefits": [
+                    "Tổng quan về công nghiệp sáng tạo.",
+                    "Xây dựng và phát triển giá trị sáng tạo.",
+                    "Quy trình xác lập kỷ lục.",
+                    "Định hướng phát triển thương hiệu."
+                ],
+                "format": "Trực tiếp kết hợp Trực tuyến",
+                "certificate": "Creative Industry Certificate",
+                "placeholderName": "Trần Thị B",
+                "placeholderPhone": "0982 xxx xxx",
+                "placeholderEmail": "creator@studio.com"
+            }
+        },
+        {
+            "id": "VK-02",
+            "name": "Khai thác Bản quyền Sáng tạo & Tài sản Trí tuệ trong Công nghiệp Văn hóa",
+            "time": "4 buổi (2 tuần)",
+            "certificate": "IP & Creative Certificate",
+            "props": {
+                "code": "VK-02",
+                "duration": "4 buổi (2 tuần)",
+                "audience": "Nhà sáng tạo nội dung, Startup, Doanh nhân trẻ",
+                "description": "Trang bị tư duy bảo hộ và thương mại hóa sản phẩm nghệ thuật, nội dung số, thiết kế và di sản trong kỷ nguyên số hóa xuyên biên giới.",
+                "benefits": [
+                    "Chiến lược đăng ký quyền tác giả, nhãn hiệu và kiểu dáng công nghiệp mỹ thuật.",
+                    "Đàm phán cấp phép bản quyền (Licensing) và nhượng quyền sản phẩm sáng tạo.",
+                    "Kiểm soát tranh chấp, ứng phó vi phạm bản quyền trên không gian mạng và mạng xã hội.",
+                    "Định giá tài sản vô hình và đưa bản quyền thành nguồn vốn kinh doanh."
+                ],
+                "format": "Trực tiếp kết hợp Trực tuyến",
+                "certificate": "IP & Creative Certificate",
+                "placeholderName": "Trần Thị B",
+                "placeholderPhone": "0982 xxx xxx",
+                "placeholderEmail": "creator@studio.com"
+            }
+        },
+        {
+            "id": "VK-03",
+            "name": "Ứng dụng AI & Công nghệ Số trong Bảo tồn Di sản Truyền thống",
+            "time": "8 buổi (4 tuần)",
+            "certificate": "Heritage Tech Specialist",
+            "props": {
+                "code": "VK-03",
+                "duration": "8 buổi (4 tuần)",
+                "audience": "Nghệ nhân, Nhà nghiên cứu, Đội ngũ kỹ thuật số",
+                "description": "Giải pháp công nghệ cao kết hợp mô hình bảo tồn nguyên bản, số hóa 3D không gian di sản và tái tạo dữ liệu văn hóa bằng trí tuệ nhân tạo.",
+                "benefits": [
+                    "Kỹ thuật quét số hóa 3D/Photogrammetry và lập kho dữ liệu di sản kỷ lục.",
+                    "Ứng dụng Generative AI phục dựng tư liệu, hoa văn cổ phục và nhạc cụ cổ.",
+                    "Phát triển trải nghiệm bảo tàng thực tế ảo (VR/AR) phục vụ du lịch sáng tạo.",
+                    "Nguyên tắc đạo đức và tính xác thực lịch sử khi ứng dụng công nghệ di sản."
+                ],
+                "format": "Phòng thí nghiệm Kỹ thuật số TTCNST",
+                "certificate": "Heritage Tech Specialist",
+                "placeholderName": "Lê Hoàng C",
+                "placeholderPhone": "0913 xxx xxx",
+                "placeholderEmail": "researcher@heritage.vn"
+            }
+        },
+        {
+            "id": "VK-04",
+            "name": "Nghệ thuật Lãnh đạo Đổi mới & Văn hóa Doanh nghiệp Tiên phong",
+            "time": "2 ngày Workshop thực chiến",
+            "certificate": "Executive Leadership Award",
+            "props": {
+                "code": "VK-04",
+                "duration": "2 ngày Workshop thực chiến",
+                "audience": "Đội ngũ quản lý cấp trung và cao",
+                "description": "Khai phóng tinh thần dám tạo đột phá, thiết kế bộ chỉ số văn hóa sáng tạo và dẫn dắt đội ngũ chinh phục các mốc son vượt bậc.",
+                "benefits": [
+                    "Mô hình quản trị kích hoạt sáng kiến và văn hóa không ngại thử nghiệm.",
+                    "Phương pháp khích lệ nhân sự hướng tới chuẩn mực kỷ lục và sự xuất sắc.",
+                    "Kỹ năng điều phối giải quyết khủng hoảng và thúc đẩy tinh thần tiên phong.",
+                    "Bài tập tình huống thực tế và mô phỏng lãnh đạo dự án chiến lược."
+                ],
+                "format": "Hà Nội & TP. Hồ Chí Minh",
+                "certificate": "Executive Leadership Award",
+                "placeholderName": "Phạm Minh D",
+                "placeholderPhone": "0977 xxx xxx",
+                "placeholderEmail": "director@enterprise.vn"
+            }
+        }
+    ]
+
+    for item in trainings_data:
+        train = Training.query.get(item["id"])
+        if not train:
+            train = Training(
+                id=item["id"],
+                name=item["name"],
+                time=item["time"],
+                certificate=item["certificate"],
+                props=item["props"],
+            )
+            db.session.add(train)
+            print(f"    + Đã thêm mới khóa đào tạo {item['id']}: {item['name']}")
+        else:
+            train.name = item["name"]
+            train.time = item["time"]
+            train.certificate = item["certificate"]
+            train.props = item["props"]
+            flag_modified(train, "props")
+            print(f"    * Đã cập nhật khóa đào tạo {item['id']}: {item['name']}")
+    db.session.commit()
+
+
+def seed_training_page():
+    """Seed hoặc cập nhật thông tin trang Training Page (Hợp tác & Đào tạo)."""
+    seed_trainings()
+
+    training_seed_data = {
+        "name": "Hợp tác & Đào tạo",
+        "slug": "trainings",
+        "props": {
+            "show_in_header": True,
+            "header_order": 9,
+            "header_section": {
+                "badge": "Chuẩn mực VIETKINGS Quốc tế",
+                "title": "HỢP TÁC & ĐÀO TẠO",
+                "description": "Chương trình phát triển năng lực sáng tạo, kỹ năng xác lập kỷ lục và đồng hành chuyển giao tri thức doanh nghiệp.",
+                "statistics": [
+                    {"label": "KỶ LỤC GIA & CHUYÊN GIA", "value": "120+", "sublabel": ""},
+                    {"label": "CHỨNG NHẬN PHÁP LÝ", "value": "100%", "sublabel": "Chuẩn mực"}
+                ]
+            },
+            "models_section": [
+                {
+                    "model": "Mô hình 01",
+                    "icon": "hub",
+                    "title": "Liên kết Nghiên cứu & Chuyển giao",
+                    "description": "Kết nối nguồn lực chuyên gia, viện nghiên cứu và doanh nghiệp nhằm chuẩn hóa quy trình đổi mới sáng tạo và chuyển giao bản quyền ứng dụng thực tiễn.",
+                    "action": "Quy trình chuẩn hóa"
+                },
+                {
+                    "model": "Mô hình 02",
+                    "icon": "workspace",
+                    "title": "Tư vấn Xác lập Tiêu chuẩn Kỷ lục",
+                    "description": "Xây dựng hồ sơ khoa học, định vị tiêu chí độc bản và bảo hộ tính xác thực dữ liệu kỷ lục doanh nghiệp theo hệ thống tiêu chí VIETKINGS.",
+                    "action": "Hồ sơ định lượng"
+                },
+                {
+                    "model": "Mô hình 03",
+                    "icon": "storefront",
+                    "title": "Đồng hành Thương mại hóa Sáng tạo",
+                    "description": "Bảo hộ thương hiệu, liên kết chuỗi cung ứng văn hóa nghệ thuật và truyền thông định vị giá trị sản phẩm kỷ lục ra thị trường toàn cầu.",
+                    "action": "Gia tăng vị thế"
+                }
+            ],
+            "certification_section": {
+                "tag": "Bảo chứng Pháp lý & Học thuật",
+                "title": "Cam Kết Chất Lượng Đào Tạo & Giá Trị Chứng Nhận",
+                "description": "Mọi chương trình đào tạo tại Trung tâm Công nghiệp Sáng tạo đều tuân thủ các chuẩn mực nghiêm ngặt của Hội đồng Viện Kỷ lục Việt Nam (VIETKINGS). Học viên sau khi hoàn thành khóa học và bảo vệ đề án thành công sẽ được cấp chứng nhận chính thức có giá trị lưu trữ trong cơ sở dữ liệu quốc gia.",
+                "items": [
+                    {
+                        "icon": "award",
+                        "title": "Chứng nhận Quốc gia",
+                        "description": "Ký duyệt trực tiếp bởi lãnh đạo Viện Kỷ lục Việt Nam."
+                    },
+                    {
+                        "icon": "id-badge",
+                        "title": "Mã số Tra cứu Toàn quốc",
+                        "description": "Tích hợp mã định danh điện tử trên cổng tra cứu hồ sơ quốc gia."
+                    },
+                    {
+                        "icon": "users",
+                        "title": "Mạng lưới Kỷ lục gia",
+                        "description": "Quyền tham gia Câu lạc bộ Sáng tạo & Kỷ lục gia doanh nghiệp."
+                    },
+                    {
+                        "icon": "handshake",
+                        "title": "Cố vấn Dự án Thực tế",
+                        "description": "Hỗ trợ kết nối chuyên gia đồng hành 6 tháng sau đào tạo."
+                    }
+                ],
+                "seal_title": "VIETKINGS SEAL",
+                "seal_subtitle": "Hội đồng Xác lập Kỷ lục",
+                "seal_description": "Mỗi học viên tốt nghiệp là một đại sứ thúc đẩy tinh thần sáng tạo và kỷ lục bền vững trong tổ chức của mình.",
+                "seal_badge": "Tiêu Chuẩn Học Thuật 2024"
+            },
+            "proposal_section": {
+                "tag": "GHI DANH & KẾT NỐI DOANH NGHIỆP",
+                "title": "ĐĂNG KÝ THAM GIA KHÓA ĐÀO TẠO HOẶC ĐỀ XUẤT HỢP TÁC CHIẾN LƯỢC",
+                "description": "Quý doanh nghiệp, tổ chức hoặc cá nhân có nhu cầu nâng cao năng lực quản trị tài sản trí tuệ và ươm tạo dự án sáng tạo vui lòng gửi thông tin đăng ký để Hội đồng tuyển sinh tiếp nhận và phản hồi.",
+                "benefits": [
+                    "Chứng nhận chính thức từ Viện Kỷ lục Việt Nam (VIETKINGS)",
+                    "Tích hợp mã số tra cứu điện tử trên hệ thống hồ sơ quốc gia",
+                    "Đồng hành chuyên gia & tư vấn bảo hộ sở hữu trí tuệ"
+                ],
+                "form_title": "Đăng Ký Khóa Học & Đề Xuất Hợp Tác",
+                "form_description": "Ban Tuyển sinh & Hợp tác Chiến lược sẽ liên hệ phản hồi trong 24 giờ làm việc.",
+                "button_text": "GỬI HỒ SƠ ĐĂNG KÝ",
+                "form_fields": [
+                    {
+                        "id": "full_name",
+                        "label": "HỌ VÀ TÊN / ĐẠI DIỆN ĐƠN VI",
+                        "placeholder": "Ví dụ: Nguyễn Văn A",
+                        "type": "text",
+                        "options": [],
+                        "required": True,
+                        "width": "full"
+                    },
+                    {
+                        "id": "phone",
+                        "label": "SỐ ĐIỆN THOẠI LIÊN HỆ",
+                        "placeholder": "0987xxxxxx",
+                        "type": "tel",
+                        "options": [],
+                        "required": True,
+                        "width": "half"
+                    },
+                    {
+                        "id": "email",
+                        "label": "ĐỊA CHỈ EMAIL",
+                        "placeholder": "contact@domain.vn",
+                        "type": "email",
+                        "options": [],
+                        "required": True,
+                        "width": "half"
+                    },
+                    {
+                        "id": "course_interest",
+                        "label": "CHUYÊN ĐỀ ĐÀO TẠO QUAN TÂM",
+                        "placeholder": "Chọn khóa đào tạo",
+                        "type": "select",
+                        "options": [
+                            "VK-01: Nền tảng Công nghiệp Sáng tạo & Kỷ lục",
+                            "VK-02: Khai thác Bản quyền Sáng tạo & Tài sản Trí tuệ trong Công nghiệp Văn hóa",
+                            "VK-03: Ứng dụng AI & Công nghệ Số trong Bảo tồn Di sản Truyền thống",
+                            "VK-04: Nghệ thuật Lãnh đạo Đổi mới & Văn hóa Doanh nghiệp Tiên phong",
+                            "Chuyên đề tùy chỉnh theo nhu cầu tổ chức"
+                        ],
+                        "required": False,
+                        "width": "full"
+                    },
+                    {
+                        "id": "notes",
+                        "label": "NHU CẦU & MỤC TIÊU ĐÀO TẠO",
+                        "placeholder": "Mô tả ngắn gọn về quy mô doanh nghiệp và mục tiêu tham gia...",
+                        "type": "textarea",
+                        "options": [],
+                        "required": False,
+                        "width": "full"
+                    }
+                ]
+            },
+            "selected_training_ids": ["VK-01", "VK-02", "VK-03", "VK-04"]
+        }
+    }
+
+    existing_page = Page.query.filter_by(slug="trainings").first() or Page.query.filter_by(slug="training").first()
+    if existing_page:
+        existing_page.name = training_seed_data["name"]
+        existing_page.slug = "trainings"
+        merged_props = dict(existing_page.props or {})
+        for k, v in training_seed_data["props"].items():
+            if k not in merged_props:
+                merged_props[k] = v
+        # Luôn đảm bảo models_section, certification_section và selected_training_ids có đầy đủ
+        if "proposal_section" not in merged_props or not merged_props.get("proposal_section"):
+            merged_props["proposal_section"] = training_seed_data["props"]["proposal_section"]
+        if "header_section" not in merged_props or not merged_props.get("header_section"):
+            merged_props["header_section"] = training_seed_data["props"]["header_section"]
+        merged_props["models_section"] = training_seed_data["props"]["models_section"]
+        merged_props["certification_section"] = training_seed_data["props"]["certification_section"]
+        merged_props["selected_training_ids"] = training_seed_data["props"]["selected_training_ids"]
+        merged_props["show_in_header"] = True
+        merged_props["header_order"] = 9
+        existing_page.props = merged_props
+        flag_modified(existing_page, "props")
+        print("  -> Đã cập nhật trang Hợp tác & Đào tạo thành công!")
+    else:
+        page = Page(
+            id=9,
+            name=training_seed_data["name"],
+            slug=training_seed_data["slug"],
+            props=training_seed_data["props"],
+        )
+        db.session.add(page)
+        print("  -> Đã tạo mới trang Hợp tác & Đào tạo thành công!")
+    db.session.commit()
+
+
+
 def seed_nav_pages():
     """Cập nhật và sắp xếp lại 10 trang điều hướng trong database đúng thứ tự id từ 1 đến 10."""
     print("\n[Nav] Đang chuẩn hóa thứ tự các trang trong bảng Page (id 1 -> 10)...")
@@ -558,46 +855,8 @@ def seed_database():
     # BƯỚC 4: CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO
     # ========================================================
     print("\n[4/7] Đang seed Chương trình hợp tác & Đào tạo...")
-    trainings_data = [
-        {
-            "name": "Đào Tạo Quản Trị Tài Sản Trí Tuệ & Thương Quyền Kỷ Lục",
-            "time": datetime.date(2025, 6, 1),
-            "certificate": "Chứng chỉ Quản trị Tài sản Trí tuệ - VietKings",
-            "props": {"icon": "graduation-cap", "description": "Khóa học chuyên sâu dành cho chủ doanh nghiệp, giúp biến giá trị vô hình thành công cụ tăng trưởng doanh thu vượt bậc.", "info_highlight": "Thời lượng: 6 tuần • Trực tiếp & Trực tuyến", "btn_action": "ĐĂNG KÝ THAM VẤN", "link": "/trainings/quan-tri-tai-san-tri-tue"},
-        },
-        {
-            "name": "Ươm Tạo Doanh Nghiệp Công Nghiệp Văn Hóa Sáng Tạo",
-            "time": datetime.date(2025, 7, 1),
-            "certificate": "Chứng nhận Ươm tạo Doanh nghiệp Sáng tạo",
-            "props": {"icon": "lightbulb", "description": "Chương trình cố vấn 1–1 cùng các Kỷ lục gia và chuyên gia công nghệ, hoàn thiện mô hình sản phẩm từ phôi thai đến thị trường.", "info_highlight": "Chỉ tiêu: 20 dự án mỗi khóa", "btn_action": "ĐĂNG KÝ THAM VẤN", "link": "/trainings/uom-tao-doanh-nghiep-sang-tao"},
-        },
-        {
-            "name": "Liên Minh Hợp Tác Viện – Doanh Nghiệp – Địa Phương",
-            "time": datetime.date(2025, 8, 1),
-            "certificate": "Chứng thư Liên minh Hợp tác Chiến lược",
-            "props": {"icon": "handshake", "description": "Ký kết hợp tác chiến lược nhằm xây dựng hồ sơ kỷ lục chỉ dẫn địa lý, quảng bá văn hóa ẩm thực và thắng cảnh du lịch tỉnh thành.", "info_highlight": "Hỗ trợ pháp lý & Xúc tiến truyền thông", "btn_action": "LIÊN HỆ HỢP TÁC", "link": "/cooperation"},
-        },
-    ]
+    seed_trainings()
 
-    training_ids = []
-    for item in trainings_data:
-        existing = Training.query.filter_by(name=item["name"]).first()
-        if not existing:
-            new_train = Training(
-                id=generate_id("VK"),
-                name=item["name"],
-                time=normalize_date(item["time"]),
-                certificate=item["certificate"],
-                props=item["props"],
-            )
-            db.session.add(new_train)
-            db.session.flush()
-            training_ids.append(new_train.id)
-            print(f"  + Đã thêm khóa đào tạo ID {new_train.id}: {new_train.name}")
-        else:
-            training_ids.append(existing.id)
-            print(f"  . Đã có khóa đào tạo ID {existing.id}: {existing.name}")
-    db.session.commit()
 
     # ========================================================
     # BƯỚC 5: HEADER NAVIGATION / PAGES (Thứ tự bắt đầu từ Trang chủ id=1..10)
@@ -608,6 +867,7 @@ def seed_database():
     seed_introduce()
     seed_founder_page()
     seed_project_page()
+    seed_training_page()
 
     # ========================================================
     # BƯỚC 6: PROPS TRANG CHỦ
@@ -642,6 +902,7 @@ def seed_database():
     }
     AboutSectionRequestDTO().load(about_section_payload)
 
+    training_ids = [training.id for training in Training.query.all()]
     nav_sections_payload = [
         {"id": 1, "tag": "DÒNG THỜI GIAN HOẠT ĐỘNG", "title_main": "SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI", "action_button": {"text": "XEM TẤT CẢ SỰ KIỆN", "link": "/events"}, "children_id": event_ids},
         {"id": 2, "tag": "HÀNH TRÌNH THỰC TIỄN", "title_main": "DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP", "action_button": {"text": "XEM TẤT CẢ DỰ ÁN", "link": "/projects"}, "children_id": project_ids},
@@ -706,6 +967,8 @@ if __name__ == "__main__":
                         help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).")
     parser.add_argument("--project-page-only", action="store_true",
                         help="Chỉ bổ sung/cập nhật trang Projects.")
+    parser.add_argument("--training-page-only", action="store_true",
+                        help="Chỉ bổ sung/cập nhật trang Training (Hợp tác & Đào tạo).")
     args = parser.parse_args()
     
     app = create_app()
@@ -716,5 +979,7 @@ if __name__ == "__main__":
             seed_nav_pages()
         elif args.project_page_only:
             seed_project_page()
+        elif args.training_page_only:
+            seed_training_page()
         else:
             seed_database()
