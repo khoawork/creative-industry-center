@@ -1,138 +1,164 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ProjectHeader from "./project-header";
 import ProjectFilter from "./project-filter";
 import ProjectCard from "./project-card";
 import ProjectForm from "./project-form";
-
-// Dữ liệu mẫu giả lập mô phỏng thiết kế
-const sampleProjects = [
-  {
-    id: 1,
-    name: "Bảo tàng Không Gian Kỷ Lục Sáng Tạo Việt Nam (Giai đoạn 1)",
-    categoryTag: "TRỌNG ĐIỂM QUỐC GIA",
-    code: "MÃ DỰ ÁN: TTCNST-2024-EX01",
-    title: "Quần thể Không Gian Kỷ Lục Sáng Tạo",
-    description:
-      "Khu phức hợp quần thể văn hóa triển lãm kiến trúc độc bản rộng 12 ha. Nơi lưu trữ, tôn vinh các sáng chế độc quyền, công trình kỷ lục...",
-    image:
-      "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&auto=format&fit=crop&q=80",
-    details: [
-      { label: "Địa điểm", value: "Đại lộ Sáng Tạo, Hà Nội" },
-      { label: "Quy mô", value: "12 Hecta (GĐ 1: 4.8 ha)" },
-    ],
-    footerText: "",
-    buttonLabel: "Khám phá dự án",
-  },
-  {
-    id: 2,
-    name: "Hệ Thống Số Hóa 3D 100 Di Sản Làng Nghề & Cổ Vật Quốc Gia",
-    categoryTag: "CHUYỂN ĐỔI SỐ",
-    code: "MÃ DỰ ÁN: TTCNST-2024-DIG02",
-    title: "Nền Tảng Dữ Liệu Di Sản Số Hóa",
-    description:
-      "Số hóa mô hình không gian ba chiều có độ phân giải siêu nét (Sub-millimeter LiDAR) kết hợp gắn thẻ xác thực chuỗi khối (Blockchain)...",
-    image:
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
-    details: [
-      { label: "Công nghệ lõi", value: "LiDAR 3D, WebAR, NFT Pass" },
-      { label: "Mục tiêu số hóa", value: "100 Cổ vật & 45 Làng nghề" },
-      { label: "Thời gian", value: "2023 – 2026" },
-    ],
-    footerText: "Chứng thực VIETKINGS",
-    buttonLabel: "Xem chi tiết",
-  },
-  {
-    id: 3,
-    name: "Chuỗi Không Gian Trưng Bày Tinh Hoa Gốm Sứ Bát Tràng Đương Đại",
-    categoryTag: "CÔNG NGHIỆP VĂN HÓA",
-    code: "MÃ DỰ ÁN: TTCNST-2024-CUL03",
-    title: "Bát Tràng Tinh Hoa Đương Đại",
-    description:
-      "Chuỗi showroom nghệ thuật bảo tồn kết hợp kiến trúc đất nung đương đại, thương mại hóa các dòng sản phẩm đạt giải kỷ lục tạo hình...",
-    image:
-      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&auto=format&fit=crop&q=80",
-    details: [
-      { label: "Mạng lưới", value: "Hà Nội, Hội An, TP. HCM" },
-      { label: "Nghệ nhân chủ nhiệm", value: "12 Bàn tay Vàng Kỷ lục" },
-      { label: "Lượt khách/năm", value: "180.000+ Khách" },
-    ],
-    footerText: "KẾT NỐI CHUỖI GIÁ TRỊ",
-    buttonLabel: "Xem chi tiết",
-  },
-  {
-    id: 4,
-    name: "Vườn Ươm Doanh Nghiệp Sáng Nghiệp Kỷ Lục (Record Startup Hub)",
-    categoryTag: "ƯƠM TẠO & ĐẦU TƯ",
-    code: "MÃ DỰ ÁN: TTCNST-2024-HUB04",
-    title: "Record Startup Hub Vietnam",
-    description:
-      "Cơ sở hỗ trợ hoàn thiện pháp lý sở hữu trí tuệ, tiêu chuẩn hóa thương hiệu và bảo trợ kết nối nguồn vốn mạo hiểm cho hơn 50 doanh nghiệp...",
-    image:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=80",
-    details: [
-      { label: "Đơn vị bảo trợ", value: "Viện Kỷ Lục & Quỹ Đổi Mới" },
-      { label: "Startup được ươm tạo", value: "52 Doanh nghiệp" },
-    ],
-    footerText: "Cố vấn 1-1 chuyên sâu",
-    buttonLabel: "Xem chi tiết",
-  },
-  {
-    id: 5,
-    name: "Bộ Kỷ Yếu & Bản Đồ Số Kỷ Lục Sáng Tạo 63 Tỉnh Thành",
-    categoryTag: "NGHIÊN CỨU",
-    code: "MÃ DỰ ÁN: TTCNST-2024-PUB05",
-    title: "Bản Đồ Số Tài Nguyên Sáng Tạo",
-    description:
-      "Đề tài điều tra dữ liệu quốc gia về tài sản sở hữu trí tuệ, đặc sản bản địa và các kỷ lục văn hóa phi vật thể tại từng đơn vị hành chính, tr...",
-    image:
-      "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=80",
-    details: [
-      { label: "Phạm vi khảo sát", value: "63 Tỉnh & Thành phố" },
-      { label: "Dữ liệu thu thập", value: "1.200+ Hồ sơ độc quyền" },
-      { label: "Quy cách", value: "Song ngữ Việt – Anh" },
-    ],
-    footerText: "Ấn bản số & Giấy mỹ thuật",
-    buttonLabel: "Xem chi tiết",
-  },
-  {
-    id: 6,
-    name: "Quỹ Bảo Trợ & Phát Triển Nghệ Nhân Trẻ Việt Nam",
-    categoryTag: "BẢO TỒN VĂN HÓA",
-    code: "MÃ DỰ ÁN: TTCNST-2024-FND06",
-    title: "Chương Trình Trao Truyền Nghề",
-    description:
-      "Chương trình học bổng toàn phần, cấp kinh phí nghiên cứu chất liệu truyền thống và hỗ trợ không gian trưng bày cho các nghệ nhân trẻ...",
-    image:
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80",
-    details: [{ label: "Lĩnh vực", value: "Sơn mài, Gốm, Dệt đũi, Kim hoàn" }],
-    footerText: "BẢO HỘ BÍ QUYẾT KỶ LỤC",
-    buttonLabel: "Xem chi tiết",
-  },
-];
+import { ProjectPageAPI } from "../../api/projectPageApi.js";
+import { ProjectAPI } from "../../api/projectApi.js";
+import { RefreshCw } from "lucide-react";
 
 export default function ProjectLayout() {
   const [activeCategory, setActiveCategory] = useState("Tất cả dự án");
+  const [pageData, setPageData] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+
+    Promise.all([
+      ProjectPageAPI.getProjectPage(5).catch((err) => {
+        console.warn("Lỗi khi tải cấu hình trang Dự án:", err);
+        return null;
+      }),
+      ProjectAPI.getProjects().catch((err) => {
+        console.warn("Lỗi khi tải danh sách dự án từ database:", err);
+        return null;
+      }),
+      ProjectAPI.getCategories().catch((err) => {
+        console.warn("Lỗi khi tải danh mục dự án từ database:", err);
+        return null;
+      }),
+    ])
+      .then(([pageRes, projectsRes, categoriesRes]) => {
+        if (!isMounted) return;
+
+        // 1. Unwrap page data
+        const pData = pageRes?.data || pageRes;
+        if (pData) setPageData(pData);
+
+        // 2. Unwrap projects from database table `project`
+        const pList = Array.isArray(projectsRes?.data)
+          ? projectsRes.data
+          : Array.isArray(projectsRes)
+          ? projectsRes
+          : [];
+        setProjects(pList);
+
+        // 3. Unwrap categories
+        const cList = Array.isArray(categoriesRes?.data)
+          ? categoriesRes.data
+          : Array.isArray(categoriesRes)
+          ? categoriesRes
+          : [];
+        setCategories(cList);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Lọc danh sách dự án được quản trị viên chọn hiển thị (hoặc toàn bộ nếu chưa chọn)
+  const displayableProjects = useMemo(() => {
+    const selectedIds = pageData?.props?.selected_project_ids;
+    if (Array.isArray(selectedIds) && selectedIds.length > 0) {
+      const allowedSet = new Set(selectedIds.map(Number));
+      return projects.filter((p) => allowedSet.has(Number(p.id)));
+    }
+    return projects;
+  }, [projects, pageData]);
+
+  // Tính toán danh sách danh mục kèm số lượng dự án từ database
+  const filterCategories = useMemo(() => {
+    const list = [
+      {
+        name: "Tất cả dự án",
+        count: displayableProjects.length < 10 ? `0${displayableProjects.length}` : String(displayableProjects.length),
+      },
+    ];
+
+    if (categories.length > 0) {
+      categories.forEach((cat) => {
+        const count = displayableProjects.filter(
+          (p) => p.category_id === cat.id || p.category?.name === cat.name
+        ).length;
+        if (count > 0) {
+          list.push({
+            name: cat.name,
+            count: count < 10 ? `0${count}` : String(count),
+          });
+        }
+      });
+    } else {
+      // Nhóm theo category của project nếu category API chưa có
+      const uniqueNames = new Set(
+        displayableProjects.map((p) => p.category?.name || p.categoryTag).filter(Boolean)
+      );
+      uniqueNames.forEach((catName) => {
+        const count = displayableProjects.filter(
+          (p) => (p.category?.name || p.categoryTag) === catName
+        ).length;
+        list.push({
+          name: catName,
+          count: count < 10 ? `0${count}` : String(count),
+        });
+      });
+    }
+
+    return list;
+  }, [displayableProjects, categories]);
+
+  // Lọc danh sách dự án hiển thị dựa theo danh mục được chọn
+  const filteredProjects = useMemo(() => {
+    if (activeCategory === "Tất cả dự án") return displayableProjects;
+    return displayableProjects.filter(
+      (p) =>
+        p.category?.name === activeCategory ||
+        p.categoryTag === activeCategory ||
+        categories.find((c) => c.name === activeCategory)?.id === p.category_id
+    );
+  }, [displayableProjects, activeCategory, categories]);
 
   return (
     <div className="max-w pb-16">
-      {/* 1. Phần Header nội dung trang */}
-      <ProjectHeader />
+      {/* 1. Phần Header nội dung trang (lấy từ page props) */}
+      <ProjectHeader headerData={pageData?.props?.header_section} />
 
       {/* 2. Phần Bộ lọc danh mục dự án */}
       <ProjectFilter
+        categories={filterCategories}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
 
-      {/* 3. Danh sách các Card dự án (Grid) */}
-      <div className="px-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sampleProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
-      </div>
+      {/* 3. Danh sách các Card dự án từ cơ sở dữ liệu */}
+      {loading ? (
+        <div className="flex justify-center items-center py-20 text-gray-500 gap-3">
+          <RefreshCw className="animate-spin text-[#710008]" size={24} />
+          <span>Đang nạp danh sách dự án từ cơ sở dữ liệu...</span>
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="text-center py-16 px-4 bg-white rounded-xl mx-6 md:mx-20 border border-gray-200">
+          <p className="text-gray-500 text-base">
+            Không tìm thấy dự án nào trong mục "{activeCategory}".
+          </p>
+        </div>
+      ) : (
+        <div className="px-6 md:px-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      )}
 
-      {/* 4. Phần Form đề xuất dự án (Nền đỏ sẫm phía dưới) */}
-      <ProjectForm />
+      {/* 4. Phần Form đề xuất dự án (lấy từ page props) */}
+      <ProjectForm formData={pageData?.props?.proposal_section} />
     </div>
   );
 }
