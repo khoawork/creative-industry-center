@@ -24,10 +24,12 @@ export default function AwardTableManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
+    code: '',
     name: '',
     title: '',
     description: '',
     decision_number: '',
+    year: '',
     image: '',
   });
   const [errors, setErrors] = useState({});
@@ -78,10 +80,12 @@ export default function AwardTableManager() {
     setEditingItem(null);
     setSelectedImageFile(null);
     setFormData({
+      code: '',
       name: '',
       title: '',
       description: '',
       decision_number: '',
+      year: '',
       image: '',
     });
     setErrors({});
@@ -92,10 +96,12 @@ export default function AwardTableManager() {
     setEditingItem(item);
     setSelectedImageFile(null);
     setFormData({
+      code: item.code || '',
       name: item.name || '',
       title: item.title || '',
       description: item.description || '',
       decision_number: item.decision_number || '',
+      year: item.year || '',
       image: item.image || '',
     });
     setErrors({});
@@ -104,6 +110,7 @@ export default function AwardTableManager() {
 
   const validate = () => {
     const errs = {};
+    if (!formData.code.trim()) errs.code = 'Mã giải thưởng là bắt buộc';
     if (!formData.name.trim()) errs.name = 'Tên giải thưởng là bắt buộc';
     if (!formData.title.trim()) errs.title = 'Hạng mục/Danh hiệu là bắt buộc';
     if (!formData.description.trim()) errs.description = 'Mô tả là bắt buộc';
@@ -118,10 +125,12 @@ export default function AwardTableManager() {
 
     setIsSaving(true);
     const payload = {
+      code: formData.code.trim(),
       name: formData.name.trim(),
       title: formData.title.trim(),
       description: formData.description.trim(),
       decision_number: formData.decision_number.trim(),
+      year: formData.year ? Number(formData.year) : null,
       image: formData.image.trim() || null,
       props: { icon: 'award' },
     };
@@ -169,9 +178,9 @@ export default function AwardTableManager() {
       const q = searchQuery.toLowerCase();
       return (
         (aw.name && aw.name.toLowerCase().includes(q)) ||
+        (aw.code && aw.code.toLowerCase().includes(q)) ||
         (aw.title && aw.title.toLowerCase().includes(q)) ||
-        (aw.decision_number && aw.decision_number.toLowerCase().includes(q)) ||
-        String(aw.id).includes(q)
+        (aw.decision_number && aw.decision_number.toLowerCase().includes(q))
       );
     });
   }, [awards, searchQuery]);
@@ -240,27 +249,27 @@ export default function AwardTableManager() {
             <table className="w-full text-left border-collapse text-sm">
               <thead>
                 <tr className="border-b border-(--admin-border) bg-(--admin-background)/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <th className="py-3 px-4 w-14">ID</th>
-                  <th className="py-3 px-4">Tên Giải Thưởng</th>
+                  <th className="w-36 px-4 py-3">Mã</th>
+                  <th className="px-4 py-3">Tên giải thưởng</th>
                   <th className="py-3 px-4">Hạng mục / Danh hiệu</th>
-                  <th className="py-3 px-4">Số Quyết Định</th>
+                  <th className="w-44 px-4 py-3">Số quyết định</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-(--admin-border)">
                 {filteredAwards.map((item) => (
                   <tr key={item.id} className="hover:bg-(--admin-background)/40 transition-colors">
-                    <td className="py-3 px-4 font-mono text-xs text-gray-500 font-semibold">#{item.id}</td>
-                    <td className="py-3 px-4 font-semibold text-(--admin-title)">
-                      <div>{item.name}</div>
+                    <td className="px-4 py-3 font-mono text-xs font-semibold text-gray-500">{item.code}</td>
+                    <td className="px-4 py-3 font-semibold text-(--admin-title)">
+                      <div className="truncate">{item.name}</div>
                       <div className="text-xs text-gray-500 font-normal line-clamp-1">{item.description}</div>
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                    <td className="max-w-[260px] px-4 py-3">
+                      <span className="inline-block max-w-full truncate rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
                         {item.title}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-mono text-xs text-gray-600">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-600">
                       <span className="inline-flex items-center gap-1">
                         <FileText size={12} className="text-gray-400" />
                         {item.decision_number}
@@ -309,7 +318,19 @@ export default function AwardTableManager() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
               <div>
-                <label className="block text-xs font-semibold text-(--admin-heading) uppercase mb-1">Tên Giải Thưởng *</label>
+                <label className="block text-xs font-semibold text-(--admin-heading) uppercase mb-1">Mã giải thưởng *</label>
+                <input
+                  type="text"
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) focus:outline-(--admin-accent)"
+                  placeholder="Ví dụ: HG-ANG-01"
+                />
+                {errors.code && <p className="text-xs text-red-500 mt-1">{errors.code}</p>}
+              </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-semibold uppercase text-(--admin-heading)">Tên giải thưởng *</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -320,9 +341,9 @@ export default function AwardTableManager() {
                 {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-(--admin-heading) uppercase mb-1">Hạng mục / Danh hiệu *</label>
+                  <label className="mb-1 block text-xs font-semibold uppercase text-(--admin-heading)">Hạng mục / Danh hiệu *</label>
                   <input
                     type="text"
                     value={formData.title}
@@ -334,7 +355,7 @@ export default function AwardTableManager() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-(--admin-heading) uppercase mb-1">Số Quyết Định *</label>
+                  <label className="mb-1 block text-xs font-semibold uppercase text-(--admin-heading)">Số quyết định *</label>
                   <input
                     type="text"
                     value={formData.decision_number}
@@ -344,6 +365,19 @@ export default function AwardTableManager() {
                   />
                   {errors.decision_number && <p className="text-xs text-red-500 mt-1">{errors.decision_number}</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase text-(--admin-heading)">Năm xét tặng</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="9999"
+                  value={formData.year}
+                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                  className="min-h-10 w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent)"
+                  placeholder="Ví dụ: 2026"
+                />
               </div>
 
               <div>

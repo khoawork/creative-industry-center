@@ -1,11 +1,15 @@
 import React from 'react';
 
-export const AwardHero = () => {
+export const AwardHero = ({ header = {} }) => {
+  const title = header.tittle || header.title || 'GIẢI THƯỞNG';
+  const subTitle = header.sub_title || 'Hệ thống tôn vinh thường niên';
+  const description = header.description || 'Hệ thống giải thưởng và tôn vinh thường niên do Trung tâm Công nghiệp Sáng tạo & Viện Kỷ lục Việt Nam (VIETKINGS) chủ trì, nhằm ghi nhận những cống hiến xuất sắc trong bảo tồn di sản, đổi mới sáng tạo và xác lập giá trị kỷ lục Việt Nam.';
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#faf6f0] via-[#fdfbf7] to-[#faf9f7] pt-10 pb-8 md:pt-14 md:pb-12 border-b border-[#f1eae0]">
+    <section className="relative w-full overflow-hidden border-b border-[#710008]/15 bg-gradient-to-r from-[#580006]/5 via-[#710008]/10 to-transparent py-12 md:py-16">
       {/* Decorative Star Watermark Background (Emblem-style) */}
       <div 
-        className="pointer-events-none absolute -right-12 -top-16 md:right-10 md:-top-10 w-[380px] h-[380px] md:w-[520px] md:h-[520px] opacity-[0.07] select-none"
+        className="pointer-events-none absolute -right-20 -top-24 h-[420px] w-[420px] select-none opacity-[0.04] md:right-10 md:-top-16 md:h-[600px] md:w-[600px]"
         aria-hidden="true"
       >
         <svg viewBox="0 0 500 500" className="w-full h-full fill-current text-[#680007]">
@@ -19,21 +23,21 @@ export const AwardHero = () => {
         </svg>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Top Header Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ffdad6]/60 border border-[#f5b8b0] text-[#680007] text-xs font-semibold tracking-wider uppercase mb-4 shadow-2xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#680007]"></span>
-          <span>Hệ thống tôn vinh thường niên • Viện Kỷ lục Việt Nam</span>
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#710008]/20 bg-[#710008]/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#710008]">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-[#710008]"></span>
+          <span>{subTitle}</span>
         </div>
 
         {/* Main Title */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[44px] font-black text-[#680007] tracking-tight uppercase leading-tight mb-4">
-          GIẢI THƯỞNG
+        <h1 className="mb-4 text-4xl font-extrabold uppercase leading-tight tracking-tight text-[#710008] sm:text-5xl md:text-[2.75rem]">
+          {title}
         </h1>
 
         {/* Description Subtitle */}
-        <p className="max-w-4xl text-sm sm:text-base text-gray-700 leading-relaxed font-normal">
-          Hệ thống giải thưởng và tôn vinh thường niên do Trung tâm Công nghiệp Sáng tạo &amp; Viện Kỷ lục Việt Nam (VIETKINGS) chủ trì, nhằm ghi nhận những cống hiến xuất sắc trong bảo tồn di sản, đổi mới sáng tạo và xác lập giá trị kỷ lục Việt Nam.
+        <p className="max-w-3xl text-base leading-relaxed text-[#58413f]">
+          {description}
         </p>
       </div>
     </section>

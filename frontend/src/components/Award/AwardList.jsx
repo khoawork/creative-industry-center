@@ -10,12 +10,11 @@ export const AwardList = ({
   onResetFilter,
 }) => {
   return (
-    <section className="mb-14">
+    <section className="mb-14 w-full">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-2 border-b border-gray-200/80">
+      <div className="mb-6 flex flex-col justify-between gap-3 border-l-4 border-[#710008] py-1 pl-3 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2.5">
-          <div className="w-1.5 h-6 bg-[#680007] rounded-full shrink-0"></div>
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">
+          <h2 className="text-base font-bold uppercase tracking-tight text-[#710008] sm:text-lg">
             DANH MỤC 06 GIẢI THƯỞNG THƯỜNG NIÊN VIETKINGS
           </h2>
         </div>
@@ -24,7 +23,7 @@ export const AwardList = ({
         <button
           type="button"
           onClick={onOpenRegulationModal}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#680007] text-[#680007] hover:bg-[#680007] hover:text-white text-xs font-semibold transition-all duration-200 cursor-pointer shadow-2xs shrink-0 self-start sm:self-auto"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#710008] px-3.5 py-2 text-xs font-bold text-[#710008] transition hover:bg-[#710008] hover:text-white"
         >
           <FileDown className="w-3.5 h-3.5" />
           <span>Quy chế xét tặng &amp; đề cử [PDF]</span>
@@ -33,7 +32,7 @@ export const AwardList = ({
 
       {/* Awards Cards List */}
       {awards.length > 0 ? (
-        <div className="space-y-4 sm:space-y-5">
+        <div className="space-y-6">
           {awards.map((award) => (
             <AwardCard
               key={award.id}
@@ -63,7 +62,7 @@ export const AwardList = ({
       )}
 
       {/* Bottom Information Notice Bar */}
-      <div className="mt-5 bg-[#fff8f8] border border-[#fbd0d0] rounded-xl px-4 py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+      <div className="mt-6 flex flex-col justify-between gap-3 rounded-xl border border-[#710008]/20 bg-gradient-to-r from-[#710008]/10 via-[#710008]/5 to-transparent px-4 py-3 text-xs text-[#58413f] sm:flex-row sm:items-center sm:text-sm">
         <div className="flex items-start sm:items-center gap-2 text-gray-700">
           <MapPin className="w-4 h-4 text-[#680007] shrink-0 mt-0.5 sm:mt-0" />
           <p className="text-xs sm:text-[13px] leading-relaxed">
