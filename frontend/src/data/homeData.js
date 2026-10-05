@@ -48,7 +48,7 @@ function formatEventDate(value) {
     .toLocaleUpperCase('vi-VN')
 }
 
-const pageResponse = await HomeAPI.getHomePage(9).catch((error) => {
+const pageResponse = await HomeAPI.getHomePage(1).catch((error) => {
   console.warn('Không thể tải dữ liệu Home từ API.', error)
   return null
 })

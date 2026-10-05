@@ -30,7 +30,9 @@ export function AboutSection() {
         <SectionHeading eyebrow={about.eyebrow} title={about.title} />
         <div className="home-about-grid grid lg:grid-cols-[5fr_7fr]">
           <div className="home-about-photo">
-            <img src={about.image} alt={about.imageAlt} loading="lazy" />
+           {about?.image && (
+  <img src={about.image} alt={about.imageAlt} loading="lazy" />
+)}
             <div className="home-about-photo-shade" aria-hidden="true" />
             <div className="home-about-caption">
               <h3>{about.captionTitle}</h3>
