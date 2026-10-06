@@ -1,13 +1,15 @@
 import axios from 'axios'
 import { API_BASE_URL } from '../config/config.js'
 
+export const CONTACT_PAGE_ID = 10
+
 export const ContactAPI = {
-  getPage: async (options = {}) => {
-    const response = await axios.get(`${API_BASE_URL}/contact`, options)
+  getPage: async (pageIndex = CONTACT_PAGE_ID, options = {}) => {
+    const response = await axios.get(`${API_BASE_URL}/contact/${pageIndex}`, options)
     return response.data
   },
-  updatePage: async (data, options = {}) => {
-    const response = await axios.put(`${API_BASE_URL}/contact`, data, options)
+  updatePage: async (pageIndex, data, options = {}) => {
+    const response = await axios.put(`${API_BASE_URL}/contact/${pageIndex}`, data, options)
     return response.data
   },
 }

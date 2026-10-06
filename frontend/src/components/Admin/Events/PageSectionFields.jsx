@@ -123,9 +123,9 @@ export default function PageSectionFields({ section, value, onChange }) {
       </div>
       <div className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
         <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-(--admin-title)"><Eye size={16} className="text-(--admin-accent)" />Xem trước Giao diện Form thực tế</h3>
-        <div className="pointer-events-none overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-background)">
+        <fieldset disabled className="pointer-events-none min-w-0 overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-background)">
           <EventNewsletter section={{ ...value, form_fields: newsletterPreviewFields }} />
-        </div>
+        </fieldset>
       </div>
     </>}
   </div>

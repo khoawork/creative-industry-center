@@ -1,8 +1,5 @@
 import { iconPaths } from '../shared/iconPaths.js'
 
-// Shared by the public page and admin; update here if the database Page ID changes.
-export const INTRODUCE_PAGE_ID = 2
-
 export const aboutIconNames = {
   globe: 'globe',
   lightbulb: 'bulb',

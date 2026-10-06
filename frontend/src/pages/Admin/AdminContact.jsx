@@ -5,7 +5,7 @@ import AdminContactInbox from '../../components/Admin/AdminContactInbox.jsx'
 import { FormBuilder } from '../../components/Admin/Base/index.js'
 import ContactAvailabilityMessage from '../../components/Contact/ContactAvailabilityMessage.jsx'
 import ContactForm from '../../components/Contact/ContactForm.jsx'
-import { ContactAPI, contactError, contactValidationErrors, requireContactData } from '../../api/contactApi.js'
+import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, requireContactData } from '../../api/contactApi.js'
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
@@ -130,7 +130,7 @@ export default function AdminContact() {
 
   useEffect(() => {
     const controller = new AbortController()
-    ContactAPI.getPage({ signal: controller.signal }).then((response) => {
+    ContactAPI.getPage(CONTACT_PAGE_ID, { signal: controller.signal }).then((response) => {
       if (controller.signal.aborted) return
       const page = requireContactData(response)
       setContent(page)
@@ -453,7 +453,7 @@ export default function AdminContact() {
         ...channel,
         href: externalHrefFromValue(channel.href),
       }))
-      const response = await ContactAPI.updatePage({ props })
+      const response = await ContactAPI.updatePage(CONTACT_PAGE_ID, { props })
       const page = requireContactData(response)
       setContent(page)
       setDraftProps(clone(page.props))

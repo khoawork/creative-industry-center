@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 import { API_BASE_URL } from '../config/config.js';
-import { EVENTS_PAGE_ID } from '../config/Events/eventsConfig.js';
 
 function eventPayload(data, imageFile, speakerImageFiles = []) {
 	const files = Array.isArray(speakerImageFiles) ? speakerImageFiles : [];
@@ -17,12 +16,8 @@ function eventPayload(data, imageFile, speakerImageFiles = []) {
 }
 
 export const EventAPI = {
-	subscribeNewsletter: async (pageId, data) => {
-		const response = await axios.post(`${API_BASE_URL}/events/page/newsletter/${pageId}/subscribe`, data);
-		return response.data;
-	},
-	getPage: async (pageId = EVENTS_PAGE_ID, options = {}) => {
-		const response = await axios.get(`${API_BASE_URL}/events/page/${pageId}`, options);
+	getPage: async (pageIndex = 3, options = {}) => {
+		const response = await axios.get(`${API_BASE_URL}/events/${pageIndex}`, options);
 		return response.data;
 	},
 
@@ -49,6 +44,16 @@ export const EventAPI = {
 
 	createCategory: async (data) => {
 		const response = await axios.post(`${API_BASE_URL}/events/categories`, data);
+		return response.data;
+	},
+
+	updateCategory: async (id, data) => {
+		const response = await axios.put(`${API_BASE_URL}/events/categories/${id}`, data);
+		return response.data;
+	},
+
+	deleteCategory: async (id) => {
+		const response = await axios.delete(`${API_BASE_URL}/events/categories/${id}`);
 		return response.data;
 	},
 

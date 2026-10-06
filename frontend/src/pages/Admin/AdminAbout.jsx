@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react'
 import { IntroduceAPI } from '../../api/introduceApi.js'
-import { INTRODUCE_PAGE_ID } from '../../config/About/aboutConfig.js'
 import { aboutAdminButton, aboutAdminPrimaryButton, aboutAdminTabs, emptyAboutSection } from '../../config/Admin/adminAbout.js'
 import HeroEditor from '../../components/Admin/About/HeroEditor.jsx'
 import OverviewEditor from '../../components/Admin/About/OverviewEditor.jsx'
@@ -41,7 +40,7 @@ export default function AdminAbout() {
 
   useEffect(() => {
     const controller = new AbortController()
-    IntroduceAPI.getIntroducePage(INTRODUCE_PAGE_ID, { signal: controller.signal }).then((response) => {
+    IntroduceAPI.getIntroducePage(undefined, { signal: controller.signal }).then((response) => {
       if (controller.signal.aborted) return
       const page = response?.data
       if (response?.success !== true || !page || !page.props || typeof page.props !== 'object' || Array.isArray(page.props)) {

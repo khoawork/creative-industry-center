@@ -3,7 +3,7 @@ import ContactHero from '../components/Contact/ContactHero.jsx'
 import ContactInfo from '../components/Contact/ContactInfo.jsx'
 import ContactMap from '../components/Contact/ContactMap.jsx'
 import ContactForm from '../components/Contact/ContactForm.jsx'
-import { ContactAPI, contactError, requireContactData } from '../api/contactApi.js'
+import { CONTACT_PAGE_ID, ContactAPI, contactError, requireContactData } from '../api/contactApi.js'
 
 export default function ContactPage() {
   const [content, setContent] = useState(null)
@@ -13,7 +13,7 @@ export default function ContactPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    ContactAPI.getPage({ signal: controller.signal })
+    ContactAPI.getPage(CONTACT_PAGE_ID, { signal: controller.signal })
       .then((response) => {
         if (!controller.signal.aborted) setContent(requireContactData(response))
       })
@@ -37,7 +37,7 @@ export default function ContactPage() {
       id="contact-content"
       lang="vi"
       aria-busy={loading}
-      className="min-w-0 flex-1 bg-[var(--contact-cream)] text-base leading-relaxed text-black antialiased [--contact-red:#710008] [--contact-gold:#d49520] [--contact-cream:#f4f3f1] [font-family:'Inter',sans-serif]"
+      className="min-h-screen min-w-0 flex-1 bg-[var(--contact-cream)] text-base leading-relaxed text-black antialiased [--contact-red:#710008] [--contact-gold:#d49520] [--contact-cream:#f4f3f1] [font-family:'Inter',sans-serif]"
     >
       {loading ? <p role="status" className="p-16 text-center">Đang tải thông tin liên hệ…</p> : error ? (
         <div className="space-y-4 p-16 text-center">

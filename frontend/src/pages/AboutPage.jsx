@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import AboutLayout from "../components/About/about-layout";
 import { IntroduceAPI } from "../api/introduceApi.js";
-import { INTRODUCE_PAGE_ID } from "../config/About/aboutConfig.js";
 
 export default function AboutPage() {
   const [attempt, setAttempt] = useState(0);
@@ -10,7 +9,7 @@ export default function AboutPage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    IntroduceAPI.getIntroducePage(INTRODUCE_PAGE_ID, { signal: controller.signal })
+    IntroduceAPI.getIntroducePage(undefined, { signal: controller.signal })
       .then((response) => {
         if (controller.signal.aborted) return;
         const page = response?.data;

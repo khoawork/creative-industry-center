@@ -4,11 +4,12 @@ from extensions import db
 from models.PageModel import Page
 
 
-def get_contact_page(page_id=None):
-    query = Page.query.filter_by(slug="contact")
-    if page_id is not None:
-        query = query.filter_by(id=page_id)
-    return query.first()
+def get_contact_page_by_id(page_id):
+    return db.session.get(Page, page_id)
+
+
+def get_contact_page_by_slug():
+    return Page.query.filter_by(slug="contact").first()
 
 
 def update_contact_props(page, props):

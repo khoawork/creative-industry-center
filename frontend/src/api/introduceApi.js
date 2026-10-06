@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config/config.js';
-import { INTRODUCE_PAGE_ID } from '../config/About/aboutConfig.js';
 
 export const IntroduceAPI = {
-  getIntroducePage: async (pageId = INTRODUCE_PAGE_ID, options = {}) => {
-    const response = await axios.get(`${API_BASE_URL}/introduce/${pageId}`, options);
+  getIntroducePage: async (pageIndex = 2, options = {}) => {
+    const response = await axios.get(`${API_BASE_URL}/introduce/${pageIndex}`, options);
     return response.data;
   },
 
