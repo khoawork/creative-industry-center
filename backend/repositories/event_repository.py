@@ -2,8 +2,6 @@ from models import Event, EventCategory
 from extensions import db
 from dto.event_dto import SpeakerDTO
 from sqlalchemy.orm.attributes import flag_modified
-from sqlalchemy.exc import IntegrityError
-from models.EventModel import EventNewsletterSubscription
 
 
 def get_all_events() -> list[Event]:
@@ -30,18 +28,30 @@ def get_all_event_categories() -> list[EventCategory]:
     return EventCategory.query.order_by(EventCategory.name.asc()).all()
 
 
+def get_event_category_by_id(category_id):
+    return db.session.get(EventCategory, category_id)
+
+
+def has_events_in_category(category_id):
+    return Event.query.filter_by(category_id=category_id).first() is not None
+
+
+def update_event_category(category, data):
+    category.name = data.name
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    return category
+
+
 def _get_or_create_category(category_data) -> EventCategory:
     category_id = getattr(category_data, "category_id", None)
     if category_id is not None:
-        category = EventCategory.query.get(category_id)
-        if not category:
-            raise ValueError("Event category not found")
-        return category
+        return get_event_category_by_id(category_id)
 
     category_data = getattr(category_data, "category", None)
-    if not category_data or not category_data.name:
-        raise ValueError("Event category is required")
-
     category = get_event_category_by_name(category_data.name)
     if not category:
         category = EventCategory(name=category_data.name)
@@ -120,12 +130,16 @@ def create_event_category(category_data: Event) -> Event:
 
 
 def delete_event_category(category_id: int) -> bool:
-    event_category = EventCategory.query.get(category_id)
+    event_category = get_event_category_by_id(category_id)
     if not event_category:
         return False
 
-    db.session.delete(event_category)
-    db.session.commit()
+    try:
+        db.session.delete(event_category)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
     return True
 
 
@@ -154,23 +168,3 @@ def update_displayed_events(page, data):
 
 def update_newsletter(page, data):
     return _save_page_section(page, "newsletter_section", data)
-
-
-def subscribe_newsletter(page_id, data):
-    email = data["email"].strip().lower()
-    existing = EventNewsletterSubscription.query.filter_by(page_id=page_id, email=email).first()
-    if existing:
-        return
-    try:
-        db.session.add(EventNewsletterSubscription(
-            page_id=page_id, email=email, full_name=data["full_name"].strip(),
-            organization=data["organization"].strip(), consent=data["consent"],
-        ))
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        if not EventNewsletterSubscription.query.filter_by(page_id=page_id, email=email).first():
-            raise
-    except Exception:
-        db.session.rollback()
-        raise

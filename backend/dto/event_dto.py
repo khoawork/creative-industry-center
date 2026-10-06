@@ -4,8 +4,14 @@ from datetime import date
 
 
 class EventCategoryRequestDTO(BaseSchema):
-    name = fields.String(required=True)
+    name = fields.String(required=True, validate=validate.Length(min=1, max=255))
     description = fields.String(load_default="", allow_none=True)
+
+    @pre_load
+    def trim_name(self, data, **kwargs):
+        if isinstance(data, dict) and isinstance(data.get("name"), str):
+            return {**data, "name": data["name"].strip()}
+        return data
 
 
 class EventCategoryResponse(BaseSchema):
@@ -152,10 +158,3 @@ class EventPageNewsletterDTO(Schema):
     consent_text = fields.String(required=True, validate=_not_blank)
     success_message = fields.String(required=True, validate=_not_blank)
     form_fields = fields.List(fields.Dict(), required=False, allow_none=True)
-
-
-class EventNewsletterSubscriptionDTO(Schema):
-    full_name = fields.String(required=True, validate=[_not_blank, validate.Length(max=255)])
-    organization = fields.String(load_default="", validate=validate.Length(max=255))
-    email = fields.Email(required=True, validate=validate.Length(max=254))
-    consent = fields.Boolean(required=True, validate=validate.Equal(True, error="Vui lòng đồng ý nhận thông tin sự kiện."))

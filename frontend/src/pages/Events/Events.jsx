@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { EventAPI } from '../../api/eventApi.js'
-import { EVENTS_PAGE_ID, eventPageStatusFilters } from '../../config/Events/eventsConfig.js'
+import { eventPageStatusFilters } from '../../config/Events/eventsConfig.js'
 import { requireEventData, eventError } from '../../api/eventApi.js'
 import useDebouncedValue from '../../hooks/shared/useDebouncedValue.js'
 import EventHero from '../../components/event-actis/EventHero.jsx'
@@ -22,7 +22,7 @@ export default function Events() {
   const [detail, setDetail] = useState(null)
   useEffect(() => {
     const controller = new AbortController()
-    Promise.all([EventAPI.getPage(EVENTS_PAGE_ID, { signal: controller.signal }), EventAPI.getEvents({ signal: controller.signal }), EventAPI.getCategories({ signal: controller.signal })])
+    Promise.all([EventAPI.getPage(undefined, { signal: controller.signal }), EventAPI.getEvents({ signal: controller.signal }), EventAPI.getCategories({ signal: controller.signal })])
       .then(([pageResponse, eventsResponse, categoriesResponse]) => {
         if (controller.signal.aborted) return
         const page = requireEventData(pageResponse)

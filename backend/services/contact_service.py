@@ -5,7 +5,9 @@ from utils.error import InternalServerError, NotFoundError
 
 
 def _get_contact_page(page_id=None):
-    page = contact_repository.get_contact_page(page_id)
+    page = contact_repository.get_contact_page_by_id(page_id) if page_id is not None else None
+    if page is None or page.slug != "contact":
+        page = contact_repository.get_contact_page_by_slug()
     if page is None:
         suffix = f" (id={page_id})" if page_id is not None else ""
         raise NotFoundError(message=f"Không tìm thấy trang Liên hệ{suffix}.")

@@ -1,5 +1,3 @@
-export const EVENTS_PAGE_ID = 3
-
 export function formatEventDate(value) {
   return value ? value.split('-').reverse().join('/') : 'Chưa có ngày tổ chức'
 }

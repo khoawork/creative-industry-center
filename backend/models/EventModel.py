@@ -37,14 +37,3 @@ class EventCategory(BaseModel):
     __tablename__ = "event_category"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
-
-
-class EventNewsletterSubscription(BaseModel):
-    __tablename__ = "event_newsletter_subscription"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    page_id = db.Column(db.Integer, db.ForeignKey("page.id"), nullable=False)
-    full_name = db.Column(db.String(255), nullable=False)
-    organization = db.Column(db.String(255), nullable=False, default="")
-    email = db.Column(db.String(254), nullable=False)
-    consent = db.Column(db.Boolean, nullable=False)
-    __table_args__ = (db.UniqueConstraint("page_id", "email", name="uq_event_newsletter_page_email"),)

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react'
 import { EventAPI } from '../../api/eventApi.js'
-import { EVENTS_PAGE_ID } from '../../config/Events/eventsConfig.js'
 import { eventsAdminTabs, eventSectionDraft } from '../../config/Admin/adminEvents.js'
 import { adminButton, adminContentTheme, adminPanel, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { eventError, requireEventData } from '../../api/eventApi.js'
@@ -23,7 +22,7 @@ export default function AdminEvents() {
   const [listVersion, setListVersion] = useState(0)
   const busy = useRef(false)
   const tabRefs = useRef([])
-  const [pageId, setPageId] = useState(EVENTS_PAGE_ID)
+  const [pageId, setPageId] = useState(null)
   const dirtyKeys = saved ? eventsAdminTabs.filter(({ key }) => key !== 'events' && JSON.stringify(drafts[key]) !== JSON.stringify(eventSectionDraft(key, saved[key]))).map(({ key }) => key) : []
   useEffect(() => {
     if (!toast) return
@@ -32,7 +31,7 @@ export default function AdminEvents() {
   }, [toast])
   useEffect(() => {
     const controller = new AbortController()
-    EventAPI.getPage(EVENTS_PAGE_ID, { signal: controller.signal }).then((response) => {
+    EventAPI.getPage(undefined, { signal: controller.signal }).then((response) => {
       if (controller.signal.aborted) return
       const page = requireEventData(response)
       if (page.slug !== 'events' || !page.props || typeof page.props !== 'object' || Array.isArray(page.props)) throw new Error('Nội dung trang Sự kiện không hợp lệ.')
@@ -106,7 +105,7 @@ export default function AdminEvents() {
             <div className="flex justify-end border-t border-(--admin-border) pt-4"><button className={adminPrimaryButton} disabled={!dirtyKeys.includes(tab.key)}><Save size={16} />{saving ? 'Đang lưu…' : 'Lưu thay đổi'}</button></div>
           </fieldset>
         </form>}
-        {tab.key === 'filter_section' && <EventCategories onCreated={() => setListVersion((value) => value + 1)} />}
+        {tab.key === 'filter_section' && <EventCategories onChanged={() => setListVersion((value) => value + 1)} />}
       </div>}
     </div>)}
     {toast && <div className="fixed right-4 bottom-4 z-40 flex w-[calc(100%-2rem)] max-w-sm items-start gap-3 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-(--admin-ink) shadow-lg sm:right-6 sm:bottom-6">

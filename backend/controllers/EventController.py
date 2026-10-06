@@ -30,7 +30,7 @@ def _apply_event_image_uploads(json_data):
             speakers[index]["image"] = upload_image(speaker_file, folder="events/speakers")
 
 
-@event_api.route("/page/<int:page_id>", methods=["GET"])
+@event_api.route("/<int:page_id>", methods=["GET"])
 def get_events_page(page_id):
     page = event_services.get_events_page(page_id)
     return success_response(data={
@@ -64,13 +64,6 @@ def update_page_newsletter(page_id):
     data = event_dto.EventPageNewsletterDTO().load(request.get_json())
     data = event_services.update_newsletter_section(data, page_id)
     return success_response(data=data, message="Đã lưu nội dung trang Sự kiện.")
-
-
-@event_api.route("/page/newsletter/<int:page_id>/subscribe", methods=["POST"])
-def subscribe_newsletter(page_id):
-    data = event_dto.EventNewsletterSubscriptionDTO().load(request.get_json())
-    event_services.subscribe_newsletter(data, page_id)
-    return success_response(message="Đã ghi nhận đăng ký nhận thông tin sự kiện.")
 
 
 @event_api.route("/categories", methods=["GET"])
@@ -117,6 +110,30 @@ def create_event_category():
     return error_response(
       message="Failed to create event category", details=str(e), status_code=500
     )
+
+
+@event_api.route("/categories/<int:category_id>", methods=["PUT"])
+def update_event_category(category_id):
+    try:
+        data = event_dto.EventCategoryRequestDTO().load(request.get_json())
+        category = event_services.update_event_category(category_id, data)
+        return success_response(
+            data=event_dto.EventCategoryResponse().dump(category),
+            message="Đã cập nhật chuyên mục.",
+        )
+    except ValidationError as e:
+        return error_response(message="Tên chuyên mục phải có từ 1 đến 255 ký tự.", details=e.messages, status_code=400)
+    except ValueError as e:
+        return error_response(message=str(e), status_code=409)
+
+
+@event_api.route("/categories/<int:category_id>", methods=["DELETE"])
+def delete_event_category(category_id):
+    try:
+        event_services.delete_event_category(category_id)
+        return success_response(message="Đã xóa chuyên mục.")
+    except ValueError as e:
+        return error_response(message=str(e), status_code=409)
 
 
 @event_api.route("/", methods=["GET"])
