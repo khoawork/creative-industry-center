@@ -19,6 +19,8 @@ import {
  * - errors: Object chứa lỗi validation
  * - showFormMeta: boolean (mặc định: true, hiển thị cấu hình tiêu đề, mô tả, nút gửi)
  * - showPreview: boolean (mặc định: true, hiển thị khung xem trước)
+ * - previewValue: dữ liệu chỉ dùng cho khung xem trước khi preview khác value đang chỉnh sửa
+ * - previewFooter: nội dung bổ sung hiển thị bên dưới nút trong khung xem trước
  * - previewAccentColor: string (mặc định: '#710008')
  * - title: string (tiêu đề section)
  * - description: string (mô tả section)
@@ -29,6 +31,8 @@ export default function FormBuilder({
   errors = {},
   showFormMeta = true,
   showPreview = true,
+  previewValue = null,
+  previewFooter = null,
   previewAccentColor = '#710008',
   title = 'Cấu hình Khối Form & Các Ô Nhập Liệu',
   description = 'Admin có thể tự do thêm mới, tùy chỉnh chủ đề (label), gợi ý nhập (placeholder) và kiểu dữ liệu cho từng ô nhập liệu.',
@@ -37,6 +41,10 @@ export default function FormBuilder({
   const formDescription = value?.form_description ?? '';
   const buttonText = value?.button_text ?? 'Gửi Hồ Sơ';
   const formFields = Array.isArray(value?.form_fields) ? value.form_fields : [];
+  const previewFormTitle = previewValue?.form_title ?? formTitle;
+  const previewFormDescription = previewValue?.form_description ?? formDescription;
+  const previewButtonText = previewValue?.button_text ?? buttonText;
+  const previewFormFields = Array.isArray(previewValue?.form_fields) ? previewValue.form_fields : formFields;
 
   const updateParent = (updates) => {
     if (typeof onChange === 'function') {
@@ -169,9 +177,9 @@ export default function FormBuilder({
           <button
             type="button"
             onClick={handleAddField}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-(--admin-accent) text-white hover:opacity-90 transition cursor-pointer shadow-sm shrink-0"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-(--admin-accent) px-5 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:opacity-90 cursor-pointer shrink-0"
           >
-            <Plus size={14} /> Thêm ô nhập liệu mới
+            <Plus size={16} /> Thêm ô nhập liệu mới
           </button>
         </div>
 
@@ -189,9 +197,9 @@ export default function FormBuilder({
             <button
               type="button"
               onClick={handleAddField}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-(--admin-accent) text-white hover:opacity-90 transition cursor-pointer"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-(--admin-accent) px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90 cursor-pointer"
             >
-              <Plus size={14} /> Thêm ô nhập liệu đầu tiên
+              <Plus size={16} /> Thêm ô nhập liệu đầu tiên
             </button>
           </div>
         ) : (
@@ -416,19 +424,19 @@ export default function FormBuilder({
                 className="text-xl font-bold mb-1"
                 style={{ color: previewAccentColor }}
               >
-                {formTitle || '(Tiêu đề form)'}
+                {previewFormTitle || '(Tiêu đề form)'}
               </h3>
               <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                {formDescription || '(Mô tả phản hồi của form)'}
+                {previewFormDescription || '(Mô tả phản hồi của form)'}
               </p>
 
-              {formFields.length === 0 ? (
+              {previewFormFields.length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400 italic">
                   Chưa có ô nhập liệu nào để hiển thị xem trước.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  {formFields.map((field, idx) => {
+                  {previewFormFields.map((field, idx) => {
                     const isHalf = field.width === 'half';
                     return (
                       <div
@@ -475,8 +483,9 @@ export default function FormBuilder({
                 style={{ backgroundColor: previewAccentColor }}
               >
                 <span className="text-[10px]">▶</span>
-                <span>{buttonText || 'Gửi Thông Tin'}</span>
+                <span>{previewButtonText || 'Gửi Thông Tin'}</span>
               </div>
+              {previewFooter}
             </div>
           </div>
         </div>

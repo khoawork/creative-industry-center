@@ -1,5 +1,6 @@
 import datetime
 import argparse
+from copy import deepcopy
 import sys
 
 try:
@@ -30,6 +31,7 @@ from repositories.id_counter_repository import generate_id
 from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
 from dto import introduce_dto, event_dto
+from dto import contact_dto
 from app import create_app
 
 
@@ -74,6 +76,78 @@ EVENT_DATES_EVENT = {
     "Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia": datetime.date(2025, 5, 15),
     "Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục": datetime.date(2025, 5, 28),
     'Tọa đàm: "Tài sản Vô hình & Định giá Thương hiệu Kỷ lục"': datetime.date(2025, 6, 8),
+}
+
+CONTACT_PAGE_PROPS = {
+    "intro": {
+        "badge": "Ban Thư Ký & Tiếp Nhận Hồ Sơ",
+        "title": "Liên hệ",
+        "description": "Trung tâm Công nghiệp Sáng tạo luôn sẵn sàng lắng nghe, tư vấn và đồng hành cùng các tổ chức, doanh nghiệp và cá nhân trên hành trình đổi mới sáng tạo.",
+    },
+    "contact": {
+        "organization": "Trung tâm Công nghiệp Sáng tạo",
+        "address": "Trung tâm Công nghiệp Sáng tạo, Viện Kỷ lục Việt Nam, TP. Hồ Chí Minh & Hà Nội",
+        "phone": "(+84) 28 3847 7777",
+        "phoneHref": "tel:+842838477777",
+        "phones": [{"number": "(+84) 28 3847 7777", "href": "tel:+842838477777"}],
+        "emails": ["bbt@kyluc.vn", "contact@vietkings.org"],
+    },
+    "offices": [
+        {
+            "id": "ha-noi",
+            "label": "Trụ sở chính",
+            "city": "TP. Hà Nội",
+            "address": "Tầng 6, Tòa nhà Liên hiệp các Hội Khoa học & Kỹ thuật Việt Nam, TP. Hà Nội.",
+        },
+        {
+            "id": "ho-chi-minh",
+            "label": "Văn phòng Đại diện phía Nam",
+            "city": "TP. Hồ Chí Minh",
+            "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        },
+    ],
+    "workingHours": [
+        {"days": "Thứ Hai — Thứ Sáu", "time": "08:00 – 17:30"},
+        {"days": "Thứ Bảy", "time": "08:00 – 12:00"},
+    ],
+    "socialChannels": [
+        {"id": "zalo", "label": "Zalo OA", "href": None},
+        {"id": "facebook", "label": "Fanpage", "href": None},
+        {"id": "youtube", "label": "Sáng Tạo Việt", "href": None},
+    ],
+    "mapLocation": {
+        "label": "Trụ sở VIETKINGS — TTCN Sáng Tạo",
+        "office": {
+            "id": "ho-chi-minh",
+            "label": "Văn phòng Đại diện phía Nam",
+            "city": "TP. Hồ Chí Minh",
+            "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        },
+        "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        "mapAddress": "16/1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        "embedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.2025137972955!2d106.66687307480518!3d10.795795989354158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752900091dee09%3A0xe23cdfee230e065b!2zMTYvMSDEkOG6t25nIFbEg24gTmfhu68sUGjGsOG7nW5nIDEwLFBow7ogTmh14bqtbg!5e0!3m2!1svi!2s!4v1790769635883!5m2!1svi!2s&hl=vi",
+        "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=16%2F1%20%C4%90%E1%BA%B7ng%20V%C4%83n%20Ng%E1%BB%AF%2C%20Ph%C6%B0%E1%BB%9Dng%2010%2C%20Qu%E1%BA%ADn%20Ph%C3%BA%20Nhu%E1%BA%ADn%2C%20TP.%20H%E1%BB%93%20Ch%C3%AD%20Minh",
+    },
+    "contactCategories": [
+        {"value": "de-cu", "label": "Đề cử kỷ lục sáng tạo"},
+        {"value": "dao-tao", "label": "Khóa đào tạo & Phát triển kỹ năng"},
+        {"value": "truyen-thong", "label": "Hợp tác truyền thông & Sự kiện"},
+        {"value": "khac", "label": "Hoạt động / Yêu cầu khác"},
+    ],
+    "form": {
+        "form_title": "Gửi phản hồi hoặc yêu cầu tư vấn",
+        "form_description": "Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.",
+        "button_text": "GỬI LỜI NHẮN NGAY",
+        "availability_text": "Biểu mẫu hiện chưa tiếp nhận trực tuyến. Quý vị vui lòng liên hệ qua {hotline} hoặc {email}.",
+        "privacy_text": "Nội dung đang nhập chỉ được giữ trên trang, chưa được gửi hoặc lưu vào hệ thống. Quý vị có thể liên hệ trực tiếp Ban Thư ký để được hướng dẫn tiếp nhận hồ sơ.",
+        "form_fields": [
+            {"id": "fullName", "label": "Họ và tên", "placeholder": "Ví dụ: Nguyễn Văn An", "type": "text", "options": [], "required": True, "width": "half"},
+            {"id": "email", "label": "Địa chỉ Email", "placeholder": "name@domain.com", "type": "email", "options": [], "required": True, "width": "half"},
+            {"id": "phone", "label": "Số điện thoại liên hệ", "placeholder": "Ví dụ: 0912 345 678", "type": "tel", "options": [], "required": False, "width": "half"},
+            {"id": "category", "label": "Lĩnh vực quan tâm", "placeholder": "Vui lòng chọn lĩnh vực", "type": "select", "options": ["Đề cử kỷ lục sáng tạo", "Khóa đào tạo & Phát triển kỹ năng", "Hợp tác truyền thông & Sự kiện", "Hoạt động / Yêu cầu khác"], "required": False, "width": "half"},
+            {"id": "message", "label": "Nội dung lời nhắn / Đề xuất chi tiết", "placeholder": "Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất...", "type": "textarea", "options": [], "required": True, "width": "full"},
+        ],
+    },
 }
 
 
@@ -126,6 +200,39 @@ def seed_event_dates():
         except Exception:
             db.session.rollback()
             raise
+
+
+def seed_contact_page(page_id=10):
+    """Bổ sung nội dung trang Contact, giữ nguyên giá trị đã chỉnh trong DB."""
+    page = db.session.get(Page, page_id)
+    if page is None or page.slug != "contact":
+        page = Page.query.filter_by(slug="contact").first()
+    if page is None:
+        page = Page(id=page_id, name="Liên hệ", slug="contact", props={})
+        db.session.add(page)
+        db.session.flush()
+
+    defaults = contact_dto.ContactPagePropsDTO().load(CONTACT_PAGE_PROPS)
+    def merge_missing(current, fallback):
+        if not isinstance(current, dict) or not isinstance(fallback, dict):
+            return deepcopy(fallback), True
+        merged = deepcopy(current)
+        changed = False
+        for key, value in fallback.items():
+            if key not in merged:
+                merged[key] = deepcopy(value)
+                changed = True
+            elif isinstance(value, dict) and isinstance(merged[key], dict):
+                merged[key], nested_changed = merge_missing(merged[key], value)
+                changed = changed or nested_changed
+        return merged, changed
+
+    props, changed = merge_missing(page.props or {}, defaults)
+    if changed:
+        page.props = props
+        flag_modified(page, "props")
+        db.session.commit()
+    return page
 
 
 # Seed images are served from frontend/public/images/about/.
@@ -706,6 +813,7 @@ def seed_database():
     seed_nav_pages()
 
     # Cập nhật chi tiết các sections cho Giới thiệu, Founder & Projects
+    seed_contact_page()
     seed_introduce()
     seed_events_page()
     seed_founder_page()
@@ -810,6 +918,8 @@ if __name__ == "__main__":
                         help="Chỉ bổ sung các trường đầu trang, bộ lọc và bản tin Events chưa có.")
     parser.add_argument("--project-page-only", action="store_true",
                         help="Chỉ bổ sung/cập nhật trang Projects.")
+    parser.add_argument("--contact-only", action="store_true",
+                        help="Chỉ bổ sung nội dung trang Contact.")
     args = parser.parse_args()
     
     app = create_app()
@@ -824,5 +934,7 @@ if __name__ == "__main__":
             seed_nav_pages()
         elif args.project_page_only:
             seed_project_page()
+        elif args.contact_only:
+            seed_contact_page()
         else:
             seed_database()

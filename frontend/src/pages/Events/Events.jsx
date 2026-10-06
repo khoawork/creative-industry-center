@@ -18,6 +18,7 @@ export default function Events() {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search, 500)
   const [year, setYear] = useState('')
+  const debouncedYear = useDebouncedValue(year, 500)
   const [detail, setDetail] = useState(null)
   useEffect(() => {
     const controller = new AbortController()
@@ -47,7 +48,7 @@ export default function Events() {
       || Boolean(statusFilter?.statuses.includes('ALL'))
       || Boolean(statusFilter?.statuses.includes(event.status))
       || String(event.category?.id) === category
-    const matchesYear = !year || event.event_date?.slice(0, 4) === year
+    const matchesYear = !debouncedYear || event.event_date?.slice(0, 4) === debouncedYear
     return matchesCategory && matchesYear && [event.name, event.description, event.location, ...(event.speakers || []).map((speaker) => speaker.name)].some((value) => String(value || '').toLocaleLowerCase('vi').includes(term))
   })
   return <main className="min-h-screen bg-(--color-brand-cream) text-black [font-family:Inter,sans-serif]" aria-busy={loading}>
@@ -55,7 +56,7 @@ export default function Events() {
       <EventHero section={content.props.hero_section} />
       <EventFilter section={content.props.filter_section} categories={displayedCategories} activeCategory={category} onSelectCategory={setCategory} searchTerm={search} onSearchChange={setSearch} selectedYear={year} onSelectYear={setYear} />
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <EventList key={`${category}:${debouncedSearch}:${year}`} events={events} onResetFilter={() => { setCategory(statusFilters.length ? 'status-filter:0' : 'all'); setSearch(''); setYear('') }} onDetailEvent={setDetail} />
+        <EventList key={`${category}:${debouncedSearch}:${debouncedYear}`} events={events} onResetFilter={() => { setCategory(statusFilters.length ? 'status-filter:0' : 'all'); setSearch(''); setYear('') }} onDetailEvent={setDetail} />
         <EventNewsletter section={content.props.newsletter_section} />
       </div>
       <EventDetailModal event={detail} isOpen={Boolean(detail)} onClose={() => setDetail(null)} />
