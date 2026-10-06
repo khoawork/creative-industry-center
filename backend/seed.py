@@ -11,6 +11,7 @@ from models import (
     Page,
     Project,
     ProjectCategory,
+    Record,
     Training,
     User,
 )
@@ -836,9 +837,10 @@ def seed_database():
     # ========================================================
     seed_nav_pages()
 
-    # Cập nhật chi tiết các sections cho Giới thiệu & Founder
+    # Cập nhật chi tiết các sections cho Giới thiệu & Founder & Records
     seed_introduce()
     seed_founder_page()
+    seed_record_page()
 
     # ========================================================
     # BƯỚC 6: PROPS TRANG CHỦ
@@ -952,6 +954,315 @@ def seed_database():
     print("\n🎉 Seed toàn bộ dữ liệu thành công!")
 
 
+RECORDS_SEED_DATA = [
+    {
+        "id": "1",
+        "rank": "HẠNG MỤC TỐI CAO",
+        "title": "Đề Cử Ngọn Hải Đăng Sáng Nghiệp",
+        "subtitle": "Biểu tượng ngọn hải đăng bằng đồng mạ vàng",
+        "category": "Doanh nhân & Nhà sáng lập",
+        "cycle": "Chu kỳ: Thường niên (Tháng 12)",
+        "icon": "flare",
+        "criteria": [
+            "Doanh nghiệp sở hữu tối thiểu 01 giải pháp hoặc sản phẩm có tính đột phá độc bản trên thị trường.",
+            "Tạo lập từ 100 việc làm bền vững hoặc đóng góp tối thiểu 10% doanh thu thường niên cho hoạt động cộng đồng.",
+            "Được Hội đồng Viện Kỷ lục Quốc gia xác nhận chỉ số ảnh hưởng tích cực trong hệ sinh thái khởi nghiệp.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_HaiDangSangNghiep_2025.pdf",
+        },
+    },
+    {
+        "id": "2",
+        "rank": "HUY CHƯƠNG VÀNG DI SẢN",
+        "title": "Huy Hiệu Tinh Hoa Nghề Truyền Thống",
+        "subtitle": "Đúc kim hoàn truyền thống chạm nổi",
+        "category": "Nghệ nhân & Làng nghề Di sản",
+        "cycle": "Chu kỳ: Định kỳ 2 năm một lần",
+        "icon": "handyman",
+        "criteria": [
+            "Thời gian gắn bó và cống hiến liên tục tối thiểu 20 năm cho nghề thủ công di sản.",
+            "Đào tạo, truyền thụ thành công ngón nghề cho tối thiểu 3 thế hệ học trò hoặc 50 lao động địa phương.",
+            "Có tác phẩm đạt kỷ lục kích thước, độ tinh xảo hoặc giải thưởng tinh hoa nghề thuật cấp tỉnh/quốc gia.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_TinhHoaNgheTruyenThong.pdf",
+        },
+    },
+    {
+        "id": "3",
+        "rank": "CHỨNG NHẬN KỶ LỤC",
+        "title": "Bằng Chứng Nhận Kỷ Lục Sáng Tạo Quốc Gia",
+        "subtitle": "Bằng da đính ấn tín vàng Hoàng Gia",
+        "category": "Nhà Khoa học, Viện nghiên cứu, Sáng chế",
+        "cycle": "Chu kỳ: Thường xuyên theo đợt thẩm định",
+        "icon": "history_edu",
+        "criteria": [
+            "Có bằng độc quyền sáng chế hoặc giải pháp hữu ích đã được Cục Sở hữu Trí tuệ cấp văn bằng bảo hộ.",
+            "Đã thương mại hóa thực tế hoặc chuyển giao công nghệ cho tối thiểu 03 đơn vị sử dụng thành công.",
+            "Mang thông số vượt trội định lượng được so với các giải pháp hiện hành trong khu vực.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_KyLucSangTaoQuocGia.pdf",
+        },
+    },
+    {
+        "id": "4",
+        "rank": "HẠNG MỤC ĐỀ CỬ CÔNG NGHIỆP VĂN HÓA",
+        "title": "Đề Cử Đổi Mới Sáng Tạo Di Sản Việt",
+        "subtitle": "Cúp Pha lê Đế Gỗ Quý Khảm Đồng",
+        "category": "Doanh nghiệp Di sản, Du lịch Văn hóa & Nghệ thuật",
+        "cycle": "Chu kỳ: Thường niên (Tháng 10)",
+        "icon": "account_balance",
+        "criteria": [
+            "Sản phẩm lấy chất liệu văn hóa di sản vật thể hoặc phi vật thể của Việt Nam làm nguồn cảm hứng cốt lõi.",
+            "Tích hợp công nghệ hiện đại, thúc đẩy thương hiệu quốc gia trên thị trường quốc tế.",
+            "Có đánh giá tác động tích cực tới bảo tồn di sản của cơ quan quản lý văn hóa địa phương.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_SangTaoDiSanViet.pdf",
+        },
+    },
+    {
+        "id": "5",
+        "rank": "CÚP TÔN VINH ĐỈNH CAO",
+        "title": "Cúp Vinh Danh Nghệ Nhân Bàn Tay Vàng Kỷ Lục",
+        "subtitle": "Cúp bàn tay vàng đúc đồng nguyên khối",
+        "category": "Nghệ nhân Chế tác & Điêu khắc Điển hình",
+        "cycle": "Chu kỳ: Thường niên tại Đại hội Kỷ lục",
+        "icon": "trophy",
+        "criteria": [
+            "Là tác giả trực tiếp của tối thiểu 01 tác phẩm xác lập Kỷ lục Quốc gia hoặc Châu Á.",
+            "Có công trình phục chế hoặc chế tác phục vụ công trình văn hóa tầm vóc quốc gia.",
+            "Được sự tín nhiệm tuyệt đối (100% phiếu thuận) từ Hội đồng Nghệ nhân Viện Kỷ lục.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_BanTayVangKyLuc.pdf",
+        },
+    },
+]
+
+
+def seed_records():
+    """Seed dữ liệu cho bảng Record."""
+    print("\nĐang seed danh sách Record vào bảng record...")
+    for item in RECORDS_SEED_DATA:
+        rec = Record.query.filter_by(id=item["id"]).first()
+        if not rec:
+            rec = Record(
+                id=item["id"],
+                rank=item["rank"],
+                title=item["title"],
+                subtitle=item.get("subtitle"),
+                cycle=item.get("cycle"),
+                criteria=item.get("criteria"),
+                category=item.get("category"),
+                icon=item.get("icon"),
+                action=item.get("action"),
+            )
+            db.session.add(rec)
+            print(f"  + Đã thêm record ID {item['id']}: {item['title']}")
+        else:
+            rec.rank = item["rank"]
+            rec.title = item["title"]
+            rec.subtitle = item.get("subtitle")
+            rec.cycle = item.get("cycle")
+            rec.criteria = item.get("criteria")
+            rec.category = item.get("category")
+            rec.icon = item.get("icon")
+            rec.action = item.get("action")
+            print(f"  . Đã cập nhật record ID {item['id']}: {item['title']}")
+    db.session.commit()
+    print("  -> Seed bảng Record thành công!")
+
+
+def seed_record_page():
+    """Seed hoặc cập nhật trang records (slug='records') với dữ liệu JSON mẫu và bảng Record."""
+    record_props = {
+        "header": {
+            "id": 1,
+            "title": "HỆ THỐNG ĐỀ CỬ KỶ LỤC & TÔN VINH DANH HIỆU",
+            "subtitle": "CỔNG THÔNG TIN ĐỀ CỬ KỶ LỤC QUỐC GIA",
+            "icon": "military_tech",
+            "slogan": "Tôn vinh trí tuệ — Ghi nhận cống hiến — Xác lập giá trị trường tồn",
+            "metrics": [
+                {"label": "HẠNG MỤC ĐỀ CỬ", "value": "05"},
+                {"label": "HẠNG MỤC ĐỀ CỬ", "value": "100%"},
+            ],
+        },
+        "governance": {
+            "id": 2,
+            "title": "QUY CHẾ PHÁP LÝ & CHUẨN MỰC",
+            "subtitle": "Quy Chế & Hội Đồng Thẩm Định Khoa Học",
+            "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+            "cards": [
+                {
+                    "id": 1,
+                    "icon": "verified_user",
+                    "title": "Minh Bạch",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+                {
+                    "id": 2,
+                    "icon": "public",
+                    "title": "Chuẩn Quốc Tế",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+                {
+                    "id": 3,
+                    "icon": "balance",
+                    "title": "Di Sản & Giá Trị",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+            ],
+            "cta": [
+                {
+                    "id": 1,
+                    "icon": "gavel",
+                    "title": "Hội Đồng Khoa Học Độc Lập",
+                    "cycle": "Nhiệm kỳ 2024 - 2029 | Quyết định số 18/QĐ-VIETKINGS",
+                    "number_decision": "18/QĐ-VIETKINGS",
+                    "roles": [
+                        {
+                            "role": "Chủ tịch Hội đồng",
+                            "value": "TS. Thang Văn Phúc - Nguyên Thứ trưởng Bộ Nội vụ, Chủ tịch T.Ư Hội Kỷ lục gia VN.",
+                        },
+                        {
+                            "role": "Tổng thư ký",
+                            "value": "Ban Thường trực Viện Kỷ lục Việt Nam & Viện Trưởng Viện Sáng tạo.",
+                        },
+                        {
+                            "role": "Chuyên gia phản biện",
+                            "value": "15 Giáo sư, Viện sĩ, Nghệ nhân Nhân dân danh dự.",
+                        },
+                    ],
+                    "btn_action": "TRA CỨU DANH MỤC ĐỀ CỬ",
+                }
+            ],
+        },
+        "records": RECORDS_SEED_DATA,
+        "honor_rolls": [
+            {
+                "id": 1,
+                "title": "BẢNG VÀNG DANH DỰ",
+                "subtitle": "Cá Nhân & Tập Thể Được Tôn Vinh Gần Đây",
+                "description": "Ghi nhận những tấm gương cống hiến vượt bậc đã được trao chứng nhận và cúp vàng tại các kỳ hội ngộ Kỷ lục gia toàn quốc.",
+                "award_nomination_name": {
+                    "id": 1,
+                    "label": "Đề Cử Được Vinh Danh:",
+                    "value": "Bàn Tay Vàng Kỷ Lục 2024",
+                },
+                "cards": [
+                    {
+                        "year": "Năm 2024",
+                        "title": "Nghệ nhân Trần Duy Long",
+                        "description": "Làng nghề Gốm Bát Tràng, Hà Nội",
+                        "category": "nghe-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2024",
+                        "title": "Bà Nguyễn Hồng Trang",
+                        "description": "Chủ tịch HĐQT Tập đoàn Dược Liệu Tự Nhiên",
+                        "category": "doanh-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2023",
+                        "title": "Công ty CP Di Sản Số Đông Dương",
+                        "description": "Dự án Số hóa 3D Đại Nội Huế",
+                        "category": "doanh-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2023",
+                        "title": "Nghệ nhân Đỗ Quang Hùng",
+                        "description": "Lụa Vạn Phúc - Hà Đông",
+                        "category": "nghe-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                ],
+            }
+        ],
+        "process": {
+            "title": "QUY TRÌNH 4 BƯỚC THẨM ĐỊNH & XÁC LẬP",
+            "subtitle": "QUY TRÌNH CHUẨN HÓA",
+            "description": "Đảm bảo tính pháp lý, độc lập tuyệt đối và đánh giá giá trị sáng tạo theo quy chế Viện Kỷ lục Việt Nam.",
+            "cards": [
+                {
+                    "id": 1,
+                    "icon": "description",
+                    "title": "Nộp Hồ Sơ Sơ Khảo",
+                    "description": "Tổ chức hoặc cá nhân gửi bộ hồ sơ đề cử theo biểu mẫu ban hành, đính kèm văn bằng sở hữu trí tuệ, báo cáo tài chính kiểm toán và tư liệu minh chứng.",
+                    "color": "primary",
+                    "info": [
+                        {
+                            "label": "Thời gian",
+                            "value": "Tiếp nhận liên tục theo đợt công bố.",
+                        }
+                    ],
+                },
+                {
+                    "id": 2,
+                    "icon": "psychology",
+                    "title": "HĐ Khoa Học Thẩm Định",
+                    "description": "Hội đồng Khoa học gồm các Giáo sư, Nhà nghiên cứu họp phiên chuyên đề đánh giá tính xác thực, đóng góp xã hội và giá trị độc bản của đề cử.",
+                    "color": "primary",
+                    "info": [{"label": "Thời gian", "value": "15 – 20 ngày làm việc."}],
+                },
+                {
+                    "id": 3,
+                    "icon": "travel_explore",
+                    "title": "Khảo Sát Thực Địa",
+                    "description": "Đoàn Thư ký và Giám định viên trực tiếp xuống cơ sở, xưởng sản xuất, viện nghiên cứu để kiểm tra quy trình thực tế và phỏng vấn nhân chứng.",
+                    "color": "primary",
+                    "info": [
+                        {
+                            "label": "Biên bản",
+                            "value": "Lập biên bản giám định thực tế.",
+                        }
+                    ],
+                },
+                {
+                    "id": 4,
+                    "icon": "military_tech",
+                    "title": "Công Bố & Xác Lập Kỷ Lục",
+                    "description": "Ban hành Nghị quyết Vinh danh, cấp Bằng chứng nhận, Huy chương vàng và truyền thông chính thống tại Đại hội Kỷ lục Gia Toàn Quốc.",
+                    "color": "secondary",
+                    "info": [
+                        {
+                            "label": "Địa điểm",
+                            "value": "Khách sạn Rex / Dinh Độc Lập / Hà Nội.",
+                        }
+                    ],
+                },
+            ],
+        },
+        "show_in_header": True,
+        "header_order": 4,
+    }
+    page = Page.query.filter_by(slug="records").first()
+    if page is None:
+        page = Page(id=4, name="Kỷ lục", slug="records", props=record_props)
+        db.session.add(page)
+    else:
+        page.props = {**(page.props or {}), **record_props}
+        flag_modified(page, "props")
+    db.session.commit()
+    print("  -> Đã seed page records.")
+
+    # Seed các dòng record vào bảng record
+    seed_records()
+
+
+# Gọi hàm seed mới
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Khởi tạo dữ liệu mẫu.")
     parser.add_argument(
@@ -968,6 +1279,7 @@ if __name__ == "__main__":
 
     app = create_app()
     with app.app_context():
+        seed_record_page()
         if args.introduce_only:
             seed_introduce()
         elif args.nav_only:
