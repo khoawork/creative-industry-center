@@ -19,6 +19,7 @@ from models import (
     Page,
     Project,
     ProjectCategory,
+    Record,
     Training,
     User,
 )
@@ -238,47 +239,85 @@ def seed_contact_page(page_id=10):
 # Seed images are served from frontend/public/images/about/.
 INTRODUCE_SECTIONS = {
     "hero_section": {
-        "breadcrumbs": [{"text": "Trang chủ", "link": "/"}, {"text": "Giới thiệu", "link": None}],
+        "breadcrumbs": [
+            {"text": "Trang chủ", "link": "/"},
+            {"text": "Giới thiệu", "link": None},
+        ],
         "title_main": "Trung tâm Công nghiệp Sáng tạo",
         "quote": "Kết nối tri thức, khơi nguồn sáng tạo, lan tỏa giá trị Việt.",
         "quote_author": "",
     },
     "overview_section": {
-        "tag": "Tổng quan", "title_main": "Không gian kết nối và sáng tạo",
-        "paragraphs": ["Trung tâm Công nghiệp Sáng tạo kết nối cộng đồng sáng tạo, doanh nghiệp và chuyên gia để cùng phát triển các giá trị văn hóa, tri thức và đổi mới."],
+        "tag": "Tổng quan",
+        "title_main": "Không gian kết nối và sáng tạo",
+        "paragraphs": [
+            "Trung tâm Công nghiệp Sáng tạo kết nối cộng đồng sáng tạo, doanh nghiệp và chuyên gia để cùng phát triển các giá trị văn hóa, tri thức và đổi mới."
+        ],
         "featured_image": {
             "url": "/images/about/overview.jpg",
             "alt": "Hội trường VietKings với khu vực trưng bày biểu trưng danh dự",
-            "tag": "Kết nối", "caption_title": "Nơi hội tụ những giá trị sáng tạo",
+            "tag": "Kết nối",
+            "caption_title": "Nơi hội tụ những giá trị sáng tạo",
         },
         "statistics": [],
     },
     "vision_section": {
-        "tag": "Tầm nhìn", "title_main": "Lan tỏa giá trị sáng tạo Việt",
-        "paragraphs": ["Xây dựng cộng đồng hợp tác bền vững, đưa tri thức và bản sắc Việt đến gần hơn với đời sống."],
+        "tag": "Tầm nhìn",
+        "title_main": "Lan tỏa giá trị sáng tạo Việt",
+        "paragraphs": [
+            "Xây dựng cộng đồng hợp tác bền vững, đưa tri thức và bản sắc Việt đến gần hơn với đời sống."
+        ],
         "featured_image": {
-            "url": "/images/about/vision.jpg", "alt": "Các diễn giả trao đổi tại diễn đàn kinh tế sáng tạo",
+            "url": "/images/about/vision.jpg",
+            "alt": "Các diễn giả trao đổi tại diễn đàn kinh tế sáng tạo",
             "caption_title": "Cùng định hướng tương lai",
         },
-        "items": [{"icon": "globe", "title": "Kết nối rộng mở", "description": "Thúc đẩy trao đổi tri thức và hợp tác giữa các cộng đồng sáng tạo."}],
+        "items": [
+            {
+                "icon": "globe",
+                "title": "Kết nối rộng mở",
+                "description": "Thúc đẩy trao đổi tri thức và hợp tác giữa các cộng đồng sáng tạo.",
+            }
+        ],
     },
     "mission_section": {
-        "tag": "Sứ mệnh", "title_main": "Đồng hành cùng cộng đồng sáng tạo",
+        "tag": "Sứ mệnh",
+        "title_main": "Đồng hành cùng cộng đồng sáng tạo",
         "featured_image": {
-            "url": "/images/about/mission.jpg", "alt": "Lễ công bố và vinh danh kỷ lục Việt Nam",
+            "url": "/images/about/mission.jpg",
+            "alt": "Lễ công bố và vinh danh kỷ lục Việt Nam",
             "caption_title": "Tôn vinh những đóng góp cho cộng đồng",
         },
-        "items": [{"icon": "lightbulb", "title": "Khơi nguồn ý tưởng", "description": "Tạo điều kiện để ý tưởng được chia sẻ, phát triển và ứng dụng."}],
+        "items": [
+            {
+                "icon": "lightbulb",
+                "title": "Khơi nguồn ý tưởng",
+                "description": "Tạo điều kiện để ý tưởng được chia sẻ, phát triển và ứng dụng.",
+            }
+        ],
     },
     "core_values_section": {
-        "tag": "Giá trị cốt lõi", "title_main": "Tri thức, sáng tạo và hợp tác",
+        "tag": "Giá trị cốt lõi",
+        "title_main": "Tri thức, sáng tạo và hợp tác",
         "description": "Lấy con người và giá trị cộng đồng làm nền tảng cho các hoạt động.",
-        "items": [{"icon": "handshake", "title": "Hợp tác", "description": "Cùng chia sẻ nguồn lực và phát triển những giá trị lâu dài."}],
+        "items": [
+            {
+                "icon": "handshake",
+                "title": "Hợp tác",
+                "description": "Cùng chia sẻ nguồn lực và phát triển những giá trị lâu dài.",
+            }
+        ],
     },
-    "actions_section": {"buttons": [
-        {"text": "Liên hệ hợp tác", "link": "/contact", "icon": "handshake"},
-        {"text": "Khám phá chương trình", "link": "/training", "icon": "graduation_cap"},
-    ]},
+    "actions_section": {
+        "buttons": [
+            {"text": "Liên hệ hợp tác", "link": "/contact", "icon": "handshake"},
+            {
+                "text": "Khám phá chương trình",
+                "link": "/training",
+                "icon": "graduation_cap",
+            },
+        ]
+    },
 }
 
 
@@ -295,17 +334,24 @@ def seed_introduce():
     try:
         page = Page.query.filter_by(slug="introduce").one_or_none()
         if page is not None and not isinstance(page.props, dict):
-            raise ValueError("Page introduce có props sai kiểu; cần sửa dữ liệu trước khi seed.")
+            raise ValueError(
+                "Page introduce có props sai kiểu; cần sửa dữ liệu trước khi seed."
+            )
         props = dict(page.props) if page is not None else {}
         missing = [key for key in schemas if key not in props]
-        
+
         additions = {}
         for key in missing:
             schema = schemas[key]()
             additions[key] = schema.dump(schema.load(INTRODUCE_SECTIONS[key]))
-            
+
         if page is None:
-            page = Page(id=2, name="Giới thiệu", slug="introduce", props={**additions, "show_in_header": True, "header_order": 2})
+            page = Page(
+                id=2,
+                name="Giới thiệu",
+                slug="introduce",
+                props={**additions, "show_in_header": True, "header_order": 2},
+            )
             db.session.add(page)
         elif additions:
             current_props = dict(page.props or {})
@@ -314,7 +360,7 @@ def seed_introduce():
             current_props["header_order"] = 2
             page.props = current_props
             flag_modified(page, "props")
-            
+
         if additions or page is not None:
             db.session.commit()
         return page
@@ -356,9 +402,21 @@ def seed_founder_page():
                     "name": "Nguyễn Văn A",
                     "description": "Với hơn 10 năm kinh nghiệm trong lĩnh vực công nghệ và quản trị doanh nghiệp, Nguyễn Văn A là người đồng sáng lập và dẫn dắt định hướng phát triển của công ty.",
                     "founder_info": [
-                        {"id": "founder_info_1", "label": "Chức danh", "value": "Founder & CEO"},
-                        {"id": "founder_info_2", "label": "Kinh nghiệm", "value": "10+ năm"},
-                        {"id": "founder_info_3", "label": "Lĩnh vực", "value": "Technology & Business"},
+                        {
+                            "id": "founder_info_1",
+                            "label": "Chức danh",
+                            "value": "Founder & CEO",
+                        },
+                        {
+                            "id": "founder_info_2",
+                            "label": "Kinh nghiệm",
+                            "value": "10+ năm",
+                        },
+                        {
+                            "id": "founder_info_3",
+                            "label": "Lĩnh vực",
+                            "value": "Technology & Business",
+                        },
                     ],
                     "is_verified": True,
                     "image": "/images/founder/founder-1.jpg",
@@ -377,9 +435,21 @@ def seed_founder_page():
                     "name": "Trần Văn B",
                     "description": "Với nền tảng chuyên sâu về công nghệ và phát triển sản phẩm, Trần Văn B phụ trách định hướng kỹ thuật và xây dựng các giải pháp công nghệ cho công ty.",
                     "founder_info": [
-                        {"id": "founder_info_4", "label": "Chức danh", "value": "Co-Founder & CTO"},
-                        {"id": "founder_info_5", "label": "Kinh nghiệm", "value": "8+ năm"},
-                        {"id": "founder_info_6", "label": "Lĩnh vực", "value": "Software Engineering"},
+                        {
+                            "id": "founder_info_4",
+                            "label": "Chức danh",
+                            "value": "Co-Founder & CTO",
+                        },
+                        {
+                            "id": "founder_info_5",
+                            "label": "Kinh nghiệm",
+                            "value": "8+ năm",
+                        },
+                        {
+                            "id": "founder_info_6",
+                            "label": "Lĩnh vực",
+                            "value": "Software Engineering",
+                        },
                     ],
                     "is_verified": True,
                     "image": "/images/founder/founder-2.jpg",
@@ -429,420 +499,6 @@ def seed_founder_page():
         )
         db.session.add(page)
         print("  -> Đã tạo mới trang Founder thành công!")
-
-
-def seed_project_page():
-    """Seed hoặc cập nhật thông tin trang Project Page (Dự án nổi bật)."""
-    project_seed_data = {
-        "name": "Dự án nổi bật",
-        "slug": "projects",
-        "props": {
-            "show_in_header": True,
-            "header_order": 5,
-            "header_section": {
-                "badge": "DANH MỤC DỰ ÁN TRỌNG ĐIỂM",
-                "title": "CÁC DỰ ÁN NỔI BẬT",
-                "description": "Hiện thực hóa giá trị sáng tạo Việt — Từ ý tưởng đến công trình thế kỷ. Trung tâm trực tiếp đồng hành, thẩm định giải pháp kỹ nghệ và kết nối nguồn lực cho các công trình mang tầm vóc biểu tượng.",
-                "statistics": [
-                    {"label": "DỰ ÁN ĐANG TRIỂN KHAI", "value": "24+", "sublabel": ""},
-                    {"label": "ĐỊA PHƯƠNG KẾT NỐI", "value": "35+", "sublabel": "Tỉnh thành"}
-                ]
-            },
-            "proposal_section": {
-                "tag": "HỢP TÁC PHÁT TRIỂN & ĐỒNG HÀNH CHIẾN LƯỢC",
-                "title": "ĐỀ XUẤT DỰ ÁN SÁNG TẠO HOẶC ĐĂNG KÝ ĐỒNG HÀNH CÙNG TRUNG TÂM",
-                "description": "Bạn là tổ chức, địa phương hay nhà sáng lập sở hữu công trình, giải pháp nghệ thuật hoặc công nghệ đột phá? Hãy nộp hồ sơ để nhận thẩm định chuyên gia, bảo trợ pháp lý và tiếp cận nguồn lực hệ sinh thái Viện Kỷ lục Việt Nam.",
-                "benefits": [
-                    "Bảo chứng Kỷ lục Quốc gia",
-                    "Tư vấn Sở hữu trí tuệ",
-                    "Kết nối Mạng lưới Chuyên gia"
-                ],
-                "form_title": "Gửi Đề Xuất Dự Án Mới",
-                "form_description": "Ban Thư ký Hội đồng Khoa học sẽ phản hồi văn bản trong vòng 03 ngày làm việc.",
-                "button_text": "Gửi Hồ Sơ Dự Án",
-                "form_fields": [
-                    {
-                        "id": "agency_name",
-                        "label": "TÊN CƠ QUAN / CHỦ NHIỆM DỰ ÁN",
-                        "placeholder": "Ví dụ: Tập đoàn Công nghệ & Di sản Văn hóa...",
-                        "type": "text",
-                        "options": [],
-                        "required": True,
-                        "width": "full"
-                    },
-                    {
-                        "id": "project_name",
-                        "label": "TÊN DỰ ÁN SÁNG TẠO",
-                        "placeholder": "Ví dụ: Khu bảo tồn tương tác nghệ thuật số...",
-                        "type": "text",
-                        "options": [],
-                        "required": True,
-                        "width": "full"
-                    },
-                    {
-                        "id": "phone",
-                        "label": "SỐ ĐIỆN THOẠI",
-                        "placeholder": "0987xxxxxx",
-                        "type": "tel",
-                        "options": [],
-                        "required": True,
-                        "width": "half"
-                    },
-                    {
-                        "id": "region",
-                        "label": "ĐỊA BÀN TRIỂN KHAI",
-                        "placeholder": "Chọn địa bàn",
-                        "type": "select",
-                        "options": ["Miền Bắc", "Miền Trung", "Miền Nam", "Toàn quốc"],
-                        "required": False,
-                        "width": "half"
-                    },
-                    {
-                        "id": "cooperation_need",
-                        "label": "NHU CẦU HỢP TÁC",
-                        "placeholder": "Chọn nhu cầu",
-                        "type": "select",
-                        "options": [
-                            "Đề cử xác lập Kỷ lục Quốc gia & Cố vấn chuyên môn",
-                            "Bảo trợ truyền thông & Phát triển thương hiệu",
-                            "Tư vấn giải pháp công nghệ & Bảo tồn di sản",
-                            "Hỗ trợ tiếp cận quỹ và nguồn lực đầu tư",
-                            "Khác"
-                        ],
-                        "required": False,
-                        "width": "full"
-                    }
-                ]
-            }
-        }
-    }
-
-    existing_page = Page.query.filter_by(slug="projects").first()
-    if existing_page:
-        existing_page.name = project_seed_data["name"]
-        merged_props = dict(existing_page.props or {})
-        for k, v in project_seed_data["props"].items():
-            if k not in merged_props:
-                merged_props[k] = v
-        # Đảm bảo form_fields được cập nhật nếu chưa có
-        if "proposal_section" in merged_props:
-            prop_sec = dict(merged_props["proposal_section"] or {})
-            if "form_fields" not in prop_sec or not prop_sec["form_fields"]:
-                prop_sec["form_fields"] = project_seed_data["props"]["proposal_section"]["form_fields"]
-                prop_sec["button_text"] = project_seed_data["props"]["proposal_section"]["button_text"]
-                merged_props["proposal_section"] = prop_sec
-        merged_props["show_in_header"] = True
-        merged_props["header_order"] = 5
-        existing_page.props = merged_props
-        flag_modified(existing_page, "props")
-        print("  -> Đã cập nhật trang Projects thành công!")
-    else:
-        page = Page(
-            id=5,
-            name=project_seed_data["name"],
-            slug=project_seed_data["slug"],
-            props=project_seed_data["props"],
-        )
-        db.session.add(page)
-        print("  -> Đã tạo mới trang Projects thành công!")
-    db.session.commit()
-
-
-def seed_trainings():
-    """Khởi tạo hoặc cập nhật 4 khóa đào tạo chuẩn vào bảng Training"""
-    print("\n  -> Đang đồng bộ danh mục khóa học (Training)...")
-    trainings_data = [
-        {
-            "id": "VK-01",
-            "name": "Nền tảng Công nghiệp Sáng tạo & Kỷ lục",
-            "time": "3 buổi (1 tuần)",
-            "certificate": "Creative Industry Certificate",
-            "props": {
-                "code": "VK-01",
-                "duration": "3 buổi (1 tuần)",
-                "audience": "Doanh nghiệp, Nhà sáng tạo",
-                "description": "Trang bị kiến thức nền tảng về công nghiệp sáng tạo, đổi mới và xây dựng giá trị kỷ lục.",
-                "benefits": [
-                    "Tổng quan về công nghiệp sáng tạo.",
-                    "Xây dựng và phát triển giá trị sáng tạo.",
-                    "Quy trình xác lập kỷ lục.",
-                    "Định hướng phát triển thương hiệu."
-                ],
-                "format": "Trực tiếp kết hợp Trực tuyến",
-                "certificate": "Creative Industry Certificate",
-                "placeholderName": "Trần Thị B",
-                "placeholderPhone": "0982 xxx xxx",
-                "placeholderEmail": "creator@studio.com"
-            }
-        },
-        {
-            "id": "VK-02",
-            "name": "Khai thác Bản quyền Sáng tạo & Tài sản Trí tuệ trong Công nghiệp Văn hóa",
-            "time": "4 buổi (2 tuần)",
-            "certificate": "IP & Creative Certificate",
-            "props": {
-                "code": "VK-02",
-                "duration": "4 buổi (2 tuần)",
-                "audience": "Nhà sáng tạo nội dung, Startup, Doanh nhân trẻ",
-                "description": "Trang bị tư duy bảo hộ và thương mại hóa sản phẩm nghệ thuật, nội dung số, thiết kế và di sản trong kỷ nguyên số hóa xuyên biên giới.",
-                "benefits": [
-                    "Chiến lược đăng ký quyền tác giả, nhãn hiệu và kiểu dáng công nghiệp mỹ thuật.",
-                    "Đàm phán cấp phép bản quyền (Licensing) và nhượng quyền sản phẩm sáng tạo.",
-                    "Kiểm soát tranh chấp, ứng phó vi phạm bản quyền trên không gian mạng và mạng xã hội.",
-                    "Định giá tài sản vô hình và đưa bản quyền thành nguồn vốn kinh doanh."
-                ],
-                "format": "Trực tiếp kết hợp Trực tuyến",
-                "certificate": "IP & Creative Certificate",
-                "placeholderName": "Trần Thị B",
-                "placeholderPhone": "0982 xxx xxx",
-                "placeholderEmail": "creator@studio.com"
-            }
-        },
-        {
-            "id": "VK-03",
-            "name": "Ứng dụng AI & Công nghệ Số trong Bảo tồn Di sản Truyền thống",
-            "time": "8 buổi (4 tuần)",
-            "certificate": "Heritage Tech Specialist",
-            "props": {
-                "code": "VK-03",
-                "duration": "8 buổi (4 tuần)",
-                "audience": "Nghệ nhân, Nhà nghiên cứu, Đội ngũ kỹ thuật số",
-                "description": "Giải pháp công nghệ cao kết hợp mô hình bảo tồn nguyên bản, số hóa 3D không gian di sản và tái tạo dữ liệu văn hóa bằng trí tuệ nhân tạo.",
-                "benefits": [
-                    "Kỹ thuật quét số hóa 3D/Photogrammetry và lập kho dữ liệu di sản kỷ lục.",
-                    "Ứng dụng Generative AI phục dựng tư liệu, hoa văn cổ phục và nhạc cụ cổ.",
-                    "Phát triển trải nghiệm bảo tàng thực tế ảo (VR/AR) phục vụ du lịch sáng tạo.",
-                    "Nguyên tắc đạo đức và tính xác thực lịch sử khi ứng dụng công nghệ di sản."
-                ],
-                "format": "Phòng thí nghiệm Kỹ thuật số TTCNST",
-                "certificate": "Heritage Tech Specialist",
-                "placeholderName": "Lê Hoàng C",
-                "placeholderPhone": "0913 xxx xxx",
-                "placeholderEmail": "researcher@heritage.vn"
-            }
-        },
-        {
-            "id": "VK-04",
-            "name": "Nghệ thuật Lãnh đạo Đổi mới & Văn hóa Doanh nghiệp Tiên phong",
-            "time": "2 ngày Workshop thực chiến",
-            "certificate": "Executive Leadership Award",
-            "props": {
-                "code": "VK-04",
-                "duration": "2 ngày Workshop thực chiến",
-                "audience": "Đội ngũ quản lý cấp trung và cao",
-                "description": "Khai phóng tinh thần dám tạo đột phá, thiết kế bộ chỉ số văn hóa sáng tạo và dẫn dắt đội ngũ chinh phục các mốc son vượt bậc.",
-                "benefits": [
-                    "Mô hình quản trị kích hoạt sáng kiến và văn hóa không ngại thử nghiệm.",
-                    "Phương pháp khích lệ nhân sự hướng tới chuẩn mực kỷ lục và sự xuất sắc.",
-                    "Kỹ năng điều phối giải quyết khủng hoảng và thúc đẩy tinh thần tiên phong.",
-                    "Bài tập tình huống thực tế và mô phỏng lãnh đạo dự án chiến lược."
-                ],
-                "format": "Hà Nội & TP. Hồ Chí Minh",
-                "certificate": "Executive Leadership Award",
-                "placeholderName": "Phạm Minh D",
-                "placeholderPhone": "0977 xxx xxx",
-                "placeholderEmail": "director@enterprise.vn"
-            }
-        }
-    ]
-
-    for item in trainings_data:
-        train = Training.query.get(item["id"])
-        if not train:
-            train = Training(
-                id=item["id"],
-                name=item["name"],
-                time=item["time"],
-                certificate=item["certificate"],
-                props=item["props"],
-            )
-            db.session.add(train)
-            print(f"    + Đã thêm mới khóa đào tạo {item['id']}: {item['name']}")
-        else:
-            train.name = item["name"]
-            train.time = item["time"]
-            train.certificate = item["certificate"]
-            train.props = item["props"]
-            flag_modified(train, "props")
-            print(f"    * Đã cập nhật khóa đào tạo {item['id']}: {item['name']}")
-    db.session.commit()
-
-
-def seed_training_page():
-    """Seed hoặc cập nhật thông tin trang Training Page (Hợp tác & Đào tạo)."""
-    seed_trainings()
-
-    training_seed_data = {
-        "name": "Hợp tác & Đào tạo",
-        "slug": "trainings",
-        "props": {
-            "show_in_header": True,
-            "header_order": 9,
-            "header_section": {
-                "badge": "Chuẩn mực VIETKINGS Quốc tế",
-                "title": "HỢP TÁC & ĐÀO TẠO",
-                "description": "Chương trình phát triển năng lực sáng tạo, kỹ năng xác lập kỷ lục và đồng hành chuyển giao tri thức doanh nghiệp.",
-                "statistics": [
-                    {"label": "KỶ LỤC GIA & CHUYÊN GIA", "value": "120+", "sublabel": ""},
-                    {"label": "CHỨNG NHẬN PHÁP LÝ", "value": "100%", "sublabel": "Chuẩn mực"}
-                ]
-            },
-            "models_section": [
-                {
-                    "model": "Mô hình 01",
-                    "icon": "hub",
-                    "title": "Liên kết Nghiên cứu & Chuyển giao",
-                    "description": "Kết nối nguồn lực chuyên gia, viện nghiên cứu và doanh nghiệp nhằm chuẩn hóa quy trình đổi mới sáng tạo và chuyển giao bản quyền ứng dụng thực tiễn.",
-                    "action": "Quy trình chuẩn hóa"
-                },
-                {
-                    "model": "Mô hình 02",
-                    "icon": "workspace",
-                    "title": "Tư vấn Xác lập Tiêu chuẩn Kỷ lục",
-                    "description": "Xây dựng hồ sơ khoa học, định vị tiêu chí độc bản và bảo hộ tính xác thực dữ liệu kỷ lục doanh nghiệp theo hệ thống tiêu chí VIETKINGS.",
-                    "action": "Hồ sơ định lượng"
-                },
-                {
-                    "model": "Mô hình 03",
-                    "icon": "storefront",
-                    "title": "Đồng hành Thương mại hóa Sáng tạo",
-                    "description": "Bảo hộ thương hiệu, liên kết chuỗi cung ứng văn hóa nghệ thuật và truyền thông định vị giá trị sản phẩm kỷ lục ra thị trường toàn cầu.",
-                    "action": "Gia tăng vị thế"
-                }
-            ],
-            "certification_section": {
-                "tag": "Bảo chứng Pháp lý & Học thuật",
-                "title": "Cam Kết Chất Lượng Đào Tạo & Giá Trị Chứng Nhận",
-                "description": "Mọi chương trình đào tạo tại Trung tâm Công nghiệp Sáng tạo đều tuân thủ các chuẩn mực nghiêm ngặt của Hội đồng Viện Kỷ lục Việt Nam (VIETKINGS). Học viên sau khi hoàn thành khóa học và bảo vệ đề án thành công sẽ được cấp chứng nhận chính thức có giá trị lưu trữ trong cơ sở dữ liệu quốc gia.",
-                "items": [
-                    {
-                        "icon": "award",
-                        "title": "Chứng nhận Quốc gia",
-                        "description": "Ký duyệt trực tiếp bởi lãnh đạo Viện Kỷ lục Việt Nam."
-                    },
-                    {
-                        "icon": "id-badge",
-                        "title": "Mã số Tra cứu Toàn quốc",
-                        "description": "Tích hợp mã định danh điện tử trên cổng tra cứu hồ sơ quốc gia."
-                    },
-                    {
-                        "icon": "users",
-                        "title": "Mạng lưới Kỷ lục gia",
-                        "description": "Quyền tham gia Câu lạc bộ Sáng tạo & Kỷ lục gia doanh nghiệp."
-                    },
-                    {
-                        "icon": "handshake",
-                        "title": "Cố vấn Dự án Thực tế",
-                        "description": "Hỗ trợ kết nối chuyên gia đồng hành 6 tháng sau đào tạo."
-                    }
-                ],
-                "seal_title": "VIETKINGS SEAL",
-                "seal_subtitle": "Hội đồng Xác lập Kỷ lục",
-                "seal_description": "Mỗi học viên tốt nghiệp là một đại sứ thúc đẩy tinh thần sáng tạo và kỷ lục bền vững trong tổ chức của mình.",
-                "seal_badge": "Tiêu Chuẩn Học Thuật 2024"
-            },
-            "proposal_section": {
-                "tag": "GHI DANH & KẾT NỐI DOANH NGHIỆP",
-                "title": "ĐĂNG KÝ THAM GIA KHÓA ĐÀO TẠO HOẶC ĐỀ XUẤT HỢP TÁC CHIẾN LƯỢC",
-                "description": "Quý doanh nghiệp, tổ chức hoặc cá nhân có nhu cầu nâng cao năng lực quản trị tài sản trí tuệ và ươm tạo dự án sáng tạo vui lòng gửi thông tin đăng ký để Hội đồng tuyển sinh tiếp nhận và phản hồi.",
-                "benefits": [
-                    "Chứng nhận chính thức từ Viện Kỷ lục Việt Nam (VIETKINGS)",
-                    "Tích hợp mã số tra cứu điện tử trên hệ thống hồ sơ quốc gia",
-                    "Đồng hành chuyên gia & tư vấn bảo hộ sở hữu trí tuệ"
-                ],
-                "form_title": "Đăng Ký Khóa Học & Đề Xuất Hợp Tác",
-                "form_description": "Ban Tuyển sinh & Hợp tác Chiến lược sẽ liên hệ phản hồi trong 24 giờ làm việc.",
-                "button_text": "GỬI HỒ SƠ ĐĂNG KÝ",
-                "form_fields": [
-                    {
-                        "id": "full_name",
-                        "label": "HỌ VÀ TÊN / ĐẠI DIỆN ĐƠN VI",
-                        "placeholder": "Ví dụ: Nguyễn Văn A",
-                        "type": "text",
-                        "options": [],
-                        "required": True,
-                        "width": "full"
-                    },
-                    {
-                        "id": "phone",
-                        "label": "SỐ ĐIỆN THOẠI LIÊN HỆ",
-                        "placeholder": "0987xxxxxx",
-                        "type": "tel",
-                        "options": [],
-                        "required": True,
-                        "width": "half"
-                    },
-                    {
-                        "id": "email",
-                        "label": "ĐỊA CHỈ EMAIL",
-                        "placeholder": "contact@domain.vn",
-                        "type": "email",
-                        "options": [],
-                        "required": True,
-                        "width": "half"
-                    },
-                    {
-                        "id": "course_interest",
-                        "label": "CHUYÊN ĐỀ ĐÀO TẠO QUAN TÂM",
-                        "placeholder": "Chọn khóa đào tạo",
-                        "type": "select",
-                        "options": [
-                            "VK-01: Nền tảng Công nghiệp Sáng tạo & Kỷ lục",
-                            "VK-02: Khai thác Bản quyền Sáng tạo & Tài sản Trí tuệ trong Công nghiệp Văn hóa",
-                            "VK-03: Ứng dụng AI & Công nghệ Số trong Bảo tồn Di sản Truyền thống",
-                            "VK-04: Nghệ thuật Lãnh đạo Đổi mới & Văn hóa Doanh nghiệp Tiên phong",
-                            "Chuyên đề tùy chỉnh theo nhu cầu tổ chức"
-                        ],
-                        "required": False,
-                        "width": "full"
-                    },
-                    {
-                        "id": "notes",
-                        "label": "NHU CẦU & MỤC TIÊU ĐÀO TẠO",
-                        "placeholder": "Mô tả ngắn gọn về quy mô doanh nghiệp và mục tiêu tham gia...",
-                        "type": "textarea",
-                        "options": [],
-                        "required": False,
-                        "width": "full"
-                    }
-                ]
-            },
-            "selected_training_ids": ["VK-01", "VK-02", "VK-03", "VK-04"]
-        }
-    }
-
-    existing_page = Page.query.filter_by(slug="trainings").first() or Page.query.filter_by(slug="training").first()
-    if existing_page:
-        existing_page.name = training_seed_data["name"]
-        existing_page.slug = "trainings"
-        merged_props = dict(existing_page.props or {})
-        for k, v in training_seed_data["props"].items():
-            if k not in merged_props:
-                merged_props[k] = v
-        # Luôn đảm bảo models_section, certification_section và selected_training_ids có đầy đủ
-        if "proposal_section" not in merged_props or not merged_props.get("proposal_section"):
-            merged_props["proposal_section"] = training_seed_data["props"]["proposal_section"]
-        if "header_section" not in merged_props or not merged_props.get("header_section"):
-            merged_props["header_section"] = training_seed_data["props"]["header_section"]
-        merged_props["models_section"] = training_seed_data["props"]["models_section"]
-        merged_props["certification_section"] = training_seed_data["props"]["certification_section"]
-        merged_props["selected_training_ids"] = training_seed_data["props"]["selected_training_ids"]
-        merged_props["show_in_header"] = True
-        merged_props["header_order"] = 9
-        existing_page.props = merged_props
-        flag_modified(existing_page, "props")
-        print("  -> Đã cập nhật trang Hợp tác & Đào tạo thành công!")
-    else:
-        page = Page(
-            id=9,
-            name=training_seed_data["name"],
-            slug=training_seed_data["slug"],
-            props=training_seed_data["props"],
-        )
-        db.session.add(page)
-        print("  -> Đã tạo mới trang Hợp tác & Đào tạo thành công!")
-    db.session.commit()
-
 
 
 def seed_nav_pages():
@@ -1226,15 +882,15 @@ def seed_database():
                 status=item["status"],
                 btn_action=item["btn_action"],
                 form_url=item["form_url"],
-                category_id=EventCategory.query.filter_by(name=item["category"]).one().id,
+                category_id=EventCategory.query.filter_by(name=item["category"])
+                .one()
+                .id,
             )
             db.session.add(new_event)
             db.session.flush()
             event_ids.append(new_event.id)
             print(f"  + Đã thêm sự kiện ID {new_event.id}: {new_event.name}")
         else:
-            if existing.event_date is None:
-                existing.event_date = item["event_date"]
             event_ids.append(existing.id)
             print(f"  . Đã có sự kiện ID {existing.id}: {existing.name}")
     db.session.commit()
@@ -1256,8 +912,17 @@ def seed_database():
             "title": "DỰ ÁN TRỌNG ĐIỂM QUỐC GIA",
             "slogan": "KHỞI CÔNG 2025 – QUY MÔ 12 HECTA",
             "description": "Khu phức hợp lưu trữ, bảo tồn và ứng dụng công nghệ thực tế ảo tương tác nhằm tái hiện hành trình xác lập các kỳ tích quốc gia. Công trình tạo điểm đến văn hóa giáo dục tự hào cho thế hệ trẻ.",
-            "research_info": {"scale": "12 Hecta", "start_year": "2025", "technology": "VR/AR Interactive 3D", "focus": "Lưu trữ, giáo dục & bảo tồn văn hóa"},
-            "project_info": {"image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80", "btn_action": "TÌM HIỂU TIẾN ĐỘ DỰ ÁN", "link": "/projects/bao-tang-khong-gian-ky-luc"},
+            "research_info": {
+                "scale": "12 Hecta",
+                "start_year": "2025",
+                "technology": "VR/AR Interactive 3D",
+                "focus": "Lưu trữ, giáo dục & bảo tồn văn hóa",
+            },
+            "project_info": {
+                "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                "btn_action": "TÌM HIỂU TIẾN ĐỘ DỰ ÁN",
+                "link": "/projects/bao-tang-khong-gian-ky-luc",
+            },
         },
         {
             "name": "Chuyện Nhà Sáng Nghiệp: Nghệ Nhân Vũ Văn Hùng & Hành Trình 40 Năm Giữ Lửa Gốm Dân Tộc",
@@ -1265,8 +930,16 @@ def seed_database():
             "title": "GƯƠNG MẶT KỶ LỤC GIA TIÊU BIỂU",
             "slogan": "KỶ LỤC GIA VĂN HÓA DÂN GIAN",
             "description": "Từ xưởng gốm thủ công thô mộc đến việc xác lập kỷ lục chiếc bình gốm độc bản khắc họa 54 dân tộc anh em. Câu chuyện về lòng kiên định vượt qua ba lần suy thoái để xây dựng cơ đồ bền vững.",
-            "research_info": {"career_span": "40 năm gìn giữ nghề", "achievement": "Xác lập kỷ lục bình gốm 54 dân tộc", "field": "Gốm mỹ nghệ truyền thống"},
-            "project_info": {"image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80", "btn_action": "ĐỌC TOÀN BỘ CÂU CHUYỆN SÁNG NGHIỆP", "link": "/stories/nghe-nhan-vu-van-hung"},
+            "research_info": {
+                "career_span": "40 năm gìn giữ nghề",
+                "achievement": "Xác lập kỷ lục bình gốm 54 dân tộc",
+                "field": "Gốm mỹ nghệ truyền thống",
+            },
+            "project_info": {
+                "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+                "btn_action": "ĐỌC TOÀN BỘ CÂU CHUYỆN SÁNG NGHIỆP",
+                "link": "/stories/nghe-nhan-vu-van-hung",
+            },
         },
     ]
 
@@ -1281,7 +954,9 @@ def seed_database():
                 description=item["description"],
                 research_info=item["research_info"],
                 project_info=item["project_info"],
-                category_id=ProjectCategory.query.filter_by(name=item["category"]).one().id,
+                category_id=ProjectCategory.query.filter_by(name=item["category"])
+                .one()
+                .id,
             )
             db.session.add(new_proj)
             db.session.flush()
@@ -1322,7 +997,10 @@ def seed_database():
         "title_main": "TRUNG TÂM CÔNG NGHIỆP SÁNG TẠO",
         "subtitle": "NƠI KẾT TINH TRÍ TUỆ, XÁC LẬP KỶ LỤC VÀ TÔN VINH GIÁ TRỊ VIỆT",
         "quote": '"Chứng thực giá trị — Kiến tạo tài sản — Trao truyền ý chí"',
-        "buttons": [{"text": "TÌM HIỂU VỀ CHÚNG TÔI", "link": "/about"}, {"text": "KHÁM PHÁ KỶ LỤC & DỰ ÁN", "link": "/projects"}],
+        "buttons": [
+            {"text": "TÌM HIỂU VỀ CHÚNG TÔI", "link": "/about"},
+            {"text": "KHÁM PHÁ KỶ LỤC & DỰ ÁN", "link": "/projects"},
+        ],
         "statistics": [
             {"value": "500+", "label": "KỶ LỤC GIA & TỔ CHỨC"},
             {"value": "120+", "label": "CÔNG TRÌNH SÁNG TẠO"},
@@ -1335,20 +1013,54 @@ def seed_database():
     about_section_payload = {
         "tag": "SỨ MỆNH & TẦM NHÌN QUỐC GIA",
         "title_main": "VỀ TRUNG TÂM CÔNG NGHIỆP SÁNG TẠO",
-        "featured_image": {"url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80", "caption_title": "Viện Kỷ lục Việt Nam (VietKings)", "caption_text": "Thành trì kết nối những trí tuệ ưu tú, gìn giữ tinh hoa văn hóa và đổi mới sáng tạo."},
+        "featured_image": {
+            "url": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+            "caption_title": "Viện Kỷ lục Việt Nam (VietKings)",
+            "caption_text": "Thành trì kết nối những trí tuệ ưu tú, gìn giữ tinh hoa văn hóa và đổi mới sáng tạo.",
+        },
         "core_values": [
-            {"icon": "bank", "title": "Tôn chỉ Hoạt động", "description": "Trung tâm Công nghiệp Sáng tạo được thành lập với mục tiêu trở thành hạt nhân nghiên cứu, bảo tồn, kích hoạt các tiềm năng trí tuệ vô tận của con người Việt Nam. Chúng tôi đóng vai trò cầu nối thể chế và thị trường, biến các ý tưởng và phát minh độc bản thành tài sản sở hữu trí tuệ có giá trị thương mại bền vững."},
-            {"icon": "shield-check", "title": "Xác Lập Chuẩn Mực", "description": "Chứng thực công trình, phát minh, giải pháp đạt tiêu chí kỷ lục và sáng tạo tầm vóc."},
-            {"icon": "globe", "title": "Vươn Tầm Quốc Tế", "description": "Đưa các kỷ lục gia và sản phẩm tinh hoa dân tộc tiếp cận các thị trường toàn cầu."},
+            {
+                "icon": "bank",
+                "title": "Tôn chỉ Hoạt động",
+                "description": "Trung tâm Công nghiệp Sáng tạo được thành lập với mục tiêu trở thành hạt nhân nghiên cứu, bảo tồn, kích hoạt các tiềm năng trí tuệ vô tận của con người Việt Nam. Chúng tôi đóng vai trò cầu nối thể chế và thị trường, biến các ý tưởng và phát minh độc bản thành tài sản sở hữu trí tuệ có giá trị thương mại bền vững.",
+            },
+            {
+                "icon": "shield-check",
+                "title": "Xác Lập Chuẩn Mực",
+                "description": "Chứng thực công trình, phát minh, giải pháp đạt tiêu chí kỷ lục và sáng tạo tầm vóc.",
+            },
+            {
+                "icon": "globe",
+                "title": "Vươn Tầm Quốc Tế",
+                "description": "Đưa các kỷ lục gia và sản phẩm tinh hoa dân tộc tiếp cận các thị trường toàn cầu.",
+            },
         ],
         "action_button": {"text": "XEM CHI TIẾT GIỚI THIỆU", "link": "/about"},
     }
     AboutSectionRequestDTO().load(about_section_payload)
 
     nav_sections_payload = [
-        {"id": 1, "tag": "DÒNG THỜI GIAN HOẠT ĐỘNG", "title_main": "SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI", "action_button": {"text": "XEM TẤT CẢ SỰ KIỆN", "link": "/events"}, "children_id": event_ids},
-        {"id": 2, "tag": "HÀNH TRÌNH THỰC TIỄN", "title_main": "DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP", "action_button": {"text": "XEM TẤT CẢ DỰ ÁN", "link": "/projects"}, "children_id": project_ids},
-        {"id": 3, "tag": "BỒI DƯỠNG & LAN TỎA", "title_main": "CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO", "action_button": {"text": "XEM TẤT CẢ CHƯƠNG TRÌNH", "link": "/trainings"}, "children_id": training_ids},
+        {
+            "id": 1,
+            "tag": "DÒNG THỜI GIAN HOẠT ĐỘNG",
+            "title_main": "SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI",
+            "action_button": {"text": "XEM TẤT CẢ SỰ KIỆN", "link": "/events"},
+            "children_id": event_ids,
+        },
+        {
+            "id": 2,
+            "tag": "HÀNH TRÌNH THỰC TIỄN",
+            "title_main": "DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP",
+            "action_button": {"text": "XEM TẤT CẢ DỰ ÁN", "link": "/projects"},
+            "children_id": project_ids,
+        },
+        {
+            "id": 3,
+            "tag": "BỒI DƯỠNG & LAN TỎA",
+            "title_main": "CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO",
+            "action_button": {"text": "XEM TẤT CẢ CHƯƠNG TRÌNH", "link": "/trainings"},
+            "children_id": training_ids,
+        },
     ]
     for nav in nav_sections_payload:
         NavSectionRequestDTO().load(nav)
@@ -1401,6 +1113,315 @@ def seed_database():
     print("\n🎉 Seed toàn bộ dữ liệu thành công!")
 
 
+RECORDS_SEED_DATA = [
+    {
+        "id": "1",
+        "rank": "HẠNG MỤC TỐI CAO",
+        "title": "Đề Cử Ngọn Hải Đăng Sáng Nghiệp",
+        "subtitle": "Biểu tượng ngọn hải đăng bằng đồng mạ vàng",
+        "category": "Doanh nhân & Nhà sáng lập",
+        "cycle": "Chu kỳ: Thường niên (Tháng 12)",
+        "icon": "flare",
+        "criteria": [
+            "Doanh nghiệp sở hữu tối thiểu 01 giải pháp hoặc sản phẩm có tính đột phá độc bản trên thị trường.",
+            "Tạo lập từ 100 việc làm bền vững hoặc đóng góp tối thiểu 10% doanh thu thường niên cho hoạt động cộng đồng.",
+            "Được Hội đồng Viện Kỷ lục Quốc gia xác nhận chỉ số ảnh hưởng tích cực trong hệ sinh thái khởi nghiệp.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_HaiDangSangNghiep_2025.pdf",
+        },
+    },
+    {
+        "id": "2",
+        "rank": "HUY CHƯƠNG VÀNG DI SẢN",
+        "title": "Huy Hiệu Tinh Hoa Nghề Truyền Thống",
+        "subtitle": "Đúc kim hoàn truyền thống chạm nổi",
+        "category": "Nghệ nhân & Làng nghề Di sản",
+        "cycle": "Chu kỳ: Định kỳ 2 năm một lần",
+        "icon": "handyman",
+        "criteria": [
+            "Thời gian gắn bó và cống hiến liên tục tối thiểu 20 năm cho nghề thủ công di sản.",
+            "Đào tạo, truyền thụ thành công ngón nghề cho tối thiểu 3 thế hệ học trò hoặc 50 lao động địa phương.",
+            "Có tác phẩm đạt kỷ lục kích thước, độ tinh xảo hoặc giải thưởng tinh hoa nghề thuật cấp tỉnh/quốc gia.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_TinhHoaNgheTruyenThong.pdf",
+        },
+    },
+    {
+        "id": "3",
+        "rank": "CHỨNG NHẬN KỶ LỤC",
+        "title": "Bằng Chứng Nhận Kỷ Lục Sáng Tạo Quốc Gia",
+        "subtitle": "Bằng da đính ấn tín vàng Hoàng Gia",
+        "category": "Nhà Khoa học, Viện nghiên cứu, Sáng chế",
+        "cycle": "Chu kỳ: Thường xuyên theo đợt thẩm định",
+        "icon": "history_edu",
+        "criteria": [
+            "Có bằng độc quyền sáng chế hoặc giải pháp hữu ích đã được Cục Sở hữu Trí tuệ cấp văn bằng bảo hộ.",
+            "Đã thương mại hóa thực tế hoặc chuyển giao công nghệ cho tối thiểu 03 đơn vị sử dụng thành công.",
+            "Mang thông số vượt trội định lượng được so với các giải pháp hiện hành trong khu vực.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_KyLucSangTaoQuocGia.pdf",
+        },
+    },
+    {
+        "id": "4",
+        "rank": "HẠNG MỤC ĐỀ CỬ CÔNG NGHIỆP VĂN HÓA",
+        "title": "Đề Cử Đổi Mới Sáng Tạo Di Sản Việt",
+        "subtitle": "Cúp Pha lê Đế Gỗ Quý Khảm Đồng",
+        "category": "Doanh nghiệp Di sản, Du lịch Văn hóa & Nghệ thuật",
+        "cycle": "Chu kỳ: Thường niên (Tháng 10)",
+        "icon": "account_balance",
+        "criteria": [
+            "Sản phẩm lấy chất liệu văn hóa di sản vật thể hoặc phi vật thể của Việt Nam làm nguồn cảm hứng cốt lõi.",
+            "Tích hợp công nghệ hiện đại, thúc đẩy thương hiệu quốc gia trên thị trường quốc tế.",
+            "Có đánh giá tác động tích cực tới bảo tồn di sản của cơ quan quản lý văn hóa địa phương.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_SangTaoDiSanViet.pdf",
+        },
+    },
+    {
+        "id": "5",
+        "rank": "CÚP TÔN VINH ĐỈNH CAO",
+        "title": "Cúp Vinh Danh Nghệ Nhân Bàn Tay Vàng Kỷ Lục",
+        "subtitle": "Cúp bàn tay vàng đúc đồng nguyên khối",
+        "category": "Nghệ nhân Chế tác & Điêu khắc Điển hình",
+        "cycle": "Chu kỳ: Thường niên tại Đại hội Kỷ lục",
+        "icon": "trophy",
+        "criteria": [
+            "Là tác giả trực tiếp của tối thiểu 01 tác phẩm xác lập Kỷ lục Quốc gia hoặc Châu Á.",
+            "Có công trình phục chế hoặc chế tác phục vụ công trình văn hóa tầm vóc quốc gia.",
+            "Được sự tín nhiệm tuyệt đối (100% phiếu thuận) từ Hội đồng Nghệ nhân Viện Kỷ lục.",
+        ],
+        "action": {
+            "nomination": "Đề Cử / Nộp Hồ Sơ",
+            "download": "QuyChe_BanTayVangKyLuc.pdf",
+        },
+    },
+]
+
+
+def seed_records():
+    """Seed dữ liệu cho bảng Record."""
+    print("\nĐang seed danh sách Record vào bảng record...")
+    for item in RECORDS_SEED_DATA:
+        rec = Record.query.filter_by(id=item["id"]).first()
+        if not rec:
+            rec = Record(
+                id=item["id"],
+                rank=item["rank"],
+                title=item["title"],
+                subtitle=item.get("subtitle"),
+                cycle=item.get("cycle"),
+                criteria=item.get("criteria"),
+                category=item.get("category"),
+                icon=item.get("icon"),
+                action=item.get("action"),
+            )
+            db.session.add(rec)
+            print(f"  + Đã thêm record ID {item['id']}: {item['title']}")
+        else:
+            rec.rank = item["rank"]
+            rec.title = item["title"]
+            rec.subtitle = item.get("subtitle")
+            rec.cycle = item.get("cycle")
+            rec.criteria = item.get("criteria")
+            rec.category = item.get("category")
+            rec.icon = item.get("icon")
+            rec.action = item.get("action")
+            print(f"  . Đã cập nhật record ID {item['id']}: {item['title']}")
+    db.session.commit()
+    print("  -> Seed bảng Record thành công!")
+
+
+def seed_record_page():
+    """Seed hoặc cập nhật trang records (slug='records') với dữ liệu JSON mẫu và bảng Record."""
+    record_props = {
+        "header": {
+            "id": 1,
+            "title": "HỆ THỐNG ĐỀ CỬ KỶ LỤC & TÔN VINH DANH HIỆU",
+            "subtitle": "CỔNG THÔNG TIN ĐỀ CỬ KỶ LỤC QUỐC GIA",
+            "icon": "military_tech",
+            "slogan": "Tôn vinh trí tuệ — Ghi nhận cống hiến — Xác lập giá trị trường tồn",
+            "metrics": [
+                {"label": "HẠNG MỤC ĐỀ CỬ", "value": "05"},
+                {"label": "HẠNG MỤC ĐỀ CỬ", "value": "100%"},
+            ],
+        },
+        "governance": {
+            "id": 2,
+            "title": "QUY CHẾ PHÁP LÝ & CHUẨN MỰC",
+            "subtitle": "Quy Chế & Hội Đồng Thẩm Định Khoa Học",
+            "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+            "cards": [
+                {
+                    "id": 1,
+                    "icon": "verified_user",
+                    "title": "Minh Bạch",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+                {
+                    "id": 2,
+                    "icon": "public",
+                    "title": "Chuẩn Quốc Tế",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+                {
+                    "id": 3,
+                    "icon": "balance",
+                    "title": "Di Sản & Giá Trị",
+                    "description": "Mọi hồ sơ xác lập và đề cử kỷ lục được Trung tâm Công nghiệp Sáng tạo trực thuộc Viện Kỷ lục Việt Nam (VIETKINGS) khởi xướng và thẩm định đều tuân thủ nguyên tắc khách quan, độc lập và chuẩn mực quốc tế liên minh với Liên minh Kỷ lục Thế giới (WorldKings).",
+                },
+            ],
+            "cta": [
+                {
+                    "id": 1,
+                    "icon": "gavel",
+                    "title": "Hội Đồng Khoa Học Độc Lập",
+                    "cycle": "Nhiệm kỳ 2024 - 2029 | Quyết định số 18/QĐ-VIETKINGS",
+                    "number_decision": "18/QĐ-VIETKINGS",
+                    "roles": [
+                        {
+                            "role": "Chủ tịch Hội đồng",
+                            "value": "TS. Thang Văn Phúc - Nguyên Thứ trưởng Bộ Nội vụ, Chủ tịch T.Ư Hội Kỷ lục gia VN.",
+                        },
+                        {
+                            "role": "Tổng thư ký",
+                            "value": "Ban Thường trực Viện Kỷ lục Việt Nam & Viện Trưởng Viện Sáng tạo.",
+                        },
+                        {
+                            "role": "Chuyên gia phản biện",
+                            "value": "15 Giáo sư, Viện sĩ, Nghệ nhân Nhân dân danh dự.",
+                        },
+                    ],
+                    "btn_action": "TRA CỨU DANH MỤC ĐỀ CỬ",
+                }
+            ],
+        },
+        "records": RECORDS_SEED_DATA,
+        "honor_rolls": [
+            {
+                "id": 1,
+                "title": "BẢNG VÀNG DANH DỰ",
+                "subtitle": "Cá Nhân & Tập Thể Được Tôn Vinh Gần Đây",
+                "description": "Ghi nhận những tấm gương cống hiến vượt bậc đã được trao chứng nhận và cúp vàng tại các kỳ hội ngộ Kỷ lục gia toàn quốc.",
+                "award_nomination_name": {
+                    "id": 1,
+                    "label": "Đề Cử Được Vinh Danh:",
+                    "value": "Bàn Tay Vàng Kỷ Lục 2024",
+                },
+                "cards": [
+                    {
+                        "year": "Năm 2024",
+                        "title": "Nghệ nhân Trần Duy Long",
+                        "description": "Làng nghề Gốm Bát Tràng, Hà Nội",
+                        "category": "nghe-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2024",
+                        "title": "Bà Nguyễn Hồng Trang",
+                        "description": "Chủ tịch HĐQT Tập đoàn Dược Liệu Tự Nhiên",
+                        "category": "doanh-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2023",
+                        "title": "Công ty CP Di Sản Số Đông Dương",
+                        "description": "Dự án Số hóa 3D Đại Nội Huế",
+                        "category": "doanh-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                    {
+                        "year": "Năm 2023",
+                        "title": "Nghệ nhân Đỗ Quang Hùng",
+                        "description": "Lụa Vạn Phúc - Hà Đông",
+                        "category": "nghe-nhan",
+                        "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
+                    },
+                ],
+            }
+        ],
+        "process": {
+            "title": "QUY TRÌNH 4 BƯỚC THẨM ĐỊNH & XÁC LẬP",
+            "subtitle": "QUY TRÌNH CHUẨN HÓA",
+            "description": "Đảm bảo tính pháp lý, độc lập tuyệt đối và đánh giá giá trị sáng tạo theo quy chế Viện Kỷ lục Việt Nam.",
+            "cards": [
+                {
+                    "id": 1,
+                    "icon": "description",
+                    "title": "Nộp Hồ Sơ Sơ Khảo",
+                    "description": "Tổ chức hoặc cá nhân gửi bộ hồ sơ đề cử theo biểu mẫu ban hành, đính kèm văn bằng sở hữu trí tuệ, báo cáo tài chính kiểm toán và tư liệu minh chứng.",
+                    "color": "primary",
+                    "info": [
+                        {
+                            "label": "Thời gian",
+                            "value": "Tiếp nhận liên tục theo đợt công bố.",
+                        }
+                    ],
+                },
+                {
+                    "id": 2,
+                    "icon": "psychology",
+                    "title": "HĐ Khoa Học Thẩm Định",
+                    "description": "Hội đồng Khoa học gồm các Giáo sư, Nhà nghiên cứu họp phiên chuyên đề đánh giá tính xác thực, đóng góp xã hội và giá trị độc bản của đề cử.",
+                    "color": "primary",
+                    "info": [{"label": "Thời gian", "value": "15 – 20 ngày làm việc."}],
+                },
+                {
+                    "id": 3,
+                    "icon": "travel_explore",
+                    "title": "Khảo Sát Thực Địa",
+                    "description": "Đoàn Thư ký và Giám định viên trực tiếp xuống cơ sở, xưởng sản xuất, viện nghiên cứu để kiểm tra quy trình thực tế và phỏng vấn nhân chứng.",
+                    "color": "primary",
+                    "info": [
+                        {
+                            "label": "Biên bản",
+                            "value": "Lập biên bản giám định thực tế.",
+                        }
+                    ],
+                },
+                {
+                    "id": 4,
+                    "icon": "military_tech",
+                    "title": "Công Bố & Xác Lập Kỷ Lục",
+                    "description": "Ban hành Nghị quyết Vinh danh, cấp Bằng chứng nhận, Huy chương vàng và truyền thông chính thống tại Đại hội Kỷ lục Gia Toàn Quốc.",
+                    "color": "secondary",
+                    "info": [
+                        {
+                            "label": "Địa điểm",
+                            "value": "Khách sạn Rex / Dinh Độc Lập / Hà Nội.",
+                        }
+                    ],
+                },
+            ],
+        },
+        "show_in_header": True,
+        "header_order": 4,
+    }
+    page = Page.query.filter_by(slug="records").first()
+    if page is None:
+        page = Page(id=4, name="Kỷ lục", slug="records", props=record_props)
+        db.session.add(page)
+    else:
+        page.props = {**(page.props or {}), **record_props}
+        flag_modified(page, "props")
+    db.session.commit()
+    print("  -> Đã seed page records.")
+
+    # Seed các dòng record vào bảng record
+    seed_records()
+
+
+# Gọi hàm seed mới
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Khởi tạo dữ liệu mẫu.")
     parser.add_argument("--introduce-only", action="store_true",
@@ -1426,9 +1447,11 @@ if __name__ == "__main__":
         help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).",
     )
     args = parser.parse_args()
-    
+
     app = create_app()
     with app.app_context():
+        seed_record_page()
+        if args.introduce_only:
         if args.events_only:
             seed_events_page()
             seed_event_dates()
