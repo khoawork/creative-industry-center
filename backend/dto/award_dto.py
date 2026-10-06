@@ -9,6 +9,7 @@ class AwardPropsDTO(Schema):
 
 
 class CreateAwardDTO(BaseSchema):
+    id = fields.String(allow_none=True, load_default=None, validate=validate.Length(max=50))
     name = fields.String(required=True, validate=validate.Length(min=1, max=255))
     title = fields.String(required=True, validate=validate.Length(min=1, max=255))
     description = fields.String(required=True)

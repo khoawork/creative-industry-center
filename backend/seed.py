@@ -17,6 +17,7 @@ from models import (
     Page,
     Project,
     ProjectCategory,
+    SiteSettings,
     Training,
     User,
 )
@@ -26,7 +27,6 @@ from dto.home_dto import (
     NavSectionRequestDTO,
     SupportBannerRequestDTO,
 )
-from repositories.id_counter_repository import generate_id
 from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
 from dto import introduce_dto
@@ -947,13 +947,56 @@ def seed_database():
     print("\n[7/7] Đang kiểm tra Giải thưởng...")
     if not Award.query.first():
         award = Award(
-            id=generate_id("VK-AWD"),
+            id="VK-AWD-01",
             name="Kỷ lục Quốc gia",
             title="Tôn vinh Công trình Sáng tạo Độc bản",
             description="Chứng nhận sáng kiến, giải pháp và công trình mang giá trị văn hóa và khoa học xuất sắc.",
             decision_number="QĐ-VK-2025/01",
         )
-        db.session.add(award)
+    # ========================================================
+    # BƯỚC 8: CẤU HÌNH WEBSITE & FOOTER (SITE SETTINGS)
+    # ========================================================
+    print("\n[8/8] Đang kiểm tra Cấu hình Website & Footer...")
+    if not SiteSettings.query.first():
+        site_settings = SiteSettings(
+            logo="/assets/shared/logo/creative-industry-center-logo.png",
+            company_name="Trung tâm Công nghiệp Sáng tạo",
+            company_tagline="VIỆN KỲ LỤC VIỆT NAM - VIETKINGS",
+            footer={
+                "short_name": "TTCNST",
+                "institute": "VIỆN KỲ LỤC VIỆT NAM",
+                "description": "Cơ quan nghiên cứu, tôn vinh và thúc đẩy các giá trị sáng tạo quốc gia, khơi nguồn tinh hoa trí tuệ Việt vươn tầm thế giới.",
+                "groups": [
+                    {
+                        "title": "VỀ VIỆN & DỰ ÁN",
+                        "links": [
+                            {"label": "Giới thiệu Tổ chức", "href": "/about"},
+                            {"label": "Dự án nổi bật", "href": "/projects"},
+                            {"label": "Chuyện nhà sáng nghiệp", "href": "/stories"},
+                            {"label": "Hệ thống Kỷ lục", "href": "/records"},
+                        ],
+                    },
+                    {
+                        "title": "SỰ KIỆN & HOẠT ĐỘNG",
+                        "links": [
+                            {"label": "Sự kiện tiêu biểu", "href": "/events"},
+                            {"label": "Hạng mục Giải thưởng", "href": "/awards"},
+                            {"label": "Hợp tác & Đào tạo", "href": "/trainings"},
+                        ],
+                    },
+                ],
+                "contact": {
+                    "title": "THÔNG TIN LIÊN HỆ",
+                    "address": "Trung tâm Công nghiệp Sáng tạo, Viện Kỷ lục Việt Nam, TP. Hồ Chí Minh & Hà Nội",
+                    "phone": "(+84) 28 3847 7777",
+                    "phone_href": "tel:+842838477777",
+                    "emails": ["bbt@kyluc.vn", "contact@vietkings.org"],
+                },
+                "copyright": "© 2026 Bản quyền thuộc Trung tâm Công nghiệp Sáng tạo - VIỆN KỲ LỤC VIỆT NAM. Bảo lưu mọi quyền.",
+            },
+        )
+        db.session.add(site_settings)
+        print("  -> Đã tạo mới Cấu hình Website & Footer mặc định!")
 
     db.session.commit()
     print("\n🎉 Seed toàn bộ dữ liệu thành công!")

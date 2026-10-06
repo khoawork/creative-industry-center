@@ -1,9 +1,23 @@
+import re
 from sqlalchemy import func, or_
 
 from extensions import db
 from models import Training
-from repositories.id_counter_repository import generate_id
 from utils.pagination import paginate_query
+
+
+def _generate_training_id():
+    trainings = Training.query.with_entities(Training.id).all()
+    max_num = 0
+    for (t_id,) in trainings:
+        if t_id:
+            match = re.match(r"^VK-(\d+)$", str(t_id).strip(), re.IGNORECASE)
+            if match:
+                num = int(match.group(1))
+                if num > max_num:
+                    max_num = num
+    next_num = max_num + 1
+    return f"VK-{next_num:02d}"
 
 
 def get_trainings(search=None, certificate=None, page=1, per_page=None):
@@ -31,7 +45,7 @@ def get_training(training_id: str):
 
 def create_training(name, time, certificate, props, id=None):
     try:
-        custom_id = id.strip() if id and isinstance(id, str) and id.strip() else generate_id("VK")
+        custom_id = id.strip() if id and isinstance(id, str) and id.strip() else _generate_training_id()
         training = Training(
             id=custom_id,
             name=name,

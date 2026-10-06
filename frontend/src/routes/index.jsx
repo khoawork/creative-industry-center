@@ -36,6 +36,7 @@ const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
 const AdminProjects = lazy(() => import("../pages/Admin/AdminProjects.jsx"));
 const AdminTraining = lazy(() => import("../pages/Admin/AdminTraining.jsx"));
+const AdminLogoFooter = lazy(() => import("../pages/Admin/AdminLogoFooter.jsx"));
 
 /* oxlint-enable react/only-export-components */
 
@@ -76,6 +77,8 @@ export const adminRoute = {
           <AdminTraining />
         ) : item.id === "navigation" ? (
           <AdminNavigation />
+        ) : item.id === "logo & footer" ? (
+          <AdminLogoFooter />
         ) : item.id === "catalog" || ["events", "awards"].includes(item.id) ? (
           <AdminCatalog defaultTab={item.id === "catalog" ? undefined : item.id} />
         ) : item.id === "about" ? (

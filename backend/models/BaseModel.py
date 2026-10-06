@@ -8,3 +8,4 @@ class BaseModel(db.Model):
     
     created_date = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     updated_date = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    

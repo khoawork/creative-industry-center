@@ -2,10 +2,12 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import routes, { adminRoute } from "./routes";
 import Header from "./layout/Header";
 import Footer from "./layout/Footer";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 
 function App() {
   return (
-    <Routes>
+    <SiteSettingsProvider>
+      <Routes>
       <Route
         element={
           <div className="booking-shell min-h-screen flex flex-col">
@@ -36,6 +38,7 @@ function App() {
         )}
       </Route>
     </Routes>
+    </SiteSettingsProvider>
   );
 }
 

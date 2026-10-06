@@ -43,6 +43,8 @@ export const adminGroups = [
         description: 'Quản lý thành viên và quyền truy cập khu vực quản trị.' },
       { id: 'navigation', label: 'Menu & Điều hướng', path: `${adminRoot}/navigation`, icon: Menu,
         description: 'Sắp xếp các mục menu và liên kết của website.' },
+      { id: 'logo & footer', label: 'Logo & Footer', path: `${adminRoot}/logo-footer`, icon: LayoutDashboard,
+        description: 'Quản lý logo và nội dung footer của website.' },
     ],
   },
 ];
