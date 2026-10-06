@@ -6,12 +6,14 @@ import {
   GraduationCap,
   FolderKanban,
   Database,
+  Trophy,
 } from 'lucide-react';
 import {
   EventTableManager,
   AwardTableManager,
   TrainingTableManager,
   ProjectTableManager,
+  RecordTableManager,
 } from '../../components/Admin/Catalog/index.js';
 
 const TABS = [
@@ -46,6 +48,14 @@ const TABS = [
     color: 'from-violet-500 to-purple-600',
     badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
     description: 'Các sáng kiến trọng điểm, khẩu hiệu và chỉ số nghiên cứu',
+  },
+  {
+    id: 'records',
+    label: 'Kỷ lục (Records)',
+    icon: Trophy,
+    color: 'from-amber-500 to-yellow-600',
+    badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    description: 'Hạng mục đề cử, quy chế, bảng vàng và hồ sơ kỷ lục',
   },
 ];
 
@@ -92,7 +102,7 @@ export default function AdminCatalog({ defaultTab }) {
     // Nếu trang hiện tại là /admin/events, /admin/projects,... thì điều hướng tới tab đó
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const lastSeg = pathSegments[pathSegments.length - 1];
-    if (['events', 'awards', 'training', 'projects'].includes(lastSeg)) {
+    if (['events', 'awards', 'training', 'projects', 'records'].includes(lastSeg)) {
       navigate(`/admin/${tabId}`);
     } else {
       setSearchParams({ tab: tabId });
@@ -115,14 +125,14 @@ export default function AdminCatalog({ defaultTab }) {
               Quản lý Dữ liệu Danh mục
             </h1>
             <p className="text-sm text-[var(--admin-text-muted)] max-w-2xl">
-              Thực hiện thêm mới, chỉnh sửa và quản lý các bản ghi của các phân hệ Sự kiện, Giải thưởng, Đào tạo và Dự án trực tiếp qua API.
+              Thực hiện thêm mới, chỉnh sửa và quản lý các bản ghi của các phân hệ Sự kiện, Giải thưởng, Đào tạo, Dự án và Kỷ lục.
             </p>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation Pill Bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         {TABS.map((tab) => {
           const TabIcon = tab.icon;
           const isSelected = activeTab === tab.id;
@@ -161,6 +171,7 @@ export default function AdminCatalog({ defaultTab }) {
         {activeTab === 'awards' && <AwardTableManager />}
         {activeTab === 'training' && <TrainingTableManager />}
         {activeTab === 'projects' && <ProjectTableManager />}
+        {activeTab === 'records' && <RecordTableManager />}
       </div>
     </div>
   );

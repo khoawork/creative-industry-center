@@ -35,6 +35,7 @@ const AdminNavigation = lazy(() => import("../pages/Admin/AdminNavigation.jsx"))
 const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 const AdminAwardPage = lazy(() => import("../pages/Admin/AdminAwardPage.jsx"));
 const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
+const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"));
 
 /* oxlint-enable react/only-export-components */
 
@@ -73,6 +74,8 @@ export const adminRoute = {
           <AdminNavigation />
         ) : item.id === "awards" ? (
           <AdminAwardPage />
+        ) : item.id === "records" ? (
+          <AdminRecordPage />
         ) : item.id === "catalog" || ["events", "training", "projects"].includes(item.id) ? (
           <AdminCatalog defaultTab={item.id === "catalog" ? undefined : item.id} />
         ) : item.id === "about" ? (
