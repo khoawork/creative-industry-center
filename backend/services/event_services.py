@@ -121,8 +121,13 @@ def delete_event_category(category_id):
         raise NotFoundError(message="Không tìm thấy chuyên mục.")
 
 
-def get_events_page(page_id):
-    page = base_repo.getPageById(page_id)
+def get_events_page(page_id=None):
+    page = None
+    if page_id is not None:
+        try:
+            page = base_repo.getPageById(int(page_id))
+        except (ValueError, TypeError):
+            page = None
     if page is None or page.slug != "events":
         page = base_repo.getPageBySlug("events")
     if page is None:

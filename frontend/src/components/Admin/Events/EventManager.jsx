@@ -15,7 +15,7 @@ function sameEventIds(left, right) {
   return left.every((id) => rightIds.has(String(id)))
 }
 
-export default function EventManager({ reloadKey = 0, pageId, displayedEventIds, onDisplayedEventsSaved, selectionMode = false }) {
+export default function EventManager({ reloadKey = 0, pageId = 3, displayedEventIds, onDisplayedEventsSaved, selectionMode = false }) {
   const [events, setEvents] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedEventIds, setSelectedEventIds] = useState([])
@@ -68,7 +68,7 @@ export default function EventManager({ reloadKey = 0, pageId, displayedEventIds,
     write.current = true; setBusy(true); setSavingSelection(true); setError(''); setToast(null)
     try {
       const orderedIds = events.filter((event) => selectedIds.has(String(event.id))).map((event) => event.id)
-      const response = await EventAPI.updateDisplayedEvents(pageId, orderedIds)
+      const response = await EventAPI.updateDisplayedEvents(pageId || 3, orderedIds)
       const saved = requireEventData(response)
       if (!Array.isArray(saved.event_ids)) throw new Error('Phản hồi lưu danh sách hiển thị không hợp lệ.')
       setSelectedEventIds(saved.event_ids); setSavedEventIds(saved.event_ids)

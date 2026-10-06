@@ -17,24 +17,29 @@ function eventPayload(data, imageFile, speakerImageFiles = []) {
 
 export const EventAPI = {
 	getPage: async (pageIndex = 3, options = {}) => {
-		const response = await axios.get(`${API_BASE_URL}/events/${pageIndex}`, options);
+		const targetId = pageIndex || 3;
+		const response = await axios.get(`${API_BASE_URL}/events/${targetId}`, options);
 		return response.data;
 	},
 
 	updateHeroSection: async (pageId, data) => {
-		const response = await axios.put(`${API_BASE_URL}/events/page/hero/${pageId}`, data);
+		const targetId = pageId || 3;
+		const response = await axios.put(`${API_BASE_URL}/events/page/hero/${targetId}`, data);
 		return response.data;
 	},
 	updateFilterSection: async (pageId, data) => {
-		const response = await axios.put(`${API_BASE_URL}/events/page/filter/${pageId}`, data);
+		const targetId = pageId || 3;
+		const response = await axios.put(`${API_BASE_URL}/events/page/filter/${targetId}`, data);
 		return response.data;
 	},
 	updateDisplayedEvents: async (pageId, eventIds) => {
-		const response = await axios.put(`${API_BASE_URL}/events/page/displayed-events/${pageId}`, { event_ids: eventIds });
+		const targetId = pageId || 3;
+		const response = await axios.put(`${API_BASE_URL}/events/page/displayed-events/${targetId}`, { event_ids: eventIds });
 		return response.data;
 	},
 	updateNewsletterSection: async (pageId, data) => {
-		const response = await axios.put(`${API_BASE_URL}/events/page/newsletter/${pageId}`, data);
+		const targetId = pageId || 3;
+		const response = await axios.put(`${API_BASE_URL}/events/page/newsletter/${targetId}`, data);
 		return response.data;
 	},
 	getCategories: async (options = {}) => {
