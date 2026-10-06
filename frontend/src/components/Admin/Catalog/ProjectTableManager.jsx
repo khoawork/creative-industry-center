@@ -382,39 +382,44 @@ export default function ProjectTableManager() {
         </div>
       </div>
 
-      {/* Filters bar */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-[var(--admin-text-muted)] whitespace-nowrap">
-          Danh mục:
-        </span>
-        <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          className="text-xs py-2 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500"
-        >
-          <option value="ALL">Tất cả phân loại</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+      {/* Search & Filters bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[var(--admin-surface)] p-3 sm:p-4 rounded-2xl border border-[var(--admin-border)] shadow-sm">
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] w-4 h-4" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm dự án theo tên, tiêu đề, khẩu hiệu..."
+            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500 transition"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] hover:text-[var(--admin-text)]"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
 
-        <span className="text-xs text-[var(--admin-text-muted)] whitespace-nowrap ml-2">
-          Năm:
-        </span>
-        <select
-          value={yearFilter}
-          onChange={(e) => setYearFilter(e.target.value)}
-          className="text-xs py-2 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500"
-        >
-          <option value="ALL">Tất cả năm</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs text-[var(--admin-text-muted)] whitespace-nowrap font-medium">
+            Danh mục:
+          </span>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="text-xs py-2 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500 cursor-pointer"
+          >
+            <option value="ALL">Tất cả phân loại ({projects.length})</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Table view */}

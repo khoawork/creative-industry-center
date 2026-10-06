@@ -2,9 +2,15 @@ from repositories import base_repo, introduce_repository
 from utils.error import InternalServerError, NotFoundError
 
 
-def _get_introduce_page(page_id):
-    page = base_repo.getPageById(page_id)
-    if page is None or page.slug != "introduce":
+def _get_introduce_page(page_id=None):
+    page = None
+    if page_id is not None:
+        page = base_repo.getPageById(page_id)
+    if not page or page.slug != "introduce":
+        page = base_repo.getPageBySlug("introduce")
+    if not page:
+        page = base_repo.getPageById(2)
+    if not page:
         raise NotFoundError(message=f"Không tìm thấy trang Giới thiệu (id={page_id}).")
     if not isinstance(page.props, dict):
         raise InternalServerError(message="Dữ liệu props của trang Giới thiệu không hợp lệ.")

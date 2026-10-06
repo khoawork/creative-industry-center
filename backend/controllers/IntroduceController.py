@@ -15,8 +15,12 @@ from services import introduce_service
 introduce_api = Blueprint("introduce_api", __name__, url_prefix="/introduce")
 
 
+@introduce_api.route("", methods=["GET"])
+@introduce_api.route("/", methods=["GET"])
 @introduce_api.route("/<int:page_id>", methods=["GET"])
-def get(page_id):
+def get(page_id=None):
+    if page_id is None:
+        page_id = request.args.get("idPage", type=int) or request.args.get("page_id", type=int)
     response = introduce_service.get_introduce(page_id)
     result = IntroduceResponse().dump(response)
     return jsonify(success=True, data=result), 200

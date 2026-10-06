@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 from repositories import base_repo, training_page_repository
+from utils.error import NotFoundError
 from models.PageModel import Page
 
 
@@ -11,6 +12,8 @@ def _get_training_page(page_id: Optional[int] = None) -> Page:
         page = base_repo.getPageBySlug("trainings") or base_repo.getPageBySlug("training")
     if not page:
         page = base_repo.getPageById(9)
+    if not page:
+        raise NotFoundError("Không tìm thấy trang Hợp tác & Đào tạo")
     return page
 
 

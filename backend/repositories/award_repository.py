@@ -1,9 +1,23 @@
+import re
 from sqlalchemy import func, or_
 
 from extensions import db
 from models import Award
-from repositories.id_counter_repository import generate_id
 from utils.pagination import paginate_query
+
+
+def _generate_award_id():
+    awards = Award.query.with_entities(Award.id).all()
+    max_num = 0
+    for (a_id,) in awards:
+        if a_id:
+            match = re.match(r"^VK-AWD-(\d+)$", str(a_id).strip(), re.IGNORECASE)
+            if match:
+                num = int(match.group(1))
+                if num > max_num:
+                    max_num = num
+    next_num = max_num + 1
+    return f"VK-AWD-{next_num:02d}"
 
 
 def get_awards(search=None, title=None, year=None, page=1, per_page=None):
@@ -46,10 +60,12 @@ def create_award(
     icon=None,
     image=None,
     props=None,
+    id=None,
 ):
     try:
+        award_id = id.strip() if id and isinstance(id, str) and id.strip() else _generate_award_id()
         award = Award(
-            id=generate_id("VK-AWD"),
+            id=award_id,
             code=code,
             name=name,
             title=title,

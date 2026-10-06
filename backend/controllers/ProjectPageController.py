@@ -11,6 +11,7 @@ from dto.project_page_dto import (
     SelectedProjectsResponse,
 )
 from services import project_page_service
+from utils.error import APIException
 from utils.json import error_response, success_response
 
 project_page_api = Blueprint("project_page_api", __name__, url_prefix="/project-page")
@@ -34,6 +35,13 @@ def get_page(page_id=None):
             data=result,
             message="Lấy dữ liệu trang Dự án thành công",
             status_code=200,
+        )
+    except APIException as e:
+        return error_response(
+            message=e.message,
+            status_code=e.status_code,
+            error_code=e.error_code,
+            details=e.details,
         )
     except Exception as e:
         return error_response(
@@ -64,6 +72,13 @@ def update_page(page_id=None):
             message="Dữ liệu đầu vào không hợp lệ",
             details=e.messages,
             status_code=422,
+        )
+    except APIException as e:
+        return error_response(
+            message=e.message,
+            status_code=e.status_code,
+            error_code=e.error_code,
+            details=e.details,
         )
     except Exception as e:
         return error_response(

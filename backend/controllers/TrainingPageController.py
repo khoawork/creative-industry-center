@@ -12,6 +12,7 @@ from dto.training_page_dto import (
     SelectedTrainingsResponse,
 )
 from services import training_page_service
+from utils.error import APIException
 from utils.json import error_response, success_response
 
 training_page_api = Blueprint("training_page_api", __name__, url_prefix="/training-page")
@@ -34,6 +35,13 @@ def get_training_page(page_id=None):
             data=result,
             message="Lấy dữ liệu trang Hợp tác & Đào tạo thành công",
             status_code=200,
+        )
+    except APIException as e:
+        return error_response(
+            message=e.message,
+            status_code=e.status_code,
+            error_code=e.error_code,
+            details=e.details,
         )
     except Exception as e:
         return error_response(

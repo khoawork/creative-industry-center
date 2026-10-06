@@ -22,7 +22,10 @@ const TABS = [
     label: 'Sự kiện (Events)',
     icon: CalendarDays,
     color: 'from-blue-500 to-indigo-600',
-    badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    badgeColor: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+    hoverBorder: 'hover:border-blue-400 hover:shadow-blue-500/10',
+    activeBorder: 'border-blue-500 ring-2 ring-blue-500/20',
+    activeDot: 'bg-blue-500',
     description: 'Quản lý lịch trình, thời gian, địa điểm và trạng thái các sự kiện',
   },
   {
@@ -30,7 +33,10 @@ const TABS = [
     label: 'Giải thưởng (Awards)',
     icon: Award,
     color: 'from-amber-500 to-yellow-600',
-    badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    badgeColor: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    hoverBorder: 'hover:border-amber-400 hover:shadow-amber-500/10',
+    activeBorder: 'border-amber-500 ring-2 ring-amber-500/20',
+    activeDot: 'bg-amber-500',
     description: 'Hồ sơ khen thưởng, số quyết định và danh hiệu tôn vinh',
   },
   {
@@ -38,7 +44,10 @@ const TABS = [
     label: 'Đào tạo (Training)',
     icon: GraduationCap,
     color: 'from-emerald-500 to-teal-600',
-    badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    badgeColor: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    hoverBorder: 'hover:border-emerald-400 hover:shadow-emerald-500/10',
+    activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/20',
+    activeDot: 'bg-emerald-500',
     description: 'Khóa học chuyên môn, chứng nhận, đối tượng và điểm nổi bật',
   },
   {
@@ -46,7 +55,10 @@ const TABS = [
     label: 'Dự án (Projects)',
     icon: FolderKanban,
     color: 'from-violet-500 to-purple-600',
-    badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+    badgeColor: 'bg-violet-500/10 text-violet-500 border-violet-500/20',
+    hoverBorder: 'hover:border-violet-400 hover:shadow-violet-500/10',
+    activeBorder: 'border-violet-500 ring-2 ring-violet-500/20',
+    activeDot: 'bg-violet-500',
     description: 'Các sáng kiến trọng điểm, khẩu hiệu và chỉ số nghiên cứu',
   },
   {
@@ -54,7 +66,10 @@ const TABS = [
     label: 'Kỷ lục (Records)',
     icon: Trophy,
     color: 'from-amber-500 to-yellow-600',
-    badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    badgeColor: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    hoverBorder: 'hover:border-amber-400 hover:shadow-amber-500/10',
+    activeBorder: 'border-amber-500 ring-2 ring-amber-500/20',
+    activeDot: 'bg-amber-500',
     description: 'Hạng mục đề cử, quy chế, bảng vàng và hồ sơ kỷ lục',
   },
 ];
@@ -140,24 +155,35 @@ export default function AdminCatalog({ defaultTab }) {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`p-4 rounded-2xl border text-left transition-all duration-200 relative group overflow-hidden ${
+              className={`p-4 rounded-2xl border text-left transition-all duration-200 relative group overflow-hidden cursor-pointer ${
                 isSelected
-                  ? 'bg-[var(--admin-surface)] border-white/20 shadow-xl ring-2 ring-white/10'
-                  : 'bg-[var(--admin-surface)]/60 border-[var(--admin-border)] hover:bg-[var(--admin-surface)] hover:border-white/10 opacity-75 hover:opacity-100'
+                  ? `bg-[var(--admin-surface)] ${tab.activeBorder} shadow-lg -translate-y-1`
+                  : `bg-[var(--admin-surface)]/80 border-[var(--admin-border)] hover:bg-[var(--admin-surface)] ${tab.hoverBorder} hover:-translate-y-1 hover:shadow-md opacity-85 hover:opacity-100`
               }`}
             >
+              {/* Top accent line on selected or hover */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 transition-all duration-300 bg-gradient-to-r ${tab.color} ${
+                  isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                }`}
+              />
+
               <div className="flex items-center justify-between mb-3">
-                <span className={`p-2.5 rounded-xl border ${tab.badgeColor}`}>
+                <span
+                  className={`p-2.5 rounded-xl border transition-all duration-200 group-hover:scale-110 group-hover:shadow-sm ${tab.badgeColor}`}
+                >
                   <TabIcon className="w-5 h-5" />
                 </span>
-                {isSelected && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                {isSelected ? (
+                  <span className={`w-2.5 h-2.5 rounded-full ${tab.activeDot} ring-4 ring-current/20 animate-pulse`} />
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 opacity-0 group-hover:opacity-60 transition-opacity duration-200" />
                 )}
               </div>
-              <h3 className="font-bold text-sm text-[var(--admin-text)] group-hover:text-white transition">
+              <h3 className="font-bold text-sm text-[var(--admin-text)] transition-colors">
                 {tab.label}
               </h3>
-              <p className="text-xs text-[var(--admin-text-muted)] line-clamp-1 mt-1">
+              <p className="text-xs text-[var(--admin-text-muted)] line-clamp-1 mt-1 group-hover:text-[var(--admin-text)] transition-colors">
                 {tab.description}
               </p>
             </button>

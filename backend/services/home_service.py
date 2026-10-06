@@ -21,6 +21,8 @@ def _get_home_page(idPage=None) -> Page:
     if not page or page.slug != "home":
         page = base_repo.getPageBySlug("home")
     if not page:
+        page = base_repo.getPageById(1)
+    if not page:
         raise NotFoundError(message="Không tìm thấy trang chủ (home)")
     return page
 

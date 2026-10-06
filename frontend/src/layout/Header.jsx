@@ -48,7 +48,6 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
     handleToggleMenu(false);
   }, [location.pathname]);
 
-  // Close menu on Escape key press or desktop breakpoint resize
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isMenuOpen) {

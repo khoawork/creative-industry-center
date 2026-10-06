@@ -13,6 +13,10 @@ def _get_project_page(page_id: Optional[int] = None) -> Page:
         page = base_repo.getPageById(page_id)
     if not page or page.slug != "projects":
         page = base_repo.getPageBySlug("projects")
+    if not page:
+        page = base_repo.getPageById(5)
+    if not page:
+        raise NotFoundError(message="Không tìm thấy trang Dự án (projects)")
     return page
 
 

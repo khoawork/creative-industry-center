@@ -2,6 +2,9 @@ import datetime
 import argparse
 from copy import deepcopy
 import sys
+from types import SimpleNamespace
+
+from dto import contact_dto, event_dto
 
 try:
     if hasattr(sys.stdout, "reconfigure"):
@@ -29,11 +32,31 @@ from dto.home_dto import (
     NavSectionRequestDTO,
     SupportBannerRequestDTO,
 )
-from repositories.id_counter_repository import generate_id
+from dto import (
+    award_dto,
+    project_dto,
+    project_page_dto,
+    record_dto,
+    training_dto,
+    training_page_dto,
+)
 from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
 from dto import introduce_dto
 from app import create_app
+
+
+def _dto_data(schema, payload):
+    def to_builtin(value):
+        if isinstance(value, SimpleNamespace):
+            return {key: to_builtin(item) for key, item in vars(value).items()}
+        if isinstance(value, dict):
+            return {key: to_builtin(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [to_builtin(item) for item in value]
+        return value
+
+    return to_builtin(schema.load(payload))
 
 
 # Nội dung đầu trang theo mẫu Events; chỉ bổ sung các trường chưa có trong DB.
@@ -154,18 +177,23 @@ CONTACT_PAGE_PROPS = {
 
 def seed_events_page(page_id=3):
     """Bổ sung props trang Events, giữ nguyên các giá trị đã lưu."""
-    page = db.session.get(Page, page_id)
+    page = Page.query.filter_by(slug="events").first()
+    if page is None:
+        page = db.session.get(Page, page_id)
     if page is None or page.slug != "events":
         raise ValueError(f"Không tìm thấy trang Sự kiện (id={page_id}).")
     if not isinstance(page.props, dict):
         raise ValueError("Props trang Sự kiện không hợp lệ.")
 
-    hero = event_dto.EventPageHeroDTO().load(EVENTS_HERO_EVENT)
-    filters = event_dto.EventPageFilterDTO().load(EVENTS_FILTER_EVENT)
-    displayed_events = event_dto.EventPageDisplayDTO().load({
-        "event_ids": [event.id for event in Event.query.order_by(Event.id.asc()).all()]
-    })
-    newsletter = event_dto.EventPageNewsletterDTO().load(NEWSLETTER_EVENT)
+    hero = _dto_data(event_dto.EventPageHeroDTO(), EVENTS_HERO_EVENT)
+    filters = _dto_data(event_dto.EventPageFilterDTO(), EVENTS_FILTER_EVENT)
+    displayed_events = _dto_data(
+        event_dto.EventPageDisplayDTO(),
+        {"event_ids": [event.id for event in Event.query.order_by(Event.id.asc()).all()]},
+    )
+    newsletter = _dto_data(
+        event_dto.EventPageNewsletterDTO(), NEWSLETTER_EVENT
+    )
     props = dict(page.props)
     changed = False
     for key, defaults in [("hero_section", hero), ("filter_section", filters), ("displayed_events", displayed_events), ("newsletter_section", newsletter)]:
@@ -213,7 +241,7 @@ def seed_contact_page(page_id=10):
         db.session.add(page)
         db.session.flush()
 
-    defaults = contact_dto.ContactPagePropsDTO().load(CONTACT_PAGE_PROPS)
+    defaults = _dto_data(contact_dto.ContactPagePropsDTO(), CONTACT_PAGE_PROPS)
     def merge_missing(current, fallback):
         if not isinstance(current, dict) or not isinstance(fallback, dict):
             return deepcopy(fallback), True
@@ -502,7 +530,7 @@ def seed_founder_page():
 
 
 def seed_nav_pages():
-    """Cập nhật và sắp xếp lại 10 trang điều hướng trong database đúng thứ tự id từ 1 đến 10."""
+    """Tạo hoặc cập nhật các trang điều hướng mà không xóa dữ liệu trang hiện có."""
     print("\n[Nav] Đang chuẩn hóa thứ tự các trang trong bảng Page (id 1 -> 10)...")
     nav_specs = [
         {"id": 1, "name": "Trang chủ", "slug": "home"},
@@ -517,43 +545,36 @@ def seed_nav_pages():
         {"id": 10, "name": "Liên hệ", "slug": "contact"},
     ]
 
-    # Thu thập dữ liệu props hiện tại theo slug
-    existing_pages = Page.query.all()
-    props_by_slug = {}
-    for p in existing_pages:
-        slug = p.slug
-        if slug == "about":
-            slug = "introduce"
-        elif slug == "stories":
-            slug = "founder"
-        current_dict = dict(p.props or {})
-        if slug not in props_by_slug or len(current_dict) > len(props_by_slug[slug]):
-            props_by_slug[slug] = current_dict
-
-    # Xóa sạch bảng page và reset autoincrement để đảm bảo id từ 1 đến 10
-    db.session.query(Page).delete()
-    try:
-        db.session.execute(db.text("DELETE FROM sqlite_sequence WHERE name='page'"))
-    except Exception:
-        pass
-    db.session.commit()
-
+    aliases = {"introduce": "about", "founder": "stories"}
     for item in nav_specs:
         target_id = item["id"]
         slug = item["slug"]
         name = item["name"]
 
-        props = props_by_slug.get(slug, {})
+        page = Page.query.filter_by(slug=slug).first()
+        if page is None and slug in aliases:
+            page = Page.query.filter_by(slug=aliases[slug]).first()
+
+        if page is None:
+            page = db.session.get(Page, target_id)
+            if page is not None and page.slug != slug:
+                page = None
+
+        if page is None:
+            page = Page(name=name, slug=slug, props={})
+            if db.session.get(Page, target_id) is None:
+                page.id = target_id
+            db.session.add(page)
+
+        page.name = name
+        page.slug = slug
+        if page.props is not None and not isinstance(page.props, dict):
+            raise ValueError(f"Props trang '{slug}' không hợp lệ.")
+        props = dict(page.props or {})
         props["show_in_header"] = True
         props["header_order"] = target_id
-
-        page = Page(
-            id=target_id,
-            name=name,
-            slug=slug,
-            props=props,
-        )
-        db.session.add(page)
+        page.props = props
+        flag_modified(page, "props")
         print(f"  + [{target_id}] {name} (slug: {slug}) -> header_order: {target_id}")
 
     db.session.commit()
@@ -708,14 +729,16 @@ def seed_nav_pages():
         ]
 
         for item in awards_data:
+            validated = _dto_data(award_dto.AwardRequestDTO(), item)
             award = Award.query.filter(
                 or_(Award.code == item["code"], Award.name == item["name"])
             ).first()
             if award is None:
-                award = Award(id=generate_id("VK-AWD"))
+                award = Award(id=item["code"])
                 db.session.add(award)
-            for field, value in item.items():
+            for field, value in validated.items():
                 setattr(award, field, value)
+            award.id = award.id or item["code"]
             print(f"  + Đã seed award {item['code']}: {item['name']}")
 
         legacy_award = Award.query.filter_by(name="Kỷ lục Quốc gia").first()
@@ -778,19 +801,133 @@ def seed_nav_pages():
             "show_in_header": True,
             "header_order": 6,
         }
-        page = Page.query.filter_by(slug="award").first()
+        page = Page.query.filter_by(slug="awards").first() or Page.query.filter_by(slug="award").first() or db.session.get(Page, 6)
         if page is None:
-            page = Page(name="Giải thưởng", slug="award", props=page_props)
+            page = Page(name="Giải thưởng", slug="awards", props=page_props)
             db.session.add(page)
         else:
             page.name = "Giải thưởng"
+            page.slug = "awards"
             page.props = {**(page.props or {}), **page_props}
             flag_modified(page, "props")
         db.session.commit()
-        print("  -> Đã seed page award và latest honor board.")
+        print("  -> Đã seed page awards và latest honor board.")
 
     seed_awards()
     seed_award_page()
+
+
+def _upsert_page_with_defaults(page_id, name, slug, defaults):
+    page = Page.query.filter_by(slug=slug).first()
+    if page is None:
+        page = db.session.get(Page, page_id)
+        if page is not None and page.slug != slug:
+            page = None
+
+    if page is None:
+        page = Page(name=name, slug=slug, props={})
+        if db.session.get(Page, page_id) is None:
+            page.id = page_id
+        db.session.add(page)
+
+    if page.props is not None and not isinstance(page.props, dict):
+        raise ValueError(f"Props trang '{slug}' không hợp lệ.")
+
+    props = dict(page.props or {})
+    changed = False
+    for key, value in defaults.items():
+        if key not in props:
+            props[key] = deepcopy(value)
+            changed = True
+
+    page.name = name
+    page.slug = slug
+    if changed or page.props is None:
+        page.props = props
+        flag_modified(page, "props")
+    return page
+
+
+def seed_project_page():
+    project_ids = [project.id for project in Project.query.order_by(Project.id).all()]
+    header = {
+        "badge": "DỰ ÁN & CÂU CHUYỆN SÁNG NGHIỆP",
+        "title": "Dự án tiêu biểu",
+        "description": "Khám phá các dự án và hành trình sáng tạo tiêu biểu.",
+        "statistics": [
+            {"label": "Dự án tiêu biểu", "value": str(len(project_ids))}
+        ],
+    }
+    proposal = {
+        "tag": "ĐỀ XUẤT DỰ ÁN",
+        "title": "Cùng phát triển ý tưởng sáng tạo",
+        "description": "Gửi đề xuất để Trung tâm xem xét cơ hội hợp tác.",
+        "benefits": ["Kết nối chuyên gia", "Đồng hành phát triển dự án"],
+        "form_title": "Thông tin đề xuất",
+        "form_description": "Vui lòng để lại thông tin và mô tả dự án.",
+        "button_text": "GỬI HỒ SƠ ĐỀ XUẤT DỰ ÁN",
+        "form_fields": [],
+    }
+    header = _dto_data(project_page_dto.HeaderSectionRequestDTO(), header)
+    proposal = _dto_data(project_page_dto.ProposalSectionRequestDTO(), proposal)
+    selected = _dto_data(
+        project_page_dto.SelectedProjectsRequestDTO(),
+        {"project_ids": project_ids},
+    )
+    defaults = {
+        "header_section": header,
+        "proposal_section": proposal,
+        "selected_project_ids": selected["project_ids"],
+        "show_in_header": True,
+        "header_order": 5,
+    }
+    page = _upsert_page_with_defaults(5, "Dự án nổi bật", "projects", defaults)
+    db.session.commit()
+    print(f"  -> Đã seed trang Projects với {len(project_ids)} dự án.")
+    return page
+
+
+def seed_training_page():
+    training_ids = [
+        training.id for training in Training.query.order_by(Training.id).all()
+    ]
+    header = {
+        "badge": "HỢP TÁC & ĐÀO TẠO",
+        "title": "Chương trình hợp tác và đào tạo",
+        "description": "Các chương trình nâng cao năng lực và lan tỏa tri thức sáng tạo.",
+        "statistics": [
+            {"label": "Chương trình", "value": str(len(training_ids))}
+        ],
+    }
+    proposal = {
+        "tag": "ĐỀ XUẤT HỢP TÁC",
+        "title": "Cùng xây dựng chương trình đào tạo",
+        "description": "Kết nối với Trung tâm để phát triển chương trình phù hợp.",
+        "benefits": ["Nội dung thực tiễn", "Kết nối chuyên gia"],
+        "form_title": "Thông tin đề xuất",
+        "form_description": "Vui lòng để lại thông tin chương trình.",
+        "button_text": "GỬI ĐỀ XUẤT HỢP TÁC",
+        "form_fields": [],
+    }
+    header = _dto_data(training_page_dto.HeaderSectionRequestDTO(), header)
+    proposal = _dto_data(training_page_dto.ProposalSectionRequestDTO(), proposal)
+    selected = _dto_data(
+        training_page_dto.SelectedTrainingsRequestDTO(),
+        {"training_ids": training_ids},
+    )
+    defaults = {
+        "header_section": header,
+        "proposal_section": proposal,
+        "selected_training_ids": selected["training_ids"],
+        "show_in_header": True,
+        "header_order": 9,
+    }
+    page = _upsert_page_with_defaults(
+        9, "Hợp tác & Đào tạo", "trainings", defaults
+    )
+    db.session.commit()
+    print(f"  -> Đã seed trang Trainings với {len(training_ids)} chương trình.")
+    return page
 
 
 def seed_database():
@@ -835,7 +972,12 @@ def seed_database():
             "event_date": EVENT_DATES_EVENT["Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia"],
             "category": "ĐẠI HỘI THƯỜNG NIÊN",
             "description": "Quy tụ hơn 300 kỷ lục gia và các nhà sáng chế trên toàn quốc nhằm đúc kết thành tựu đổi mới trong công nghệ và văn hóa di sản.",
-            "speaker": [{"name": "TS. Lê Doãn Hợp", "title": "Chủ tịch Hội đồng Xác lập Kỷ lục Việt Nam"}],
+            "speakers": [{
+                "role": "Chủ tịch hội đồng",
+                "name": "TS. Lê Doãn Hợp",
+                "description": "Chủ tịch Hội đồng Xác lập Kỷ lục Việt Nam",
+                "image": "/images/speakers/le-doan-hop.jpg",
+            }],
             "location": "Trung tâm Hội nghị Quốc gia, Hà Nội",
             "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80",
             "status": EventStatus.UPCOMING,
@@ -847,7 +989,12 @@ def seed_database():
             "event_date": EVENT_DATES_EVENT["Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục"],
             "category": "TRIỂN LÃM ĐỘC BẢN",
             "description": "Khám phá những kiệt tác sơn mài, khảm xà cừ và gốm sứ đạt đỉnh cao nghệ thuật của các nghệ nhân nhân dân kỳ cựu.",
-            "speaker": [{"name": "Nghệ nhân Nhân dân Trần Độ", "title": "Bậc thầy Gốm sứ Bát Tràng"}],
+            "speakers": [{
+                "role": "Nghệ nhân",
+                "name": "Nghệ nhân Nhân dân Trần Độ",
+                "description": "Bậc thầy Gốm sứ Bát Tràng",
+                "image": "/images/speakers/tran-do.jpg",
+            }],
             "location": "Bảo tàng Hà Nội, Phạm Hùng, Nam Từ Liêm",
             "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
             "status": EventStatus.UPCOMING,
@@ -859,7 +1006,12 @@ def seed_database():
             "event_date": EVENT_DATES_EVENT['Tọa đàm: "Tài sản Vô hình & Định giá Thương hiệu Kỷ lục"'],
             "category": "TỌA ĐÀM KINH TẾ",
             "description": "Chia sẻ từ các chuyên gia kinh tế đầu ngành về phương pháp định giá thương quyền sở hữu trí tuệ và mở rộng dòng vốn đầu tư.",
-            "speaker": [{"name": "TS. Võ Trí Thành", "title": "Viện trưởng Viện Nghiên cứu Chiến lược Thương hiệu"}],
+            "speakers": [{
+                "role": "Diễn giả",
+                "name": "TS. Võ Trí Thành",
+                "description": "Viện trưởng Viện Nghiên cứu Chiến lược Thương hiệu",
+                "image": "/images/speakers/vo-tri-thanh.jpg",
+            }],
             "location": "Khách sạn Rex, Quận 1, TP. Hồ Chí Minh",
             "image": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
             "status": EventStatus.UPCOMING,
@@ -870,21 +1022,25 @@ def seed_database():
 
     event_ids = []
     for item in events_data:
+        category = EventCategory.query.filter_by(name=item["category"]).one()
+        validated = _dto_data(event_dto.EventRequest(), {
+            **{key: value for key, value in item.items() if key != "category"},
+            "status": item["status"].value,
+            "category_id": category.id,
+        })
         existing = Event.query.filter_by(name=item["name"]).first()
         if not existing:
             new_event = Event(
-                name=item["name"],
-                description=item["description"],
-                speaker=item["speaker"],
-                location=item["location"],
-                event_date=item["event_date"],
-                image=item["image"],
-                status=item["status"],
-                btn_action=item["btn_action"],
-                form_url=item["form_url"],
-                category_id=EventCategory.query.filter_by(name=item["category"])
-                .one()
-                .id,
+                name=validated["name"],
+                description=validated["description"],
+                speaker=validated["speakers"],
+                location=validated["location"],
+                event_date=validated.get("event_date"),
+                image=validated["image"],
+                status=validated["status"],
+                btn_action=validated["btn_action"],
+                form_url=validated["form_url"],
+                category_id=validated["category_id"],
             )
             db.session.add(new_event)
             db.session.flush()
@@ -899,10 +1055,16 @@ def seed_database():
     # BƯỚC 3: DỰ ÁN TIÊU BIỂU & CHUYỆN SÁNG NGHIỆP
     # ========================================================
     print("\n[3/7] Đang seed Dự án & Chuyện nhà sáng nghiệp...")
-    project_categories = ["DỰ ÁN TIÊU BIỂU", "CHUYỆN NHÀ SÁNG NGHIỆP"]
-    for category_name in project_categories:
-        if not ProjectCategory.query.filter_by(name=category_name).first():
-            db.session.add(ProjectCategory(name=category_name))
+    project_categories = [
+        {"name": "DỰ ÁN TIÊU BIỂU", "description": "Các dự án sáng tạo tiêu biểu."},
+        {"name": "CHUYỆN NHÀ SÁNG NGHIỆP", "description": "Câu chuyện của các nhà sáng nghiệp."},
+    ]
+    for category_data in project_categories:
+        category_data = _dto_data(
+            project_dto.ProjectCategoryRequest(), category_data
+        )
+        if not ProjectCategory.query.filter_by(name=category_data["name"]).first():
+            db.session.add(ProjectCategory(**category_data))
     db.session.commit()
 
     projects_data = [
@@ -912,12 +1074,13 @@ def seed_database():
             "title": "DỰ ÁN TRỌNG ĐIỂM QUỐC GIA",
             "slogan": "KHỞI CÔNG 2025 – QUY MÔ 12 HECTA",
             "description": "Khu phức hợp lưu trữ, bảo tồn và ứng dụng công nghệ thực tế ảo tương tác nhằm tái hiện hành trình xác lập các kỳ tích quốc gia. Công trình tạo điểm đến văn hóa giáo dục tự hào cho thế hệ trẻ.",
-            "research_info": {
-                "scale": "12 Hecta",
-                "start_year": "2025",
-                "technology": "VR/AR Interactive 3D",
-                "focus": "Lưu trữ, giáo dục & bảo tồn văn hóa",
-            },
+            "research_info": [
+                {"label": "Quy mô", "value": "12 Hecta"},
+                {"label": "Khởi công", "value": "2025"},
+                {"label": "Công nghệ", "value": "VR/AR Interactive 3D"},
+                {"label": "Trọng tâm", "value": "Lưu trữ, giáo dục & bảo tồn văn hóa"},
+            ],
+            "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
             "project_info": {
                 "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
                 "btn_action": "TÌM HIỂU TIẾN ĐỘ DỰ ÁN",
@@ -930,11 +1093,12 @@ def seed_database():
             "title": "GƯƠNG MẶT KỶ LỤC GIA TIÊU BIỂU",
             "slogan": "KỶ LỤC GIA VĂN HÓA DÂN GIAN",
             "description": "Từ xưởng gốm thủ công thô mộc đến việc xác lập kỷ lục chiếc bình gốm độc bản khắc họa 54 dân tộc anh em. Câu chuyện về lòng kiên định vượt qua ba lần suy thoái để xây dựng cơ đồ bền vững.",
-            "research_info": {
-                "career_span": "40 năm gìn giữ nghề",
-                "achievement": "Xác lập kỷ lục bình gốm 54 dân tộc",
-                "field": "Gốm mỹ nghệ truyền thống",
-            },
+            "research_info": [
+                {"label": "Hành trình", "value": "40 năm gìn giữ nghề"},
+                {"label": "Thành tựu", "value": "Xác lập kỷ lục bình gốm 54 dân tộc"},
+                {"label": "Lĩnh vực", "value": "Gốm mỹ nghệ truyền thống"},
+            ],
+            "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
             "project_info": {
                 "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
                 "btn_action": "ĐỌC TOÀN BỘ CÂU CHUYỆN SÁNG NGHIỆP",
@@ -947,16 +1111,13 @@ def seed_database():
     for item in projects_data:
         existing = Project.query.filter_by(name=item["name"]).first()
         if not existing:
+            category = ProjectCategory.query.filter_by(name=item["category"]).one()
+            validated = _dto_data(project_dto.ProjectRequest(), {
+                **{key: value for key, value in item.items() if key != "category"},
+                "category_id": category.id,
+            })
             new_proj = Project(
-                name=item["name"],
-                title=item["title"],
-                slogan=item["slogan"],
-                description=item["description"],
-                research_info=item["research_info"],
-                project_info=item["project_info"],
-                category_id=ProjectCategory.query.filter_by(name=item["category"])
-                .one()
-                .id,
+                **validated,
             )
             db.session.add(new_proj)
             db.session.flush()
@@ -971,21 +1132,83 @@ def seed_database():
     # BƯỚC 4: CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO
     # ========================================================
     print("\n[4/7] Đang seed Chương trình hợp tác & Đào tạo...")
-    seed_trainings()
-
+    trainings_data = [
+        {
+            "id": "VK-01",
+            "name": "Quản trị đổi mới sáng tạo",
+            "time": "2 ngày workshop thực hành",
+            "certificate": "Chứng nhận Quản trị đổi mới sáng tạo",
+            "props": {
+                "target_audience": "Lãnh đạo và quản lý doanh nghiệp",
+                "description": "Ứng dụng phương pháp đổi mới vào quản trị và phát triển sản phẩm.",
+                "highlights": [
+                    "Xây dựng văn hóa đổi mới",
+                    "Thiết kế và đánh giá sáng kiến",
+                ],
+                "locations": ["Hà Nội", "TP. Hồ Chí Minh"],
+            },
+        },
+        {
+            "id": "VK-02",
+            "name": "Bảo tồn và phát triển làng nghề",
+            "time": "3 buổi chuyên đề",
+            "certificate": "Chứng nhận Phát triển làng nghề",
+            "props": {
+                "target_audience": "Nghệ nhân, hợp tác xã và đơn vị quản lý làng nghề",
+                "description": "Kết hợp tri thức truyền thống với mô hình phát triển bền vững.",
+                "highlights": [
+                    "Nhận diện giá trị di sản",
+                    "Phát triển sản phẩm và thị trường",
+                ],
+                "locations": ["Hà Nội", "Huế"],
+            },
+        },
+        {
+            "id": "VK-03",
+            "name": "Sở hữu trí tuệ và tài sản sáng tạo",
+            "time": "1 ngày chuyên đề",
+            "certificate": "Chứng nhận Tài sản sáng tạo",
+            "props": {
+                "target_audience": "Doanh nghiệp, nhà sáng chế và chuyên gia",
+                "description": "Nhận diện, bảo hộ và khai thác giá trị tài sản trí tuệ.",
+                "highlights": [
+                    "Tổng quan quyền sở hữu trí tuệ",
+                    "Định giá và thương mại hóa tài sản",
+                ],
+                "locations": ["TP. Hồ Chí Minh"],
+            },
+        },
+    ]
+    training_ids = []
+    for item in trainings_data:
+        validated = _dto_data(training_dto.CreateTrainingDTO(), item)
+        validated["props"] = _dto_data(
+            training_dto.TrainingPropsDTO(), validated["props"]
+        )
+        training = Training.query.filter_by(id=validated["id"]).first()
+        if training is None:
+            training = Training(**validated)
+            db.session.add(training)
+            print(f"  + Đã thêm chương trình {training.id}: {training.name}")
+        else:
+            print(f"  . Đã có chương trình {training.id}: {training.name}")
+        training_ids.append(training.id)
+    db.session.commit()
 
     # ========================================================
-    # BƯỚC 5: HEADER NAVIGATION / PAGES (Thứ tự bắt đầu từ Trang chủ id=1..10)
+    # BƯỚC 5: HEADER NAVIGATION / PAGES
     # ========================================================
     seed_nav_pages()
 
-    # Cập nhật chi tiết các sections cho Giới thiệu, Founder & Projects
+    # Cập nhật các section cấu hình của từng trang.
     seed_contact_page()
     seed_introduce()
     seed_events_page()
+    seed_event_dates()
     seed_founder_page()
     seed_project_page()
     seed_training_page()
+    seed_record_page()
 
     # ========================================================
     # BƯỚC 6: PROPS TRANG CHỦ
@@ -1095,20 +1318,6 @@ def seed_database():
         flag_modified(home_page, "props")
         print("  -> Đã cập nhật Trang chủ (slug='home')!")
 
-    # ========================================================
-    # BƯỚC 7: GIẢI THƯỞNG
-    # ========================================================
-    print("\n[7/7] Đang kiểm tra Giải thưởng...")
-    if not Award.query.first():
-        award = Award(
-            id=generate_id("VK-AWD"),
-            name="Kỷ lục Quốc gia",
-            title="Tôn vinh Công trình Sáng tạo Độc bản",
-            description="Chứng nhận sáng kiến, giải pháp và công trình mang giá trị văn hóa và khoa học xuất sắc.",
-            decision_number="QĐ-VK-2025/01",
-        )
-        db.session.add(award)
-
     db.session.commit()
     print("\n🎉 Seed toàn bộ dữ liệu thành công!")
 
@@ -1211,30 +1420,21 @@ def seed_records():
     """Seed dữ liệu cho bảng Record."""
     print("\nĐang seed danh sách Record vào bảng record...")
     for item in RECORDS_SEED_DATA:
+        validated = _dto_data(
+            record_dto.RecordResquestDto(),
+            {field: value for field, value in item.items() if field != "id"},
+        )
         rec = Record.query.filter_by(id=item["id"]).first()
         if not rec:
             rec = Record(
                 id=item["id"],
-                rank=item["rank"],
-                title=item["title"],
-                subtitle=item.get("subtitle"),
-                cycle=item.get("cycle"),
-                criteria=item.get("criteria"),
-                category=item.get("category"),
-                icon=item.get("icon"),
-                action=item.get("action"),
+                **validated,
             )
             db.session.add(rec)
             print(f"  + Đã thêm record ID {item['id']}: {item['title']}")
         else:
-            rec.rank = item["rank"]
-            rec.title = item["title"]
-            rec.subtitle = item.get("subtitle")
-            rec.cycle = item.get("cycle")
-            rec.criteria = item.get("criteria")
-            rec.category = item.get("category")
-            rec.icon = item.get("icon")
-            rec.action = item.get("action")
+            for field, value in validated.items():
+                setattr(rec, field, value)
             print(f"  . Đã cập nhật record ID {item['id']}: {item['title']}")
     db.session.commit()
     print("  -> Seed bảng Record thành công!")
@@ -1424,42 +1624,49 @@ def seed_record_page():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Khởi tạo dữ liệu mẫu.")
-    parser.add_argument("--introduce-only", action="store_true",
-                        help="Chỉ bổ sung Giới thiệu; giữ nguyên Home và nội dung đã sửa.")
-    parser.add_argument("--nav-only", action="store_true",
-                        help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).")
-    parser.add_argument("--events-only", action="store_true",
-                        help="Chỉ bổ sung các trường đầu trang, bộ lọc và bản tin Events chưa có.")
-    parser.add_argument("--project-page-only", action="store_true",
-                        help="Chỉ bổ sung/cập nhật trang Projects.")
-    parser.add_argument("--contact-only", action="store_true",
-                        help="Chỉ bổ sung nội dung trang Contact.")
-    parser.add_argument("--training-page-only", action="store_true",
-                        help="Chỉ bổ sung/cập nhật trang Training (Hợp tác & Đào tạo).")
-    parser.add_argument(
+    seed_modes = parser.add_mutually_exclusive_group()
+    seed_modes.add_argument(
         "--introduce-only",
         action="store_true",
-        help="Chỉ bổ sung Giới thiệu; giữ nguyên Home và nội dung đã sửa.",
+        help="Chỉ bổ sung nội dung trang Giới thiệu.",
     )
-    parser.add_argument(
+    seed_modes.add_argument(
         "--nav-only",
         action="store_true",
-        help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).",
+        help="Chỉ tạo/cập nhật các trang điều hướng và dữ liệu giải thưởng.",
+    )
+    seed_modes.add_argument(
+        "--events-only",
+        action="store_true",
+        help="Chỉ bổ sung nội dung trang Sự kiện và ngày sự kiện.",
+    )
+    seed_modes.add_argument(
+        "--project-page-only",
+        action="store_true",
+        help="Chỉ bổ sung/cập nhật trang Projects.",
+    )
+    seed_modes.add_argument(
+        "--contact-only",
+        action="store_true",
+        help="Chỉ bổ sung nội dung trang Contact.",
+    )
+    seed_modes.add_argument(
+        "--training-page-only",
+        action="store_true",
+        help="Chỉ bổ sung/cập nhật trang Training.",
     )
     args = parser.parse_args()
 
     app = create_app()
     with app.app_context():
-        seed_record_page()
+        db.create_all()
         if args.introduce_only:
-        if args.events_only:
-            seed_events_page()
-            seed_event_dates()
-            print("Đã bổ sung nội dung trang Sự kiện; giữ nguyên nội dung đã lưu.")
-        elif args.introduce_only:
             seed_introduce()
         elif args.nav_only:
             seed_nav_pages()
+        elif args.events_only:
+            seed_events_page()
+            seed_event_dates()
         elif args.project_page_only:
             seed_project_page()
         elif args.training_page_only:

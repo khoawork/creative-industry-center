@@ -21,7 +21,6 @@ import {
   adminUnreadCount,
 } from "../data/Admin/adminDashboardData.js";
 
-/* oxlint-disable react/only-export-components -- Route configuration exports objects; lazy components are internal route elements. */
 const AdminLayout = lazy(() => import("../layout/Admin/AdminLayout.jsx"));
 const AdminDashboard = lazy(() => import("../pages/Admin/AdminDashboard.jsx"));
 const AdminModulePlaceholder = lazy(
@@ -30,17 +29,22 @@ const AdminModulePlaceholder = lazy(
 const AdminNotFound = lazy(() => import("../pages/Admin/AdminNotFound.jsx"));
 const AdminContact = lazy(() => import("../pages/Admin/AdminContact.jsx"));
 const AdminHome = lazy(() => import("../pages/Admin/AdminHome.jsx"));
-const FounderAdminPanel = lazy(() => import("../components/Admin/Founder/FounderAdminPanel.jsx"));
-const AdminNavigation = lazy(() => import("../pages/Admin/AdminNavigation.jsx"));
+const FounderAdminPanel = lazy(
+  () => import("../components/Admin/Founder/FounderAdminPanel.jsx"),
+);
+const AdminNavigation = lazy(
+  () => import("../pages/Admin/AdminNavigation.jsx"),
+);
 const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 const AdminAwardPage = lazy(() => import("../pages/Admin/AdminAwardPage.jsx"));
 const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
 const AdminEvents = lazy(() => import("../pages/Admin/AdminEvents.jsx"));
 const AdminProjects = lazy(() => import("../pages/Admin/AdminProjects.jsx"));
 const AdminTraining = lazy(() => import("../pages/Admin/AdminTraining.jsx"));
-const AdminLogoFooter = lazy(() => import("../pages/Admin/AdminLogoFooter.jsx"));
+const AdminLogoFooter = lazy(
+  () => import("../pages/Admin/AdminLogoFooter.jsx"),
+);
 const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"));
-
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
@@ -67,36 +71,40 @@ export const adminRoute = {
     { index: true, element: <AdminDashboard /> },
     ...adminModules.map((item) => ({
       path: item.path.slice(adminRoot.length + 1),
-      element:
-        item.id === "contact" ? (
-          <AdminContact />
-        ) : item.id === "home" ? (
-          <AdminHome />
-        ) : item.id === "stories" ? (
-          <FounderAdminPanel />
-        ) : item.id === "projects" ? (
-          <AdminProjects />
-        ) : item.id === "events" ? (
-          <AdminEvents />
-        ) : item.id === "training" ? (
-          <AdminTraining />
-        ) : item.id === "navigation" ? (
-          <AdminNavigation />
-        ) : item.id === "awards" ? (
-          <AdminAwardPage />
-        ) : item.id === "records" ? (
-          <AdminRecordPage />
-        ) : item.id === "catalog" || ["events", "training", "projects"].includes(item.id) ? (
-        ) : item.id === "catalog" || ["awards", "training"].includes(item.id) ? (
-        ) : item.id === "logo & footer" ? (
-          <AdminLogoFooter />
-        ) : item.id === "catalog" || ["events", "awards"].includes(item.id) ? (
-          <AdminCatalog defaultTab={item.id === "catalog" ? undefined : item.id} />
-        ) : item.id === "about" ? (
-          <AdminAbout />
-        ) : (
-          <AdminModulePlaceholder item={item} />
-        ),
+      element: (() => {
+        switch (item.id) {
+          case "contact":
+            return <AdminContact />;
+          case "home":
+            return <AdminHome />;
+          case "stories":
+            return <FounderAdminPanel />;
+          case "projects":
+            return <AdminProjects />;
+          case "events":
+            return <AdminEvents />;
+          case "training":
+            return <AdminTraining />;
+          case "navigation":
+            return <AdminNavigation />;
+          case "awards":
+            return <AdminAwardPage />;
+          case "records":
+            return <AdminRecordPage />;
+          case "logo & footer":
+            return <AdminLogoFooter />;
+          case "about":
+            return <AdminAbout />;
+          case "catalog":
+            return <AdminCatalog />;
+          default:
+            return ["events", "awards"].includes(item.id) ? (
+              <AdminCatalog defaultTab={item.id} />
+            ) : (
+              <AdminModulePlaceholder item={item} />
+            );
+        }
+      })(),
     })),
     {
       path: "catalog",
