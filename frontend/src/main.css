@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/shared/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
+  --color-brand-red: #710008;
+  --color-brand-gold: #d49520;
+  --color-brand-cream: #f4f3f1;
   --primary-color: #680007;
   --secondary-color: #b88628;
   --background-light: #faf9f7;

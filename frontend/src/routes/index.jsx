@@ -34,6 +34,7 @@ const FounderAdminPanel = lazy(() => import("../components/Admin/Founder/Founder
 const AdminNavigation = lazy(() => import("../pages/Admin/AdminNavigation.jsx"));
 const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
+const AdminEvents = lazy(() => import("../pages/Admin/AdminEvents.jsx"));
 const AdminProjects = lazy(() => import("../pages/Admin/AdminProjects.jsx"));
 const AdminTraining = lazy(() => import("../pages/Admin/AdminTraining.jsx"));
 const AdminLogoFooter = lazy(() => import("../pages/Admin/AdminLogoFooter.jsx"));
@@ -73,10 +74,13 @@ export const adminRoute = {
           <FounderAdminPanel />
         ) : item.id === "projects" ? (
           <AdminProjects />
+        ) : item.id === "events" ? (
+          <AdminEvents />
         ) : item.id === "training" ? (
           <AdminTraining />
         ) : item.id === "navigation" ? (
           <AdminNavigation />
+        ) : item.id === "catalog" || ["awards", "training"].includes(item.id) ? (
         ) : item.id === "logo & footer" ? (
           <AdminLogoFooter />
         ) : item.id === "catalog" || ["events", "awards"].includes(item.id) ? (

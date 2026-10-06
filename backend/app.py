@@ -49,6 +49,7 @@ def create_app():
     from controllers.BaseController import base_api
     from controllers.AwardController import award_api
     from controllers.EventController import event_api
+    from controllers.ContactController import contact_api
     from controllers.ProjectController import project_api, category_project_api
     from controllers.ProjectPageController import project_page_api
     from controllers.TrainingPageController import training_page_api
@@ -58,6 +59,7 @@ def create_app():
     app.register_blueprint(user_api)
     app.register_blueprint(training_api)
     app.register_blueprint(event_api)
+    app.register_blueprint(contact_api)
     app.register_blueprint(project_api)
     app.register_blueprint(category_project_api)
     app.register_blueprint(award_api)

@@ -1,6 +1,9 @@
+import { FileText, Info, Inbox } from 'lucide-react';
+
 export const adminContactTabs = [
-  { id: 'inbox', label: 'Hộp thư' },
-  { id: 'form', label: 'Cấu hình form', description: 'Cấu hình trường nhập và nội dung form liên hệ sẽ được bổ sung khi tích hợp backend.' },
-  { id: 'info', label: 'Thông tin liên hệ' },
-  { id: 'branding', label: 'Footer / Logo / Favicon', description: 'Giao diện cập nhật footer, logo và favicon sẽ được bổ sung trong bước tiếp theo.' },
+  { id: 'inbox', label: 'Hộp thư', icon: Inbox },
+  { id: 'form', label: 'Cấu hình Form', icon: FileText, description: 'Cấu hình trường nhập và nội dung form hiển thị trên trang Liên hệ.' },
+  { id: 'info', label: 'Thông tin liên hệ', icon: Info },
 ];
+
+export const contactFixedFieldIds = ['fullName', 'email', 'phone', 'category', 'message'];

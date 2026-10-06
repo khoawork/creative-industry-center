@@ -1,5 +1,6 @@
 import datetime
 import argparse
+from copy import deepcopy
 import sys
 
 try:
@@ -27,10 +28,212 @@ from dto.home_dto import (
     NavSectionRequestDTO,
     SupportBannerRequestDTO,
 )
+from repositories.id_counter_repository import generate_id
 from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
-from dto import introduce_dto
+from dto import introduce_dto, event_dto
+from dto import contact_dto
 from app import create_app
+
+
+# Nội dung đầu trang theo mẫu Events; chỉ bổ sung các trường chưa có trong DB.
+EVENTS_HERO_EVENT = {
+    "breadcrumbs": [
+        {"text": "Trang chủ", "link": "/"},
+        {"text": "Sự kiện & Diễn đàn", "link": None},
+    ],
+    "badge": "VIETKINGS • LỊCH TRÌNH QUỐC GIA",
+    "title": "SỰ KIỆN & HOẠT ĐỘNG",
+    "description": "Không gian kết nối tri thức đỉnh cao, nơi tôn vinh những kỳ tích sáng tạo, hội ngộ các kỷ lục gia, nhà khoa học và doanh nhân sáng nghiệp hàng đầu Việt Nam.",
+    "statistics": [
+        {"icon": "calendar", "value": "54+ Kỳ", "label": "Hội ngộ Kỷ lục"},
+        {"icon": "users", "value": "12.000+", "label": "Đại biểu tham gia"},
+        {"icon": "certificate", "value": "3.200+", "label": "Bằng chứng nhận"},
+        {"icon": "building", "value": "63 Tỉnh/TP", "label": "Quy mô bảo trợ"},
+    ],
+}
+EVENTS_FILTER_EVENT = {
+    "status_filters": [
+        {"statuses": ["ALL"], "label": "Tất cả sự kiện"},
+        {"statuses": ["REGISTRATION_OPEN", "UPCOMING"], "label": "Đang diễn ra & Sắp tới"},
+        {"statuses": ["REGISTRATION_OPEN"], "label": "Đang mở đăng ký"},
+    ],
+    "search_placeholder": "Tìm tên sự kiện...",
+    "show_year_filter": True,
+}
+NEWSLETTER_EVENT = {
+    "tag": "BẢN TIN VIỆN KỶ LỤC",
+    "title": "Đăng Ký Nhận Thông Báo Sự Kiện Sớm",
+    "description": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức trực tiếp từ Ban Thư ký Trung tâm Công nghiệp Sáng tạo.",
+    "privacy_text": "Bảo mật thông tin theo tiêu chuẩn viện nghiên cứu quốc gia.",
+    "full_name_label": "Họ và tên", "full_name_placeholder": "Nguyễn Văn A",
+    "organization_label": "Đơn vị / Doanh nghiệp", "organization_placeholder": "Tổ chức / Doanh nghiệp",
+    "email_label": "Địa chỉ Email đại biểu", "email_placeholder": "daibieu@tochuc.vn",
+    "consent_text": "Tôi đồng ý tiếp nhận các tài liệu và thông tri sự kiện từ VIETKINGS.",
+    "button_text": "Xác Nhận Đăng Ký Thông Báo",
+    "success_message": "Cảm ơn Quý vị! Đăng ký nhận thông tin sự kiện đã được ghi nhận.",
+}
+EVENT_DATES_EVENT = {
+    "Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia": datetime.date(2025, 5, 15),
+    "Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục": datetime.date(2025, 5, 28),
+    'Tọa đàm: "Tài sản Vô hình & Định giá Thương hiệu Kỷ lục"': datetime.date(2025, 6, 8),
+}
+
+CONTACT_PAGE_PROPS = {
+    "intro": {
+        "badge": "Ban Thư Ký & Tiếp Nhận Hồ Sơ",
+        "title": "Liên hệ",
+        "description": "Trung tâm Công nghiệp Sáng tạo luôn sẵn sàng lắng nghe, tư vấn và đồng hành cùng các tổ chức, doanh nghiệp và cá nhân trên hành trình đổi mới sáng tạo.",
+    },
+    "contact": {
+        "organization": "Trung tâm Công nghiệp Sáng tạo",
+        "address": "Trung tâm Công nghiệp Sáng tạo, Viện Kỷ lục Việt Nam, TP. Hồ Chí Minh & Hà Nội",
+        "phone": "(+84) 28 3847 7777",
+        "phoneHref": "tel:+842838477777",
+        "phones": [{"number": "(+84) 28 3847 7777", "href": "tel:+842838477777"}],
+        "emails": ["bbt@kyluc.vn", "contact@vietkings.org"],
+    },
+    "offices": [
+        {
+            "id": "ha-noi",
+            "label": "Trụ sở chính",
+            "city": "TP. Hà Nội",
+            "address": "Tầng 6, Tòa nhà Liên hiệp các Hội Khoa học & Kỹ thuật Việt Nam, TP. Hà Nội.",
+        },
+        {
+            "id": "ho-chi-minh",
+            "label": "Văn phòng Đại diện phía Nam",
+            "city": "TP. Hồ Chí Minh",
+            "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        },
+    ],
+    "workingHours": [
+        {"days": "Thứ Hai — Thứ Sáu", "time": "08:00 – 17:30"},
+        {"days": "Thứ Bảy", "time": "08:00 – 12:00"},
+    ],
+    "socialChannels": [
+        {"id": "zalo", "label": "Zalo OA", "href": None},
+        {"id": "facebook", "label": "Fanpage", "href": None},
+        {"id": "youtube", "label": "Sáng Tạo Việt", "href": None},
+    ],
+    "mapLocation": {
+        "label": "Trụ sở VIETKINGS — TTCN Sáng Tạo",
+        "office": {
+            "id": "ho-chi-minh",
+            "label": "Văn phòng Đại diện phía Nam",
+            "city": "TP. Hồ Chí Minh",
+            "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        },
+        "address": "1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        "mapAddress": "16/1 Đặng Văn Ngữ, Phường 10, Quận Phú Nhuận, TP. Hồ Chí Minh",
+        "embedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.2025137972955!2d106.66687307480518!3d10.795795989354158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752900091dee09%3A0xe23cdfee230e065b!2zMTYvMSDEkOG6t25nIFbEg24gTmfhu68sUGjGsOG7nW5nIDEwLFBow7ogTmh14bqtbg!5e0!3m2!1svi!2s!4v1790769635883!5m2!1svi!2s&hl=vi",
+        "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=16%2F1%20%C4%90%E1%BA%B7ng%20V%C4%83n%20Ng%E1%BB%AF%2C%20Ph%C6%B0%E1%BB%9Dng%2010%2C%20Qu%E1%BA%ADn%20Ph%C3%BA%20Nhu%E1%BA%ADn%2C%20TP.%20H%E1%BB%93%20Ch%C3%AD%20Minh",
+    },
+    "contactCategories": [
+        {"value": "de-cu", "label": "Đề cử kỷ lục sáng tạo"},
+        {"value": "dao-tao", "label": "Khóa đào tạo & Phát triển kỹ năng"},
+        {"value": "truyen-thong", "label": "Hợp tác truyền thông & Sự kiện"},
+        {"value": "khac", "label": "Hoạt động / Yêu cầu khác"},
+    ],
+    "form": {
+        "form_title": "Gửi phản hồi hoặc yêu cầu tư vấn",
+        "form_description": "Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.",
+        "button_text": "GỬI LỜI NHẮN NGAY",
+        "availability_text": "Biểu mẫu hiện chưa tiếp nhận trực tuyến. Quý vị vui lòng liên hệ qua {hotline} hoặc {email}.",
+        "privacy_text": "Nội dung đang nhập chỉ được giữ trên trang, chưa được gửi hoặc lưu vào hệ thống. Quý vị có thể liên hệ trực tiếp Ban Thư ký để được hướng dẫn tiếp nhận hồ sơ.",
+        "form_fields": [
+            {"id": "fullName", "label": "Họ và tên", "placeholder": "Ví dụ: Nguyễn Văn An", "type": "text", "options": [], "required": True, "width": "half"},
+            {"id": "email", "label": "Địa chỉ Email", "placeholder": "name@domain.com", "type": "email", "options": [], "required": True, "width": "half"},
+            {"id": "phone", "label": "Số điện thoại liên hệ", "placeholder": "Ví dụ: 0912 345 678", "type": "tel", "options": [], "required": False, "width": "half"},
+            {"id": "category", "label": "Lĩnh vực quan tâm", "placeholder": "Vui lòng chọn lĩnh vực", "type": "select", "options": ["Đề cử kỷ lục sáng tạo", "Khóa đào tạo & Phát triển kỹ năng", "Hợp tác truyền thông & Sự kiện", "Hoạt động / Yêu cầu khác"], "required": False, "width": "half"},
+            {"id": "message", "label": "Nội dung lời nhắn / Đề xuất chi tiết", "placeholder": "Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất...", "type": "textarea", "options": [], "required": True, "width": "full"},
+        ],
+    },
+}
+
+
+def seed_events_page(page_id=3):
+    """Bổ sung props trang Events, giữ nguyên các giá trị đã lưu."""
+    page = db.session.get(Page, page_id)
+    if page is None or page.slug != "events":
+        raise ValueError(f"Không tìm thấy trang Sự kiện (id={page_id}).")
+    if not isinstance(page.props, dict):
+        raise ValueError("Props trang Sự kiện không hợp lệ.")
+
+    hero = event_dto.EventPageHeroDTO().load(EVENTS_HERO_EVENT)
+    filters = event_dto.EventPageFilterDTO().load(EVENTS_FILTER_EVENT)
+    displayed_events = event_dto.EventPageDisplayDTO().load({
+        "event_ids": [event.id for event in Event.query.order_by(Event.id.asc()).all()]
+    })
+    newsletter = event_dto.EventPageNewsletterDTO().load(NEWSLETTER_EVENT)
+    props = dict(page.props)
+    changed = False
+    for key, defaults in [("hero_section", hero), ("filter_section", filters), ("displayed_events", displayed_events), ("newsletter_section", newsletter)]:
+        section = props.get(key, {})
+        if not isinstance(section, dict):
+            raise ValueError(f"{key} không hợp lệ; cần kiểm tra dữ liệu đã lưu.")
+        missing = {field: value for field, value in defaults.items() if field not in section}
+        if missing:
+            props[key] = {**section, **missing}
+            changed = True
+    if changed:
+        try:
+            page.props = props
+            flag_modified(page, "props")
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+    return page
+
+
+def seed_event_dates():
+    """Bổ sung ngày cho sự kiện mẫu đang thiếu, không ghi đè ngày đã chỉnh."""
+    changed = False
+    for name, event_date in EVENT_DATES_EVENT.items():
+        event = Event.query.filter_by(name=name).first()
+        if event is not None and event.event_date is None:
+            event.event_date = event_date
+            changed = True
+    if changed:
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+
+def seed_contact_page(page_id=10):
+    """Bổ sung nội dung trang Contact, giữ nguyên giá trị đã chỉnh trong DB."""
+    page = db.session.get(Page, page_id)
+    if page is None or page.slug != "contact":
+        page = Page.query.filter_by(slug="contact").first()
+    if page is None:
+        page = Page(id=page_id, name="Liên hệ", slug="contact", props={})
+        db.session.add(page)
+        db.session.flush()
+
+    defaults = contact_dto.ContactPagePropsDTO().load(CONTACT_PAGE_PROPS)
+    def merge_missing(current, fallback):
+        if not isinstance(current, dict) or not isinstance(fallback, dict):
+            return deepcopy(fallback), True
+        merged = deepcopy(current)
+        changed = False
+        for key, value in fallback.items():
+            if key not in merged:
+                merged[key] = deepcopy(value)
+                changed = True
+            elif isinstance(value, dict) and isinstance(merged[key], dict):
+                merged[key], nested_changed = merge_missing(merged[key], value)
+                changed = changed or nested_changed
+        return merged, changed
+
+    props, changed = merge_missing(page.props or {}, defaults)
+    if changed:
+        page.props = props
+        flag_modified(page, "props")
+        db.session.commit()
+    return page
 
 
 # Seed images are served from frontend/public/images/about/.
@@ -741,6 +944,7 @@ def seed_database():
     events_data = [
         {
             "name": "Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia",
+            "event_date": EVENT_DATES_EVENT["Hội ngộ Kỷ lục gia Việt Nam lần thứ 54: Tôn vinh Sáng tạo Quốc gia"],
             "category": "ĐẠI HỘI THƯỜNG NIÊN",
             "description": "Quy tụ hơn 300 kỷ lục gia và các nhà sáng chế trên toàn quốc nhằm đúc kết thành tựu đổi mới trong công nghệ và văn hóa di sản.",
             "speaker": [{"name": "TS. Lê Doãn Hợp", "title": "Chủ tịch Hội đồng Xác lập Kỷ lục Việt Nam"}],
@@ -752,6 +956,7 @@ def seed_database():
         },
         {
             "name": "Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục",
+            "event_date": EVENT_DATES_EVENT["Không Gian Trưng Bày Tinh Hoa Thủ Công Mỹ Nghệ Đạt Kỷ Lục"],
             "category": "TRIỂN LÃM ĐỘC BẢN",
             "description": "Khám phá những kiệt tác sơn mài, khảm xà cừ và gốm sứ đạt đỉnh cao nghệ thuật của các nghệ nhân nhân dân kỳ cựu.",
             "speaker": [{"name": "Nghệ nhân Nhân dân Trần Độ", "title": "Bậc thầy Gốm sứ Bát Tràng"}],
@@ -763,6 +968,7 @@ def seed_database():
         },
         {
             "name": 'Tọa đàm: "Tài sản Vô hình & Định giá Thương hiệu Kỷ lục"',
+            "event_date": EVENT_DATES_EVENT['Tọa đàm: "Tài sản Vô hình & Định giá Thương hiệu Kỷ lục"'],
             "category": "TỌA ĐÀM KINH TẾ",
             "description": "Chia sẻ từ các chuyên gia kinh tế đầu ngành về phương pháp định giá thương quyền sở hữu trí tuệ và mở rộng dòng vốn đầu tư.",
             "speaker": [{"name": "TS. Võ Trí Thành", "title": "Viện trưởng Viện Nghiên cứu Chiến lược Thương hiệu"}],
@@ -783,6 +989,7 @@ def seed_database():
                 description=item["description"],
                 speaker=item["speaker"],
                 location=item["location"],
+                event_date=item["event_date"],
                 image=item["image"],
                 status=item["status"],
                 btn_action=item["btn_action"],
@@ -794,6 +1001,8 @@ def seed_database():
             event_ids.append(new_event.id)
             print(f"  + Đã thêm sự kiện ID {new_event.id}: {new_event.name}")
         else:
+            if existing.event_date is None:
+                existing.event_date = item["event_date"]
             event_ids.append(existing.id)
             print(f"  . Đã có sự kiện ID {existing.id}: {existing.name}")
     db.session.commit()
@@ -864,7 +1073,9 @@ def seed_database():
     seed_nav_pages()
 
     # Cập nhật chi tiết các sections cho Giới thiệu, Founder & Projects
+    seed_contact_page()
     seed_introduce()
+    seed_events_page()
     seed_founder_page()
     seed_project_page()
     seed_training_page()
@@ -1008,15 +1219,23 @@ if __name__ == "__main__":
                         help="Chỉ bổ sung Giới thiệu; giữ nguyên Home và nội dung đã sửa.")
     parser.add_argument("--nav-only", action="store_true",
                         help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).")
+    parser.add_argument("--events-only", action="store_true",
+                        help="Chỉ bổ sung các trường đầu trang, bộ lọc và bản tin Events chưa có.")
     parser.add_argument("--project-page-only", action="store_true",
                         help="Chỉ bổ sung/cập nhật trang Projects.")
+    parser.add_argument("--contact-only", action="store_true",
+                        help="Chỉ bổ sung nội dung trang Contact.")
     parser.add_argument("--training-page-only", action="store_true",
                         help="Chỉ bổ sung/cập nhật trang Training (Hợp tác & Đào tạo).")
     args = parser.parse_args()
     
     app = create_app()
     with app.app_context():
-        if args.introduce_only:
+        if args.events_only:
+            seed_events_page()
+            seed_event_dates()
+            print("Đã bổ sung nội dung trang Sự kiện; giữ nguyên nội dung đã lưu.")
+        elif args.introduce_only:
             seed_introduce()
         elif args.nav_only:
             seed_nav_pages()
@@ -1024,5 +1243,7 @@ if __name__ == "__main__":
             seed_project_page()
         elif args.training_page_only:
             seed_training_page()
+        elif args.contact_only:
+            seed_contact_page()
         else:
             seed_database()

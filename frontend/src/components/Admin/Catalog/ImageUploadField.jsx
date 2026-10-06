@@ -9,6 +9,7 @@ export default function ImageUploadField({
   label = 'Hình ảnh',
   required = false,
   error = '',
+  showClear = true,
   placeholder = 'VD: https://... hoặc chọn ảnh từ máy tính',
 }) {
   const [internalFile, setInternalFile] = useState(selectedFile);
@@ -111,7 +112,7 @@ export default function ImageUploadField({
           </span>
         )}
 
-        {(previewUrl || value || activeFile) && (
+        {showClear && (previewUrl || value || activeFile) && (
           <button
             type="button"
             onClick={handleClear}

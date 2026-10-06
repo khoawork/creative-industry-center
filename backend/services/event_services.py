@@ -1,5 +1,7 @@
 from repositories import event_repository as event_repo
 from dto import event_dto
+from repositories import base_repo
+from utils.error import InternalServerError, NotFoundError
 
 
 def is_unique_name(name: str, event_id: int = None) -> bool:
@@ -85,3 +87,39 @@ def create_event_category(
     category = event_repo.create_event_category(category_data)
 
     return category
+
+
+def get_events_page(page_id):
+    page = base_repo.getPageById(page_id)
+    if page is None or page.slug != "events":
+        raise NotFoundError(message=f"Không tìm thấy trang Sự kiện (id={page_id}).")
+    if not isinstance(page.props, dict):
+        raise InternalServerError(message="Nội dung trang Sự kiện không hợp lệ.")
+    return page
+
+
+def update_hero_section(data, page_id):
+    return event_repo.update_hero(get_events_page(page_id), data)
+
+
+def update_filter_section(data, page_id):
+    return event_repo.update_filter(get_events_page(page_id), data)
+
+
+def update_displayed_events(data, page_id):
+    event_ids = list(dict.fromkeys(data["event_ids"]))
+    return event_repo.update_displayed_events(
+        get_events_page(page_id), {"event_ids": event_ids}
+    )
+
+
+def update_newsletter_section(data, page_id):
+    return event_repo.update_newsletter(get_events_page(page_id), data)
+
+
+def subscribe_newsletter(data, page_id):
+    page = get_events_page(page_id)
+    newsletter = page.props.get("newsletter_section")
+    if not isinstance(newsletter, dict) or not newsletter.get("title"):
+        raise NotFoundError(message="Form đăng ký bản tin chưa được cấu hình.")
+    event_repo.subscribe_newsletter(page.id, data)
