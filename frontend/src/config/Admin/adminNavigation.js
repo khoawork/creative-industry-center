@@ -3,6 +3,7 @@ import {
   BookOpen,
   CalendarDays,
   Database,
+  FileSpreadsheet,
   FolderKanban,
   GraduationCap,
   House,
@@ -114,6 +115,14 @@ export const adminGroups = [
         path: `${adminRoot}/navigation`,
         icon: Menu,
         description: "Sắp xếp các mục menu và liên kết của website.",
+      },
+      {
+        id: "forms",
+        label: "Quản lý Biểu mẫu (Forms)",
+        path: `${adminRoot}/forms`,
+        icon: FileSpreadsheet,
+        description:
+          "Cấu hình Google Sheet và các trường nhập liệu cho từng biểu mẫu trên website.",
       },
     ],
   },

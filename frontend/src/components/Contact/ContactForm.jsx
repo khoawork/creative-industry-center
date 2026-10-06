@@ -1,6 +1,11 @@
-import { useState } from 'react'
-import { ChevronDown, FilePenLine, LayoutGrid, Mail, MessageSquareText, Phone, Send, ShieldCheck } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ChevronDown, FilePenLine, LayoutGrid, Mail, MessageSquareText, Phone, Send, ShieldCheck, CheckCircle2, Loader2 } from 'lucide-react'
 import Icon from '../shared/Icon.jsx'
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from '../../services/googleSheetService.js'
 
 const inputClass = 'w-full rounded-[4px] bg-[var(--contact-cream)] pl-10 pr-3 text-base text-black placeholder:text-black outline-none focus:bg-white focus:ring-2 focus:ring-[var(--contact-gold)] motion-safe:transition-colors'
 const inputIconClass = 'pointer-events-none absolute top-3.5 left-3 text-[var(--contact-gold)]'
@@ -19,10 +24,19 @@ function Field({ id, label, required = false, icon, error, children }) {
 }
 
 export default function ContactForm({ categories, contact }) {
+  const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.contact_feedback)
   const [errors, setErrors] = useState({})
   const [attempted, setAttempted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
 
-  function handleSubmit(event) {
+  useEffect(() => {
+    fetchFormConfig('contact_feedback').then((loaded) => {
+      if (loaded) setConfig(loaded)
+    })
+  }, [])
+
+  async function handleSubmit(event) {
     event.preventDefault()
     const form = event.currentTarget
     const values = new FormData(form)
@@ -35,8 +49,26 @@ export default function ContactForm({ categories, contact }) {
       form.elements.namedItem(Object.keys(nextErrors)[0]).focus()
       return
     }
-    // No contact endpoint exists yet. Preserve the values and never claim delivery.
-    setAttempted(true)
+
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        fullName: values.get('fullName') || '',
+        email: values.get('email') || '',
+        phone: values.get('phone') || '',
+        category: values.get('category') || '',
+        message: values.get('message') || '',
+      }
+      await submitFormToBackend('contact_feedback', payload, config)
+      setIsSuccess(true)
+      form.reset()
+      setTimeout(() => setIsSuccess(false), 5000)
+    } catch (err) {
+      console.error('Lỗi khi gửi liên hệ:', err)
+      setAttempted(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function clearFieldError(event) {
@@ -81,18 +113,34 @@ export default function ContactForm({ categories, contact }) {
         <Field id="contact-message" label="Nội dung lời nhắn / Đề xuất chi tiết" required icon={<MessageSquareText size={20} aria-hidden="true" />} error={errors.message}>
           <textarea id="contact-message" name="message" rows={5} required placeholder="Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất..." className={`${inputClass} min-h-40 resize-y py-3 leading-relaxed`} aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
         </Field>
+        {isSuccess && (
+          <div className="flex items-center gap-2 rounded-[4px] bg-emerald-50 border border-emerald-200 p-3.5 text-sm text-emerald-800">
+            <CheckCircle2 size={20} className="shrink-0 text-emerald-600" />
+            <p><strong>Gửi lời nhắn thành công!</strong> Cảm ơn Quý vị. Ban Thư ký đã tiếp nhận và sẽ liên hệ hỗ trợ trong thời gian sớm nhất.</p>
+          </div>
+        )}
         <div className="pt-2">
-          <button type="submit" className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-[4px] bg-[var(--contact-red)] px-6 py-3 text-base font-bold text-white shadow-md hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--contact-gold)] motion-safe:transition-shadow sm:w-auto sm:px-8 sm:text-lg">
-            <span aria-hidden="true" className="h-4 w-1 shrink-0 rounded-full bg-[var(--contact-gold)]" />
-            GỬI LỜI NHẮN NGAY
-            <Send size={20} aria-hidden="true" className="shrink-0 text-[var(--contact-gold)] motion-safe:transition-transform motion-safe:group-hover:translate-x-1" />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-[4px] bg-[var(--contact-red)] px-6 py-3 text-base font-bold text-white shadow-md hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--contact-gold)] motion-safe:transition-shadow sm:w-auto sm:px-8 sm:text-lg disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 size={20} className="animate-spin text-[var(--contact-gold)]" />
+                ĐANG GỬI LỜI NHẮN...
+              </>
+            ) : (
+              <>
+                <span aria-hidden="true" className="h-4 w-1 shrink-0 rounded-full bg-[var(--contact-gold)]" />
+                GỬI LỜI NHẮN NGAY
+                <Send size={20} aria-hidden="true" className="shrink-0 text-[var(--contact-gold)] motion-safe:transition-transform motion-safe:group-hover:translate-x-1" />
+              </>
+            )}
           </button>
         </div>
-        <div id="contact-form-availability" className="rounded-[4px] bg-[var(--contact-cream)] p-3 text-sm leading-relaxed">
-          <p>Biểu mẫu hiện chưa tiếp nhận trực tuyến. Quý vị vui lòng liên hệ qua <a href={contact.phoneHref} className="rounded-sm font-semibold text-[var(--contact-red)] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[var(--contact-gold)]">hotline</a> hoặc <a href={`mailto:${contact.emails[0]}`} className="rounded-sm font-semibold text-[var(--contact-red)] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-[var(--contact-gold)]">email Ban Thư ký</a>.</p>
-        </div>
         <div role="status" aria-live="polite" aria-atomic="true">
-          {attempted && <p className="rounded-[4px] border border-[var(--contact-red)] p-3 text-sm text-[var(--contact-red)]">Lời nhắn chưa được gửi. Thông tin đã nhập vẫn được giữ trên biểu mẫu để quý vị có thể sao chép và gửi qua email.</p>}
+          {attempted && <p className="rounded-[4px] border border-[var(--contact-red)] p-3 text-sm text-[var(--contact-red)]">Có lỗi xảy ra hoặc chưa thể kết nối. Quý vị vui lòng thử lại hoặc liên hệ qua email Ban Thư ký.</p>}
         </div>
         <div className="flex items-start gap-2 rounded-[4px] bg-[var(--contact-cream)] p-3 text-sm leading-relaxed">
           <ShieldCheck size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--contact-gold)]" />

@@ -36,6 +36,7 @@ const AdminCatalog = lazy(() => import("../pages/Admin/AdminCatalog.jsx"));
 const AdminAwardPage = lazy(() => import("../pages/Admin/AdminAwardPage.jsx"));
 const AdminAbout = lazy(() => import("../pages/Admin/AdminAbout.jsx"));
 const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"));
+const AdminFormsPage = lazy(() => import("../pages/Admin/AdminFormsPage.jsx"));
 
 /* oxlint-enable react/only-export-components */
 
@@ -64,7 +65,9 @@ export const adminRoute = {
     ...adminModules.map((item) => ({
       path: item.path.slice(adminRoot.length + 1),
       element:
-        item.id === "contact" ? (
+        item.id === "forms" ? (
+          <AdminFormsPage />
+        ) : item.id === "contact" ? (
           <AdminContact />
         ) : item.id === "home" ? (
           <AdminHome />

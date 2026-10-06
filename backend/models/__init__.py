@@ -6,3 +6,4 @@ from .TrainingModel import Training
 from .ProjectModel import Project, ProjectCategory
 from .IdCounterModel import IdCounter
 from .RecordModel import Record
+from .FormSubmissionModel import FormSubmission

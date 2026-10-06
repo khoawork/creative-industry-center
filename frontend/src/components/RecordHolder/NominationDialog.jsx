@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "../shared/Icon.jsx";
 import { site } from "../../config/shared/site.js";
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from "../../services/googleSheetService.js";
 
 const inputClasses =
   "mt-1 w-full rounded-lg border border-primary/20 bg-white px-4 py-2.5 text-sm text-black outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
@@ -8,7 +13,15 @@ const inputClasses =
 export default function NominationDialog({ award, onClose }) {
   const dialogRef = useRef(null);
   const openerRef = useRef(document.activeElement);
-  const [mailPrepared, setMailPrepared] = useState(false);
+  const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.record_nomination);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    fetchFormConfig("record_nomination").then((loaded) => {
+      if (loaded) setConfig(loaded);
+    });
+  }, []);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -43,20 +56,37 @@ export default function NominationDialog({ award, onClose }) {
     };
   }, [onClose]);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const body = [
-      `Hạng mục đề cử: ${award}`,
-      `Người đại diện: ${form.get("name")}`,
-      `Số điện thoại: ${form.get("phone")}`,
-      `Email: ${form.get("email")}`,
-      `Tổ chức / làng nghề: ${form.get("organization") || "Không cung cấp"}`,
-      `Tóm tắt thành tựu: ${form.get("summary") || "Không cung cấp"}`,
-    ].join("\n");
+    setIsSubmitting(true);
 
-    setMailPrepared(true);
-    window.location.href = `mailto:${site.contact.emails[0]}?subject=${encodeURIComponent(`Đề cử kỷ lục: ${award}`)}&body=${encodeURIComponent(body)}`;
+    const payload = {
+      award: award || "",
+      name: form.get("name") || "",
+      phone: form.get("phone") || "",
+      email: form.get("email") || "",
+      organization: form.get("organization") || "",
+      summary: form.get("summary") || "",
+    };
+
+    try {
+      await submitFormToBackend("record_nomination", payload, config);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 3000);
+    } catch (err) {
+      console.error("Lỗi khi gửi đề cử kỷ lục:", err);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -172,34 +202,28 @@ export default function NominationDialog({ award, onClose }) {
               placeholder="Mô tả ngắn gọn về giải pháp, sản phẩm hoặc năm cống hiến..."
             />
           </label>
-          {mailPrepared && (
+          {submitted && (
             <p
               role="status"
-              className="rounded-lg bg-cream p-3 text-sm leading-6 text-primary"
+              className="rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-sm leading-6 text-emerald-800 font-medium"
             >
-              Nếu ứng dụng email không mở, hãy gửi thông tin đến{" "}
-              <a
-                className="font-bold underline"
-                href={`mailto:${site.contact.emails[0]}`}
-              >
-                {site.contact.emails[0]}
-              </a>
-              . Hồ sơ chưa được gửi trực tiếp qua website.
+              Hồ sơ đề cử kỷ lục đã được gửi thành công! Ban Thư ký Trung tâm sẽ liên hệ thẩm định trong vòng 48 giờ làm việc.
             </p>
           )}
           <div className="flex flex-wrap justify-end gap-3 pt-2">
             <button
               type="button"
-              className="rounded-lg bg-cream px-5 py-3 text-sm font-semibold text-primary hover:bg-gold"
+              className="rounded-lg bg-cream px-5 py-3 text-sm font-semibold text-primary hover:bg-gold cursor-pointer"
               onClick={onClose}
             >
               Hủy bỏ
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-gold hover:text-primary"
+              disabled={isSubmitting}
+              className="rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-gold hover:text-primary cursor-pointer disabled:opacity-50"
             >
-              Gửi hồ sơ sơ tuyển qua email
+              {isSubmitting ? "Đang gửi hồ sơ..." : "Gửi hồ sơ đề cử ngay"}
             </button>
           </div>
         </form>

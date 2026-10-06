@@ -1,0 +1,426 @@
+{
+  "event_newsletter": {
+    "id": "event_newsletter",
+    "title": "Đăng Ký Nhận Thông Báo Sự Kiện Sớm",
+    "subtitle": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức trực tiếp từ Ban Thư ký Trung tâm Công nghiệp Sáng tạo.",
+    "pagePath": "/events",
+    "componentName": "EventNewsletter",
+    "badgeText": "BẢN TIN VIỆN KỶ LỤC",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "DangKySuKien",
+    "fields": [
+      {
+        "key": "fullName",
+        "label": "Họ và tên đại biểu",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "organization",
+        "label": "Đơn vị / Doanh nghiệp",
+        "type": "text",
+        "placeholder": "Tên cơ quan, tổ chức hoặc doanh nghiệp",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email liên hệ",
+        "type": "email",
+        "placeholder": "daibieu@tochuc.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0901234567",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "note",
+        "label": "Ghi chú / Yêu cầu thêm",
+        "type": "textarea",
+        "placeholder": "Nêu rõ lĩnh vực quan tâm hoặc yêu cầu đặc biệt (nếu có)...",
+        "required": false,
+        "colSpan": 2
+      }
+    ],
+    "trustBadge": "Bảo mật thông tin theo tiêu chuẩn viện nghiên cứu quốc gia.",
+    "submitButtonText": "Xác Nhận Đăng Ký Thông Báo",
+    "successTitle": "Đăng ký nhận thông báo thành công!",
+    "successMessage": "Cảm ơn Quý đại biểu. Thông báo sự kiện mới nhất sẽ được gửi đến hộp thư của Quý vị.",
+    "updatedAt": "2026-10-06T08:54:34.146Z",
+    "lastSyncedAt": "2026-10-06T08:53:59.193000+00:00"
+  },
+  "event_registration": {
+    "id": "event_registration",
+    "title": "Đăng Ký Tham Gia Sự Kiện (Đại Biểu)",
+    "subtitle": "Xác nhận đăng ký tham dự trực tiếp hoặc trực tuyến cho từng sự kiện cụ thể.",
+    "pagePath": "/events",
+    "componentName": "EventRegisterModal",
+    "badgeText": "ĐẠI BIỂU SỰ KIỆN",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "ThamGiaSuKien",
+    "fields": [
+      {
+        "key": "eventName",
+        "label": "Tên sự kiện tham dự",
+        "type": "text",
+        "placeholder": "Tên chương trình sự kiện",
+        "required": true,
+        "colSpan": 2
+      },
+      {
+        "key": "fullName",
+        "label": "Họ và tên đại biểu",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email",
+        "type": "email",
+        "placeholder": "daibieu@tochuc.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "organization",
+        "label": "Cơ quan / Doanh nghiệp",
+        "type": "text",
+        "placeholder": "Tên cơ quan / tổ chức",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "ticketType",
+        "label": "Hình thức tham dự",
+        "type": "text",
+        "placeholder": "Trực tiếp / Trực tuyến / VIP",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "notes",
+        "label": "Ghi chú thêm",
+        "type": "textarea",
+        "placeholder": "Yêu cầu vị trí ngồi, tài liệu trước sự kiện...",
+        "required": false,
+        "colSpan": 2
+      }
+    ],
+    "lastSyncedAt": "2026-10-06T08:54:54.231Z",
+    "syncedSheetName": "ThamGiaSuKien",
+    "updatedAt": "2026-10-06T08:54:54.231Z"
+  },
+  "training_registration": {
+    "id": "training_registration",
+    "title": "Ghi Danh Khóa Học & Đào Tạo Kỷ Lục",
+    "subtitle": "Tiếp nhận thông tin học viên đăng ký tham gia các khóa huấn luyện chuyên gia & kỷ lục.",
+    "pagePath": "/training",
+    "componentName": "RegistrationForm",
+    "badgeText": "TUYỂN SINH ĐÀO TẠO",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "DangKyDaoTao",
+    "fields": [
+      {
+        "key": "trainingCourse",
+        "label": "Khóa đào tạo / Mã chương trình",
+        "type": "text",
+        "placeholder": "Mã hoặc tên khóa học",
+        "required": true,
+        "colSpan": 2
+      },
+      {
+        "key": "fullName",
+        "label": "Họ và tên học viên",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email học viên",
+        "type": "email",
+        "placeholder": "hocvien@gmail.com",
+        "required": true,
+        "colSpan": 2
+      }
+    ],
+    "lastSyncedAt": "2026-10-06T08:55:10.600Z",
+    "syncedSheetName": "DangKyDaoTao",
+    "updatedAt": "2026-10-06T08:55:10.600Z"
+  },
+  "contact_feedback": {
+    "id": "contact_feedback",
+    "title": "Liên Hệ & Đề Xuất Tư Vấn Trực Tuyến",
+    "subtitle": "Cổng tiếp nhận thông tin phản hồi, nguyện vọng hợp tác và yêu cầu tư vấn từ cộng đồng.",
+    "pagePath": "/contact",
+    "componentName": "ContactForm",
+    "badgeText": "TIẾP NHẬN LIÊN HỆ",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "LienHeTuVan",
+    "fields": [
+      {
+        "key": "fullName",
+        "label": "Họ và tên người gửi",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email",
+        "type": "email",
+        "placeholder": "email@tochuc.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "category",
+        "label": "Lĩnh vực quan tâm",
+        "type": "text",
+        "placeholder": "Đề cử kỷ lục / Hợp tác sáng tạo / Khác",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "message",
+        "label": "Nội dung lời nhắn / Đề xuất chi tiết",
+        "type": "textarea",
+        "placeholder": "Mô tả tóm tắt nội dung đề xuất hoặc nguyện vọng hợp tác...",
+        "required": true,
+        "colSpan": 2
+      }
+    ],
+    "lastSyncedAt": "2026-10-06T08:55:32.496Z",
+    "syncedSheetName": "LienHeTuVan",
+    "updatedAt": "2026-10-06T08:55:32.496Z"
+  },
+  "record_nomination": {
+    "id": "record_nomination",
+    "title": "Đề Cử Kỷ Lục Mới (Hồ Sơ Ban Đầu)",
+    "subtitle": "Tiếp nhận hồ sơ đề cử danh hiệu Kỷ lục gia và Biểu tượng công nghiệp sáng tạo.",
+    "pagePath": "/records",
+    "componentName": "NominationDialog",
+    "badgeText": "ĐỀ CỬ KỶ LỤC",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "DeCuKyLuc",
+    "fields": [
+      {
+        "key": "award",
+        "label": "Hạng mục / Danh hiệu đề cử",
+        "type": "text",
+        "placeholder": "Tên danh hiệu kỷ lục",
+        "required": true,
+        "colSpan": 2
+      },
+      {
+        "key": "name",
+        "label": "Người / Tổ chức đại diện",
+        "type": "text",
+        "placeholder": "Họ và tên người đại diện",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email",
+        "type": "email",
+        "placeholder": "decu@tochuc.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "organization",
+        "label": "Tổ chức / Làng nghề",
+        "type": "text",
+        "placeholder": "Tên tổ chức / doanh nghiệp / làng nghề",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "summary",
+        "label": "Tóm tắt thành tựu / Đề cử",
+        "type": "textarea",
+        "placeholder": "Tóm tắt các thông số, kỷ lục hoặc thành tựu nổi bật...",
+        "required": false,
+        "colSpan": 2
+      }
+    ],
+    "lastSyncedAt": "2026-10-06T08:55:50.729Z",
+    "syncedSheetName": "DeCuKyLuc",
+    "updatedAt": "2026-10-06T08:55:50.729Z"
+  },
+  "founder_story_submission": {
+    "id": "founder_story_submission",
+    "title": "Gửi Câu Chuyện Nhà Sáng Nghiệp",
+    "subtitle": "Chia sẻ hành trình khởi nghiệp, sáng tạo thương hiệu và tôn vinh giá trị văn hóa.",
+    "pagePath": "/founder",
+    "componentName": "SubmitStoryModal",
+    "badgeText": "CÂU CHUYỆN SÁNG NGHIỆP",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "CauChuyenSangNghiep",
+    "fields": [
+      {
+        "key": "founderName",
+        "label": "Họ và tên nhà sáng lập",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "brandName",
+        "label": "Tên thương hiệu / Doanh nghiệp",
+        "type": "text",
+        "placeholder": "Tên thương hiệu sáng tạo",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "category",
+        "label": "Lĩnh vực hoạt động",
+        "type": "text",
+        "placeholder": "Thủ công mỹ nghệ / Ẩm thực / Công nghệ...",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ Email",
+        "type": "email",
+        "placeholder": "founder@brand.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "storySummary",
+        "label": "Tóm tắt hành trình sáng nghiệp",
+        "type": "textarea",
+        "placeholder": "Chia sẻ ngắn gọn về hành trình khởi lập và giá trị cốt lõi...",
+        "required": true,
+        "colSpan": 2
+      }
+    ],
+    "lastSyncedAt": "2026-10-06T08:56:02.296Z",
+    "syncedSheetName": "CauChuyenSangNghiep",
+    "updatedAt": "2026-10-06T08:56:02.296Z"
+  },
+  "project_proposal": {
+    "id": "project_proposal",
+    "title": "Đề Xuất Dự Án Sáng Tạo Mới",
+    "subtitle": "Kết nối cùng các chuyên gia và mạng lưới Kỷ lục để thẩm định, cố vấn và hiện thực hóa dự án của bạn.",
+    "pagePath": "/projects",
+    "componentName": "ProjectProposal",
+    "badgeText": "CỔNG ĐỀ XUẤT DỰ ÁN",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetName": "DeXuatDuAn",
+    "fields": [
+      {
+        "key": "authorName",
+        "label": "Họ và tên người đại diện",
+        "type": "text",
+        "placeholder": "Nguyễn Văn B",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "organization",
+        "label": "Tổ chức / Nhóm dự án",
+        "type": "text",
+        "placeholder": "Công ty / Studio / Nhóm nghiên cứu",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Email liên hệ",
+        "type": "email",
+        "placeholder": "project@creative.vn",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại",
+        "type": "tel",
+        "placeholder": "0912345678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "projectTitle",
+        "label": "Tên dự án sáng tạo",
+        "type": "text",
+        "placeholder": "Ví dụ: Không gian trải nghiệm văn hóa số đa giác quan...",
+        "required": true,
+        "colSpan": 2
+      },
+      {
+        "key": "projectSummary",
+        "label": "Tóm tắt nội dung và mục tiêu dự án",
+        "type": "textarea",
+        "placeholder": "Mô tả ngắn gọn về ý tưởng, quy mô và đối tượng thụ hưởng...",
+        "required": true,
+        "colSpan": 2
+      }
+    ],
+    "trustBadge": "Bảo mật ý tưởng và thông tin sở hữu trí tuệ của tác giả.",
+    "submitButtonText": "Gửi Đề Xuất Dự Án",
+    "successTitle": "Đã gửi đề xuất thành công!",
+    "successMessage": "Ban Thư ký đã nhận được thông tin dự án và sẽ liên hệ phản hồi trong vòng 3-5 ngày làm việc.",
+    "updatedAt": "2026-10-06T08:56:19.164Z",
+    "lastSyncedAt": "2026-10-06T08:56:19.164Z",
+    "syncedSheetName": "DeXuatDuAn"
+  }
+}
