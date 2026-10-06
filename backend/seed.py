@@ -9,6 +9,7 @@ try:
 except Exception:
     pass
 
+from sqlalchemy import or_
 from sqlalchemy.orm.attributes import flag_modified
 from extensions import db
 from models import (
@@ -18,7 +19,6 @@ from models import (
     Page,
     Project,
     ProjectCategory,
-    SiteSettings,
     Training,
     User,
 )
@@ -31,8 +31,7 @@ from dto.home_dto import (
 from repositories.id_counter_repository import generate_id
 from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
-from dto import introduce_dto, event_dto
-from dto import contact_dto
+from dto import introduce_dto
 from app import create_app
 
 
@@ -904,6 +903,239 @@ def seed_nav_pages():
     db.session.commit()
     print("  -> Cập nhật 10 trang điều hướng thành công với id từ 1 đến 10!")
 
+    def seed_awards():
+        awards_data = [
+            {
+                "code": "HG-ANG-01",
+                "name": "Giải thưởng Ngọn Hải Đăng Sáng Nghiệp",
+                "title": "Kinh tế & Doanh nghiệp sáng tạo",
+                "description": "Vinh danh doanh nghiệp và nhà sáng lập tiên phong đổi mới mô hình kinh tế xanh, tạo ra giá trị bền vững cho cộng đồng.",
+                "decision_number": "QĐ-VK-2025/01",
+                "year": 2025,
+                "image": "/images/awards/event-gathering.jpg",
+                "icon": "Flame",
+                "props": {
+                    "category_badge": "HẠNG MỤC 01",
+                    "scope": "XÉT TẶNG TOÀN QUỐC",
+                    "subtitle": "HẠNG MỤC TIÊN PHONG PHÁT TRIỂN KINH TẾ SÁNG TẠO",
+                    "iconName": "Flame",
+                    "award_evaluation_criteria": [
+                        "Hoạt động hợp pháp tại Việt Nam từ 3 năm trở lên.",
+                        "Có mô hình tăng trưởng bền vững và ứng dụng sáng tạo rõ rệt.",
+                    ],
+                    "nomination_dossier": [
+                        "Bản đăng ký tham gia xét tặng.",
+                        "Báo cáo thành tích và minh chứng tăng trưởng trong 3 năm gần nhất.",
+                    ],
+                },
+            },
+            {
+                "code": "HG-ANG-02",
+                "name": "Cúp Bàn Tay Vàng Kỷ Lục Dân Tộc",
+                "title": "Thủ công mỹ nghệ & Kỹ nghệ dân tộc",
+                "description": "Tôn vinh nghệ nhân đỉnh cao gìn giữ tinh hoa kỹ nghệ cổ truyền và kết hợp tư duy sáng tạo hiện đại.",
+                "decision_number": "QĐ-VK-2024/02",
+                "year": 2024,
+                "image": "/images/awards/story-artisan.jpg",
+                "icon": "Award",
+                "props": {
+                    "category_badge": "HẠNG MỤC 02",
+                    "scope": "ĐỀ CỬ QUỐC GIA - THƯỜNG NIÊN",
+                    "subtitle": "VINH DANH ĐỈNH CAO KỸ NGHỆ THỦ CÔNG MỸ NGHỆ",
+                    "iconName": "Award",
+                    "award_evaluation_criteria": [
+                        "Có thâm niên làm nghề từ 15 năm trở lên.",
+                        "Tạo tác phẩm độc bản, tiêu biểu cho kỹ nghệ dân tộc.",
+                    ],
+                    "nomination_dossier": [
+                        "Giới thiệu quá trình làm nghề và tác phẩm tiêu biểu.",
+                        "Hình ảnh chất lượng cao về tác phẩm và quy trình thực hiện.",
+                    ],
+                },
+            },
+            {
+                "code": "HG-ANG-03",
+                "name": "Huy Hiệu Tinh Hoa Nghề Truyền Thống",
+                "title": "Làng nghề & Gia tộc truyền thống",
+                "description": "Tôn vinh làng nghề và gia tộc nhiều thế hệ gìn giữ ngọn lửa nghề, đưa giá trị di sản vươn ra thị trường.",
+                "decision_number": "QĐ-VK-2024/03",
+                "year": 2024,
+                "image": "/images/awards/about.jpg",
+                "icon": "Medal",
+                "props": {
+                    "category_badge": "HẠNG MỤC 03",
+                    "scope": "XÉT ĐỀ CỬ ĐỊNH KỲ",
+                    "subtitle": "CÔNG NHẬN LÀNG NGHỀ & GIA TỘC CÓ TRUYỀN THỐNG VÀNG",
+                    "iconName": "Medal",
+                    "award_evaluation_criteria": [
+                        "Có lịch sử hình thành và phát triển từ 50 năm trở lên.",
+                        "Gìn giữ quy trình sản xuất thủ công và bản sắc vùng miền.",
+                    ],
+                    "nomination_dossier": [
+                        "Tư liệu lịch sử làng nghề hoặc gia phả nghề.",
+                        "Xác nhận của chính quyền địa phương về làng nghề tiêu biểu.",
+                    ],
+                },
+            },
+            {
+                "code": "HG-ANG-04",
+                "name": "Giải Thưởng Đổi Mới Sáng Tạo Di Sản Việt",
+                "title": "Di sản văn hóa & Ứng dụng số",
+                "description": "Vinh danh các dự án ứng dụng công nghệ hiện đại để bảo tồn và đưa di sản văn hóa đến gần hơn với thế hệ trẻ.",
+                "decision_number": "QĐ-VK-2025/04",
+                "year": 2025,
+                "image": "/images/awards/event-exhibition.jpg",
+                "icon": "Sparkles",
+                "props": {
+                    "category_badge": "HẠNG MỤC 04",
+                    "scope": "GIẢI THƯỞNG MỞ RỘNG TOÀN QUỐC",
+                    "subtitle": "ĐỘT PHÁ SỐ HÓA & ỨNG DỤNG DI SẢN ĐƯƠNG ĐẠI",
+                    "iconName": "Sparkles",
+                    "award_evaluation_criteria": [
+                        "Ứng dụng công nghệ số vào bảo tồn hoặc giới thiệu di sản.",
+                        "Đã ra mắt công chúng hoặc triển khai thử nghiệm thực tế.",
+                    ],
+                    "nomination_dossier": [
+                        "Thuyết minh kỹ thuật và ý tưởng nghệ thuật.",
+                        "Bản demo hoặc đường link trải nghiệm sản phẩm.",
+                    ],
+                },
+            },
+            {
+                "code": "HG-ANG-05",
+                "name": "Kỷ Niệm Chương Cống Hiến Vì Sự Nghiệp Sáng Tạo",
+                "title": "Cống hiến & Nghiên cứu khoa học",
+                "description": "Ghi nhận các nhà khoa học, chuyên gia và nhà quản lý có đóng góp bền bỉ cho phong trào sáng tạo và kỷ lục Việt Nam.",
+                "decision_number": "QĐ-VK-2023/05",
+                "year": 2023,
+                "image": "/images/awards/event-forum.jpg",
+                "icon": "Award",
+                "props": {
+                    "category_badge": "HẠNG MỤC 05",
+                    "scope": "HUY HIỆU DANH DỰ TOÀN QUỐC",
+                    "subtitle": "HUY HIỆU DANH DỰ CẤP CAO CỦA VIỆN KỶ LỤC VIỆT NAM",
+                    "iconName": "Award",
+                    "award_evaluation_criteria": [
+                        "Có ít nhất 10 năm gắn bó với nghiên cứu hoặc hoạt động sáng tạo.",
+                        "Có công trình, đề án hoặc đóng góp cố vấn tiêu biểu.",
+                    ],
+                    "nomination_dossier": [
+                        "Trích ngang lý lịch khoa học và quá trình công tác.",
+                        "Danh mục công trình và đóng góp tiêu biểu.",
+                    ],
+                },
+            },
+            {
+                "code": "HG-ANG-06",
+                "name": "Giải Thưởng Ngôi Sao Khởi Nghiệp Kỷ Lục Trẻ",
+                "title": "Khởi nghiệp đổi mới sáng tạo trẻ",
+                "description": "Tôn vinh tài năng trẻ sở hữu sáng kiến, sản phẩm hoặc mô hình khởi nghiệp tạo ra giá trị mới cho công nghiệp sáng tạo.",
+                "decision_number": "QĐ-VK-2025/06",
+                "year": 2025,
+                "image": "/images/awards/project-museum.jpg",
+                "icon": "Trophy",
+                "props": {
+                    "category_badge": "HẠNG MỤC 06",
+                    "scope": "DÀNH CHO ĐỐI TƯỢNG DƯỚI 35 TUỔI",
+                    "subtitle": "ƯƠM MẦM TÀI NĂNG TRẺ & Ý TƯỞNG ĐỘT PHÁ CẢM HỨNG",
+                    "iconName": "Trophy",
+                    "award_evaluation_criteria": [
+                        "Người sáng lập hoặc đại diện dự án không quá 35 tuổi.",
+                        "Sản phẩm có tính mới và tiềm năng thương mại hóa.",
+                    ],
+                    "nomination_dossier": [
+                        "Bản thuyết minh mô hình kinh doanh khởi nghiệp.",
+                        "Video giới thiệu sản phẩm hoặc giải pháp thực tế.",
+                    ],
+                },
+            },
+        ]
+
+        for item in awards_data:
+            award = Award.query.filter(
+                or_(Award.code == item["code"], Award.name == item["name"])
+            ).first()
+            if award is None:
+                award = Award(id=generate_id("VK-AWD"))
+                db.session.add(award)
+            for field, value in item.items():
+                setattr(award, field, value)
+            print(f"  + Đã seed award {item['code']}: {item['name']}")
+
+        legacy_award = Award.query.filter_by(name="Kỷ lục Quốc gia").first()
+        seeded_codes = {item["code"] for item in awards_data}
+        if legacy_award and legacy_award.code not in seeded_codes:
+            db.session.delete(legacy_award)
+
+        db.session.commit()
+
+    def seed_award_page():
+        page_props = {
+            "header": {
+                "tittle": "Hệ thống giải thưởng sáng tạo",
+                "title": "Hệ thống giải thưởng sáng tạo",
+                "sub_title": "BẢNG VINH DANH THƯỜNG NIÊN",
+                "description": "Hệ thống giải thưởng tôn vinh những đóng góp nổi bật trong bảo tồn di sản, đổi mới sáng tạo và xác lập giá trị Việt Nam.",
+            },
+            "list_card": {
+                "count": Award.query.count(),
+                "title": "Danh mục giải thưởng thường niên",
+                "award_ids": [
+                    str(award.id) for award in Award.query.order_by(Award.id).all()
+                ],
+            },
+            "latest_honor_board": [
+                {
+                    "id": "honor_board_1",
+                    "icon": "/images/awards/about.jpg",
+                    "image": "/images/awards/about.jpg",
+                    "title": "GIẢI ĐỔI MỚI SÁNG TẠO DI SẢN",
+                    "name": "Công ty CP Gốm Sứ Sen Việt",
+                    "sub_name": "Đại diện: Doanh nhân Nguyễn Tiến An",
+                    "description": "Ứng dụng công nghệ men nano để bảo tồn kỹ thuật gốm truyền thống và mở rộng giá trị di sản Việt ra thị trường quốc tế.",
+                    "time": "10/12/2024",
+                    "decision_number": "KHOA-2024-001",
+                },
+                {
+                    "id": "honor_board_2",
+                    "icon": "/images/awards/story-artisan.jpg",
+                    "image": "/images/awards/story-artisan.jpg",
+                    "title": "BÀN TAY VÀNG KỶ LỤC DÂN TỘC",
+                    "name": "NNƯT. Trần Quang Thái",
+                    "sub_name": "Làng chạm bạc Đồng Xâm",
+                    "description": "Gìn giữ kỹ nghệ chạm bạc truyền thống và đào tạo thế hệ nghệ nhân kế thừa giá trị thủ công dân tộc.",
+                    "time": "14/11/2024",
+                    "decision_number": "BTV-2024-042",
+                },
+                {
+                    "id": "honor_board_3",
+                    "icon": "/images/awards/project-museum.jpg",
+                    "image": "/images/awards/project-museum.jpg",
+                    "title": "NGÔI SAO KHỞI NGHIỆP TRẺ",
+                    "name": "Dự án VR Di Sản Hoàng Cung",
+                    "sub_name": "Nhóm HeritageX Tech",
+                    "description": "Tái hiện không gian di sản bằng công nghệ 3D và thực tế ảo, đưa lịch sử Việt Nam đến gần hơn với công chúng trẻ.",
+                    "time": "05/01/2025",
+                    "decision_number": "STARTUP-2025-015",
+                },
+            ],
+            "show_in_header": True,
+            "header_order": 6,
+        }
+        page = Page.query.filter_by(slug="award").first()
+        if page is None:
+            page = Page(name="Giải thưởng", slug="award", props=page_props)
+            db.session.add(page)
+        else:
+            page.name = "Giải thưởng"
+            page.props = {**(page.props or {}), **page_props}
+            flag_modified(page, "props")
+        db.session.commit()
+        print("  -> Đã seed page award và latest honor board.")
+
+    seed_awards()
+    seed_award_page()
+
 
 def seed_database():
     """Seed toàn bộ dữ liệu mẫu cho hệ thống."""
@@ -1113,7 +1345,6 @@ def seed_database():
     }
     AboutSectionRequestDTO().load(about_section_payload)
 
-    training_ids = [training.id for training in Training.query.all()]
     nav_sections_payload = [
         {"id": 1, "tag": "DÒNG THỜI GIAN HOẠT ĐỘNG", "title_main": "SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI", "action_button": {"text": "XEM TẤT CẢ SỰ KIỆN", "link": "/events"}, "children_id": event_ids},
         {"id": 2, "tag": "HÀNH TRÌNH THỰC TIỄN", "title_main": "DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP", "action_button": {"text": "XEM TẤT CẢ DỰ ÁN", "link": "/projects"}, "children_id": project_ids},
@@ -1158,56 +1389,13 @@ def seed_database():
     print("\n[7/7] Đang kiểm tra Giải thưởng...")
     if not Award.query.first():
         award = Award(
-            id="VK-AWD-01",
+            id=generate_id("VK-AWD"),
             name="Kỷ lục Quốc gia",
             title="Tôn vinh Công trình Sáng tạo Độc bản",
             description="Chứng nhận sáng kiến, giải pháp và công trình mang giá trị văn hóa và khoa học xuất sắc.",
             decision_number="QĐ-VK-2025/01",
         )
-    # ========================================================
-    # BƯỚC 8: CẤU HÌNH WEBSITE & FOOTER (SITE SETTINGS)
-    # ========================================================
-    print("\n[8/8] Đang kiểm tra Cấu hình Website & Footer...")
-    if not SiteSettings.query.first():
-        site_settings = SiteSettings(
-            logo="/assets/shared/logo/creative-industry-center-logo.png",
-            company_name="Trung tâm Công nghiệp Sáng tạo",
-            company_tagline="VIỆN KỲ LỤC VIỆT NAM - VIETKINGS",
-            footer={
-                "short_name": "TTCNST",
-                "institute": "VIỆN KỲ LỤC VIỆT NAM",
-                "description": "Cơ quan nghiên cứu, tôn vinh và thúc đẩy các giá trị sáng tạo quốc gia, khơi nguồn tinh hoa trí tuệ Việt vươn tầm thế giới.",
-                "groups": [
-                    {
-                        "title": "VỀ VIỆN & DỰ ÁN",
-                        "links": [
-                            {"label": "Giới thiệu Tổ chức", "href": "/about"},
-                            {"label": "Dự án nổi bật", "href": "/projects"},
-                            {"label": "Chuyện nhà sáng nghiệp", "href": "/stories"},
-                            {"label": "Hệ thống Kỷ lục", "href": "/records"},
-                        ],
-                    },
-                    {
-                        "title": "SỰ KIỆN & HOẠT ĐỘNG",
-                        "links": [
-                            {"label": "Sự kiện tiêu biểu", "href": "/events"},
-                            {"label": "Hạng mục Giải thưởng", "href": "/awards"},
-                            {"label": "Hợp tác & Đào tạo", "href": "/trainings"},
-                        ],
-                    },
-                ],
-                "contact": {
-                    "title": "THÔNG TIN LIÊN HỆ",
-                    "address": "Trung tâm Công nghiệp Sáng tạo, Viện Kỷ lục Việt Nam, TP. Hồ Chí Minh & Hà Nội",
-                    "phone": "(+84) 28 3847 7777",
-                    "phone_href": "tel:+842838477777",
-                    "emails": ["bbt@kyluc.vn", "contact@vietkings.org"],
-                },
-                "copyright": "© 2026 Bản quyền thuộc Trung tâm Công nghiệp Sáng tạo - VIỆN KỲ LỤC VIỆT NAM. Bảo lưu mọi quyền.",
-            },
-        )
-        db.session.add(site_settings)
-        print("  -> Đã tạo mới Cấu hình Website & Footer mặc định!")
+        db.session.add(award)
 
     db.session.commit()
     print("\n🎉 Seed toàn bộ dữ liệu thành công!")
@@ -1227,6 +1415,16 @@ if __name__ == "__main__":
                         help="Chỉ bổ sung nội dung trang Contact.")
     parser.add_argument("--training-page-only", action="store_true",
                         help="Chỉ bổ sung/cập nhật trang Training (Hợp tác & Đào tạo).")
+    parser.add_argument(
+        "--introduce-only",
+        action="store_true",
+        help="Chỉ bổ sung Giới thiệu; giữ nguyên Home và nội dung đã sửa.",
+    )
+    parser.add_argument(
+        "--nav-only",
+        action="store_true",
+        help="Chỉ cập nhật thứ tự và props các trang điều hướng (nav).",
+    )
     args = parser.parse_args()
     
     app = create_app()

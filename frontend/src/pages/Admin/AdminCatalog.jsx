@@ -53,7 +53,6 @@ export default function AdminCatalog({ defaultTab }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
   // Xác định active tab dựa trên prop defaultTab, URL pathname, hoặc search query
   const getInitialTab = () => {
     if (defaultTab && TABS.some((t) => t.id === defaultTab)) {

@@ -2,14 +2,13 @@ import json
 from flask import Blueprint, request
 from marshmallow import ValidationError as MarshmallowValidationError
 
-from dto.award_dto import AwardFilterDTO, AwardResponseDTO, CreateAwardDTO
+from dto.award_dto import AwardFilterDTO, AwardResponseDTO, AwardRequestDTO
 from services import award_service
 from services.image_storage_service import upload_image
 from utils.json import error_response, success_response
 
-
 award_api = Blueprint("award_api", __name__, url_prefix="/awards")
-award_schema = CreateAwardDTO()
+award_schema = AwardRequestDTO()
 award_response_schema = AwardResponseDTO()
 award_filter_schema = AwardFilterDTO()
 
@@ -169,7 +168,9 @@ def get_awards():
     """
     filters = award_filter_schema.load(request.args.to_dict())
     awards, meta = award_service.get_awards(**filters)
-    return success_response(data=award_response_schema.dump(awards, many=True), meta=meta)
+    return success_response(
+        data=award_response_schema.dump(awards, many=True), meta=meta
+    )
 
 
 @award_api.get("/<string:award_id>")

@@ -13,9 +13,9 @@ export const AwardCard = ({ award, onSelectAward }) => {
   const IconComponent = ICON_MAP[award.iconName] || Trophy;
 
   return (
-    <article className="group bg-white rounded-xl md:rounded-2xl border border-[#e5e5e5] hover:border-[#680007]/40 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden p-4 sm:p-5 flex flex-col md:flex-row gap-5 items-stretch">
+    <article className="group grid overflow-hidden rounded-2xl border border-[#710008]/15 bg-white shadow-sm transition-all duration-300 hover:border-[#710008] hover:shadow-xl md:grid-cols-12">
       {/* Left Column: Image with Badge Overlay */}
-      <div className="relative w-full md:w-[320px] lg:w-[360px] xl:w-[390px] shrink-0 h-[210px] sm:h-[230px] md:h-auto min-h-[200px] rounded-xl overflow-hidden bg-gray-100">
+      <div className="relative min-h-[260px] overflow-hidden bg-[#e9e8e6] md:col-span-5 md:min-h-[320px]">
         <img
           src={award.image}
           alt={award.title}
@@ -26,51 +26,51 @@ export const AwardCard = ({ award, onSelectAward }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
 
         {/* Top-Left Category Badge */}
-        <div className="absolute top-3 left-3 bg-[#680007] text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md backdrop-blur-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-300 animate-pulse"></span>
+        <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-md bg-[#710008] px-3 py-1 font-mono text-xs font-bold text-white shadow-md">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-300"></span>
           <span>{award.categoryBadge}</span>
         </div>
       </div>
 
       {/* Right Column: Information & Details */}
-      <div className="flex-1 flex flex-col justify-between py-0.5">
+      <div className="flex flex-col justify-between p-5 md:col-span-7 lg:p-7">
         <div>
           {/* Top Meta Line: Code & Scope */}
-          <div className="flex items-center justify-between gap-2 mb-2.5">
-            <span className="inline-block bg-[#ffdad6]/60 border border-[#f5b8b0] text-[#680007] text-[11px] font-bold px-2 py-0.5 rounded tracking-wider">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <span className="rounded bg-[#710008]/10 px-2.5 py-1 font-mono text-xs font-bold text-[#710008]">
               {award.code}
             </span>
-            <span className="text-[11px] text-gray-500 font-semibold tracking-wider uppercase truncate">
+            <span className="truncate text-xs font-medium text-[#58413f]">
               {award.scope}
             </span>
           </div>
 
           {/* Title Row with Red Crest Icon */}
-          <div className="flex items-start gap-2.5 mb-1.5">
-            <div className="w-7 h-7 rounded bg-[#680007] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+          <div className="mb-2 flex items-start gap-3">
+            <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#710008] to-[#580006] text-amber-300 shadow-md">
               <IconComponent className="w-4 h-4" />
             </div>
             <h3 
               onClick={() => onSelectAward && onSelectAward(award)}
-              className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-[#680007] transition-colors leading-snug cursor-pointer"
+              className="cursor-pointer text-xl font-bold leading-tight tracking-tight text-[#710008] transition-colors group-hover:text-[#580006] sm:text-2xl"
             >
               {award.title}
             </h3>
           </div>
 
           {/* Subtitle in Gold/Amber Accent */}
-          <p className="text-xs sm:text-[12.5px] font-bold text-[#b88628] uppercase tracking-wide mb-2.5 pl-9.5">
+          <p className="mb-3 pl-[3.25rem] text-xs font-semibold uppercase tracking-wider text-[#805600]">
             {award.subtitle}
           </p>
 
           {/* Description */}
-          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-3 sm:line-clamp-4 pl-9.5">
+          <p className="border-t border-dashed border-[#710008]/15 pt-3 text-sm font-medium leading-relaxed text-[#58413f] line-clamp-4 pl-[3.25rem]">
             {award.description}
           </p>
         </div>
 
         {/* Action Button */}
-        <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between pl-9.5">
+        <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4 pl-[3.25rem]">
           <button
             type="button"
             onClick={() => onSelectAward && onSelectAward(award)}

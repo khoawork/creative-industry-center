@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   AwardHero,
   AwardFilter,
@@ -7,16 +7,17 @@ import {
   AwardDetailModal,
   AwardRegulationModal,
   HonoreeDetailModal,
+  AwardPageUnavailable,
 } from '../components/Award';
-import {
-  ANNUAL_AWARDS_DATA,
-  RECENT_HONOREES_DATA,
-} from '../data/awardsData';
+import { AwardAPI } from '../api/awardApi.js';
+import { mapAwardPage } from '../services/awardMapper.js';
 
 export const AwardsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState('Tất cả');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [awardPage, setAwardPage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Modals state
   const [selectedAward, setSelectedAward] = useState(null);
@@ -28,12 +29,29 @@ export const AwardsPage = () => {
 
   const honoreesRef = useRef(null);
 
+  useEffect(() => {
+    let active = true;
+    AwardAPI.getAwardPage()
+      .then((response) => {
+        if (active) setAwardPage(mapAwardPage(response));
+      })
+      .catch(() => {
+        if (active) setAwardPage(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Filter awards
   const filteredAwards = useMemo(() => {
-    return ANNUAL_AWARDS_DATA.filter((award) => {
+    return (awardPage?.awards || []).filter((award) => {
       // Year filter
       const matchYear =
-        selectedYear === 'Tất cả' || award.year === selectedYear;
+        selectedYear === 'Tất cả' || String(award.year) === selectedYear;
 
       // Category filter
       const matchCategory =
@@ -51,11 +69,11 @@ export const AwardsPage = () => {
 
       return matchYear && matchCategory && matchSearch;
     });
-  }, [searchTerm, selectedYear, selectedCategory]);
+  }, [awardPage, searchTerm, selectedYear, selectedCategory]);
 
   // Filter honorees
   const filteredHonorees = useMemo(() => {
-    return RECENT_HONOREES_DATA.filter((honoree) => {
+    return (awardPage?.honorees || []).filter((honoree) => {
       const matchYear =
         selectedYear === 'Tất cả' || honoree.year === selectedYear;
 
@@ -70,7 +88,35 @@ export const AwardsPage = () => {
 
       return matchYear && matchSearch;
     });
-  }, [searchTerm, selectedYear]);
+  }, [awardPage, searchTerm, selectedYear]);
+
+  const filterYears = useMemo(() => {
+    return Array.from(
+      new Set(
+        (awardPage?.awards || [])
+          .map((award) => String(award.year || '').trim())
+          .filter(Boolean),
+      ),
+    ).sort((firstYear, secondYear) => Number(secondYear) - Number(firstYear));
+  }, [awardPage]);
+
+  const filterCategories = useMemo(() => {
+    return Array.from(
+      new Set(
+        (awardPage?.awards || [])
+          .map((award) => String(award.category || '').trim())
+          .filter(Boolean),
+      ),
+    ).map((category) => ({ id: category, label: category }));
+  }, [awardPage]);
+
+  if (loading) {
+    return <div className="min-h-[55vh] grid place-items-center text-sm text-gray-500">Đang tải nội dung giải thưởng...</div>;
+  }
+
+  if (!awardPage || (!awardPage.header?.tittle && !awardPage.header?.title && filteredAwards.length === 0 && filteredHonorees.length === 0)) {
+    return <AwardPageUnavailable />;
+  }
 
   const handleResetFilter = () => {
     setSearchTerm('');
@@ -85,12 +131,12 @@ export const AwardsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#1a1c1b] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#faf9f7] font-sans text-[#1a1c1b]">
       {/* 1. Header Banner with decorative star watermark */}
-      <AwardHero />
+      <AwardHero header={awardPage.header} />
 
       {/* Main Body */}
-      <main className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex-1">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 md:py-8 lg:px-8">
         {/* 2. Search & Filter Bar */}
         <AwardFilter
           searchTerm={searchTerm}
@@ -100,6 +146,8 @@ export const AwardsPage = () => {
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
           onResetFilter={handleResetFilter}
+          years={filterYears}
+          categories={filterCategories}
         />
 
         {/* 3. Section: Danh mục 06 Giải thưởng thường niên */}

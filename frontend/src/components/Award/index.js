@@ -1,10 +1,10 @@
-export { AwardHero } from './AwardHero';
-export { AwardFilter } from './AwardFilter';
-export { AwardCard } from './AwardCard';
-export { AwardList } from './AwardList';
-export { HonoreeCard } from './HonoreeCard';
-export { HonoreesList } from './HonoreesList';
-export { AwardDetailModal } from './AwardDetailModal';
-export { AwardRegulationModal } from './AwardRegulationModal';
-export { HonoreeDetailModal } from './HonoreeDetailModal';
-
+export { AwardHero } from "./AwardHero";
+export { AwardFilter } from "./AwardFilter";
+export { AwardCard } from "./AwardCard";
+export { AwardList } from "./AwardList";
+export { HonoreeCard } from "./HonoreeCard";
+export { HonoreesList } from "./HonoreesList";
+export { AwardDetailModal } from "./AwardDetailModal";
+export { AwardRegulationModal } from "./AwardRegulationModal";
+export { HonoreeDetailModal } from "./HonoreeDetailModal";
+export { AwardPageUnavailable } from "./AwardPageUnavailable";
