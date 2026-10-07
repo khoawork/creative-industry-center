@@ -1,8 +1,15 @@
-import { useState } from 'react';
-import { X, Calendar, MapPin, CheckCircle2, UserCheck, Send } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Calendar, MapPin, CheckCircle2, UserCheck, Send, Loader2 } from 'lucide-react';
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from '../../services/googleSheetService.js';
 
 export const EventRegisterModal = ({ event, isOpen, onClose }) => {
+  const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.event_registration);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -12,15 +19,39 @@ export const EventRegisterModal = ({ event, isOpen, onClose }) => {
     notes: '',
   });
 
+  useEffect(() => {
+    fetchFormConfig('event_registration').then((loaded) => {
+      if (loaded) setConfig(loaded);
+    });
+  }, []);
+
   if (!isOpen || !event) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      onClose();
-    }, 2500);
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        eventName: event.actionText || event.title || 'Sự kiện CIC',
+        ...formData,
+      };
+      await submitFormToBackend('event_registration', payload, config);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 2500);
+    } catch (err) {
+      console.error('Lỗi khi đăng ký sự kiện:', err);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 2500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -170,10 +201,20 @@ export const EventRegisterModal = ({ event, isOpen, onClose }) => {
 
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-[#490003] hover:bg-[#710008] rounded-lg shadow-sm cursor-pointer transition-colors"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-[#490003] hover:bg-[#710008] rounded-lg shadow-sm cursor-pointer transition-colors disabled:opacity-50"
                 >
-                  <Send className="w-3.5 h-3.5 text-[#ffba45]" />
-                  <span>Xác nhận đăng ký</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#ffba45]" />
+                      <span>Đang gửi thông tin...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5 text-[#ffba45]" />
+                      <span>Xác nhận đăng ký</span>
+                    </>
+                  )}
                 </button>
               </div>
 

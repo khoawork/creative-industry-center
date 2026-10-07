@@ -6,3 +6,4 @@ from .TrainingModel import Training
 from .ProjectModel import Project, ProjectCategory
 from .SiteModel import  SiteSettings
 from .RecordModel import Record
+from .FormSubmissionModel import FormSubmission

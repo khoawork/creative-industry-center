@@ -1,142 +1,351 @@
-import { useState } from 'react'
-import { ChevronDown, FilePenLine, LayoutGrid, Mail, MessageSquareText, Phone, Send, ShieldCheck } from 'lucide-react'
-import Icon from '../shared/Icon.jsx'
-import ContactAvailabilityMessage from './ContactAvailabilityMessage.jsx'
+import { useState, useEffect } from "react";
+import {
+  ChevronDown,
+  FilePenLine,
+  LayoutGrid,
+  Mail,
+  MessageSquareText,
+  Phone,
+  Send,
+  ShieldCheck,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
+import Icon from "../shared/Icon.jsx";
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from "../../services/googleSheetService.js";
+import ContactAvailabilityMessage from "./ContactAvailabilityMessage.jsx";
 
-const inputClass = 'w-full rounded-[4px] border border-black/25 bg-[var(--contact-cream)] pl-10 pr-3 text-base text-black placeholder:text-black/50 outline-none focus:border-black/40 focus:bg-white focus:ring-2 focus:ring-[var(--contact-gold)] motion-safe:transition-colors'
-const inputIconClass = 'pointer-events-none absolute top-3.5 left-3 text-[var(--contact-gold)]'
+const inputClass =
+  "w-full rounded-[4px] border border-black/25 bg-[var(--contact-cream)] pl-10 pr-3 text-base text-black placeholder:text-black/50 outline-none focus:border-black/40 focus:bg-white focus:ring-2 focus:ring-[var(--contact-gold)] motion-safe:transition-colors";
+const inputIconClass =
+  "pointer-events-none absolute top-3.5 left-3 text-[var(--contact-gold)]";
 const fieldIcons = {
   fullName: <Icon name="person" />,
   email: <Mail size={20} aria-hidden="true" />,
   phone: <Phone size={20} aria-hidden="true" />,
   category: <LayoutGrid size={20} aria-hidden="true" />,
   message: <MessageSquareText size={20} aria-hidden="true" />,
-}
+};
 
-function Field({ id, label, required = false, icon, error, children, className = '' }) {
+function Field({
+  id,
+  label,
+  required = false,
+  icon,
+  error,
+  children,
+  className = "",
+}) {
   return (
     <div className={`flex min-w-0 flex-col gap-1 ${className}`}>
-      <label htmlFor={id} className="flex items-start gap-1 text-sm font-semibold">
-        {label}{required && <span aria-hidden="true" className="text-[var(--contact-red)]">*</span>}
+      <label
+        htmlFor={id}
+        className="flex items-start gap-1 text-sm font-semibold"
+      >
+        {label}
+        {required && (
+          <span aria-hidden="true" className="text-[var(--contact-red)]">
+            *
+          </span>
+        )}
       </label>
-      <div className="relative">{children}<span className={inputIconClass}>{icon}</span></div>
-      {error && <p id={`${id}-error`} className="text-sm text-[var(--contact-red)]">{error}</p>}
+      <div className="relative">
+        {children}
+        <span className={inputIconClass}>{icon}</span>
+      </div>
+      {error && (
+        <p id={`${id}-error`} className="text-sm text-[var(--contact-red)]">
+          {error}
+        </p>
+      )}
     </div>
-  )
+  );
 }
 
 function autoCompleteFor(name) {
-  return { fullName: 'name', email: 'email', phone: 'tel' }[name]
+  return { fullName: "name", email: "email", phone: "tel" }[name];
 }
 
-export default function ContactForm({ categories, contact, form = {}, preview = false }) {
-  const [errors, setErrors] = useState({})
-  const [attempted, setAttempted] = useState(false)
-  const formFields = Array.isArray(form.form_fields) ? form.form_fields : []
-  const formTitle = form.form_title || 'Gửi phản hồi hoặc yêu cầu tư vấn'
-  const formDescription = form.form_description || 'Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.'
-  const buttonText = form.button_text || 'GỬI LỜI NHẮN NGAY'
-  const availabilityText = form.availability_text || ''
-  const privacyText = form.privacy_text || ''
+export default function ContactForm({
+  categories,
+  contact,
+  form = {},
+  preview = false,
+}) {
+  const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.contact_feedback);
+  const [errors, setErrors] = useState({});
+  const [attempted, setAttempted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  function handleSubmit(event) {
-    event.preventDefault()
-    const formElement = event.currentTarget
-    const values = new FormData(formElement)
-    const nextErrors = {}
+  useEffect(() => {
+    fetchFormConfig("contact_feedback").then((loaded) => {
+      if (loaded) setConfig(loaded);
+    });
+  }, []);
+  const formFields = Array.isArray(form.form_fields) ? form.form_fields : [];
+  const formTitle = form.form_title || "Gửi phản hồi hoặc yêu cầu tư vấn";
+  const formDescription =
+    form.form_description ||
+    "Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.";
+  const buttonText = form.button_text || "GỬI LỜI NHẮN NGAY";
+  const availabilityText = form.availability_text || "";
+  const privacyText = form.privacy_text || "";
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    const values = new FormData(formElement);
+    const nextErrors = {};
     formFields.forEach((field, index) => {
-      const name = field.id || `field_${index}`
-      if (field.required && !String(values.get(name) || '').trim()) {
-        nextErrors[name] = `Vui lòng nhập ${String(field.label || 'thông tin này').toLocaleLowerCase('vi')}.`
+      const name = field.id || `field_${index}`;
+      if (field.required && !String(values.get(name) || "").trim()) {
+        nextErrors[name] =
+          `Vui lòng nhập ${String(field.label || "thông tin này").toLocaleLowerCase("vi")}.`;
       }
-    })
-    setErrors(nextErrors)
+    });
+    setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
-      setAttempted(false)
-      formElement.elements.namedItem(Object.keys(nextErrors)[0])?.focus()
-      return
+      setAttempted(false);
+      formElement.elements.namedItem(Object.keys(nextErrors)[0])?.focus();
+      return;
     }
-    setAttempted(true)
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        fullName: values.get("fullName") || "",
+        email: values.get("email") || "",
+        phone: values.get("phone") || "",
+        category: values.get("category") || "",
+        message: values.get("message") || "",
+      };
+      await submitFormToBackend("contact_feedback", payload, config);
+      setIsSuccess(true);
+      form.reset();
+      setTimeout(() => setIsSuccess(false), 5000);
+    } catch (err) {
+      console.error("Lỗi khi gửi liên hệ:", err);
+      setAttempted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+    setAttempted(true);
   }
 
   function clearFieldError(event) {
-    const name = event.target.name
-    if (errors[name]) setErrors((current) => ({ ...current, [name]: undefined }))
-    setAttempted(false)
+    const name = event.target.name;
+    if (errors[name])
+      setErrors((current) => ({ ...current, [name]: undefined }));
+    setAttempted(false);
   }
 
   function renderField(field, index) {
-    const name = field.id || `field_${index}`
-    const id = `contact-${name}`
-    const type = field.type || 'text'
-    const error = errors[name]
-    const isHalf = field.width === 'half'
-    const icon = fieldIcons[name] || <MessageSquareText size={20} aria-hidden="true" />
-    const options = name === 'category' && Array.isArray(categories) && categories.length
-      ? categories.map((category) => category.label)
-      : Array.isArray(field.options) ? field.options : []
+    const name = field.id || `field_${index}`;
+    const id = `contact-${name}`;
+    const type = field.type || "text";
+    const error = errors[name];
+    const isHalf = field.width === "half";
+    const icon = fieldIcons[name] || (
+      <MessageSquareText size={20} aria-hidden="true" />
+    );
+    const options =
+      name === "category" && Array.isArray(categories) && categories.length
+        ? categories.map((category) => category.label)
+        : Array.isArray(field.options)
+          ? field.options
+          : [];
     const commonProps = {
       id,
       name,
       required: !preview && Boolean(field.required),
       disabled: preview,
       tabIndex: preview ? -1 : undefined,
-      placeholder: field.placeholder || '',
+      placeholder: field.placeholder || "",
       autoComplete: autoCompleteFor(name),
-      className: `${inputClass} disabled:opacity-100 ${type === 'textarea' ? 'min-h-40 resize-y py-3 leading-relaxed' : 'h-12'}`,
-      'aria-invalid': Boolean(error),
-      'aria-describedby': error ? `${id}-error` : undefined,
-    }
+      className: `${inputClass} disabled:opacity-100 ${type === "textarea" ? "min-h-40 resize-y py-3 leading-relaxed" : "h-12"}`,
+      "aria-invalid": Boolean(error),
+      "aria-describedby": error ? `${id}-error` : undefined,
+    };
 
-    return <Field key={`${name}-${index}`} id={id} label={field.label || `Ô nhập ${index + 1}`} required={field.required} icon={icon} error={error} className={isHalf ? 'md:col-span-1' : 'md:col-span-2'}>
-      {type === 'select' ? <>
-        <select {...commonProps} defaultValue="" className={`${commonProps.className} cursor-pointer appearance-none pr-10`}>
-          <option value="" disabled={Boolean(field.required)}>{field.placeholder || 'Vui lòng chọn...'}</option>
-          {options.map((option) => <option key={option} value={option}>{option}</option>)}
-        </select>
-        <ChevronDown size={20} aria-hidden="true" className="pointer-events-none absolute top-3.5 right-3 text-[var(--contact-gold)]" />
-      </> : type === 'textarea' ? <textarea {...commonProps} readOnly={preview} rows={5} /> : <input {...commonProps} readOnly={preview} type={['text', 'tel', 'email', 'number'].includes(type) ? type : 'text'} />}
-    </Field>
+    return (
+      <Field
+        key={`${name}-${index}`}
+        id={id}
+        label={field.label || `Ô nhập ${index + 1}`}
+        required={field.required}
+        icon={icon}
+        error={error}
+        className={isHalf ? "md:col-span-1" : "md:col-span-2"}
+      >
+        {type === "select" ? (
+          <>
+            <select
+              {...commonProps}
+              defaultValue=""
+              className={`${commonProps.className} cursor-pointer appearance-none pr-10`}
+            >
+              <option value="" disabled={Boolean(field.required)}>
+                {field.placeholder || "Vui lòng chọn..."}
+              </option>
+              {options.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={20}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-3.5 right-3 text-[var(--contact-gold)]"
+            />
+          </>
+        ) : type === "textarea" ? (
+          <textarea {...commonProps} readOnly={preview} rows={5} />
+        ) : (
+          <input
+            {...commonProps}
+            readOnly={preview}
+            type={
+              ["text", "tel", "email", "number"].includes(type) ? type : "text"
+            }
+          />
+        )}
+      </Field>
+    );
   }
 
-  const FormElement = preview ? 'div' : 'form'
-  const formProps = preview ? {} : { onSubmit: handleSubmit, onChange: clearFieldError, 'aria-describedby': 'contact-form-availability' }
+  const FormElement = preview ? "div" : "form";
+  const formProps = preview
+    ? {}
+    : {
+        onSubmit: handleSubmit,
+        onChange: clearFieldError,
+        "aria-describedby": "contact-form-availability",
+      };
 
   return (
-    <section inert={preview || undefined} aria-labelledby="contact-form-title" className={`relative min-w-0 rounded-lg bg-white shadow-md ${preview ? 'p-5' : 'p-6 lg:col-span-7 lg:p-8'}`}>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 flex h-1.5 justify-between overflow-hidden rounded-t-lg bg-[var(--contact-red)]">
-        <span className="w-32 bg-[var(--contact-gold)]" /><span className="w-12 bg-[var(--contact-gold)]" />
+    <section
+      inert={preview || undefined}
+      aria-labelledby="contact-form-title"
+      className={`relative min-w-0 rounded-lg bg-white shadow-md ${preview ? "p-5" : "p-6 lg:col-span-7 lg:p-8"}`}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 flex h-1.5 justify-between overflow-hidden rounded-t-lg bg-[var(--contact-red)]"
+      >
+        <span className="w-32 bg-[var(--contact-gold)]" />
+        <span className="w-12 bg-[var(--contact-gold)]" />
       </div>
       <div className="pb-6">
         <p className="mb-1 flex items-center gap-2 text-xs font-bold tracking-wider text-[var(--contact-red)] uppercase">
-          <FilePenLine size={20} aria-hidden="true" className="shrink-0 text-[var(--contact-gold)]" />Cổng Tiếp Nhận Trực Tuyến
+          <FilePenLine
+            size={20}
+            aria-hidden="true"
+            className="shrink-0 text-[var(--contact-gold)]"
+          />
+          Cổng Tiếp Nhận Trực Tuyến
         </p>
-        <h2 id="contact-form-title" className="text-2xl leading-tight font-bold tracking-tight text-[var(--contact-red)] uppercase md:text-[32px] md:leading-10">{formTitle}</h2>
+        <h2
+          id="contact-form-title"
+          className="text-2xl leading-tight font-bold tracking-tight text-[var(--contact-red)] uppercase md:text-[32px] md:leading-10"
+        >
+          {formTitle}
+        </h2>
         <p className="mt-2">{formDescription}</p>
       </div>
       <FormElement {...formProps} className="flex flex-col gap-4">
-        <p className="text-xs">Các trường có dấu <span className="font-bold text-[var(--contact-red)]">*</span> là bắt buộc.</p>
+        <p className="text-xs">
+          Các trường có dấu{" "}
+          <span className="font-bold text-[var(--contact-red)]">*</span> là bắt
+          buộc.
+        </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {formFields.map(renderField)}
         </div>
+        <Field
+          id="contact-message"
+          label="Nội dung lời nhắn / Đề xuất chi tiết"
+          required
+          icon={<MessageSquareText size={20} aria-hidden="true" />}
+          error={errors.message}
+        >
+          <textarea
+            id="contact-message"
+            name="message"
+            rows={5}
+            required
+            placeholder="Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất..."
+            className={`${inputClass} min-h-40 resize-y py-3 leading-relaxed`}
+            aria-invalid={Boolean(errors.message)}
+            aria-describedby={
+              errors.message ? "contact-message-error" : undefined
+            }
+          />
+        </Field>
+        {isSuccess && (
+          <div className="flex items-center gap-2 rounded-[4px] bg-emerald-50 border border-emerald-200 p-3.5 text-sm text-emerald-800">
+            <CheckCircle2 size={20} className="shrink-0 text-emerald-600" />
+            <p>
+              <strong>Gửi lời nhắn thành công!</strong> Cảm ơn Quý vị. Ban Thư
+              ký đã tiếp nhận và sẽ liên hệ hỗ trợ trong thời gian sớm nhất.
+            </p>
+          </div>
+        )}
         <div className="pt-2">
-          <button type={preview ? 'button' : 'submit'} className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-[4px] bg-[var(--contact-red)] px-6 py-3 text-base font-bold text-white shadow-md hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--contact-gold)] motion-safe:transition-shadow sm:w-auto sm:px-8 sm:text-lg">
-            <span aria-hidden="true" className="h-4 w-1 shrink-0 rounded-full bg-[var(--contact-gold)]" />
-            {buttonText}
-            <Send size={20} aria-hidden="true" className="shrink-0 text-[var(--contact-gold)] motion-safe:transition-transform motion-safe:group-hover:translate-x-1" />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="group flex w-full cursor-pointer items-center justify-center gap-3 rounded-[4px] bg-[var(--contact-red)] px-6 py-3 text-base font-bold text-white shadow-md hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--contact-gold)] motion-safe:transition-shadow sm:w-auto sm:px-8 sm:text-lg disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2
+                  size={20}
+                  className="animate-spin text-[var(--contact-gold)]"
+                />
+                ĐANG GỬI LỜI NHẮN...
+              </>
+            ) : (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="h-4 w-1 shrink-0 rounded-full bg-[var(--contact-gold)]"
+                />
+                GỬI LỜI NHẮN NGAY
+                <Send
+                  size={20}
+                  aria-hidden="true"
+                  className="shrink-0 text-[var(--contact-gold)] motion-safe:transition-transform motion-safe:group-hover:translate-x-1"
+                />
+              </>
+            )}
           </button>
         </div>
-        <div id="contact-form-availability" className="rounded-[4px] bg-[var(--contact-cream)] p-3 text-sm leading-relaxed">
-          <p><ContactAvailabilityMessage message={availabilityText} contact={contact} /></p>
+        <div role="status" aria-live="polite" aria-atomic="true">
+          {attempted && (
+            <p className="rounded-[4px] border border-[var(--contact-red)] p-3 text-sm text-[var(--contact-red)]">
+              Có lỗi xảy ra hoặc chưa thể kết nối. Quý vị vui lòng thử lại hoặc
+              liên hệ qua email Ban Thư ký.
+            </p>
+          )}
         </div>
-        {attempted && <div role="status" aria-live="polite" aria-atomic="true">
-          <p className="rounded-[4px] border border-[var(--contact-red)] p-3 text-sm text-[var(--contact-red)]">Lời nhắn chưa được gửi. Thông tin đã nhập vẫn được giữ trên biểu mẫu để quý vị có thể sao chép và gửi qua email.</p>
-        </div>}
         <div className="flex items-start gap-2 rounded-[4px] bg-[var(--contact-cream)] p-3 text-sm leading-relaxed">
-          <ShieldCheck size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[var(--contact-gold)]" />
-          <p><strong className="font-semibold">Thông tin liên hệ:</strong> {privacyText}</p>
+          <ShieldCheck
+            size={18}
+            aria-hidden="true"
+            className="mt-0.5 shrink-0 text-[var(--contact-gold)]"
+          />
+          <p>
+            <strong className="font-semibold">Thông tin liên hệ:</strong>{" "}
+            {privacyText}
+          </p>
         </div>
       </FormElement>
     </section>
-  )
+  );
 }

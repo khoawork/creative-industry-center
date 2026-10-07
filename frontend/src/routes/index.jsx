@@ -45,6 +45,8 @@ const AdminLogoFooter = lazy(
   () => import("../pages/Admin/AdminLogoFooter.jsx"),
 );
 const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"));
+const AdminFormsPage = lazy(() => import("../pages/Admin/AdminFormsPage.jsx"));
+
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
@@ -97,6 +99,8 @@ export const adminRoute = {
             return <AdminAbout />;
           case "catalog":
             return <AdminCatalog />;
+          case "forms":
+            return <AdminFormsPage />;
           default:
             return ["events", "awards"].includes(item.id) ? (
               <AdminCatalog defaultTab={item.id} />
@@ -106,6 +110,10 @@ export const adminRoute = {
         }
       })(),
     })),
+    {
+      path: "forms",
+      element: <AdminFormsPage />,
+    },
     {
       path: "catalog",
       element: <AdminCatalog />,
