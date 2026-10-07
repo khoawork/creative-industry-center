@@ -1,7 +1,9 @@
-import { useId } from 'react'
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react'
+import { useId, useState, useRef } from 'react'
+import { ArrowDown, ArrowUp, Plus, Trash2, Upload, Loader2, AlertCircle } from 'lucide-react'
 import { aboutIconNames } from '../../../config/About/aboutConfig.js'
 import { aboutAdminButton, aboutAdminIconButton } from '../../../config/Admin/adminAbout.js'
+import AdminImagePreview from '../Common/AdminImagePreview.jsx'
+import { SiteSettingsAPI } from '../../../api/siteSettingsApi.js'
 
 function fieldError(errors, path) {
   const error = errors[path] ?? path.split('.').reduce((value, key) => value?.[key], errors)
@@ -80,14 +82,128 @@ export function ParagraphFields({ value, onChange, errors }) {
 
 export function FeaturedImageFields({ value, onChange, errors }) {
   const image = value || {}
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+  const fileInputRef = useRef(null)
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadError('')
+
+    // Kiểm tra định dạng (JPG, PNG, WEBP)
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setUploadError('Chỉ hỗ trợ file ảnh định dạng JPG, PNG hoặc WEBP.')
+      e.target.value = ''
+      return
+    }
+
+    // Kiểm tra dung lượng (tối đa 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Kích thước ảnh không được vượt quá 5 MB.')
+      e.target.value = ''
+      return
+    }
+
+    setUploading(true)
+    try {
+      // Tải ảnh lên máy chủ / Cloudinary
+      const res = await SiteSettingsAPI.uploadLogo(file)
+      const uploadedUrl = res?.data?.url
+      if (!uploadedUrl) {
+        throw new Error('Không nhận được đường dẫn ảnh sau khi tải lên.')
+      }
+      onChange({ ...image, url: uploadedUrl })
+    } catch (err) {
+      console.error('Lỗi khi tải ảnh lên:', err)
+      const msg = err.response?.data?.message || err.message || 'Không thể tải ảnh lên. Vui lòng thử lại.'
+      setUploadError(msg)
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   return <fieldset className="space-y-4 border-t border-(--admin-border) pt-4">
     <legend className="pr-3 text-base font-semibold text-(--admin-title)">Ảnh minh họa</legend>
-    {fieldError(errors, 'featured_image') && <p role="alert" className="text-sm text-(--admin-heading)">{fieldError(errors, 'featured_image')}</p>}
-    <div className="grid gap-4 sm:grid-cols-2">
-      <Field label="URL ảnh" path="featured_image.url" value={image.url} errors={errors} onChange={(url) => onChange({ ...image, url })} hint="URL http/https hoặc đường dẫn /..." />
-      <Field label="Mô tả ảnh (alt)" path="featured_image.alt" value={image.alt} errors={errors} onChange={(alt) => onChange({ ...image, alt })} />
-      <Field label="Nhãn trên ảnh (tùy chọn)" required={false} path="featured_image.tag" value={image.tag} errors={errors} onChange={(tag) => onChange({ ...image, tag })} />
-      <Field label="Chú thích ảnh" path="featured_image.caption_title" value={image.caption_title} errors={errors} onChange={(caption_title) => onChange({ ...image, caption_title })} />
+    {(fieldError(errors, 'featured_image') || uploadError) && (
+      <div className="flex items-center gap-1.5 text-sm text-red-500">
+        <AlertCircle size={15} className="shrink-0" />
+        <span>{uploadError || fieldError(errors, 'featured_image')}</span>
+      </div>
+    )}
+    <div className="grid gap-6 lg:grid-cols-12">
+      <div className="lg:col-span-7 space-y-4">
+        {/* Upload từ máy tính */}
+        <div>
+          <label className="block text-xs font-semibold text-(--admin-ink) uppercase tracking-wider mb-1.5">
+            Tải ảnh từ máy tính
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-(--admin-border) bg-(--admin-surface) px-4 py-2 text-xs font-semibold text-(--admin-ink) shadow-xs transition hover:bg-(--admin-background) active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {uploading ? (
+                <Loader2 size={15} className="animate-spin text-(--admin-accent)" />
+              ) : (
+                <Upload size={15} className="text-(--admin-accent)" />
+              )}
+              <span>{uploading ? 'Đang tải ảnh lên Cloudinary...' : 'Chọn file ảnh từ máy tính'}</span>
+            </button>
+            {image.url && (
+              <button
+                type="button"
+                disabled={uploading}
+                onClick={() => onChange({ ...image, url: '' })}
+                className="text-xs text-rose-500 hover:underline cursor-pointer disabled:opacity-50"
+              >
+                Xóa ảnh hiện tại
+              </button>
+            )}
+          </div>
+          <p className="mt-1.5 text-[11px] text-(--admin-ink)/60">
+            Hỗ trợ JPG, PNG, WEBP tối đa 5MB. Ảnh sẽ được tối ưu và lưu trên Cloudinary.
+          </p>
+        </div>
+
+        {/* URL ảnh */}
+        <Field
+          label="Hoặc nhập đường dẫn ảnh (URL)"
+          path="featured_image.url"
+          value={image.url}
+          errors={errors}
+          onChange={(url) => onChange({ ...image, url })}
+          hint="URL http/https hoặc đường dẫn tương đối /..."
+        />
+        <Field label="Mô tả ảnh (alt)" path="featured_image.alt" value={image.alt} errors={errors} onChange={(alt) => onChange({ ...image, alt })} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Nhãn trên ảnh (tùy chọn)" required={false} path="featured_image.tag" value={image.tag} errors={errors} onChange={(tag) => onChange({ ...image, tag })} />
+          <Field label="Chú thích ảnh" path="featured_image.caption_title" value={image.caption_title} errors={errors} onChange={(caption_title) => onChange({ ...image, caption_title })} />
+        </div>
+      </div>
+      <div className="lg:col-span-5">
+        <p className="text-xs font-semibold text-(--admin-ink)/70 mb-2">Xem trước ảnh</p>
+        <AdminImagePreview
+          src={image.url}
+          alt={image.alt || 'Ảnh minh họa'}
+          aspectRatio="16:9"
+          loading={uploading}
+          onRemove={image.url ? () => onChange({ ...image, url: '' }) : null}
+        />
+      </div>
     </div>
   </fieldset>
 }

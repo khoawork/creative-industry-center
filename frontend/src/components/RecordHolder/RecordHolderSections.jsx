@@ -13,6 +13,10 @@ export default function RecordHolderBody({ onNominate }) {
   const [governanceData, setGovernanceData] = useState(null);
   const [honorRollsData, setHonorRollsData] = useState(null);
   const [processData, setProcessData] = useState(null);
+  const [recordsConfig, setRecordsConfig] = useState({
+    title: "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC",
+    subtitle: "DANH MỤC ĐỀ CỬ KỶ LỤC",
+  });
   const [error, setError] = useState(null);
 
   function onDownloadDoc(filename) {
@@ -69,6 +73,10 @@ export default function RecordHolderBody({ onNominate }) {
         setHonorRollsData(Array.isArray(honorsList) ? honorsList[0] : honorsList);
         
         setProcessData(processVal || pageProps.process || null);
+        setRecordsConfig({
+          title: pageProps.record_section_title || "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC",
+          subtitle: pageProps.record_section_subtitle || "DANH MỤC ĐỀ CỬ KỶ LỤC",
+        });
       } catch (err) {
         console.error("Lỗi khi tải dữ liệu trang Kỷ lục:", err);
         setError(err.message || "Lỗi tải dữ liệu hệ thống");
@@ -84,6 +92,8 @@ export default function RecordHolderBody({ onNominate }) {
       <RecordGovernance governance={governanceData} />
       <RecordList
         records={records}
+        title={recordsConfig.title}
+        subtitle={recordsConfig.subtitle}
         error={error}
         onNominate={onNominate}
         onDownloadDoc={onDownloadDoc}

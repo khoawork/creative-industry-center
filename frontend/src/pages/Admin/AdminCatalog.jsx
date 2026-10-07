@@ -15,6 +15,7 @@ import {
   ProjectTableManager,
   RecordTableManager,
 } from '../../components/Admin/Catalog/index.js';
+import { AdminPageHeader } from '../../components/Admin/Common';
 
 const TABS = [
   {
@@ -127,24 +128,13 @@ export default function AdminCatalog({ defaultTab }) {
   const currentTabInfo = TABS.find((t) => t.id === activeTab) || TABS[0];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-6 animate-fade-in">
-      {/* Page Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--admin-surface)] to-[var(--admin-surface)]/80 border border-[var(--admin-border)] p-6 sm:p-8 shadow-sm">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-[var(--admin-border)] text-[var(--admin-text-muted)]">
-              <Database className="w-3.5 h-3.5 text-blue-400" />
-              <span>Hệ thống Quản lý Danh mục (Catalog Management)</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--admin-text)] tracking-tight">
-              Quản lý Dữ liệu Danh mục
-            </h1>
-            <p className="text-sm text-[var(--admin-text-muted)] max-w-2xl">
-              Thực hiện thêm mới, chỉnh sửa và quản lý các bản ghi của các phân hệ Sự kiện, Giải thưởng, Đào tạo, Dự án và Kỷ lục.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      {/* Page Header chuẩn hóa */}
+      <AdminPageHeader
+        badge="Hệ thống Quản lý Danh mục"
+        title="Quản lý Dữ liệu Danh mục"
+        description="Thực hiện thêm mới, chỉnh sửa và quản lý các bản ghi của các phân hệ Sự kiện, Giải thưởng, Đào tạo, Dự án và Kỷ lục."
+      />
 
       {/* Tab Navigation Pill Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">

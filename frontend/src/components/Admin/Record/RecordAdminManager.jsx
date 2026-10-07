@@ -18,6 +18,7 @@ import RecordGovernanceEditor from "./RecordGovernanceEditor.jsx";
 import RecordItemsEditor from "./RecordItemsEditor.jsx";
 import RecordHonorRollEditor from "./RecordHonorRollEditor.jsx";
 import RecordProcessEditor from "./RecordProcessEditor.jsx";
+import { AdminPageHeader, AdminTabs, AdminButton, AdminToast, AdminBadge } from "../Common";
 
 const TABS = [
   {
@@ -68,6 +69,8 @@ export default function RecordAdminManager() {
   const [header, setHeader] = useState({});
   const [governance, setGovernance] = useState({});
   const [records, setRecords] = useState([]);
+  const [recordsTitle, setRecordsTitle] = useState("DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC");
+  const [recordsSubtitle, setRecordsSubtitle] = useState("DANH MỤC ĐỀ CỬ KỶ LỤC");
   const [selectedRecordIds, setSelectedRecordIds] = useState([]);
   const [honorRolls, setHonorRolls] = useState([]);
   const [process, setProcess] = useState({});
@@ -108,6 +111,8 @@ export default function RecordAdminManager() {
         if (props.header) setHeader(props.header);
         if (props.governance) setGovernance(props.governance);
         if (props.records && sqlItems.length === 0) setRecords(props.records);
+        if (props.record_section_title) setRecordsTitle(props.record_section_title);
+        if (props.record_section_subtitle) setRecordsSubtitle(props.record_section_subtitle);
         if (props.selected_record_ids) {
           setSelectedRecordIds(props.selected_record_ids.map(String));
         } else {
@@ -137,6 +142,8 @@ export default function RecordAdminManager() {
         header,
         governance,
         records,
+        record_section_title: recordsTitle,
+        record_section_subtitle: recordsSubtitle,
         selected_record_ids: selectedRecordIds,
         honor_rolls: Array.isArray(honorRolls) ? honorRolls : [honorRolls],
         process,
@@ -170,99 +177,71 @@ export default function RecordAdminManager() {
 
   return (
     <div className="space-y-6">
-      {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-xs">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Dữ liệu trang: <strong className="text-[var(--admin-title)]">slug /records</strong></span>
-        </div>
+      <AdminToast
+        toast={feedback ? { message: feedback.text, type: feedback.type } : null}
+        onClose={() => setFeedback(null)}
+      />
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <a
-            href="/records"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border border-[var(--admin-border)] bg-[var(--admin-background)] text-[var(--admin-ink)] hover:bg-[var(--admin-border)]/40 transition cursor-pointer"
-          >
-            <ExternalLink size={14} /> Xem trang công khai
-          </a>
+      {/* Header trang quản trị chuẩn hóa */}
+      <AdminPageHeader
+        badge="Nội dung website"
+        title="Quản trị Trang Đề cử Kỷ lục"
+        subtitle="Quản lý biểu ngữ header, quy chế pháp lý & hội đồng, chọn hạng mục kỷ lục hiển thị, bảng vàng vinh danh và quy trình thẩm định công khai."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/records"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border border-(--admin-border) bg-(--admin-surface) text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer"
+            >
+              <ExternalLink size={13} />
+              <span>Xem trang công khai</span>
+            </a>
 
-          <button
-            type="button"
-            onClick={loadAllData}
-            disabled={loading || saving}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border border-[var(--admin-border)] bg-[var(--admin-background)] text-[var(--admin-ink)] hover:bg-[var(--admin-border)]/40 transition cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Tải lại
-          </button>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="sm"
+              icon={RefreshCw}
+              loading={loading}
+              disabled={loading || saving}
+              onClick={loadAllData}
+            >
+              Tải lại
+            </AdminButton>
 
-          <button
-            type="button"
-            onClick={handleSaveCurrent}
-            disabled={loading || saving}
-            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold rounded-xl bg-[var(--admin-accent)] text-white hover:opacity-90 shadow-md transition cursor-pointer disabled:opacity-50"
-          >
-            {saving ? (
-              <>
-                <RefreshCw size={14} className="animate-spin" /> Đang lưu...
-              </>
-            ) : (
-              <>
-                <Save size={14} /> Lưu thay đổi
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+            <AdminButton
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={Save}
+              loading={saving}
+              disabled={loading || saving}
+              onClick={handleSaveCurrent}
+            >
+              {saving ? "Đang lưu..." : "Lưu thay đổi"}
+            </AdminButton>
+          </div>
+        }
+      />
 
-      {feedback && (
-        <div
-          className={`p-4 rounded-xl text-xs flex items-center gap-2.5 border transition ${
-            feedback.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-              : "bg-rose-500/10 border-rose-500/20 text-rose-500"
-          }`}
-        >
-          {feedback.type === "success" ? <Check size={16} /> : <AlertCircle size={16} />}
-          <span className="font-semibold">{feedback.text}</span>
-        </div>
-      )}
-
-      {/* Tabs Navigation */}
-      <nav
-        className="sticky top-4 z-20 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)]/95 p-2 shadow-sm backdrop-blur"
-        aria-label="Nhóm nội dung trang kỷ lục"
-      >
-        {TABS.map(({ id, label, description, icon: Icon, color }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setActiveTab(id)}
-            className={`group flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition cursor-pointer ${
-              activeTab === id
-                ? "bg-[var(--admin-background)] ring-1 ring-white/10 shadow-xs"
-                : "hover:bg-[var(--admin-background)]/60"
-            }`}
-            aria-pressed={activeTab === id}
-          >
-            <Icon className={`size-4 shrink-0 ${color}`} />
-            <div className="truncate">
-              <span className="block text-xs font-bold text-[var(--admin-text)] truncate">
-                {label}
-              </span>
-              <span className="block text-[10px] text-[var(--admin-text-muted)] truncate hidden sm:block">
-                {description}
-              </span>
-            </div>
-          </button>
-        ))}
-      </nav>
+      {/* Tabs Navigation chuẩn hóa */}
+      <AdminTabs
+        tabs={TABS.map((t) => ({
+          id: t.id,
+          label: t.label,
+          icon: t.icon,
+        }))}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
       {/* Content Area */}
       {loading ? (
-        <div className="py-20 text-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-gray-400 text-sm">
-          <RefreshCw size={24} className="animate-spin mx-auto mb-2 text-[var(--admin-accent)]" />
-          Đang tải dữ liệu trang Kỷ lục...
+        <div className="py-20 text-center rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink)/60 text-sm flex flex-col items-center justify-center gap-2">
+          <RefreshCw size={24} className="animate-spin text-(--admin-accent)" />
+          <span>Đang tải dữ liệu trang Kỷ lục...</span>
         </div>
       ) : (
         <div>
@@ -277,6 +256,10 @@ export default function RecordAdminManager() {
           {activeTab === "records" && (
             <RecordItemsEditor
               records={records}
+              title={recordsTitle}
+              subtitle={recordsSubtitle}
+              onTitleChange={setRecordsTitle}
+              onSubtitleChange={setRecordsSubtitle}
               selectedRecordIds={selectedRecordIds}
               onSelectionChange={setSelectedRecordIds}
             />

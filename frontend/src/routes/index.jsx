@@ -46,12 +46,17 @@ const AdminLogoFooter = lazy(
 );
 const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"));
 const AdminFormsPage = lazy(() => import("../pages/Admin/AdminFormsPage.jsx"));
+const AdminUsers = lazy(() => import("../pages/Admin/AdminUsers.jsx"));
+const AdminActivities = lazy(() => import("../pages/Admin/AdminActivities.jsx"));
+const AdminLogin = lazy(() => import("../pages/Admin/AdminLogin.jsx"));
+const ProtectedRoute = lazy(() => import("../components/Admin/ProtectedRoute.jsx"));
 
 /* oxlint-enable react/only-export-components */
 
 export const routes = [
   { path: "/", name: "home", page: HomePage },
   { path: "/introduce", name: "introduce", page: AboutPage },
+  { path: "/about", name: "about", page: AboutPage },
   { path: "/founder", name: "founder", page: FounderStory },
   { path: "/projects", name: "projects", page: ProjectsPage },
   { path: "/contact", name: "contact", page: ContactPage },
@@ -66,63 +71,80 @@ export const adminRoute = {
   path: adminRoot,
   element: (
     <Suspense fallback={<AdminLoading />}>
-      <AdminLayout user={adminDemoUser} unreadCount={adminUnreadCount} />
+      <ProtectedRoute />
     </Suspense>
   ),
   children: [
-    { index: true, element: <AdminDashboard /> },
-    ...adminModules.map((item) => ({
-      path: item.path.slice(adminRoot.length + 1),
-      element: (() => {
-        switch (item.id) {
-          case "contact":
-            return <AdminContact />;
-          case "home":
-            return <AdminHome />;
-          case "stories":
-            return <FounderAdminPanel />;
-          case "projects":
-            return <AdminProjects />;
-          case "events":
-            return <AdminEvents />;
-          case "training":
-            return <AdminTraining />;
-          case "navigation":
-            return <AdminNavigation />;
-          case "awards":
-            return <AdminAwardPage />;
-          case "records":
-            return <AdminRecordPage />;
-          case "logo & footer":
-            return <AdminLogoFooter />;
-          case "about":
-            return <AdminAbout />;
-          case "catalog":
-            return <AdminCatalog />;
-          case "forms":
-            return <AdminFormsPage />;
-          default:
-            return ["events", "awards"].includes(item.id) ? (
-              <AdminCatalog defaultTab={item.id} />
-            ) : (
-              <AdminModulePlaceholder item={item} />
-            );
-        }
-      })(),
-    })),
     {
-      path: "forms",
-      element: <AdminFormsPage />,
+      element: <AdminLayout user={adminDemoUser} unreadCount={adminUnreadCount} />,
+      children: [
+        { index: true, element: <AdminDashboard /> },
+        ...adminModules.map((item) => ({
+          path: item.path.slice(adminRoot.length + 1),
+          element: (() => {
+            switch (item.id) {
+              case "contact":
+                return <AdminContact />;
+              case "home":
+                return <AdminHome />;
+              case "stories":
+                return <FounderAdminPanel />;
+              case "projects":
+                return <AdminProjects />;
+              case "events":
+                return <AdminEvents />;
+              case "training":
+                return <AdminTraining />;
+              case "navigation":
+                return <AdminNavigation />;
+              case "awards":
+                return <AdminAwardPage />;
+              case "records":
+                return <AdminRecordPage />;
+              case "logo & footer":
+                return <AdminLogoFooter />;
+              case "about":
+                return <AdminAbout />;
+              case "catalog":
+                return <AdminCatalog />;
+              case "forms":
+                return <AdminFormsPage />;
+              case "users":
+                return <AdminUsers />;
+              case "activities":
+                return <AdminActivities />;
+              default:
+                return ["events", "awards"].includes(item.id) ? (
+                  <AdminCatalog defaultTab={item.id} />
+                ) : (
+                  <AdminModulePlaceholder item={item} />
+                );
+            }
+          })(),
+        })),
+        {
+          path: "users",
+          element: <AdminUsers />,
+        },
+        {
+          path: "activities",
+          element: <AdminActivities />,
+        },
+        {
+          path: "forms",
+          element: <AdminFormsPage />,
+        },
+        {
+          path: "catalog",
+          element: <AdminCatalog />,
+        },
+        {
+          path: "messages",
+          element: <Navigate to={adminItemsById.contact.path} replace />,
+        },
+        { path: "*", element: <AdminNotFound /> },
+      ],
     },
-    {
-      path: "catalog",
-      element: <AdminCatalog />,
-    },
-    {
-      path: "messages",
-      element: <Navigate to={adminItemsById.contact.path} replace />,
-    },
-    { path: "*", element: <AdminNotFound /> },
   ],
 };
 
