@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #710008;
+  --color-primary-dark: #490003;
+  --color-primary-container: #580006;
+  --color-secondary: #d49520;
+  --color-secondary-bright: #f4b42c;
+  --color-secondary-fixed: #ffddaf;
+  --color-secondary-container: #ffba45;
+  --color-tertiary: #480004;
+  --color-tertiary-container: #360002;
+  --color-surface: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #faf9f6;
+  --color-surface-container: #f4f3f0;
+  --color-surface-container-high: #ebe9e4;
+  --color-surface-container-highest: #e2dfd9;
+  --color-on-surface: #1a1c1b;
+  --color-on-surface-variant: #4a4a48;
+  --color-outline: #8c716e;
+  --color-outline-variant: #e0d5c8;
+  --color-on-primary: #ffffff;
+}
+
 @font-face {
   font-family: 'Inter';
   src: url('./assets/shared/fonts/InterVariable.woff2') format('woff2');

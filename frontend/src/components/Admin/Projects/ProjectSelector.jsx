@@ -228,8 +228,7 @@ export default function ProjectSelector({ initialSelectedIds = [], onSave, isSav
             const checked = isSelected(project.id);
             const imageSrc =
               project.image ||
-              project.project_info?.image ||
-              'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&auto=format&fit=crop&q=80';
+              project.project_info?.image;
             const categoryName = project.category?.name || project.categoryTag || 'Dự án';
 
             return (

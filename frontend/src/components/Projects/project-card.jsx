@@ -35,7 +35,7 @@ const formatDetailLabel = (label = '') => {
 export default function ProjectCard({ project }) {
   const categoryTag = project.category?.name || project.categoryTag || "TRỌNG ĐIỂM QUỐC GIA";
   const code = project.code || `MÃ DỰ ÁN: TTCNST-2025-0${project.id}`;
-  const image = project.image || project.project_info?.image || "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&auto=format&fit=crop&q=80";
+  const image = project.image || project.project_info?.image;
   const title = project.title || project.name || "";
   const name = project.name || project.title || "";
   const description = project.description || "";

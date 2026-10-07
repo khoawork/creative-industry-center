@@ -112,7 +112,7 @@ export default function ProjectTableManager() {
       title: "",
       slogan: "",
       description: "",
-      image: "/images/projects/default.jpg",
+      image: "",
       category_id: categories.length > 0 ? String(categories[0].id) : "",
       research_info: [
         { label: "Quy mô", value: "Doanh nghiệp Việt" },
