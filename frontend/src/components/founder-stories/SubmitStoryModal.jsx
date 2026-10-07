@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { X, Send, Sparkles, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Send, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
 import { CATEGORIES } from '../../data/founderStoriesData';
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from '../../services/googleSheetService.js';
 
 export const SubmitStoryModal = ({ isOpen, onClose }) => {
+  const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.founder_story_submission);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     founderName: '',
     brandName: '',
@@ -13,15 +20,35 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
     storySummary: '',
   });
 
+  useEffect(() => {
+    fetchFormConfig('founder_story_submission').then((loaded) => {
+      if (loaded) setConfig(loaded);
+    });
+  }, []);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      onClose();
-    }, 2500);
+    setIsSubmitting(true);
+
+    try {
+      await submitFormToBackend('founder_story_submission', formData, config);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 2500);
+    } catch (err) {
+      console.error('Lỗi khi gửi câu chuyện sáng nghiệp:', err);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 2500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -161,10 +188,20 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
 
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-[#710008] hover:bg-[#590108] rounded-lg shadow-sm cursor-pointer transition-colors"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-[#710008] hover:bg-[#590108] rounded-lg shadow-sm cursor-pointer transition-colors disabled:opacity-50"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Gửi Ban Biên Tập</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Đang gửi câu chuyện...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Gửi Ban Biên Tập</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

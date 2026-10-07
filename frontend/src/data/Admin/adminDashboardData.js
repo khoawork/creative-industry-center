@@ -58,6 +58,12 @@ export const adminStats = [
     detail: 'hạng mục',
   },
   {
+    moduleId: 'forms',
+    label: 'Biểu mẫu (Sheets)',
+    value: '07',
+    detail: 'đã đồng bộ',
+  },
+  {
     moduleId: 'contact',
     label: 'Tin nhắn mới',
     value: String(adminUnreadCount).padStart(2, '0'),

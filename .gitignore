@@ -217,4 +217,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-tests/
+tests/backend/service_account.json
+backend/service_account.json
+backend/service_account.json
