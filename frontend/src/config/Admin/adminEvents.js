@@ -30,10 +30,10 @@ export function eventSectionDraft(key, section = {}) {
 }
 
 export const adminContentTheme = '[font-family:Inter,sans-serif] text-(--admin-ink)'
-export const adminButton = 'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-sm font-semibold text-(--admin-ink) enabled:hover:bg-(--admin-background) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50'
-export const adminPrimaryButton = 'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-(--admin-primary) px-3 py-2 text-sm font-semibold text-(--admin-white) enabled:hover:bg-(--admin-black) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50'
-export const adminInput = 'w-full min-w-0 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2.5 text-base text-(--admin-ink) placeholder:text-(--admin-ink)/50 focus-visible:outline-2 focus-visible:outline-(--admin-accent)'
-export const adminPanel = 'min-w-0 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-4 sm:p-6'
+export const adminButton = 'inline-flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-xs font-semibold text-(--admin-ink) enabled:hover:bg-(--admin-background) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50 transition-colors'
+export const adminPrimaryButton = 'inline-flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-lg bg-(--admin-primary) px-3.5 py-1.5 text-xs font-semibold text-(--admin-white) enabled:hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) disabled:cursor-not-allowed disabled:opacity-50 transition-opacity shadow-xs'
+export const adminInput = 'w-full min-w-0 rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-xs sm:text-sm text-(--admin-ink) placeholder:text-(--admin-ink)/45 transition-colors focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/20 focus:outline-none'
+export const adminPanel = 'min-w-0 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-5 sm:p-6 shadow-[var(--admin-panel-shadow)]'
 
 export function eventDraft(event = {}) {
   return {

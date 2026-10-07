@@ -4,7 +4,8 @@ from dto.base_dto import (
     PageRequestDTO,
     PageUpdateRequestDTO,
     PageResponseDTO,
-    HeaderItemDTO
+    HeaderItemDTO,
+    PageReorderRequestDTO
 )
 from utils.json import success_response, error_response
 
@@ -201,6 +202,47 @@ def delete_page(page_id: int):
     return success_response(
         data=None,
         message="Xóa trang thành công",
+        status_code=200
+    )
+
+
+@base_api.route("/reorder", methods=["PUT"])
+def reorder_pages():
+    """
+    Cập nhật thứ tự hiển thị của các trang (Header menu navigation)
+    ---
+    tags:
+      - Page & Header Management
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - orders
+          properties:
+            orders:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  order_index:
+                    type: integer
+    responses:
+      200:
+        description: Cập nhật thứ tự thành công
+    """
+    json_data = request.get_json() or {}
+    data = PageReorderRequestDTO().load(json_data)
+    orders = getattr(data, "orders", []) if not isinstance(data, dict) else data.get("orders", [])
+    updated_pages = base_service.reorder_pages(orders)
+    result = PageResponseDTO(many=True).dump(updated_pages)
+    return success_response(
+        data=result,
+        message="Cập nhật thứ tự trang thành công",
         status_code=200
     )
 

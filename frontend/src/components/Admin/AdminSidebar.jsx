@@ -1,11 +1,11 @@
 import { useEffect, useId, useRef } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronsLeft, X } from 'lucide-react';
+import { ChevronsLeft, X, LogOut } from 'lucide-react';
 import logo from '../../assets/shared/logo/creative-industry-center-logo.png';
 import { site } from '../../config/shared/site.js';
 import { adminGroups, adminRoot } from '../../config/Admin/adminNavigation.js';
 
-function SidebarContent({ collapsed = false, user, unreadCount, onNavigate, onClose, onToggleCollapse, desktopToggleRef }) {
+function SidebarContent({ collapsed = false, user, unreadCount, onNavigate, onClose, onToggleCollapse, desktopToggleRef, onLogout }) {
   const labelId = useId();
   const { pathname } = useLocation();
 
@@ -48,52 +48,88 @@ function SidebarContent({ collapsed = false, user, unreadCount, onNavigate, onCl
         [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-(--admin-accent)
         [&::-webkit-scrollbar-thumb:hover]:bg-(--admin-white) [&::-webkit-scrollbar-thumb:active]:bg-(--admin-white)
         [&::-webkit-scrollbar-button]:hidden ${collapsed ? 'px-3' : 'px-4'}`}>
-        {adminGroups.map((group, groupIndex) => (
-          <section key={group.id} aria-labelledby={`${labelId}-${group.id}`} className={groupIndex > 0 ? 'mt-6' : ''}>
-            <h2 id={`${labelId}-${group.id}`} className={collapsed ? 'sr-only' : 'mb-2 px-3 text-[10px] leading-5 font-semibold tracking-[0.18em] uppercase'}>
-              {group.label}
-            </h2>
-            {collapsed && groupIndex > 0 && <div className="mx-3 mb-3 h-px bg-(--admin-accent)" />}
-            <ul className="space-y-1">
-              {group.items.map((item) => {
-                const ItemIcon = item.icon;
-                const count = item.id === 'contact' ? unreadCount : 0;
-                return (
-                  <li key={item.id}>
-                    <NavLink to={item.path} end={item.path === adminRoot && pathname !== `${adminRoot}/`} onClick={onNavigate}
-                      aria-label={count > 0 ? `${item.label}, ${count} chưa đọc` : item.label}
-                      className={({ isActive }) => `group relative flex min-h-11 items-center gap-3 rounded-none border border-transparent text-[13px] leading-5 transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) ${collapsed ? 'justify-center px-0' : 'px-3 py-2.5'} ${isActive ? "bg-(--admin-selected) font-semibold text-(--admin-selected-text) before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-none before:bg-(--admin-white) before:content-['']" : 'font-normal hover:bg-(--admin-nav-hover) hover:text-(--admin-nav-hover-text)'}`}>
-                      <ItemIcon size={19} strokeWidth={1.7} className="shrink-0" aria-hidden="true" />
-                      {collapsed ? (
-                        <span aria-hidden="true" className="pointer-events-none fixed left-20 z-50 ml-2 hidden max-w-64 rounded-md border border-(--admin-sidebar-border) bg-(--admin-sidebar) px-3 py-2 text-sm font-medium text-(--admin-sidebar-text) group-hover:block group-focus:block">
-                          {item.label}{count > 0 ? ` · ${count} chưa đọc` : ''}
-                        </span>
-                      ) : <span className="min-w-0 flex-1">{item.label}</span>}
-                      {count > 0 && !collapsed && <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full bg-(--admin-accent) text-[10px] font-bold text-(--admin-black) group-aria-[current=page]:bg-(--admin-badge) group-aria-[current=page]:text-(--admin-badge-text)">{count}</span>}
-                      {count > 0 && collapsed && <span aria-hidden="true" className="absolute top-1 right-1 size-1.5 rounded-full bg-(--admin-accent) group-aria-[current=page]:bg-(--admin-badge)" />}
-                    </NavLink>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))}
+        {adminGroups.map((group, groupIndex) => {
+          // Lọc các item theo quyền của user
+          const isAdmin = user?.role === 'admin' || user?.role === 'administrator';
+          const filteredItems = group.items.filter((item) => {
+            // Tab 'users' (Tài khoản & Phân quyền) CHỈ hiển thị với Admin, ẩn hoàn toàn với Manager
+            if (item.id === 'users' && !isAdmin) {
+              return false;
+            }
+            return true;
+          });
+
+          if (filteredItems.length === 0) return null;
+
+          return (
+            <section key={group.id} aria-labelledby={`${labelId}-${group.id}`} className={groupIndex > 0 ? 'mt-6' : ''}>
+              <h2 id={`${labelId}-${group.id}`} className={collapsed ? 'sr-only' : 'mb-2 px-3 text-[10px] leading-5 font-semibold tracking-[0.18em] uppercase'}>
+                {group.label}
+              </h2>
+              {collapsed && groupIndex > 0 && <div className="mx-3 mb-3 h-px bg-(--admin-accent)" />}
+              <ul className="space-y-1">
+                {filteredItems.map((item) => {
+                  const ItemIcon = item.icon;
+                  const count = item.id === 'contact' ? unreadCount : 0;
+                  return (
+                    <li key={item.id}>
+                      <NavLink to={item.path} end={item.path === adminRoot && pathname !== `${adminRoot}/`} onClick={onNavigate}
+                        aria-label={count > 0 ? `${item.label}, ${count} chưa đọc` : item.label}
+                        className={({ isActive }) => `group relative flex min-h-11 items-center gap-3 rounded-none border border-transparent text-[13px] leading-5 transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-accent) ${collapsed ? 'justify-center px-0' : 'px-3 py-2.5'} ${isActive ? "bg-(--admin-selected) font-semibold text-(--admin-selected-text) before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-none before:bg-(--admin-white) before:content-['']" : 'font-normal hover:bg-(--admin-nav-hover) hover:text-(--admin-nav-hover-text)'}`}>
+                        <ItemIcon size={19} strokeWidth={1.7} className="shrink-0" aria-hidden="true" />
+                        {collapsed ? (
+                          <span aria-hidden="true" className="pointer-events-none fixed left-20 z-50 ml-2 hidden max-w-64 rounded-md border border-(--admin-sidebar-border) bg-(--admin-sidebar) px-3 py-2 text-sm font-medium text-(--admin-sidebar-text) group-hover:block group-focus:block">
+                            {item.label}{count > 0 ? ` · ${count} chưa đọc` : ''}
+                          </span>
+                        ) : <span className="min-w-0 flex-1">{item.label}</span>}
+                        {count > 0 && !collapsed && <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full bg-(--admin-accent) text-[10px] font-bold text-(--admin-black) group-aria-[current=page]:bg-(--admin-badge) group-aria-[current=page]:text-(--admin-badge-text)">{count}</span>}
+                        {count > 0 && collapsed && <span aria-hidden="true" className="absolute top-1 right-1 size-1.5 rounded-full bg-(--admin-accent) group-aria-[current=page]:bg-(--admin-badge)" />}
+                      </NavLink>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          );
+        })}
       </nav>
 
-      <div className={`shrink-0 border-t border-(--admin-sidebar-border) ${collapsed ? 'p-4' : 'px-5 py-4'}`}>
-        <div className="flex items-center gap-3" title={`${user.name} · ${user.role} · Tài khoản minh họa`}>
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-(--admin-accent) text-xs font-bold text-(--admin-black)">{user.initials}</span>
-          <div className={collapsed ? 'sr-only' : 'min-w-0 flex-1'}>
-            <p className="truncate text-sm font-semibold">{user.name}</p>
-            <p className="mt-0.5 text-[11px]">{user.role} · Minh họa</p>
+      <div className={`shrink-0 border-t border-(--admin-sidebar-border) ${collapsed ? 'p-3' : 'px-4 py-3.5'}`}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--admin-accent) text-xs font-bold text-(--admin-black) uppercase">
+              {user?.full_name ? user.full_name.charAt(0) : user?.username?.charAt(0) || 'U'}
+            </span>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-(--admin-white)">
+                  {user?.full_name || user?.username || 'Người dùng'}
+                </p>
+                <p className="mt-0.5 truncate text-[10px] font-semibold text-(--admin-accent) uppercase tracking-wider">
+                  {user?.role === 'administrator' ? 'Administrator' : user?.role === 'manager' ? 'Manager' : user?.role === 'editor' ? 'Editor' : 'User'}
+                </p>
+              </div>
+            )}
           </div>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-(--admin-sidebar-text) hover:bg-red-950/60 hover:text-red-300 transition"
+              title="Đăng xuất khỏi hệ thống"
+              aria-label="Đăng xuất"
+            >
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export default function AdminSidebar({ collapsed, mobileOpen, onClose, user, unreadCount, onToggleCollapse, desktopToggleRef }) {
+export default function AdminSidebar({ collapsed, mobileOpen, onClose, user, unreadCount, onToggleCollapse, desktopToggleRef, onLogout }) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -105,7 +141,7 @@ export default function AdminSidebar({ collapsed, mobileOpen, onClose, user, unr
   return (
     <>
       <aside id="admin-desktop-sidebar" aria-label="Menu quản trị" className={`hidden h-full shrink-0 lg:block ${collapsed ? 'w-20' : 'w-[280px]'}`}>
-        <SidebarContent collapsed={collapsed} user={user} unreadCount={unreadCount} onToggleCollapse={onToggleCollapse} desktopToggleRef={desktopToggleRef} />
+        <SidebarContent collapsed={collapsed} user={user} unreadCount={unreadCount} onToggleCollapse={onToggleCollapse} desktopToggleRef={desktopToggleRef} onLogout={onLogout} />
       </aside>
       <dialog ref={dialogRef} id="admin-mobile-sidebar" aria-label="Menu quản trị"
         onClose={() => {

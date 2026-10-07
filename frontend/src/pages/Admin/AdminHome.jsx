@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Sparkles, ExternalLink, RefreshCw, Layout, Info, Layers, BellRing } from 'lucide-react';
 import {
@@ -7,7 +7,7 @@ import {
   NavSectionsEditor,
   SupportBannerEditor,
 } from '../../components/Admin/Home';
-
+import { AdminPageHeader, AdminTabs, AdminToast, AdminBadge, AdminButton } from '../../components/Admin/Common';
 import { site } from '../../config/shared/site.js';
 import { HomeAPI } from '../../api/homeApi.js';
 import { fetchNavSections } from '../../services/contentTablesService.js';
@@ -22,7 +22,6 @@ const adminHomeTabs = [
 
 export default function AdminHome() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const tabRefs = useRef([]);
   const activeTabId = searchParams.get('tab') || 'hero';
   const activeTab = adminHomeTabs.find((t) => t.id === activeTabId) || adminHomeTabs[0];
 
@@ -31,6 +30,12 @@ export default function AdminHome() {
   const [loading, setLoading] = useState(true);
   const [isLiveApi, setIsLiveApi] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const selectTab = (tab) => {
     setSearchParams((current) => {
@@ -62,7 +67,7 @@ export default function AdminHome() {
       })
       .catch((err) => {
         console.error('Lỗi khi tải dữ liệu từ API:', err);
-        alert('Không thể kết nối lấy dữ liệu trang chủ từ API.');
+        showToast('Không thể kết nối lấy dữ liệu trang chủ từ API.', 'error');
       })
       .finally(() => {
         if (isMounted) {
@@ -102,11 +107,11 @@ export default function AdminHome() {
       }
 
       setHomeData({ ...homeData, props: updatedProps });
-      alert('Lưu thay đổi thành công!');
+      showToast('Lưu thay đổi thành công!');
       return newPropsSection.about_section ? updatedProps.about_section : true;
     } catch (error) {
       console.error('Lỗi khi lưu dữ liệu:', error);
-      alert('Có lỗi xảy ra khi lưu dữ liệu lên hệ thống.');
+      showToast('Có lỗi xảy ra khi lưu dữ liệu lên hệ thống.', 'error');
       return false;
     } finally {
       setIsSaving(false);
@@ -130,42 +135,20 @@ export default function AdminHome() {
         (section) => String(section.id) === String(savedSection.id)
       );
 
-      if (!existingSection) {
-        await HomeAPI.createNav(homeData.id, savedSection);
+      let updatedSections = [];
+      if (existingSection) {
+        updatedSections = navSections.map((section) =>
+          String(section.id) === String(savedSection.id) ? savedSection : section
+        );
       } else {
-        const metadataChanged =
-          existingSection.tag !== savedSection.tag ||
-          existingSection.title_main !== savedSection.title_main ||
-          JSON.stringify(existingSection.action_button) !==
-            JSON.stringify(savedSection.action_button);
-        const childrenChanged =
-          JSON.stringify(existingSection.children_id || []) !==
-          JSON.stringify(savedSection.children_id || []);
-
-        if (metadataChanged) {
-          await HomeAPI.updateNav(homeData.id, existingSection.id, {
-            ...savedSection,
-            children_id: existingSection.children_id || [],
-          });
-        }
-        if (childrenChanged) {
-          await HomeAPI.addNavChildren(homeData.id, existingSection.id, {
-            children_id: savedSection.children_id || [],
-          });
-        }
+        updatedSections = [...navSections, savedSection];
       }
 
-      const updatedNavSections = await fetchNavSections(homeData.id);
-      setNavSections(updatedNavSections);
-      setHomeData((current) => ({
-        ...current,
-        props: { ...current.props, nav_sections: updatedNavSections },
-      }));
-      alert('Lưu thay đổi thành công!');
+      setNavSections(updatedSections);
+      showToast('Lưu chuyên mục thành công!');
     } catch (error) {
       console.error('Lỗi khi lưu nav section:', error);
-      alert('Có lỗi xảy ra khi lưu chuyên mục lên hệ thống.');
-      throw error;
+      showToast('Có lỗi xảy ra khi lưu chuyên mục.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -176,16 +159,14 @@ export default function AdminHome() {
     setIsSaving(true);
 
     try {
-      await HomeAPI.deleteNav(homeData.id, sectionId);
-      const updatedNavSections = await fetchNavSections(homeData.id);
-      setNavSections(updatedNavSections);
-      setHomeData((current) => ({
-        ...current,
-        props: { ...current.props, nav_sections: updatedNavSections },
-      }));
+      const updatedSections = navSections.filter(
+        (section) => String(section.id) !== String(sectionId)
+      );
+      setNavSections(updatedSections);
+      showToast('Xóa chuyên mục thành công!');
     } catch (error) {
       console.error('Lỗi khi xóa nav section:', error);
-      alert('Có lỗi xảy ra khi xóa chuyên mục khỏi hệ thống.');
+      showToast('Có lỗi xảy ra khi xóa chuyên mục.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -195,7 +176,6 @@ export default function AdminHome() {
     handleUpdateProps({ support_banner: newSupportData });
   };
 
-  // Hiển thị trạng thái đang tải dữ liệu từ API
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -208,167 +188,83 @@ export default function AdminHome() {
   }
 
   return (
-    <>
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-(--admin-border) pb-7">
-        <div>
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.16em] text-(--admin-heading) uppercase">
-            Khu vực quản trị nội dung
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">
-            Quản lý Trang chủ
-          </h1>
-          <p className="mt-3 text-sm leading-6">
-            Chỉnh sửa nội dung Hero, Giới thiệu (About), Chuyên mục (Nav) và Banner hỗ trợ theo chuẩn Marshmallow DTO.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
 
-        <div className="flex items-center gap-2">
-          {isLiveApi ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              API Kết nối trực tiếp
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-accent) px-3 py-1.5 text-[11px] text-(--admin-heading)">
-              <Sparkles size={13} aria-hidden="true" />
-              Trực tuyến từ API
-            </span>
-          )}
+      {/* Header chuẩn hóa */}
+      <AdminPageHeader
+        badge="Khu vực quản trị nội dung"
+        title="Quản lý Trang chủ"
+        description="Chỉnh sửa nội dung Hero, Giới thiệu (About), Chuyên mục (Nav) và Banner hỗ trợ."
+        actions={
+          <div className="flex items-center gap-2">
+            {isLiveApi ? (
+              <AdminBadge variant="success">
+                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse mr-1 inline-block" />
+                API Kết nối trực tiếp
+              </AdminBadge>
+            ) : (
+              <AdminBadge variant="accent" icon={Sparkles}>
+                Trực tuyến từ API
+              </AdminBadge>
+            )}
 
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-[11px] font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition"
-          >
-            <ExternalLink size={13} />
-            Xem trang chủ
-          </a>
-        </div>
-      </div>
-
-      {/* Tabs List */}
-      <div
-        role="tablist"
-        aria-label="Quản lý trang chủ"
-        className="my-6 flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) p-1 [scrollbar-width:none]"
-      >
-        {adminHomeTabs.map((tab, index) => {
-          const IconComponent = tab.icon;
-          const isSelected = activeTab.id === tab.id;
-          return (
-            <button
-              key={tab.id}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              id={`home-tab-${tab.id}`}
-              type="button"
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={`home-panel-${tab.id}`}
-              tabIndex={isSelected ? 0 : -1}
-              onClick={() => selectTab(tab)}
-              onKeyDown={(event) => {
-                let nextIndex;
-                if (event.key === 'ArrowRight') nextIndex = (index + 1) % adminHomeTabs.length;
-                else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + adminHomeTabs.length) % adminHomeTabs.length;
-                else if (event.key === 'Home') nextIndex = 0;
-                else if (event.key === 'End') nextIndex = adminHomeTabs.length - 1;
-                else return;
-                event.preventDefault();
-                selectTab(adminHomeTabs[nextIndex]);
-                tabRefs.current[nextIndex]?.focus();
-              }}
-              className={`min-h-11 shrink-0 cursor-pointer border-b-2 px-4 text-sm font-semibold whitespace-nowrap flex items-center gap-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) transition-colors ${
-                isSelected
-                  ? 'border-(--admin-accent) text-(--admin-title)'
-                  : 'border-transparent text-(--admin-heading) hover:bg-(--admin-background)'
-              }`}
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition"
             >
-              <IconComponent size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+              <ExternalLink size={13} />
+              <span>Xem trang chủ</span>
+            </a>
+          </div>
+        }
+      />
+
+      {/* Tabs chuẩn hóa */}
+      <AdminTabs
+        tabs={adminHomeTabs}
+        activeTab={activeTab.id}
+        onChange={(tabId) => selectTab(adminHomeTabs.find((t) => t.id === tabId))}
+      />
 
       {/* Tab Panels */}
-      <div className="mt-4">
-        {/* Tab 1: Hero */}
-        <div
-          id="home-panel-hero"
-          role="tabpanel"
-          aria-labelledby="home-tab-hero"
-          hidden={activeTab.id !== 'hero'}
-        >
-          {activeTab.id === 'hero' && (
-            <HeroSectionEditor
-              key={`hero-${homeData?.id || 'default'}`}
-              initialData={homeData?.props?.hero_section}
-              onSave={handleSaveHero}
-              isSaving={isSaving}
-            />
-          )}
-        </div>
+      <div>
+        {activeTab.id === 'hero' && (
+          <HeroSectionEditor
+            initialData={homeData?.props?.hero_section}
+            onSave={handleSaveHero}
+            isSaving={isSaving}
+          />
+        )}
 
-        {/* Tab 2: About */}
-        <div
-          id="home-panel-about"
-          role="tabpanel"
-          aria-labelledby="home-tab-about"
-          hidden={activeTab.id !== 'about'}
-        >
-          {activeTab.id === 'about' && (
-            <AboutSectionEditor
-              key={`about-${homeData?.id || 'default'}`}
-              initialData={homeData?.props?.about_section}
-              onSave={handleSaveAbout}
-              isSaving={isSaving}
-            />
-          )}
-        </div>
+        {activeTab.id === 'about' && (
+          <AboutSectionEditor
+            initialData={homeData?.props?.about_section}
+            onSave={handleSaveAbout}
+            isSaving={isSaving}
+          />
+        )}
 
-        {/* Tab 3: Nav Sections */}
-        <div
-          id="home-panel-nav"
-          role="tabpanel"
-          aria-labelledby="home-tab-nav"
-          hidden={activeTab.id !== 'nav'}
-        >
-          {activeTab.id === 'nav' && (
-            <NavSectionsEditor
-              key={`nav-${homeData?.id || 'default'}-${navSections.length}`}
-              navSections={navSections}
-              onSaveSection={handleSaveNavSection}
-              onDeleteSection={handleDeleteNavSection}
-              isSaving={isSaving}
-            />
-          )}
-        </div>
+        {activeTab.id === 'nav' && (
+          <NavSectionsEditor
+            initialData={navSections}
+            pageId={homeData?.id}
+            onSave={handleSaveNavSection}
+            onDelete={handleDeleteNavSection}
+            isSaving={isSaving}
+          />
+        )}
 
-        {/* Tab 4: Support Banner */}
-        <div
-          id="home-panel-support"
-          role="tabpanel"
-          aria-labelledby="home-tab-support"
-          hidden={activeTab.id !== 'support'}
-        >
-          {activeTab.id === 'support' && (
-            <SupportBannerEditor
-              key={`support-${homeData?.id || 'default'}`}
-              initialData={homeData?.props?.support_banner}
-              onSave={handleSaveSupportBanner}
-              isSaving={isSaving}
-            />
-          )}
-        </div>
+        {activeTab.id === 'support' && (
+          <SupportBannerEditor
+            initialData={homeData?.props?.support_banner}
+            onSave={handleSaveSupportBanner}
+            isSaving={isSaving}
+          />
+        )}
       </div>
-
-      {/* Bottom Footer Note */}
-      <p className="mt-12 border-t border-(--admin-border) pt-5 text-[11px] leading-5 text-gray-500">
-        Khu vực quản trị trang chủ · Viện Kỷ lục Việt Nam (VIETKINGS) · {site.name}
-      </p>
-    </>
+    </div>
   );
 }

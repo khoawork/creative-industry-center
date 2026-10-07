@@ -1,10 +1,6 @@
 import React from "react";
 import { Plus, Trash2, Layout, Sparkles } from "lucide-react";
-
-const inputClass =
-  "w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3.5 py-2.5 text-sm text-[var(--admin-ink)] outline-none transition focus:border-[var(--admin-accent)] focus:ring-2 focus:ring-[var(--admin-accent)]/20";
-const labelClass =
-  "block text-xs font-semibold uppercase tracking-wider text-[var(--admin-heading)] mb-1.5";
+import { AdminCard, AdminButton, AdminInput } from "../Common";
 
 export default function RecordHeaderEditor({ data = {}, onChange }) {
   const header = {
@@ -38,103 +34,78 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-xs">
-        <div className="flex items-center gap-2.5 border-b border-[var(--admin-border)] pb-4 mb-5">
-          <span className="p-2 rounded-lg bg-[var(--admin-accent)]/10 text-[var(--admin-heading)]">
-            <Layout size={18} />
-          </span>
-          <div>
-            <h3 className="text-base font-bold text-[var(--admin-title)]">
-              Cấu hình Header &amp; Tiêu đề trang
-            </h3>
-            <p className="text-xs text-gray-500">
-              Chỉnh sửa thông tin biểu ngữ chính, khẩu hiệu và các chỉ số thống kê
-            </p>
-          </div>
-        </div>
-
+      <AdminCard
+        title="Cấu hình Header & Tiêu đề trang"
+        subtitle="Chỉnh sửa thông tin biểu ngữ chính, khẩu hiệu và các chỉ số thống kê của trang Đề cử Kỷ lục."
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="md:col-span-2">
-            <label className={labelClass}>Tiêu đề chính (Title) *</label>
-            <input
-              type="text"
+            <AdminInput
+              label="Tiêu đề chính (Title) *"
               value={header.title || ""}
-              onChange={(e) => handleFieldChange("title", e.target.value)}
-              placeholder="VD: HỆ THỐNG ĐỀ CỬ KỶ LỤC & TÔN VINH DANH HIỆU"
-              className={inputClass}
+              onChange={(e) => handleFieldChange("title", e?.target?.value ?? e)}
+              placeholder="VD: KHÔNG GIAN TÔN VINH VÀ THÚC ĐẨY CÁC GIÁ TRỊ KỶ LỤC SÁNG TẠO"
+              required
             />
           </div>
 
           <div>
-            <label className={labelClass}>Tiêu đề phụ / Huy hiệu (Subtitle)</label>
-            <input
-              type="text"
+            <AdminInput
+              label="Nhãn phụ / Badge (Subtitle)"
               value={header.subtitle || ""}
-              onChange={(e) => handleFieldChange("subtitle", e.target.value)}
-              placeholder="VD: CỔNG THÔNG TIN ĐỀ CỬ KỶ LỤC QUỐC GIA"
-              className={inputClass}
+              onChange={(e) => handleFieldChange("subtitle", e?.target?.value ?? e)}
+              placeholder="VD: VIỆN KỶ LỤC VIỆT NAM — VIETKINGS"
             />
           </div>
 
           <div>
-            <label className={labelClass}>Icon nền / biểu tượng</label>
-            <input
-              type="text"
+            <AdminInput
+              label="Biểu tượng Icon (Lucide Icon Name)"
               value={header.icon || ""}
-              onChange={(e) => handleFieldChange("icon", e.target.value)}
-              placeholder="VD: military_tech, workspace_premium, flare"
-              className={inputClass}
+              onChange={(e) => handleFieldChange("icon", e?.target?.value ?? e)}
+              placeholder="VD: Trophy, Award, Sparkles"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className={labelClass}>Khẩu hiệu / Slogan</label>
-            <textarea
-              rows={2}
+            <AdminInput
+              label="Khẩu hiệu / Slogan chính"
+              multiline
+              rows={3}
               value={header.slogan || ""}
-              onChange={(e) => handleFieldChange("slogan", e.target.value)}
-              placeholder="VD: Tôn vinh trí tuệ — Ghi nhận cống hiến — Xác lập giá trị trường tồn"
-              className={inputClass}
+              onChange={(e) => handleFieldChange("slogan", e?.target?.value ?? e)}
+              placeholder="VD: Cơ quan nghiên cứu, thẩm định và bảo trợ chính thức các sáng kiến kỷ lục quốc gia..."
             />
           </div>
         </div>
-      </div>
+      </AdminCard>
 
       {/* Metrics Section */}
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-xs">
-        <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-4 mb-5">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-              <Sparkles size={18} />
-            </span>
-            <div>
-              <h3 className="text-base font-bold text-[var(--admin-title)]">
-                Chỉ số thống kê (Metrics)
-              </h3>
-              <p className="text-xs text-gray-500">
-                Các con số nổi bật hiển thị ở góc phải banner header
-              </p>
-            </div>
-          </div>
-          <button
+      <AdminCard
+        title="Chỉ số thống kê (Metrics)"
+        subtitle="Các con số nổi bật hiển thị ở góc phải banner header."
+        actions={
+          <AdminButton
             type="button"
+            variant="primary"
+            size="sm"
+            icon={Plus}
             onClick={handleAddMetric}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[var(--admin-accent)] text-white hover:opacity-90 transition cursor-pointer"
           >
-            <Plus size={14} /> Thêm chỉ số
-          </button>
-        </div>
-
+            Thêm chỉ số
+          </AdminButton>
+        }
+      >
         <div className="space-y-3">
           {(header.metrics || []).length === 0 ? (
-            <p className="text-center py-6 text-xs text-gray-400 italic">
+            <div className="p-6 text-center text-xs text-(--admin-ink)/60 italic border border-dashed border-(--admin-border) rounded-xl">
               Chưa có chỉ số nào. Bấm "Thêm chỉ số" để tạo mới.
-            </p>
+            </div>
           ) : (
             (header.metrics || []).map((metric, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-3 p-3 rounded-xl bg-[var(--admin-background)] border border-[var(--admin-border)]"
+                className="flex items-center gap-3 p-3 rounded-xl bg-(--admin-background) border border-(--admin-border)"
               >
                 <div className="w-1/3">
                   <input
@@ -142,7 +113,7 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
                     value={metric.value || ""}
                     onChange={(e) => handleMetricChange(idx, "value", e.target.value)}
                     placeholder="Giá trị (VD: 05, 100%)"
-                    className={inputClass}
+                    className="w-full rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-bold text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent)"
                   />
                 </div>
                 <div className="flex-1">
@@ -151,7 +122,7 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
                     value={metric.label || ""}
                     onChange={(e) => handleMetricChange(idx, "label", e.target.value)}
                     placeholder="Nhãn (VD: HẠNG MỤC ĐỀ CỬ)"
-                    className={inputClass}
+                    className="w-full rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent)"
                   />
                 </div>
                 <button
@@ -160,13 +131,13 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
                   className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition cursor-pointer"
                   title="Xóa chỉ số"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
               </div>
             ))
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 }

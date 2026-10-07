@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react'
 import { IntroduceAPI } from '../../api/introduceApi.js'
 import { aboutAdminButton, aboutAdminPrimaryButton, aboutAdminTabs, emptyAboutSection } from '../../config/Admin/adminAbout.js'
+import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton } from '../../components/Admin/Common'
 import HeroEditor from '../../components/Admin/About/HeroEditor.jsx'
 import OverviewEditor from '../../components/Admin/About/OverviewEditor.jsx'
 import VisionEditor from '../../components/Admin/About/VisionEditor.jsx'
@@ -113,45 +114,101 @@ export default function AdminAbout() {
   const Editor = editors[active.key]
   const errors = fieldErrors[active.key] || {}
   const editable = drafts[active.key] && typeof drafts[active.key] === 'object' && !Array.isArray(drafts[active.key])
-  return <section className="space-y-5 font-inter text-(--admin-ink) [--admin-background:var(--color-brand-cream)] [--admin-surface:var(--admin-white)] [--admin-ink:var(--admin-black)] [--admin-heading:var(--color-brand-red)] [--admin-title:var(--color-brand-red)] [--admin-border:rgb(0_0_0/0.15)] [[data-theme=dark]_&]:[--admin-background:rgb(255_255_255/0.06)] [[data-theme=dark]_&]:[--admin-surface:var(--admin-black)] [[data-theme=dark]_&]:[--admin-ink:var(--color-brand-cream)] [[data-theme=dark]_&]:[--admin-heading:var(--color-brand-gold)] [[data-theme=dark]_&]:[--admin-title:var(--admin-white)] [[data-theme=dark]_&]:[--admin-border:rgb(212_149_32/0.25)]">
-    <div className="border-b border-(--admin-border) pb-5">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-(--admin-heading)">Khu vực quản trị nội dung</p>
-      <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">Quản lý Giới thiệu</h1>
-      <p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">Chỉnh sửa và lưu từng phần.</p>
-    </div>
-    {loading ? <p role="status">Đang tải…</p> : loadError ? <div role="alert" className="space-y-3"><p>{loadError}</p><button className={aboutAdminButton} onClick={() => { setLoading(true); setLoadError(''); setAttempt((value) => value + 1) }}>Thử lại</button></div> : <>
-      <div role="tablist" aria-label="Các phần giới thiệu" className="flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) px-2 [scrollbar-width:thin]">
-        {aboutAdminTabs.map((tab, index) => {
-          const TabIcon = tab.icon
-          return <button key={tab.key} type="button" role="tab" id={`tab-${tab.key}`} aria-controls={`panel-${tab.key}`} aria-selected={active.key === tab.key} tabIndex={active.key === tab.key ? 0 : -1} onClick={() => selectTab(tab.key)} onKeyDown={(event) => tabKeyDown(event, index)} className={`inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 border-b-2 px-3 text-sm font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--color-brand-gold) ${active.key === tab.key ? 'border-(--color-brand-gold) text-(--admin-title)' : 'border-transparent text-(--admin-ink)/70 hover:bg-(--admin-background) hover:text-(--admin-heading)'}`}>
-            <TabIcon size={14} aria-hidden="true" />{tab.label}{dirtyKeys.includes(tab.key) && <span aria-label="chưa lưu">•</span>}
-          </button>
-        })}
-      </div>
-      <div role="tabpanel" id={`panel-${active.key}`} aria-labelledby={`tab-${active.key}`} className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-5 sm:p-6">
-        <div className="mb-5 space-y-1">
-          <h2 className="text-lg font-semibold text-(--admin-title)">{active.label}</h2>
-          <p className="text-sm leading-5 text-(--admin-ink)/70">{active.description}</p>
+  return (
+    <section className="space-y-5 font-inter text-(--admin-ink)">
+      <AdminToast toast={toast ? { message: toast.message, type: toast.error ? 'error' : 'success' } : null} onClose={() => setToast(null)} />
+
+      <AdminPageHeader
+        badge="Khu vực quản trị nội dung"
+        title="Quản lý Giới thiệu"
+        description="Chỉnh sửa và lưu từng phần: Hero, Tổng quan, Tầm nhìn, Sứ mệnh, Giá trị cốt lõi, Định hướng hành động."
+      />
+
+      {loading ? (
+        <div className="flex min-h-[300px] items-center justify-center">
+          <p className="text-sm font-semibold text-gray-500">Đang tải dữ liệu giới thiệu...</p>
         </div>
-        <form ref={formRef} onSubmit={save} noValidate className="space-y-5">
-          {!Object.hasOwn(saved, active.key) && <p className="border-l-2 border-(--color-brand-gold) px-3 py-2 text-sm leading-5">Chưa có nội dung. Nhập và lưu để tạo mới.</p>}
-          {typeof errors._schema === 'string' && <p role="alert" className="text-sm text-(--admin-heading)">{errors._schema}</p>}
-          <fieldset disabled={Boolean(saving)} className="min-w-0 space-y-5 disabled:opacity-60">
-            {editable && Editor ? <Editor value={drafts[active.key]} onChange={update} errors={errors} /> : <p>Dữ liệu không hợp lệ. Vui lòng nhập lại.</p>}
-            <div className="flex justify-end border-t border-(--admin-border) pt-4">
-              <button type="submit" disabled={!dirty || Boolean(saving)} className={aboutAdminPrimaryButton}><Save size={14} aria-hidden="true" />{saving === active.key ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
-            </div>
-            {(!editable || Object.keys(errors).length > 0) && <button type="button" className={aboutAdminButton} onClick={() => { if (window.confirm('Xóa bản nháp phần này để nhập lại?')) update(emptyAboutSection(active.key)) }}>Nhập lại phần này</button>}
-          </fieldset>
-        </form>
-      </div>
-    </>}
-    {toast && <div className="fixed right-4 bottom-4 z-40 flex w-[calc(100%-2rem)] max-w-sm items-start gap-3 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-(--admin-ink) shadow-lg sm:right-6 sm:bottom-6">
-      {toast.error
-        ? <AlertCircle size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-(--admin-heading)" />
-        : <CheckCircle2 size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-(--admin-heading)" />}
-      <p role={toast.error ? 'alert' : 'status'} aria-atomic="true" className="min-w-0 flex-1 text-sm leading-6 wrap-anywhere">{toast.message}</p>
-      <button type="button" aria-label="Đóng thông báo" onClick={() => setToast(null)} className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded text-(--admin-ink)/70 hover:bg-(--admin-background) hover:text-(--admin-ink) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-brand-gold)"><X size={18} aria-hidden="true" /></button>
-    </div>}
-  </section>
+      ) : loadError ? (
+        <div role="alert" className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-800 space-y-3">
+          <p className="text-sm">{loadError}</p>
+          <button
+            className={aboutAdminButton}
+            onClick={() => { setLoading(true); setLoadError(''); setAttempt((value) => value + 1); }}
+          >
+            Thử lại
+          </button>
+        </div>
+      ) : (
+        <>
+          <AdminTabs
+            tabs={aboutAdminTabs.map((tab) => ({
+              id: tab.key,
+              label: tab.label,
+              icon: tab.icon,
+              badge: dirtyKeys.includes(tab.key) ? '•' : null,
+            }))}
+            activeTab={active.key}
+            onChange={(key) => selectTab(key)}
+          />
+
+          <AdminCard
+            title={active.label}
+            subtitle={active.description}
+            actions={
+              <AdminButton
+                type="submit"
+                form={`form-${active.key}`}
+                variant="primary"
+                size="sm"
+                icon={Save}
+                loading={saving === active.key}
+                disabled={!dirty || Boolean(saving)}
+              >
+                {saving === active.key ? 'Đang lưu…' : 'Lưu thay đổi'}
+              </AdminButton>
+            }
+          >
+            <form id={`form-${active.key}`} ref={formRef} onSubmit={save} noValidate className="space-y-5">
+              {!Object.hasOwn(saved, active.key) && (
+                <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm leading-5 bg-(--admin-background)/50 rounded-r-lg">
+                  Chưa có nội dung. Nhập và lưu để tạo mới.
+                </p>
+              )}
+              {typeof errors._schema === 'string' && (
+                <p role="alert" className="text-sm text-red-600 font-semibold">{errors._schema}</p>
+              )}
+              <fieldset disabled={Boolean(saving)} className="min-w-0 space-y-5 disabled:opacity-60">
+                {editable && Editor ? (
+                  <Editor value={drafts[active.key]} onChange={update} errors={errors} />
+                ) : (
+                  <p>Dữ liệu không hợp lệ. Vui lòng nhập lại.</p>
+                )}
+                <div className="flex items-center justify-between border-t border-(--admin-border) pt-4">
+                  {(!editable || Object.keys(errors).length > 0) ? (
+                    <AdminButton
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { if (window.confirm('Xóa bản nháp phần này để nhập lại?')) update(emptyAboutSection(active.key)) }}
+                    >
+                      Nhập lại phần này
+                    </AdminButton>
+                  ) : <div />}
+                  <AdminButton
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    icon={Save}
+                    loading={saving === active.key}
+                    disabled={!dirty || Boolean(saving)}
+                  >
+                    {saving === active.key ? 'Đang lưu…' : 'Lưu thay đổi'}
+                  </AdminButton>
+                </div>
+              </fieldset>
+            </form>
+          </AdminCard>
+        </>
+      )}
+    </section>
+  );
 }

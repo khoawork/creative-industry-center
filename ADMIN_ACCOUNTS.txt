@@ -1,0 +1,40 @@
+================================================================================
+          DANH SÁCH TÀI KHOẢN QUẢN TRỊ TEST - CREATIVE INDUSTRY CENTER
+================================================================================
+Trang đăng nhập: http://localhost:5173/admin/login
+Môi trường backend: http://localhost:5000/auth/login
+
+--------------------------------------------------------------------------------
+1. TÀI KHOẢN ADMIN (QUẢN TRỊ VIÊN - TOÀN QUYỀN HỆ THỐNG)
+--------------------------------------------------------------------------------
+- Username       : admin
+- Email          : admin@vietkings.org
+- Password       : admin123
+- Role           : admin
+- Quyền hạn      : • Toàn quyền trên mọi module hệ thống (Menu, Bài viết, Sự kiện, Dự án...)
+                   • DUY NHẤT có quyền TẠO TÀI KHOẢN MỚI
+                   • DUY NHẤT có quyền BẬT / TẮT QUYỀN TRUY CẬP ADMIN của tài khoản khác
+                   • Đổi mật khẩu, vai trò của các tài khoản
+
+--------------------------------------------------------------------------------
+2. TÀI KHOẢN MANAGER (QUẢN LÝ VẬN HÀNH)
+--------------------------------------------------------------------------------
+- Username       : manager
+- Email          : manager@vietkings.org
+- Password       : manager123
+- Role           : manager
+- Quyền hạn      : • Quản trị toàn bộ hệ thống & nội dung website giống như Admin:
+                     + Thêm, sửa, xóa, đổi thứ tự Menu & Điều hướng
+                     + Quản lý Bài viết, Sự kiện, Kỷ lục, Đào tạo, Dự án
+                     + Quản lý Biểu mẫu liên hệ & Form đăng ký
+                     + Xem danh sách tài khoản
+                   • KHÔNG CÓ QUYỀN tạo tài khoản mới (Nút "Tạo tài khoản" tự động ẩn)
+                   • KHÔNG CÓ QUYỀN bật/tắt quyền admin của tài khoản khác
+
+================================================================================
+GHI CHÚ BẢO MẬT:
+- Đăng nhập sử dụng JWT Token lưu an toàn trong Cookie HttpOnly ('admin_token').
+- Các tài khoản được bảo vệ bằng werkzeug pbkdf2:sha256 hash.
+- Đã loại bỏ hoàn toàn lịch sử đăng nhập.
+- Logic mở rộng Nhật ký chỉnh sửa dữ liệu (Audit Log) được lưu tại docs/AUDIT_LOG_DESIGN.md.
+================================================================================

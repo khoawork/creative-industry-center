@@ -1,19 +1,18 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { adminRoot } from "../../config/Admin/adminNavigation.js";
+import { AdminPageHeader } from "../../components/Admin/Common/index.js";
 
 export default function AdminModulePlaceholder({ item }) {
   const Icon = item.icon;
   return (
-    <>
-      <p className="mb-3 text-[11px] font-semibold tracking-[0.16em] text-(--admin-heading) uppercase">
-        Khu vực quản trị
-      </p>
-      <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">
-        {item.label}
-      </h1>
-      <p className="mt-3 text-sm leading-6">{item.description}</p>
-      <section className="mt-8 flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center rounded-lg border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)]">
+    <div className="space-y-6">
+      <AdminPageHeader
+        badge="Khu vực quản trị"
+        title={item.label}
+        subtitle={item.description}
+      />
+      <section className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)]">
         <span className="flex size-16 items-center justify-center rounded-xl bg-(--admin-background) text-(--admin-heading)">
           <Icon size={28} strokeWidth={1.5} aria-hidden="true" />
         </span>
@@ -50,6 +49,6 @@ export default function AdminModulePlaceholder({ item }) {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

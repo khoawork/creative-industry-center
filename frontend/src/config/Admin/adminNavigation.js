@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Trophy,
   UsersRound,
+  History,
 } from "lucide-react";
 import { siteLinks } from "../../config/shared/site.js";
 import { adminRoot } from "./adminPaths.js";
@@ -108,6 +109,13 @@ export const adminGroups = [
         path: `${adminRoot}/users`,
         icon: UsersRound,
         description: "Quản lý thành viên và quyền truy cập khu vực quản trị.",
+      },
+      {
+        id: "activities",
+        label: "Nhật ký hoạt động",
+        path: `${adminRoot}/activities`,
+        icon: History,
+        description: "Theo dõi toàn bộ lịch sử chỉnh sửa dữ liệu của đội ngũ quản trị.",
       },
       {
         id: "navigation",

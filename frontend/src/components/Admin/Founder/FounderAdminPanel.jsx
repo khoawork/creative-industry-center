@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  AlertCircle,
-  Award,
-  CheckCircle2,
   Layout,
   Pencil,
   Plus,
@@ -10,13 +7,21 @@ import {
   Save,
   Trash2,
   UsersRound,
+  Award,
 } from 'lucide-react';
 import { FounderAPI } from '../../../api/founderApi.js';
+import {
+  AdminPageHeader,
+  AdminTabs,
+  AdminCard,
+  AdminButton,
+  AdminToast,
+} from '../Common/index.js';
 
 const tabs = [
-  { id: 'hero', label: 'Hero', icon: Layout },
-  { id: 'sections', label: 'Founder', icon: UsersRound },
-  { id: 'cta', label: 'CTA & chứng nhận', icon: Award },
+  { id: 'hero', label: 'Hero Banner', icon: Layout },
+  { id: 'sections', label: 'Danh sách Founder', icon: UsersRound },
+  { id: 'cta', label: 'CTA & Chứng nhận', icon: Award },
 ];
 
 const emptyHero = {
@@ -121,6 +126,11 @@ function emptyProfile(filter) {
   };
 }
 
+const inputClass =
+  'w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3.5 py-2.5 text-sm text-(--admin-title) placeholder:text-(--admin-body)/40 outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/10';
+const labelClass =
+  'block text-xs font-bold uppercase tracking-wider text-(--admin-heading) mb-1.5';
+
 function Field({ label, name, value, onChange, type = 'text', required = true, placeholder = '' }) {
   const inputId = `founder-${name.replaceAll('.', '-')}`;
   const commonProps = {
@@ -130,25 +140,14 @@ function Field({ label, name, value, onChange, type = 'text', required = true, p
     onChange: (event) => onChange(event.target.value),
     required,
     placeholder,
-    className: 'mt-1.5 min-h-11 w-full rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm text-(--admin-ink) outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/30',
+    className: inputClass,
   };
 
   return (
-    <label htmlFor={inputId} className="block text-sm font-medium text-(--admin-ink)">
-      {label}
-      {type === 'textarea' ? <textarea {...commonProps} rows={4} /> : <input {...commonProps} type={type} />}
+    <label htmlFor={inputId} className="block">
+      <span className={labelClass}>{label}</span>
+      {type === 'textarea' ? <textarea {...commonProps} rows={3} /> : <input {...commonProps} type={type} />}
     </label>
-  );
-}
-
-function StatusMessage({ status }) {
-  if (!status) return null;
-  const isError = status.type === 'error';
-  return (
-    <div role={isError ? 'alert' : 'status'} className={`mt-5 flex items-start gap-2 rounded-md border px-3 py-2.5 text-sm ${isError ? 'border-red-300 bg-red-50 text-red-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}`}>
-      {isError ? <AlertCircle size={17} className="mt-0.5 shrink-0" aria-hidden="true" /> : <CheckCircle2 size={17} className="mt-0.5 shrink-0" aria-hidden="true" />}
-      <span>{status.message}</span>
-    </div>
   );
 }
 
@@ -160,14 +159,24 @@ function HeroEditor({ hero, saving, onSave }) {
   return (
     <form onSubmit={(event) => { event.preventDefault(); onSave({ ...form, number_of_founders: Number(form.number_of_founders) }); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Tiêu đề" name="title" value={form.title} onChange={(value) => update('title', value)} />
+        <Field label="Tiêu đề chính" name="title" value={form.title} onChange={(value) => update('title', value)} />
         <Field label="Tên nhóm Founder" name="name" value={form.name} onChange={(value) => update('name', value)} />
-        <Field label="Subtitle" name="subtitle" value={form.subtitle} onChange={(value) => update('subtitle', value)} />
+        <Field label="Tiêu đề phụ (Subtitle)" name="subtitle" value={form.subtitle} onChange={(value) => update('subtitle', value)} />
         <Field label="Số lượng Founder" name="number_of_founders" type="number" value={form.number_of_founders} onChange={(value) => update('number_of_founders', value)} />
       </div>
-      <Field label="Mô tả" name="description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
-      <Field label="Mô tả phụ" name="subdescription" type="textarea" value={form.subdescription} onChange={(value) => update('subdescription', value)} />
-      <SaveButton saving={saving} label={hero ? 'Lưu Hero' : 'Tạo Hero'} />
+      <Field label="Mô tả mở đầu" name="description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
+      <Field label="Mô tả bổ trợ" name="subdescription" type="textarea" value={form.subdescription} onChange={(value) => update('subdescription', value)} />
+      
+      <div className="flex justify-end pt-2">
+        <AdminButton
+          type="submit"
+          variant="primary"
+          loading={saving}
+          icon={Save}
+        >
+          {hero ? 'Lưu Hero Banner' : 'Tạo Hero Banner'}
+        </AdminButton>
+      </div>
     </form>
   );
 }
@@ -216,48 +225,84 @@ function SectionEditor({ section, saving, onSave, onCancel }) {
     <form onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Tên Founder" name="name" value={form.name} onChange={(value) => update('name', value)} />
-        <Field label="Chức danh / major" name="major" value={form.major} onChange={(value) => update('major', value)} />
-        <Field label="URL hình ảnh" name="image" value={form.image} onChange={(value) => update('image', value)} placeholder="https://..." />
-        <label htmlFor="founder-is-verified" className="flex min-h-11 items-center gap-3 self-end rounded-md border border-(--admin-border) px-3 text-sm font-medium">
+        <Field label="Chức danh / Major" name="major" value={form.major} onChange={(value) => update('major', value)} />
+        <Field label="URL hình ảnh chân dung" name="image" value={form.image} onChange={(value) => update('image', value)} placeholder="https://..." />
+        <label htmlFor="founder-is-verified" className="flex min-h-[46px] items-center gap-3 self-end rounded-lg border border-(--admin-border) bg-(--admin-background) px-3.5 text-sm font-medium text-(--admin-title) cursor-pointer">
           <input id="founder-is-verified" type="checkbox" checked={form.is_verified} onChange={(event) => update('is_verified', event.target.checked)} className="size-4 accent-(--admin-accent)" />
-          Đã xác minh
+          Đã xác minh (Verified)
         </label>
       </div>
       <Field label="Mô tả Founder" name="description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
 
-      <fieldset className="space-y-3 rounded-md border border-(--admin-border) p-4">
-        <legend className="px-1 text-sm font-semibold text-(--admin-heading)">Thông tin Founder</legend>
+      <fieldset className="space-y-3 rounded-xl border border-(--admin-border) bg-(--admin-background) p-4">
+        <legend className="px-2 text-xs font-bold uppercase tracking-wider text-(--admin-heading)">Thông tin chi tiết Founder</legend>
         {form.founder_info.map((item, index) => (
-          <div key={item.id || index} className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+          <div key={item.id || index} className="grid gap-3 md:grid-cols-[1fr_1fr_auto] items-end">
             <Field label={`Nhãn ${index + 1}`} name={`founder-info-label-${index}`} value={item.label} onChange={(value) => updateInfo(index, 'label', value)} />
             <Field label={`Giá trị ${index + 1}`} name={`founder-info-value-${index}`} value={item.value} onChange={(value) => updateInfo(index, 'value', value)} />
-            <button type="button" onClick={() => removeInfo(index)} disabled={form.founder_info.length === 1} aria-label={`Xóa thông tin ${index + 1}`} className="mt-6 flex min-h-11 items-center justify-center rounded-md px-3 text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"><Trash2 size={16} /></button>
+            <button
+              type="button"
+              onClick={() => removeInfo(index)}
+              disabled={form.founder_info.length === 1}
+              aria-label={`Xóa thông tin ${index + 1}`}
+              className="flex min-h-[44px] items-center justify-center rounded-lg px-3 text-rose-500 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-40 transition cursor-pointer"
+            >
+              <Trash2 size={16} />
+            </button>
           </div>
         ))}
-        <button type="button" onClick={addInfo} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-(--admin-accent) px-3 text-sm font-semibold text-(--admin-heading) hover:bg-(--admin-background)"><Plus size={15} />Thêm thông tin</button>
+        <AdminButton
+          type="button"
+          variant="outline"
+          size="sm"
+          icon={Plus}
+          onClick={addInfo}
+        >
+          Thêm thông tin
+        </AdminButton>
       </fieldset>
 
-      <fieldset className="space-y-4 rounded-md border border-(--admin-border) p-4">
-        <legend className="px-1 text-sm font-semibold text-(--admin-heading)">Founder profile</legend>
+      <fieldset className="space-y-4 rounded-xl border border-(--admin-border) bg-(--admin-background) p-4">
+        <legend className="px-2 text-xs font-bold uppercase tracking-wider text-(--admin-heading)">Hồ sơ Founder (Profile)</legend>
         <div className="grid gap-5 md:grid-cols-2">
-          <label htmlFor="founder-profile-filter" className="block text-sm font-medium">
-            Bộ lọc
-            <select id="founder-profile-filter" value={form.founder_profile.filter} onChange={(event) => updateProfileFilter(event.target.value)} className="mt-1.5 min-h-11 w-full rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm outline-none focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/30">
-              <option value="bio">Bio</option>
-              <option value="projects">Projects</option>
-              <option value="achievements">Achievements</option>
+          <label htmlFor="founder-profile-filter" className="block">
+            <span className={labelClass}>Bộ lọc (Filter)</span>
+            <select
+              id="founder-profile-filter"
+              value={form.founder_profile.filter}
+              onChange={(event) => updateProfileFilter(event.target.value)}
+              className={inputClass}
+            >
+              <option value="bio">Tiểu sử (Bio)</option>
+              <option value="projects">Dự án (Projects)</option>
+              <option value="achievements">Thành tựu (Achievements)</option>
             </select>
           </label>
-          <Field label="Tiêu đề profile" name="profile-title" value={form.founder_profile.title} onChange={(value) => updateProfile('title', value)} />
-          <Field label="Slogan" name="slogan" value={form.founder_profile.slogan} onChange={(value) => updateProfile('slogan', value)} />
-          <Field label="Sub slogan" name="sub-slogan" value={form.founder_profile.sub_slogan} onChange={(value) => updateProfile('sub_slogan', value)} />
+          <Field label="Tiêu đề Profile" name="profile-title" value={form.founder_profile.title} onChange={(value) => updateProfile('title', value)} />
+          <Field label="Khẩu hiệu (Slogan)" name="slogan" value={form.founder_profile.slogan} onChange={(value) => updateProfile('slogan', value)} />
+          <Field label="Khẩu hiệu phụ (Sub slogan)" name="sub-slogan" value={form.founder_profile.sub_slogan} onChange={(value) => updateProfile('sub_slogan', value)} />
         </div>
-        <Field label="Mô tả profile" name="profile-description" type="textarea" value={form.founder_profile.description} onChange={(value) => updateProfile('description', value)} />
+        <Field label="Mô tả Profile" name="profile-description" type="textarea" value={form.founder_profile.description} onChange={(value) => updateProfile('description', value)} />
       </fieldset>
 
-      <div className="flex flex-wrap gap-3">
-        <SaveButton saving={saving} label={section ? 'Lưu Founder' : 'Tạo Founder'} />
-        {section && <button type="button" onClick={onCancel} className="min-h-11 rounded-md border border-(--admin-border) px-4 text-sm font-semibold hover:bg-(--admin-background)">Hủy chỉnh sửa</button>}
+      <div className="flex items-center justify-end gap-3 pt-2">
+        {section && (
+          <AdminButton
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+          >
+            Hủy chỉnh sửa
+          </AdminButton>
+        )}
+        <AdminButton
+          type="submit"
+          variant="primary"
+          loading={saving}
+          icon={Save}
+        >
+          {section ? 'Lưu Founder' : 'Tạo Founder mới'}
+        </AdminButton>
       </div>
     </form>
   );
@@ -271,23 +316,24 @@ function CtaEditor({ cta, saving, onSave }) {
   return (
     <form onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Subtitle" name="cta-subtitle" value={form.subtitle} onChange={(value) => update('subtitle', value)} />
-        <Field label="Tiêu đề" name="cta-title" value={form.title} onChange={(value) => update('title', value)} />
-        <Field label="Nút chính" name="btn-cta" value={form.btn_cta} onChange={(value) => update('btn_cta', value)} />
-        <Field label="Nút phụ" name="sub-btn-cta" value={form.sub_btn_cta} onChange={(value) => update('sub_btn_cta', value)} />
+        <Field label="Tiêu đề phụ (Subtitle)" name="cta-subtitle" value={form.subtitle} onChange={(value) => update('subtitle', value)} />
+        <Field label="Tiêu đề chính (Title)" name="cta-title" value={form.title} onChange={(value) => update('title', value)} />
+        <Field label="Nút hành động chính (Button CTA)" name="btn-cta" value={form.btn_cta} onChange={(value) => update('btn_cta', value)} />
+        <Field label="Nút hành động phụ (Sub Button CTA)" name="sub-btn-cta" value={form.sub_btn_cta} onChange={(value) => update('sub_btn_cta', value)} />
       </div>
       <Field label="Mô tả CTA" name="cta-description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
-      <SaveButton saving={saving} label={cta ? 'Lưu CTA' : 'Tạo CTA'} />
+      
+      <div className="flex justify-end pt-2">
+        <AdminButton
+          type="submit"
+          variant="primary"
+          loading={saving}
+          icon={Save}
+        >
+          {cta ? 'Lưu CTA' : 'Tạo CTA mới'}
+        </AdminButton>
+      </div>
     </form>
-  );
-}
-
-function SaveButton({ saving, label }) {
-  return (
-    <button type="submit" disabled={saving} className="inline-flex min-h-11 items-center gap-2 rounded-md bg-(--admin-primary) px-4 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-heading)">
-      <Save size={16} aria-hidden="true" />
-      {saving ? 'Đang lưu...' : label}
-    </button>
   );
 }
 
@@ -480,53 +526,222 @@ export default function FounderAdminPanel() {
   }
 
   return (
-    <>
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-(--admin-border) pb-7">
-        <div>
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.16em] text-(--admin-heading) uppercase">Khu vực quản trị</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">Chuyện nhà sáng nghiệp</h1>
-          <p className="mt-3 text-sm leading-6">Quản lý Hero, hồ sơ Founder, lời kêu gọi hành động và chứng nhận.</p>
-        </div>
-        <button type="button" onClick={loadFounderData} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-(--admin-border) px-3 text-sm font-semibold hover:bg-(--admin-background)" title="Tải lại dữ liệu"><RefreshCw size={16} />Tải lại</button>
-      </div>
+    <div className="space-y-6">
+      <AdminToast
+        toast={status ? { message: status.message, type: status.type } : null}
+        onClose={() => setStatus(null)}
+      />
 
-      <StatusMessage status={status} />
+      {/* Header trang quản trị chuẩn hóa */}
+      <AdminPageHeader
+        badge="Nội dung website"
+        title="Quản trị Chuyện nhà sáng nghiệp"
+        subtitle="Quản lý Hero banner, hồ sơ các nhà sáng lập (Founder), lời kêu gọi hành động (CTA) và chứng nhận."
+        actions={
+          <AdminButton
+            type="button"
+            variant="outline"
+            size="sm"
+            icon={RefreshCw}
+            loading={loading}
+            onClick={loadFounderData}
+          >
+            Tải lại
+          </AdminButton>
+        }
+      />
 
-      <div role="tablist" aria-label="Quản lý Founder" className="my-6 flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) p-1">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return <button key={tab.id} type="button" role="tab" aria-selected={activeTab === tab.id} onClick={() => setActiveTab(tab.id)} className={`inline-flex min-h-11 shrink-0 items-center gap-2 border-b-2 px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-(--admin-heading) ${activeTab === tab.id ? 'border-(--admin-accent) text-(--admin-title)' : 'border-transparent text-(--admin-heading) hover:bg-(--admin-background)'}`}><Icon size={16} />{tab.label}</button>;
-        })}
-      </div>
+      {/* Tabs Navigation chuẩn hóa */}
+      <AdminTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
-      {activeTab === 'hero' && <Panel title="Hero section" description="Nội dung mở đầu của trang Founder."><HeroEditor key={page?.props?.hero_section?.id || 'new'} hero={page?.props?.hero_section} saving={saving} onSave={saveHero} /></Panel>}
+      {/* Tab 1: Hero Banner */}
+      {activeTab === 'hero' && (
+        <AdminCard
+          title="Cấu hình Hero Banner"
+          subtitle="Thông tin tiêu đề, lời mở đầu và số lượng nhà sáng lập"
+        >
+          <HeroEditor
+            key={page?.props?.hero_section?.id || 'new'}
+            hero={page?.props?.hero_section}
+            saving={saving}
+            onSave={saveHero}
+          />
+        </AdminCard>
+      )}
 
+      {/* Tab 2: Danh sách Founder */}
       {activeTab === 'sections' && (
-        <div className="grid gap-6 xl:grid-cols-[minmax(260px,0.7fr)_minmax(0,1.5fr)]">
-          <Panel title="Danh sách Founder" description={`${sections.length} hồ sơ đang có.`}>
-            <div className="space-y-2">
-              <button type="button" onClick={() => setSelectedSectionId(null)} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-dashed border-(--admin-accent) px-3 text-sm font-semibold text-(--admin-heading) hover:bg-(--admin-background)"><Plus size={16} />Thêm Founder</button>
-              {sections.map((section) => <div key={section.id} className={`flex items-center gap-2 rounded-md border p-3 ${selectedSectionId === section.id ? 'border-(--admin-accent) bg-(--admin-background)' : 'border-(--admin-border)'}`}><button type="button" onClick={() => setSelectedSectionId(section.id)} className="min-w-0 flex-1 text-left"><span className="block truncate text-sm font-semibold">{section.name}</span><span className="mt-1 block truncate text-xs opacity-70">{section.major} · {section.id}</span></button><button type="button" onClick={() => setSelectedSectionId(section.id)} aria-label={`Sửa ${section.name}`} className="flex size-9 shrink-0 items-center justify-center rounded-md hover:bg-(--admin-background)"><Pencil size={15} /></button><button type="button" onClick={() => deleteSection(section.id)} aria-label={`Xóa ${section.name}`} className="flex size-9 shrink-0 items-center justify-center rounded-md text-red-700 hover:bg-red-50"><Trash2 size={15} /></button></div>)}
-              {!sections.length && <p className="py-8 text-center text-sm opacity-70">Chưa có Founder nào.</p>}
+        <div className="grid gap-6 xl:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.5fr)]">
+          <AdminCard
+            title="Danh sách Founder"
+            subtitle={`${sections.length} hồ sơ trong hệ thống`}
+            actions={
+              <AdminButton
+                type="button"
+                variant="outline"
+                size="sm"
+                icon={Plus}
+                onClick={() => setSelectedSectionId(null)}
+              >
+                Thêm Founder
+              </AdminButton>
+            }
+          >
+            <div className="space-y-2.5">
+              {sections.map((section) => (
+                <div
+                  key={section.id}
+                  className={`flex items-center gap-2 rounded-xl border p-3.5 transition duration-150 ${
+                    selectedSectionId === section.id
+                      ? 'border-(--admin-accent) bg-(--admin-accent)/5 shadow-xs ring-1 ring-(--admin-accent)/10'
+                      : 'border-(--admin-border) bg-(--admin-background) hover:border-(--admin-border-hover)'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSectionId(section.id)}
+                    className="min-w-0 flex-1 text-left cursor-pointer"
+                  >
+                    <span className="block truncate text-sm font-bold text-(--admin-title)">
+                      {section.name}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-(--admin-body)/60">
+                      {section.major} · Mã: {section.id}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSectionId(section.id)}
+                    aria-label={`Sửa ${section.name}`}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-(--admin-body)/60 hover:text-(--admin-accent) hover:bg-(--admin-surface) transition cursor-pointer"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteSection(section.id)}
+                    aria-label={`Xóa ${section.name}`}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+              {!sections.length && (
+                <p className="py-8 text-center text-xs text-(--admin-body)/50 italic">
+                  Chưa có Founder nào trong danh sách.
+                </p>
+              )}
             </div>
-          </Panel>
-          <Panel title={selectedSection ? 'Chỉnh sửa Founder' : 'Tạo Founder'} description="Các trường bắt buộc theo FounderSectionDto."><SectionEditor key={selectedSectionId || 'new'} section={selectedSection} saving={saving} onSave={saveSection} onCancel={() => setSelectedSectionId(null)} /></Panel>
+          </AdminCard>
+
+          <AdminCard
+            title={selectedSection ? `Chỉnh sửa: ${selectedSection.name}` : 'Tạo mới hồ sơ Founder'}
+            subtitle="Thiết lập thông tin cá nhân, tiểu sử và profile chi tiết"
+          >
+            <SectionEditor
+              key={selectedSectionId || 'new'}
+              section={selectedSection}
+              saving={saving}
+              onSave={saveSection}
+              onCancel={() => setSelectedSectionId(null)}
+            />
+          </AdminCard>
         </div>
       )}
 
+      {/* Tab 3: CTA & Chứng nhận */}
       {activeTab === 'cta' && (
         <div className="space-y-6">
-          <Panel title="CTA section" description="Nội dung kêu gọi hành động của trang Founder."><CtaEditor key={cta?.id || 'new'} cta={cta} saving={saving} onSave={saveCta} /></Panel>
-          <Panel title="Chứng nhận" description="Quản lý các chứng nhận hiển thị trong CTA.">
-            <form onSubmit={saveCertificate} className="flex flex-col gap-3 sm:flex-row"><label htmlFor="certificate-name" className="sr-only">Tên chứng nhận</label><input id="certificate-name" value={certificateName} onChange={(event) => setCertificateName(event.target.value)} placeholder="Ví dụ: ISO 9001" className="min-h-11 flex-1 rounded-md border border-(--admin-border) bg-(--admin-background) px-3 text-sm outline-none focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/30" /><button type="submit" disabled={saving || !certificateName.trim()} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-(--admin-primary) px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{editingCertificateId ? <Pencil size={16} /> : <Plus size={16} />}{editingCertificateId ? 'Lưu chứng nhận' : 'Thêm chứng nhận'}</button>{editingCertificateId && <button type="button" onClick={() => { setEditingCertificateId(null); setCertificateName(''); }} className="min-h-11 rounded-md border border-(--admin-border) px-4 text-sm font-semibold">Hủy</button>}</form>
-            <div className="mt-5 divide-y divide-(--admin-border) border-y border-(--admin-border)">{certificates.map((certificate) => <div key={certificate.id} className="flex min-h-14 items-center gap-3 py-2"><span className="flex-1 text-sm font-medium">{certificate.name}</span><button type="button" onClick={() => { setEditingCertificateId(certificate.id); setCertificateName(certificate.name); }} aria-label={`Sửa ${certificate.name}`} className="flex size-9 items-center justify-center rounded-md hover:bg-(--admin-background)"><Pencil size={15} /></button><button type="button" onClick={() => deleteCertificate(certificate.id)} aria-label={`Xóa ${certificate.name}`} className="flex size-9 items-center justify-center rounded-md text-red-700 hover:bg-red-50"><Trash2 size={15} /></button></div>)}{!certificates.length && <p className="py-8 text-center text-sm opacity-70">Chưa có chứng nhận nào.</p>}</div>
-          </Panel>
+          <AdminCard
+            title="Cấu hình Khối Kêu gọi hành động (CTA)"
+            subtitle="Nội dung kêu gọi đăng ký và hợp tác cuối trang Founder"
+          >
+            <CtaEditor
+              key={cta?.id || 'new'}
+              cta={cta}
+              saving={saving}
+              onSave={saveCta}
+            />
+          </AdminCard>
+
+          <AdminCard
+            title={`Danh sách Chứng nhận (${certificates.length})`}
+            subtitle="Quản lý các chứng nhận và bảo chứng pháp lý hiển thị trong khối CTA"
+          >
+            <div className="space-y-4">
+              <form onSubmit={saveCertificate} className="flex flex-col gap-2.5 sm:flex-row">
+                <input
+                  value={certificateName}
+                  onChange={(event) => setCertificateName(event.target.value)}
+                  placeholder="Nhập tên chứng nhận (Ví dụ: ISO 9001:2015, VIETKINGS Seal...)"
+                  className="w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3.5 py-2.5 text-sm text-(--admin-title) placeholder:text-(--admin-body)/40 outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/10"
+                />
+                <AdminButton
+                  type="submit"
+                  variant="primary"
+                  disabled={saving || !certificateName.trim()}
+                  icon={editingCertificateId ? Pencil : Plus}
+                >
+                  {editingCertificateId ? 'Lưu chứng nhận' : 'Thêm chứng nhận'}
+                </AdminButton>
+                {editingCertificateId && (
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setEditingCertificateId(null);
+                      setCertificateName('');
+                    }}
+                  >
+                    Hủy
+                  </AdminButton>
+                )}
+              </form>
+
+              <div className="divide-y divide-(--admin-border) border-y border-(--admin-border)">
+                {certificates.map((certificate) => (
+                  <div key={certificate.id} className="flex min-h-12 items-center justify-between gap-3 py-2">
+                    <span className="text-sm font-semibold text-(--admin-title)">
+                      {certificate.name}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingCertificateId(certificate.id);
+                          setCertificateName(certificate.name);
+                        }}
+                        aria-label={`Sửa ${certificate.name}`}
+                        className="flex size-8 items-center justify-center rounded-lg text-(--admin-body)/60 hover:text-(--admin-accent) hover:bg-(--admin-background) transition cursor-pointer"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCertificate(certificate.id)}
+                        aria-label={`Xóa ${certificate.name}`}
+                        className="flex size-8 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {!certificates.length && (
+                  <p className="py-6 text-center text-xs text-(--admin-body)/50 italic">
+                    Chưa có chứng nhận nào trong danh sách.
+                  </p>
+                )}
+              </div>
+            </div>
+          </AdminCard>
         </div>
       )}
-    </>
+    </div>
   );
-}
-
-function Panel({ title, description, children }) {
-  return <section className="border border-(--admin-border) bg-(--admin-surface) p-5 shadow-[var(--admin-panel-shadow)] sm:p-6"><h2 className="text-lg font-semibold text-(--admin-title)">{title}</h2><p className="mt-1 text-sm leading-6 opacity-75">{description}</p><div className="mt-5">{children}</div></section>;
 }

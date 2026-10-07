@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pencil, X, Check, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Pencil, X, Check, RefreshCw, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function NavEditModal({
   page,
@@ -9,7 +9,7 @@ export default function NavEditModal({
 }) {
   const [formData, setFormData] = useState({
     name: page?.name || '',
-    slug: page?.slug || '',
+    isVisible: page?.is_visible !== false,
   });
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
@@ -18,7 +18,7 @@ export default function NavEditModal({
     if (page) {
       setFormData({
         name: page.name || '',
-        slug: page.slug || '',
+        isVisible: page.is_visible !== false,
       });
       setErrors({});
     }
@@ -29,12 +29,6 @@ export default function NavEditModal({
     if (!formData.name.trim()) {
       errs.name = 'Tên menu không được để trống';
     }
-    const cleanSlug = formData.slug.trim().replace(/^\/+|\/+$/g, '');
-    if (!cleanSlug) {
-      errs.slug = 'Đường dẫn slug không được để trống';
-    } else if (/\s/.test(cleanSlug)) {
-      errs.slug = 'Đường dẫn slug không được chứa khoảng trắng';
-    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -44,12 +38,10 @@ export default function NavEditModal({
     if (!validate() || !page) return;
 
     setIsSaving(true);
-    const cleanSlug = formData.slug.trim().replace(/^\/+|\/+$/g, '');
-
     try {
       await onSave(page.id, {
         name: formData.name.trim(),
-        slug: cleanSlug,
+        is_visible: formData.isVisible,
       });
       onClose();
     } catch (error) {
@@ -61,8 +53,7 @@ export default function NavEditModal({
 
   if (!page) return null;
 
-  const publicUrl = getPublicHref ? getPublicHref(formData.slug) : `/${formData.slug}`;
-  const isHomePage = page.id === 9 || page.slug === 'home';
+  const publicUrl = getPublicHref ? getPublicHref(page.slug) : `/${page.slug}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
@@ -75,9 +66,9 @@ export default function NavEditModal({
             </span>
             <div>
               <h3 className="text-base font-bold text-(--admin-title)">
-                Chỉnh sửa Menu &amp; Slug
+                Chỉnh sửa Trang Menu
               </h3>
-              <p className="text-xs text-gray-500">ID #{page.id} · Model Page</p>
+              <p className="text-xs text-gray-500">ID #{page.id} · Cập nhật tên và trạng thái hiển thị</p>
             </div>
           </div>
           <button
@@ -94,7 +85,7 @@ export default function NavEditModal({
           {/* Tên Menu */}
           <div>
             <label className="block text-xs font-semibold text-(--admin-heading) uppercase tracking-wider mb-1">
-              Tên Menu hiển thị *
+              Tên Trang hiển thị *
             </label>
             <input
               type="text"
@@ -111,53 +102,70 @@ export default function NavEditModal({
             )}
           </div>
 
-          {/* Slug */}
+          {/* Slug cố định (Không cho chỉnh sửa) */}
           <div>
-            <label className="block text-xs font-semibold text-(--admin-heading) uppercase tracking-wider mb-1">
-              Đường dẫn trang (Slug) *
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                <Lock size={12} className="text-amber-600" />
+                Đường dẫn trang (Slug cố định)
+              </label>
+              <span className="text-[10px] text-gray-400 italic">Không thể sửa</span>
+            </div>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-mono text-sm">
                 /
               </span>
               <input
                 type="text"
-                value={formData.slug}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    slug: e.target.value.toLowerCase().replace(/\s+/g, '-'),
-                  }))
-                }
-                placeholder="events, about, contact..."
-                className={`w-full pl-7 pr-3.5 py-2 text-sm font-mono rounded-lg border bg-(--admin-background) text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent) transition ${
-                  errors.slug ? 'border-red-500' : 'border-(--admin-border)'
-                }`}
+                readOnly
+                disabled
+                value={page.slug}
+                className="w-full pl-7 pr-3.5 py-2 text-sm font-mono rounded-lg border border-(--admin-border) bg-gray-100 text-gray-500 select-all cursor-not-allowed"
               />
             </div>
-            {errors.slug && (
-              <p className="mt-1 text-xs text-red-500">{errors.slug}</p>
-            )}
             <p className="mt-1.5 text-xs text-gray-500">
-              URL xem trước:{' '}
+              URL công khai:{' '}
               <code className="text-emerald-700 font-semibold font-mono">
                 {publicUrl}
               </code>
             </p>
           </div>
 
-          {/* Cảnh báo trang chủ */}
-          {isHomePage && (
-            <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
-              <div className="flex items-center gap-1.5 font-semibold">
-                <AlertTriangle size={14} className="text-amber-600" />
-                Lưu ý đối với Trang Chủ
+          {/* Toggle Ẩn / Hiện trên Menu Header */}
+          <div className="p-3.5 rounded-xl border border-(--admin-border) bg-(--admin-background)/50 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {formData.isVisible ? (
+                  <Eye className="size-4 text-emerald-600" />
+                ) : (
+                  <EyeOff className="size-4 text-gray-400" />
+                )}
+                <div>
+                  <span className="text-xs font-bold text-(--admin-title) block">
+                    Hiển thị trên Menu Header
+                  </span>
+                  <span className="text-[11px] text-gray-500">
+                    {formData.isVisible
+                      ? 'Trang sẽ xuất hiện trên thanh điều hướng người dùng'
+                      : 'Trang sẽ bị ẩn khỏi thanh điều hướng người dùng'}
+                  </span>
+                </div>
               </div>
-              <p className="mt-1 text-[11px] leading-relaxed">
-                Trang chủ (ID #9) nên giữ slug là <code className="font-bold">home</code> để website liên kết chính xác tới trang đầu.
-              </p>
+
+              {/* Switch Button */}
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isVisible}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, isVisible: e.target.checked }))
+                  }
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
             </div>
-          )}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex items-center justify-end gap-2 pt-4 border-t border-(--admin-border)">

@@ -16,6 +16,7 @@ import { eventError, requireEventData } from "../../api/eventApi.js";
 import PageSectionFields from "../../components/Admin/Events/PageSectionFields.jsx";
 import EventCategories from "../../components/Admin/Events/EventCategories.jsx";
 import EventManager from "../../components/Admin/Events/EventManager.jsx";
+import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton } from "../../components/Admin/Common/index.js";
 
 export default function AdminEvents() {
   const [params, setParams] = useSearchParams();
@@ -142,69 +143,22 @@ export default function AdminEvents() {
     }
   };
   return (
-    <section className={`${adminContentTheme} space-y-5`}>
-      <header className="border-b border-(--admin-border) pb-5">
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-(--admin-heading)">
-            Khu vực quản trị nội dung
-          </p>
-          <h1 className="text-2xl font-semibold text-(--admin-title) sm:text-3xl">
-            Quản lý Sự kiện
-          </h1>
-          <p className="mt-2 text-sm text-(--admin-ink)/70">
-            Chỉnh sửa từng phần theo thứ tự hiển thị trên trang Sự kiện.
-          </p>
-        </div>
-      </header>
-      <div
-        role="tablist"
-        aria-label="Quản lý trang Sự kiện"
-        className="my-6 flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) p-1 [scrollbar-width:none]"
-      >
-        {eventsAdminTabs.map((tab, index) => {
-          const IconComponent = tab.icon;
-          const isSelected = active.key === tab.key;
-          return (
-            <button
-              key={tab.key}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              type="button"
-              id={`events-tab-${tab.key}`}
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={`events-panel-${tab.key}`}
-              tabIndex={isSelected ? 0 : -1}
-              disabled={saving}
-              onClick={() => selectTab(tab.key)}
-              onKeyDown={(event) => {
-                let nextIndex;
-                if (event.key === "ArrowRight")
-                  nextIndex = (index + 1) % eventsAdminTabs.length;
-                else if (event.key === "ArrowLeft")
-                  nextIndex =
-                    (index - 1 + eventsAdminTabs.length) %
-                    eventsAdminTabs.length;
-                else if (event.key === "Home") nextIndex = 0;
-                else if (event.key === "End")
-                  nextIndex = eventsAdminTabs.length - 1;
-                else return;
-                event.preventDefault();
-                selectTab(eventsAdminTabs[nextIndex].key);
-                tabRefs.current[nextIndex]?.focus();
-              }}
-              className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-2 border-b-2 px-4 text-sm font-semibold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) ${isSelected ? "border-(--admin-accent) text-(--admin-title)" : "border-transparent text-(--admin-heading) hover:bg-(--admin-background)"}`}
-            >
-              <IconComponent size={16} />
-              <span>{tab.label}</span>
-              {dirtyKeys.includes(tab.key) && (
-                <span aria-label="chưa lưu"> •</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+    <div className="space-y-6">
+      <AdminPageHeader
+        badge="Khu vực quản trị nội dung"
+        title="Quản lý Sự kiện"
+        subtitle="Chỉnh sửa từng phần theo thứ tự hiển thị trên trang Sự kiện."
+      />
+
+      <AdminTabs
+        tabs={eventsAdminTabs.map((tab) => ({
+          ...tab,
+          id: tab.key,
+          badge: dirtyKeys.includes(tab.key) ? 'chưa lưu' : undefined,
+        }))}
+        activeTab={active.key}
+        onChange={selectTab}
+      />
       {eventsAdminTabs.map((tab) => (
         <div
           key={tab.key}
@@ -215,12 +169,13 @@ export default function AdminEvents() {
         >
           {tab.key === "events" ? (
             loading ? (
-              <p role="status">Đang tải nội dung trang…</p>
+              <div className="flex min-h-[300px] items-center justify-center text-sm font-semibold text-(--admin-ink)/60">Đang tải nội dung sự kiện…</div>
             ) : loadError ? (
-              <div role="alert" className={`${adminPanel} space-y-3`}>
-                <p>{loadError}</p>
-                <button
-                  className={adminButton}
+              <div role="alert" className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 space-y-3">
+                <p className="text-sm">{loadError}</p>
+                <AdminButton
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setLoading(true);
                     setLoadError("");
@@ -228,32 +183,38 @@ export default function AdminEvents() {
                   }}
                 >
                   Thử lại
-                </button>
+                </AdminButton>
               </div>
             ) : (
-              <EventManager
-                selectionMode
-                reloadKey={listVersion}
-                pageId={pageId || 3}
-                displayedEventIds={saved?.displayed_events?.event_ids}
-                onDisplayedEventsSaved={(data) =>
-                  setSaved((current) => ({
-                    ...current,
-                    displayed_events: data,
-                  }))
-                }
-              />
+              <AdminCard
+                title="Quản lý Sự kiện & Lựa chọn Hiển thị"
+                subtitle="Danh sách các sự kiện được tổ chức và cấu hình các sự kiện xuất hiện trên trang Sự kiện ngoài website."
+              >
+                <EventManager
+                  selectionMode
+                  reloadKey={listVersion}
+                  pageId={pageId || 3}
+                  displayedEventIds={saved?.displayed_events?.event_ids}
+                  onDisplayedEventsSaved={(data) =>
+                    setSaved((current) => ({
+                      ...current,
+                      displayed_events: data,
+                    }))
+                  }
+                />
+              </AdminCard>
             )
           ) : (
             active.key === tab.key && (
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {loading ? (
-                  <p role="status">Đang tải nội dung trang…</p>
+                  <div className="flex min-h-[300px] items-center justify-center text-sm font-semibold text-(--admin-ink)/60">Đang tải nội dung trang…</div>
                 ) : loadError ? (
-                  <div role="alert" className={`${adminPanel} space-y-3`}>
-                    <p>{loadError}</p>
-                    <button
-                      className={adminButton}
+                  <div role="alert" className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 space-y-3">
+                    <p className="text-sm">{loadError}</p>
+                    <AdminButton
+                      variant="outline"
+                      size="sm"
                       onClick={() => {
                         setLoading(true);
                         setLoadError("");
@@ -261,88 +222,80 @@ export default function AdminEvents() {
                       }}
                     >
                       Thử lại
-                    </button>
+                    </AdminButton>
                   </div>
                 ) : (
-                  <form onSubmit={save} className={`${adminPanel} space-y-5`}>
-                    <h2 className="text-lg font-semibold text-(--admin-title)">
-                      {tab.label}
-                    </h2>
-                    {!saved?.[tab.key] && (
-                      <p className="border-l-2 border-(--admin-accent) pl-3 text-sm">
-                        Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
-                        trang Sự kiện.
-                      </p>
-                    )}
-                    <fieldset
-                      disabled={saving}
-                      className="min-w-0 space-y-5 disabled:opacity-60"
-                    >
-                      <PageSectionFields
-                        section={tab.key}
-                        value={drafts[tab.key]}
-                        onChange={(value) => {
-                          setDrafts((current) => ({
-                            ...current,
-                            [tab.key]: value,
-                          }));
-                          setToast(null);
-                        }}
-                      />
-                      <div className="flex justify-end border-t border-(--admin-border) pt-4">
-                        <button
-                          className={adminPrimaryButton}
-                          disabled={!dirtyKeys.includes(tab.key)}
-                        >
-                          <Save size={16} />
-                          {saving ? "Đang lưu…" : "Lưu thay đổi"}
-                        </button>
-                      </div>
-                    </fieldset>
-                  </form>
+                  <AdminCard
+                    title={tab.label}
+                    subtitle={tab.description || "Tùy biến nội dung chi tiết của phần này trên trang Sự kiện."}
+                    actions={
+                      <AdminButton
+                        type="submit"
+                        form={`events-form-${tab.key}`}
+                        variant="primary"
+                        size="sm"
+                        icon={Save}
+                        loading={saving}
+                        disabled={!dirtyKeys.includes(tab.key) || saving}
+                      >
+                        {saving ? "Đang lưu…" : "Lưu thay đổi"}
+                      </AdminButton>
+                    }
+                  >
+                    <form id={`events-form-${tab.key}`} onSubmit={save} className="space-y-5">
+                      {!saved?.[tab.key] && (
+                        <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm bg-(--admin-background)/50 rounded-r-lg">
+                          Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
+                          trang Sự kiện.
+                        </p>
+                      )}
+                      <fieldset
+                        disabled={saving}
+                        className="min-w-0 space-y-5 disabled:opacity-60"
+                      >
+                        <PageSectionFields
+                          section={tab.key}
+                          value={drafts[tab.key]}
+                          onChange={(value) => {
+                            setDrafts((current) => ({
+                              ...current,
+                              [tab.key]: value,
+                            }));
+                            setToast(null);
+                          }}
+                        />
+                        <div className="flex justify-end border-t border-(--admin-border) pt-4">
+                          <AdminButton
+                            type="submit"
+                            variant="primary"
+                            size="sm"
+                            icon={Save}
+                            loading={saving}
+                            disabled={!dirtyKeys.includes(tab.key) || saving}
+                          >
+                            {saving ? "Đang lưu…" : "Lưu thay đổi"}
+                          </AdminButton>
+                        </div>
+                      </fieldset>
+                    </form>
+                  </AdminCard>
                 )}
                 {tab.key === "filter_section" && (
-                  <EventCategories
-                    onCreated={() => setListVersion((value) => value + 1)}
-                  />
+                  <AdminCard
+                    title="Quản lý Chuyên mục Sự kiện"
+                    subtitle="Tạo và sắp xếp các nhóm chuyên mục để phân loại sự kiện."
+                  >
+                    <EventCategories
+                      onCreated={() => setListVersion((value) => value + 1)}
+                    />
+                  </AdminCard>
                 )}
               </div>
             )
           )}
         </div>
       ))}
-      {toast && (
-        <div className="fixed right-4 bottom-4 z-40 flex w-[calc(100%-2rem)] max-w-sm items-start gap-3 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-(--admin-ink) shadow-lg sm:right-6 sm:bottom-6">
-          {toast.error ? (
-            <AlertCircle
-              size={20}
-              aria-hidden="true"
-              className="mt-0.5 shrink-0 text-(--admin-heading)"
-            />
-          ) : (
-            <CheckCircle2
-              size={20}
-              aria-hidden="true"
-              className="mt-0.5 shrink-0 text-(--admin-heading)"
-            />
-          )}
-          <p
-            role={toast.error ? "alert" : "status"}
-            aria-atomic="true"
-            className="min-w-0 flex-1 text-sm leading-6 wrap-anywhere"
-          >
-            {toast.message}
-          </p>
-          <button
-            type="button"
-            aria-label="Đóng thông báo"
-            onClick={() => setToast(null)}
-            className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded text-(--admin-ink)/70 hover:bg-(--admin-background) hover:text-(--admin-ink) focus-visible:outline-2 focus-visible:outline-(--color-brand-gold)"
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
-      )}
-    </section>
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
+    </div>
   );
 }
