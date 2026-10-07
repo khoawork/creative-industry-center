@@ -41,7 +41,7 @@ class ProposalSectionRequestDTO(BaseSchema):
     title = fields.Str(required=True, error_messages={"required": "tiêu đề đề xuất là bắt buộc"})
     description = fields.Str(required=True, error_messages={"required": "mô tả đề xuất là bắt buộc"})
     benefits = fields.List(
-        fields.Str(),
+        fields.Raw(),
         required=True,
         error_messages={"required": "danh sách benefits là bắt buộc"}
     )
@@ -55,7 +55,7 @@ class ProposalSectionResponse(BaseSchema):
     tag = fields.Str(dump_only=True)
     title = fields.Str(dump_only=True)
     description = fields.Str(dump_only=True)
-    benefits = fields.List(fields.Str(), dump_only=True)
+    benefits = fields.List(fields.Raw(), dump_only=True)
     form_title = fields.Str(dump_only=True)
     form_description = fields.Str(dump_only=True)
     button_text = fields.Str(dump_only=True)

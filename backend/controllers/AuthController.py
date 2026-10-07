@@ -50,7 +50,9 @@ def login():
     try:
         user = user_service.authenticate_user(username_or_email, password)
     except AppError as e:
-        return error_response(message=e.message, status_code=e.status_code, error_code=e.error_code)
+        return error_response(
+            message=e.message, status_code=e.status_code, error_code=e.error_code
+        )
 
     # Cập nhật thời gian đăng nhập lần cuối
     now = datetime.utcnow()
@@ -68,7 +70,7 @@ def login():
         "data": {
             "token": token,
             "user": user_data,
-        }
+        },
     }
 
     resp = make_response(response_payload, 200)
@@ -80,7 +82,7 @@ def login():
         httponly=True,
         samesite="Lax",
         secure=False,  # Đặt False khi chạy HTTP localhost, chuyển True nếu trên HTTPS production
-        path="/"
+        path="/",
     )
     return resp
 
@@ -99,7 +101,7 @@ def logout():
     response_payload = {
         "success": True,
         "message": "Đã đăng xuất thành công.",
-        "data": None
+        "data": None,
     }
     resp = make_response(response_payload, 200)
     resp.delete_cookie("admin_token", path="/")
@@ -124,6 +126,5 @@ def get_current_user_profile():
     return success_response(
         data=user.to_dict(),
         message="Lấy thông tin tài khoản thành công",
-        status_code=200
+        status_code=200,
     )
-
