@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Send, Check } from 'lucide-react';
 import { FormBuilder } from '../Base';
+import { fetchFormConfig, DEFAULT_FORM_CONFIGS } from '../../../services/googleSheetService.js';
 
 export default function TrainingProposalEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -17,10 +18,55 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
       initialData?.form_description ||
       'Ban Tuyển sinh & Hợp tác Chiến lược sẽ liên hệ phản hồi trong 24 giờ làm việc.',
     button_text: initialData?.button_text || 'GỬI HỒ SƠ ĐĂNG KÝ',
-    form_fields: Array.isArray(initialData?.form_fields)
+    form_fields: Array.isArray(initialData?.form_fields) && initialData.form_fields.length > 0
       ? [...initialData.form_fields]
       : [],
   });
+
+  // Tải cấu hình form hiện tại theo slug/id nếu form_fields đang trống
+  useEffect(() => {
+    fetchFormConfig('training_registration').then((cfg) => {
+      const activeCfg = cfg || DEFAULT_FORM_CONFIGS.training_registration;
+      setFormData((prev) => {
+        let currentFields = Array.isArray(prev.form_fields) && prev.form_fields.length > 0
+          ? [...prev.form_fields]
+          : (activeCfg.fields || []);
+
+        // Đảm bảo luôn có 2 trường cố định courseCode và courseName
+        const hasCode = currentFields.some((f) => (f.key === 'courseCode' || f.id === 'courseCode'));
+        const hasName = currentFields.some((f) => (f.key === 'courseName' || f.id === 'courseName'));
+        const prefix = [];
+        if (!hasCode) {
+          prefix.push({
+            key: 'courseCode',
+            id: 'courseCode',
+            label: 'Mã khóa học',
+            type: 'text',
+            placeholder: 'Mã khóa học',
+            required: true,
+            readOnly: true,
+            width: 'half',
+          });
+        }
+        if (!hasName) {
+          prefix.push({
+            key: 'courseName',
+            id: 'courseName',
+            label: 'Tên khóa học',
+            type: 'text',
+            placeholder: 'Tên khóa học đăng ký',
+            required: true,
+            readOnly: true,
+            width: 'half',
+          });
+        }
+        return {
+          ...prev,
+          form_fields: [...prefix, ...currentFields],
+        };
+      });
+    });
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -214,6 +260,7 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
 
       {/* Component Reusable FormBuilder từ Base */}
       <FormBuilder
+        formId="training_registration"
         value={{
           form_title: formData.form_title,
           form_description: formData.form_description,

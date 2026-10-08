@@ -17,7 +17,7 @@ export function emptyEventsSection(key) {
     search_placeholder: '',
     show_year_filter: true,
   }
-  return { tag: '', title: '', description: '', privacy_text: '', button_text: '', full_name_label: '', full_name_placeholder: '', organization_label: '', organization_placeholder: '', email_label: '', email_placeholder: '', consent_text: '', success_message: '' }
+  return { tag: '', title: '', description: '', privacy_text: '', button_text: '', full_name_label: '', full_name_placeholder: '', organization_label: '', organization_placeholder: '', email_label: '', email_placeholder: '', consent_text: '', success_message: '', form_fields: [] }
 }
 
 export function eventSectionDraft(key, section = {}) {

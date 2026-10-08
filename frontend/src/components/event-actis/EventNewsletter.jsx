@@ -7,7 +7,7 @@ import {
   DEFAULT_FORM_CONFIGS,
 } from "../../services/googleSheetService.js";
 
-export const EventNewsletter = () => {
+export const EventNewsletter = ({ section }) => {
   const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.event_newsletter);
   const [formData, setFormData] = useState({});
   const [agreed, setAgreed] = useState(true);
@@ -18,17 +18,35 @@ export const EventNewsletter = () => {
   // Tải cấu hình form động từ service & backend
   useEffect(() => {
     fetchFormConfig("event_newsletter").then((loaded) => {
-      if (loaded) {
-        setConfig(loaded);
-        // Khởi tạo formData theo danh sách fields
-        const initial = {};
-        (loaded.fields || []).forEach((f) => {
-          initial[f.key] = "";
-        });
-        setFormData(initial);
-      }
+      const baseConfig = loaded || DEFAULT_FORM_CONFIGS.event_newsletter;
+      const mergedConfig = section?.form_fields && Array.isArray(section.form_fields) && section.form_fields.length > 0
+        ? {
+            ...baseConfig,
+            title: section.title || baseConfig.title,
+            subtitle: section.description || baseConfig.subtitle,
+            badgeText: section.tag || baseConfig.badgeText,
+            submitButtonText: section.button_text || baseConfig.submitButtonText,
+            fields: section.form_fields.map((f) => ({
+              key: f.key || f.id,
+              label: f.label || '',
+              type: f.type || 'text',
+              placeholder: f.placeholder || '',
+              required: Boolean(f.required),
+              colSpan: f.width === 'half' || f.colSpan === 1 ? 1 : 2,
+              options: f.options,
+            })),
+          }
+        : baseConfig;
+
+      setConfig(mergedConfig);
+      // Khởi tạo formData theo danh sách fields và giữ lại dữ liệu đang nhập
+      const initial = {};
+      (mergedConfig.fields || []).forEach((f) => {
+        initial[f.key] = "";
+      });
+      setFormData((prev) => ({ ...initial, ...prev }));
     });
-  }, []);
+  }, [section]);
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({
@@ -133,13 +151,23 @@ export const EventNewsletter = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-12 gap-3.5">
                   {fields.map((field) => {
-                    const isFullWidth = field.colSpan === 2 || field.type === "textarea";
+                    const colSpan =
+                      field.width === 'half' || field.colSpan === 1
+                        ? 'col-span-12 sm:col-span-6'
+                        : field.width === 'third'
+                        ? 'col-span-12 sm:col-span-4'
+                        : field.width === 'quarter'
+                        ? 'col-span-12 sm:col-span-3'
+                        : field.width === 'two-thirds'
+                        ? 'col-span-12 sm:col-span-8'
+                        : 'col-span-12';
+
                     return (
                       <div
                         key={field.key}
-                        className={isFullWidth ? "sm:col-span-2" : ""}
+                        className={colSpan}
                       >
                         <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
                           {field.label} {field.required && <span className="text-red-500">*</span>}
@@ -162,12 +190,22 @@ export const EventNewsletter = () => {
                             className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-sm bg-white border border-[#e2d9cd] text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#710008] transition-all"
                           >
                             <option value="">-- Chọn {field.label} --</option>
-                            {(field.options || []).map((opt) => (
-                              <option key={opt} value={opt}>
-                                {opt}
+                            {(field.options || []).map((opt, oIdx) => (
+                              <option key={oIdx} value={typeof opt === 'object' ? opt.value : opt}>
+                                {typeof opt === 'object' ? opt.label : opt}
                               </option>
                             ))}
                           </select>
+                        ) : field.type === "checkbox" ? (
+                          <label className="flex items-center gap-2 pt-2 cursor-pointer text-xs text-[#1a1c1b]">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formData[field.key])}
+                              onChange={(e) => handleChange(field.key, e.target.checked)}
+                              className="rounded border-gray-300 text-[#710008] focus:ring-[#710008]"
+                            />
+                            <span>{field.placeholder || field.label}</span>
+                          </label>
                         ) : (
                           <input
                             type={field.type || "text"}

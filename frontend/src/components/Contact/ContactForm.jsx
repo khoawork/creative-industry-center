@@ -87,12 +87,29 @@ export default function ContactForm({
       if (loaded) setConfig(loaded);
     });
   }, []);
-  const formFields = Array.isArray(form.form_fields) ? form.form_fields : [];
-  const formTitle = form.form_title || "Gửi phản hồi hoặc yêu cầu tư vấn";
+  const rawFields = Array.isArray(form.form_fields) && form.form_fields.length > 0
+    ? form.form_fields
+    : (Array.isArray(config?.fields) && config.fields.length > 0
+      ? config.fields.map((f) => ({
+          id: f.key,
+          label: f.label,
+          type: f.type,
+          placeholder: f.placeholder,
+          required: f.required,
+          width: f.colSpan === 1 ? 'half' : (f.width || 'full'),
+          options: f.options,
+        }))
+      : []);
+
+  const hasCustomMessage = rawFields.some((f) => (f.id === 'message' || f.key === 'message'));
+  const formFields = rawFields;
+
+  const formTitle = form.form_title || config?.title || "Gửi phản hồi hoặc yêu cầu tư vấn";
   const formDescription =
     form.form_description ||
+    config?.subtitle ||
     "Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.";
-  const buttonText = form.button_text || "GỬI LỜI NHẮN NGAY";
+  const buttonText = form.button_text || config?.submitButtonText || "GỬI LỜI NHẮN NGAY";
   const availabilityText = form.availability_text || "";
   const privacyText = form.privacy_text || "";
 
@@ -101,13 +118,19 @@ export default function ContactForm({
     const formElement = event.currentTarget;
     const values = new FormData(formElement);
     const nextErrors = {};
+
     formFields.forEach((field, index) => {
-      const name = field.id || `field_${index}`;
+      const name = field.id || field.key || `field_${index}`;
       if (field.required && !String(values.get(name) || "").trim()) {
         nextErrors[name] =
           `Vui lòng nhập ${String(field.label || "thông tin này").toLocaleLowerCase("vi")}.`;
       }
     });
+
+    if (!hasCustomMessage && !String(values.get("message") || "").trim()) {
+      nextErrors.message = "Vui lòng nhập nội dung lời nhắn.";
+    }
+
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       setAttempted(false);
@@ -117,16 +140,18 @@ export default function ContactForm({
 
     setIsSubmitting(true);
     try {
-      const payload = {
-        fullName: values.get("fullName") || "",
-        email: values.get("email") || "",
-        phone: values.get("phone") || "",
-        category: values.get("category") || "",
-        message: values.get("message") || "",
-      };
+      const payload = {};
+      formFields.forEach((field, index) => {
+        const name = field.id || field.key || `field_${index}`;
+        payload[name] = values.get(name) || "";
+      });
+      if (values.get("message") && !payload.message) {
+        payload.message = values.get("message");
+      }
+
       await submitFormToBackend("contact_feedback", payload, config);
       setIsSuccess(true);
-      form.reset();
+      formElement.reset();
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (err) {
       console.error("Lỗi khi gửi liên hệ:", err);
@@ -267,26 +292,28 @@ export default function ContactForm({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {formFields.map(renderField)}
         </div>
-        <Field
-          id="contact-message"
-          label="Nội dung lời nhắn / Đề xuất chi tiết"
-          required
-          icon={<MessageSquareText size={20} aria-hidden="true" />}
-          error={errors.message}
-        >
-          <textarea
+        {!hasCustomMessage && (
+          <Field
             id="contact-message"
-            name="message"
-            rows={5}
+            label="Nội dung lời nhắn / Đề xuất chi tiết"
             required
-            placeholder="Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất..."
-            className={`${inputClass} min-h-40 resize-y py-3 leading-relaxed`}
-            aria-invalid={Boolean(errors.message)}
-            aria-describedby={
-              errors.message ? "contact-message-error" : undefined
-            }
-          />
-        </Field>
+            icon={<MessageSquareText size={20} aria-hidden="true" />}
+            error={errors.message}
+          >
+            <textarea
+              id="contact-message"
+              name="message"
+              rows={5}
+              required
+              placeholder="Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất..."
+              className={`${inputClass} min-h-40 resize-y py-3 leading-relaxed`}
+              aria-invalid={Boolean(errors.message)}
+              aria-describedby={
+                errors.message ? "contact-message-error" : undefined
+              }
+            />
+          </Field>
+        )}
         {isSuccess && (
           <div className="flex items-center gap-2 rounded-[4px] bg-emerald-50 border border-emerald-200 p-3.5 text-sm text-emerald-800">
             <CheckCircle2 size={20} className="shrink-0 text-emerald-600" />
@@ -316,7 +343,7 @@ export default function ContactForm({
                   aria-hidden="true"
                   className="h-4 w-1 shrink-0 rounded-full bg-[var(--contact-gold)]"
                 />
-                GỬI LỜI NHẮN NGAY
+                {buttonText}
                 <Send
                   size={20}
                   aria-hidden="true"

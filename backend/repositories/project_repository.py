@@ -89,6 +89,7 @@ def _extract_research_info(items):
 
 def create_project(project_data: Project) -> Project:
     project = Project(
+        code=getattr(project_data, "code", None),
         name=project_data.name,
         title=project_data.title,
         description=project_data.description,
@@ -110,6 +111,8 @@ def update_project(project_id: int, project_data: Project) -> Project:
     if not project:
         return None
 
+    if hasattr(project_data, "code"):
+        project.code = project_data.code
     project.name = project_data.name
     project.title = project_data.title
     project.description = project_data.description

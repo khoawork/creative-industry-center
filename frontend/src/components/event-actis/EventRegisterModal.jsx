@@ -10,22 +10,34 @@ export const EventRegisterModal = ({ event, isOpen, onClose }) => {
   const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.event_registration);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-    organization: '',
-    ticketType: 'standard',
-    notes: '',
-  });
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     fetchFormConfig('event_registration').then((loaded) => {
-      if (loaded) setConfig(loaded);
+      if (loaded) {
+        setConfig(loaded);
+        const initial = {};
+        (loaded.fields || []).forEach((f) => {
+          if (f.key === 'eventName') {
+            initial[f.key] = event?.actionText || event?.title || 'Sự kiện CIC';
+          } else {
+            initial[f.key] = '';
+          }
+        });
+        setFormData((prev) => ({
+          ...initial,
+          ...prev,
+          eventName: event?.actionText || event?.title || 'Sự kiện CIC',
+        }));
+      }
     });
-  }, []);
+  }, [event]);
 
   if (!isOpen || !event) return null;
+
+  const handleChange = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,6 +65,8 @@ export const EventRegisterModal = ({ event, isOpen, onClose }) => {
       setIsSubmitting(false);
     }
   };
+
+  const fields = (config.fields || []).filter((f) => f.key !== 'eventName');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
@@ -116,78 +130,58 @@ export const EventRegisterModal = ({ event, isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
-                    Họ và tên đại biểu *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Nguyễn Văn A"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
-                  />
-                </div>
+              <div className="grid grid-cols-12 gap-3.5">
+                {fields.map((field, idx) => {
+                  const key = field.key || `field_${idx}`;
+                  const colSpan =
+                    field.width === 'half' || field.colSpan === 1
+                      ? 'col-span-12 sm:col-span-6'
+                      : field.width === 'third'
+                      ? 'col-span-12 sm:col-span-4'
+                      : 'col-span-12';
 
-                <div>
-                  <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
-                    Số điện thoại liên hệ *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="0912 345 678"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
-                  />
-                </div>
-              </div>
+                  return (
+                    <div key={key} className={colSpan}>
+                      <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
-                    Email đại biểu *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="daibieu@tochuc.vn"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
-                    Cơ quan / Doanh nghiệp
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.organization}
-                    onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                    placeholder="Tên viện / công ty"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#1a1c1b] mb-1">
-                  Hình thức tham dự
-                </label>
-                <select
-                  value={formData.ticketType}
-                  onChange={(e) => setFormData({ ...formData, ticketType: e.target.value })}
-                  className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
-                >
-                  <option value="standard">Đại biểu chính thức (Trực tiếp tại khán phòng)</option>
-                  <option value="online">Đại biểu trực tuyến (Qua cầu truyền hình Zoom)</option>
-                  <option value="vip">Khách mời VIP / Cơ quan Báo chí truyền thông</option>
-                </select>
+                      {field.type === 'textarea' ? (
+                        <textarea
+                          rows={3}
+                          required={field.required}
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          placeholder={field.placeholder || ''}
+                          className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
+                        />
+                      ) : field.type === 'select' ? (
+                        <select
+                          required={field.required}
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
+                        >
+                          <option value="">{field.placeholder || '-- Chọn --'}</option>
+                          {(field.options || []).map((opt, oIdx) => (
+                            <option key={oIdx} value={typeof opt === 'object' ? opt.value : opt}>
+                              {typeof opt === 'object' ? opt.label : opt}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type={field.type || 'text'}
+                          required={field.required}
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          placeholder={field.placeholder || ''}
+                          className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#f4f3f1] border border-transparent text-[#1a1c1b] focus:outline-hidden focus:bg-white focus:border-[#8c716e]"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-3">

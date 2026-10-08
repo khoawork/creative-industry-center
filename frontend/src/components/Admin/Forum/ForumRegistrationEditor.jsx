@@ -207,6 +207,7 @@ export default function ForumRegistrationEditor({ initialData, onSave, isSaving 
 
       {/* 2. Cấu hình các trường đăng ký (FormBuilder - Chuyển từ Forms sang đây) */}
       <FormBuilder
+        formId="forum_registration"
         value={{
           form_fields: formData.form_fields || [],
         }}

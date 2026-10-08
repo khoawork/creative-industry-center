@@ -17,7 +17,7 @@ export const DEFAULT_FORM_CONFIGS = {
     pagePath: "/events",
     componentName: "EventNewsletter",
     badgeText: "BẢN TIN SỰ KIỆN",
-    sheetUrl: "",
+    sheetUrl: "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
     sheetName: "DangKySuKien",
     fields: [
       {
@@ -211,12 +211,22 @@ export const DEFAULT_FORM_CONFIGS = {
     sheetName: "DangKyDaoTao",
     fields: [
       {
-        key: "trainingCourse",
-        label: "Khóa đào tạo / Mã chương trình",
+        key: "courseCode",
+        label: "Mã khóa học",
         type: "text",
-        placeholder: "Mã hoặc tên khóa học",
+        placeholder: "Mã khóa học",
         required: true,
-        colSpan: 2,
+        readOnly: true,
+        colSpan: 1,
+      },
+      {
+        key: "courseName",
+        label: "Tên khóa học",
+        type: "text",
+        placeholder: "Tên khóa học đăng ký",
+        required: true,
+        readOnly: true,
+        colSpan: 1,
       },
       {
         key: "fullName",
@@ -500,6 +510,25 @@ export const getAllFormConfigs = () => {
 };
 
 /**
+ * Tải toàn bộ cấu hình biểu mẫu từ Backend API (và cập nhật vào LocalStorage)
+ */
+export const fetchAllFormConfigs = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/forms/configs`);
+    if (res?.data?.data && typeof res.data.data === "object") {
+      const merged = { ...DEFAULT_FORM_CONFIGS, ...res.data.data };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      } catch (err) {}
+      return merged;
+    }
+  } catch (e) {
+    console.warn("Không thể tải toàn bộ cấu hình biểu mẫu từ máy chủ:", e);
+  }
+  return getAllFormConfigs();
+};
+
+/**
  * Lấy cấu hình của 1 form cụ thể theo formId (đồng bộ)
  */
 export const getFormConfig = (formId) => {
@@ -609,10 +638,16 @@ export const testSheetConnection = async (sheetUrl, sheetName = "DangKySuKien", 
  */
 export const syncAllFormsToSheet = async (sheetUrl, forms = []) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/forms/sync-all`, {
-      sheetUrl,
-      forms,
-    });
+    const response = await axios.post(
+      `${API_BASE_URL}/forms/sync-all`,
+      {
+        sheetUrl,
+        forms,
+      },
+      {
+        timeout: 120000,
+      }
+    );
     return response.data;
   } catch (error) {
     const message =

@@ -27,6 +27,7 @@ export default function ProjectTableManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
+    code: "",
     name: "",
     title: "",
     slogan: "",
@@ -108,6 +109,7 @@ export default function ProjectTableManager() {
     setIsAddingCategory(false);
     setNewCategoryName("");
     setFormData({
+      code: "",
       name: "",
       title: "",
       slogan: "",
@@ -142,6 +144,7 @@ export default function ProjectTableManager() {
     }
 
     setFormData({
+      code: project.code || "",
       name: project.name || "",
       title: project.title || "",
       slogan: project.slogan || "",
@@ -235,6 +238,7 @@ export default function ProjectTableManager() {
     setIsSaving(true);
     try {
       const payload = {
+        code: formData.code.trim(),
         name: formData.name.trim(),
         title: formData.title.trim(),
         slogan: formData.slogan.trim(),
@@ -305,6 +309,7 @@ export default function ProjectTableManager() {
   const filteredProjects = useMemo(() => {
     return projects.filter((p) => {
       const matchesSearch =
+        (p.code || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.slogan || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -501,8 +506,15 @@ export default function ProjectTableManager() {
                       </div>
                     </td>
                     <td className="py-3.5 px-4 max-w-xs">
-                      <div className="font-semibold text-[var(--admin-text)] line-clamp-1">
-                        {project.name}
+                      <div className="flex items-center gap-1.5 line-clamp-1">
+                        {project.code && (
+                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30 shrink-0">
+                            {project.code}
+                          </span>
+                        )}
+                        <span className="font-semibold text-[var(--admin-text)] truncate">
+                          {project.name}
+                        </span>
                       </div>
                       <div className="text-xs text-[var(--admin-text-muted)] line-clamp-1 mt-0.5">
                         {project.title}
@@ -597,10 +609,25 @@ export default function ProjectTableManager() {
               onSubmit={handleSubmit}
               className="p-6 overflow-y-auto space-y-4"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                <div className="sm:col-span-4">
                   <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                    Tên dự án (Mã / Tên ngắn){" "}
+                    Mã dự án (Code)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="VD: PRJ-01, DA-02..."
+                    value={formData.code}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-[var(--admin-border)] bg-black/20 text-[var(--admin-text)] font-mono focus:outline-none focus:border-violet-500 transition"
+                  />
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
+                    Tên dự án (Tên ngắn){" "}
                     <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -621,7 +648,7 @@ export default function ProjectTableManager() {
                   )}
                 </div>
 
-                <div>
+                <div className="sm:col-span-4">
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider">
                       Danh mục dự án <span className="text-rose-500">*</span>

@@ -458,6 +458,30 @@ export default function AdminContact() {
       const page = requireContactData(response)
       setContent(page)
       setDraftProps(clone(page.props))
+
+      // Đồng bộ cấu hình form sang trang Quản lý Biểu mẫu
+      try {
+        const { saveFormConfig } = await import('../../services/googleSheetService.js');
+        const contactForm = props.form || {};
+        const contactFields = Array.isArray(contactForm.form_fields) ? contactForm.form_fields : [];
+        await saveFormConfig('contact_feedback', {
+          title: contactForm.form_title || 'Liên Hệ & Đề Xuất Tư Vấn Trực Tuyến',
+          subtitle: contactForm.form_description || 'Cổng tiếp nhận thông tin phản hồi...',
+          button_text: contactForm.button_text || 'GỬI LỜI NHẮN NGAY',
+          fields: contactFields.map((f) => ({
+            key: f.id || f.key,
+            label: f.label,
+            type: f.type,
+            placeholder: f.placeholder,
+            required: Boolean(f.required),
+            colSpan: f.width === 'half' ? 1 : 2,
+            options: f.options,
+          })),
+        });
+      } catch (syncErr) {
+        console.warn('Đồng bộ contact_feedback vào googleSheetService hoàn tất với cảnh báo:', syncErr);
+      }
+
       setToast({ message: 'Đã lưu nội dung trang Liên hệ.' })
     } catch (error) {
       const errors = contactValidationErrors(error)
@@ -536,6 +560,7 @@ export default function AdminContact() {
         </div>
       </section>
       <FormBuilder
+        formId="contact_feedback"
         value={{ form_fields: extraFields }}
         previewValue={{
           form_title: form.form_title,

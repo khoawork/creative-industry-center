@@ -64,13 +64,43 @@ export default function AdminEvents() {
           throw new Error("Nội dung trang Sự kiện không hợp lệ.");
         setPageId(page.id);
         setSaved(page.props);
-        setDrafts(
-          Object.fromEntries(
-            eventsAdminTabs
-              .filter(({ key }) => key !== "events")
-              .map(({ key }) => [key, eventSectionDraft(key, page.props[key])]),
-          ),
+        const pageDrafts = Object.fromEntries(
+          eventsAdminTabs
+            .filter(({ key }) => key !== "events")
+            .map(({ key }) => [key, eventSectionDraft(key, page.props[key])]),
         );
+
+        // Đảm bảo newsletter_section luôn có danh sách fields đầy đủ từ form config
+        const currentNlFields = pageDrafts?.newsletter_section?.form_fields;
+        if (!Array.isArray(currentNlFields) || currentNlFields.length === 0) {
+          import('../../services/googleSheetService.js').then(({ fetchFormConfig, DEFAULT_FORM_CONFIGS }) => {
+            fetchFormConfig('event_newsletter').then((cfg) => {
+              const activeCfg = cfg || DEFAULT_FORM_CONFIGS.event_newsletter;
+              const defaultFields = (activeCfg?.fields || []).map((f) => ({
+                id: f.id || f.key,
+                key: f.key || f.id,
+                label: f.label || '',
+                type: f.type || 'text',
+                placeholder: f.placeholder || '',
+                required: Boolean(f.required),
+                width: f.width || (f.colSpan === 1 ? 'half' : 'full'),
+                options: Array.isArray(f.options) ? f.options : [],
+                helpText: f.helpText || '',
+              }));
+              if (defaultFields.length > 0) {
+                setDrafts((prev) => ({
+                  ...prev,
+                  newsletter_section: {
+                    ...prev.newsletter_section,
+                    form_fields: defaultFields,
+                  },
+                }));
+              }
+            });
+          });
+        }
+
+        setDrafts(pageDrafts);
       })
       .catch((err) => {
         if (!controller.signal.aborted) setLoadError(eventError(err));
@@ -124,6 +154,34 @@ export default function AdminEvents() {
         ...current,
         [key]: eventSectionDraft(key, data),
       }));
+
+      // Đồng bộ cấu hình ô nhập liệu sang trang Quản lý Biểu mẫu nếu lưu newsletter_section
+      if (key === "newsletter_section") {
+        try {
+          const { saveFormConfig } = await import('../../services/googleSheetService.js');
+          const nlData = drafts[key] || {};
+          const nlFields = Array.isArray(nlData.form_fields) ? nlData.form_fields : [];
+          if (nlFields.length > 0) {
+            await saveFormConfig('event_newsletter', {
+              title: nlData.title || "Đăng Ký Nhận Bản Tin & Thông Báo Sự Kiện",
+              subtitle: nlData.description || "Nhận thư mời ưu tiên, tài liệu kỷ yếu...",
+              button_text: nlData.button_text || "Xác Nhận Đăng Ký Thông Báo",
+              fields: nlFields.map((f) => ({
+                key: f.id || f.key,
+                label: f.label,
+                type: f.type,
+                placeholder: f.placeholder,
+                required: Boolean(f.required),
+                colSpan: f.width === 'half' ? 1 : 2,
+                options: f.options,
+              })),
+            });
+          }
+        } catch (syncErr) {
+          console.warn("Lỗi sync event_newsletter config:", syncErr);
+        }
+      }
+
       setToast({ message: "Đã lưu thay đổi." });
     } catch (err) {
       const details = err.response?.data?.error?.details;

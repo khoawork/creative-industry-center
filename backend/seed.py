@@ -571,13 +571,14 @@ def seed_nav_pages():
                 page = None
 
         if page is None:
-            page = Page(name=name, slug=slug, props={})
+            page = Page(name=name, slug=slug, props={}, order_index=target_id)
             if db.session.get(Page, target_id) is None:
                 page.id = target_id
             db.session.add(page)
 
         page.name = name
         page.slug = slug
+        page.order_index = target_id
         if page.props is not None and not isinstance(page.props, dict):
             raise ValueError(f"Props trang '{slug}' không hợp lệ.")
         props = dict(page.props or {})
@@ -1006,20 +1007,48 @@ def seed_database():
     # BƯỚC 1: NGƯỜI DÙNG QUẢN TRỊ
     # ========================================================
     print("\n[1/7] Đang kiểm tra & seed tài khoản Người dùng (User)...")
-    if not User.query.filter_by(username="admin").first():
-        admin_user = User(
-            username="admin",
-            email="admin@vietkings.org",
-            password="pbkdf2:sha256:default_hashed_password",
-            full_name="Quản trị viên Viện Kỷ lục",
-            avatar="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80",
-            role=RoleEnum.ADMIN,
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-        print("  -> Đã tạo tài khoản admin: admin@vietkings.org")
-    else:
-        print("  -> Tài khoản admin đã tồn tại.")
+    accounts = [
+        {
+            "username": "admin",
+            "email": "admin@vietkings.org",
+            "password": "admin123",
+            "full_name": "Quản Trị Viên (Admin)",
+            "role": RoleEnum.ADMIN.value,
+            "can_admin_access": True,
+        },
+        {
+            "username": "manager",
+            "email": "manager@vietkings.org",
+            "password": "manager123",
+            "full_name": "Quản Lý (Manager)",
+            "role": RoleEnum.MANAGER.value,
+            "can_admin_access": True,
+        },
+    ]
+
+    for acc in accounts:
+        user = User.query.filter_by(username=acc["username"]).first()
+        if not user:
+            user = User(
+                username=acc["username"],
+                email=acc["email"],
+                full_name=acc["full_name"],
+                role=acc["role"],
+                is_active=True,
+                can_admin_access=acc["can_admin_access"],
+            )
+            user.set_password(acc["password"])
+            db.session.add(user)
+            print(f"  + Đã tạo tài khoản: {acc['username']} ({acc['role']})")
+        else:
+            user.email = acc["email"]
+            user.full_name = acc["full_name"]
+            user.role = acc["role"]
+            user.is_active = True
+            user.can_admin_access = acc["can_admin_access"]
+            user.set_password(acc["password"])
+            print(f"  . Đã cập nhật tài khoản: {acc['username']}")
+    db.session.commit()
 
     # ========================================================
     # BƯỚC 2: DANH MỤC VÀ SỰ KIỆN NỔI BẬT
@@ -1489,6 +1518,7 @@ def seed_records():
             record_dto.RecordResquestDto(),
             {field: value for field, value in item.items() if field != "id"},
         )
+        validated.pop("id", None)
         rec = Record.query.filter_by(id=item["id"]).first()
         if not rec:
             rec = Record(
