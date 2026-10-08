@@ -6,9 +6,9 @@ import {
   AlertTriangle,
   Check,
   Sliders,
-  HelpCircle,
   Eye,
   Zap,
+  ClipboardList,
 } from 'lucide-react';
 import {
   getAllFormConfigs,
@@ -17,22 +17,28 @@ import {
   syncFieldsToSheet,
   syncAllFormsToSheet,
   formatRelativeTime,
+  fetchFormConfig,
+  fetchFormSubmissions,
   DEFAULT_FORM_CONFIGS,
 } from '../../services/googleSheetService.js';
 import {
   FormListSidebar,
   SheetLinkConfig,
   FieldBuilderTable,
-  FormIntegrationGuide,
   FormPreviewContainer,
 } from '../../components/Admin/Forms';
+import { FormBuilder } from '../../components/Admin/Base';
 import { AdminPageHeader, AdminToast, AdminButton } from '../../components/Admin/Common';
 
 export default function AdminFormsPage() {
   const [allConfigs, setAllConfigs] = useState({});
   const [activeFormId, setActiveFormId] = useState('event_newsletter');
   const [currentConfig, setCurrentConfig] = useState(null);
-  const [activeSubTab, setActiveSubTab] = useState('sheet'); // 'sheet' | 'fields' | 'preview' | 'guide'
+  const [activeSubTab, setActiveSubTab] = useState('sheet');
+  const [submissions, setSubmissions] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissionsError, setSubmissionsError] = useState('');
+  const [submissionsRefreshKey, setSubmissionsRefreshKey] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
@@ -45,6 +51,50 @@ export default function AdminFormsPage() {
   });
   const [isEmailCopied, setIsEmailCopied] = useState(false);
   const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    if (activeSubTab !== 'submissions') return undefined;
+    let isMounted = true;
+    setSubmissionsLoading(true);
+    setSubmissionsError('');
+    fetchFormSubmissions(activeFormId)
+      .then((response) => {
+        if (isMounted) {
+          setSubmissions(Array.isArray(response?.data) ? response.data : []);
+        }
+      })
+      .catch((error) => {
+        console.error(`Không thể tải dữ liệu biểu mẫu ${activeFormId}:`, error);
+        if (isMounted) {
+          setSubmissionsError('Không thể tải dữ liệu gửi về. Vui lòng thử tải lại.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) setSubmissionsLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeFormId, activeSubTab, submissionsRefreshKey]);
+
+  useEffect(() => {
+    if (activeFormId !== 'forum_registration') return undefined;
+    let isMounted = true;
+    fetchFormConfig(activeFormId).then((config) => {
+      if (!isMounted || !config) return;
+      setAllConfigs((current) => ({ ...current, [activeFormId]: config }));
+      setCurrentConfig((current) => {
+        if (!current) return config;
+        return {
+          ...config,
+          sheetUrl: config.sheetUrl || current.sheetUrl || '',
+        };
+      });
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [activeFormId]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -202,7 +252,7 @@ export default function AdminFormsPage() {
     }
   };
 
-  // Đồng bộ tất cả 7 Form cùng 1 lúc (1 lần duy nhất)
+  // Đồng bộ tất cả biểu mẫu cùng một lúc.
   const handleSyncAllForms = async () => {
     const targetUrl = currentConfig?.sheetUrl;
     if (!targetUrl?.trim()) {
@@ -248,7 +298,7 @@ export default function AdminFormsPage() {
           setCurrentConfig(nextAllConfigs[activeFormId]);
         }
 
-        showToast(res.message || 'Đã đồng bộ tất cả 7 biểu mẫu vào Google Sheet thành công!');
+        showToast(res.message || `Đã đồng bộ ${formList.length} biểu mẫu vào Google Sheet thành công!`);
       } else {
         showToast(res.message || 'Có lỗi khi đồng bộ tất cả các trang tính.', 'error');
       }
@@ -336,9 +386,9 @@ export default function AdminFormsPage() {
               loading={isSyncingAll}
               disabled={!currentConfig.sheetUrl}
               onClick={handleSyncAllForms}
-              title="Tự động khởi tạo cả 7 tab trong Google Sheet trong 1 lần bấm"
+              title={`Tự động khởi tạo cả ${formList.length} tab trong Google Sheet trong 1 lần bấm`}
             >
-              {isSyncingAll ? 'Đang sync 7 tab...' : 'Đồng bộ tất cả'}
+              {isSyncingAll ? `Đang sync ${formList.length} tab...` : 'Đồng bộ tất cả'}
             </AdminButton>
 
             <AdminButton
@@ -437,6 +487,19 @@ export default function AdminFormsPage() {
 
               <button
                 type="button"
+                onClick={() => setActiveSubTab('submissions')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg transition cursor-pointer shrink-0 ${
+                  activeSubTab === 'submissions'
+                    ? 'bg-(--admin-heading) text-white shadow-xs'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <ClipboardList className="w-4 h-4" />
+                Dữ liệu gửi về
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setActiveSubTab('preview')}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg transition cursor-pointer shrink-0 ${
                   activeSubTab === 'preview'
@@ -446,19 +509,6 @@ export default function AdminFormsPage() {
               >
                 <Eye className="w-4 h-4" />
                 3. Giao Diện Mẫu Ngoài Web
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveSubTab('guide')}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg transition cursor-pointer shrink-0 ${
-                  activeSubTab === 'guide'
-                    ? 'bg-(--admin-heading) text-white shadow-xs'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <HelpCircle className="w-4 h-4" />
-                4. Luồng Hoạt Động &amp; Hướng Dẫn
               </button>
             </div>
           </div>
@@ -484,35 +534,167 @@ export default function AdminFormsPage() {
               onCopyBotEmail={handleCopyBotEmail}
               applyToAllForms={applyToAllForms}
               onToggleApplyToAll={setApplyToAllForms}
+              totalForms={formList.length}
             />
           )}
 
           {/* Sub-Tab 2: Cấu hình Fields */}
           {activeSubTab === 'fields' && (
-            <FieldBuilderTable
-              fields={currentConfig.fields || []}
-              onAddField={handleAddField}
-              onUpdateField={handleUpdateField}
-              onRemoveField={handleRemoveField}
-            />
+            <div className="space-y-4">
+              {activeFormId === 'forum_registration' && (
+                <section className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-5 shadow-2xs">
+                  <h3 className="mb-1 text-sm font-bold text-(--admin-title)">Nội dung hiển thị của biểu mẫu</h3>
+                  <p className="mb-4 text-xs text-gray-500">
+                    Cấu hình tiêu đề, phần mô tả và nút gửi của form đăng ký Forum.
+                  </p>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {[
+                      ['title', 'Tiêu đề biểu mẫu'],
+                      ['badgeText', 'Nhãn nhận diện'],
+                      ['submitButtonText', 'Nhãn nút gửi'],
+                    ].map(([field, label]) => (
+                      <label key={field} className="block text-xs font-semibold text-gray-700">
+                        {label}
+                        <input
+                          type="text"
+                          value={currentConfig[field] || ''}
+                          onChange={(event) => handleUpdateConfigField(field, event.target.value)}
+                          className="mt-1.5 w-full rounded-lg border border-(--admin-border) bg-white px-3 py-2 text-sm"
+                        />
+                      </label>
+                    ))}
+                    <label className="block text-xs font-semibold text-gray-700 md:col-span-2">
+                      Mô tả biểu mẫu
+                      <textarea
+                        value={currentConfig.subtitle || ''}
+                        onChange={(event) => handleUpdateConfigField('subtitle', event.target.value)}
+                        rows={2}
+                        className="mt-1.5 w-full rounded-lg border border-(--admin-border) bg-white px-3 py-2 text-sm"
+                      />
+                    </label>
+                  </div>
+                </section>
+              )}
+              {activeFormId === 'forum_registration' ? (
+                <FormBuilder
+                  value={{
+                    form_fields: (currentConfig.fields || []).map((field) => ({
+                      ...field,
+                      id: field.key,
+                      width: field.colSpan === 1 ? 'half' : 'full',
+                    })),
+                  }}
+                  onChange={(updated) => handleUpdateConfigField(
+                    'fields',
+                    (updated.form_fields || []).map(({ id, width, ...field }) => ({
+                      ...field,
+                      key: id,
+                      colSpan: width === 'half' ? 1 : 2,
+                    })),
+                  )}
+                  showFormMeta={false}
+                  showPreview={false}
+                  title="Cấu hình các trường đăng ký"
+                  description="Thêm, sắp xếp và tùy chỉnh các ô nhập liệu hiển thị trong form đăng ký Forum."
+                />
+              ) : (
+                <FieldBuilderTable
+                  fields={currentConfig.fields || []}
+                  onAddField={handleAddField}
+                  onUpdateField={handleUpdateField}
+                  onRemoveField={handleRemoveField}
+                />
+              )}
+            </div>
+          )}
+
+          {activeSubTab === 'submissions' && (
+            <section className="overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--admin-border) px-5 py-4">
+                <div>
+                  <h3 className="text-sm font-bold text-(--admin-title)">Dữ liệu đăng ký đã nhận</h3>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Hiển thị tối đa 100 lượt gửi gần nhất của biểu mẫu này.
+                  </p>
+                </div>
+                <AdminButton
+                  variant="secondary"
+                  icon={RefreshCw}
+                  loading={submissionsLoading}
+                  onClick={() => setSubmissionsRefreshKey((key) => key + 1)}
+                >
+                  Tải lại
+                </AdminButton>
+              </div>
+
+              {submissionsError && (
+                <p role="alert" className="px-5 py-3 text-sm text-red-700">{submissionsError}</p>
+              )}
+              {submissionsLoading ? (
+                <p className="px-5 py-8 text-center text-sm text-gray-500">Đang tải dữ liệu...</p>
+              ) : submissions.length === 0 ? (
+                <p className="px-5 py-8 text-center text-sm text-gray-500">
+                  Chưa có dữ liệu gửi về cho biểu mẫu này.
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[760px] border-collapse text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-(--admin-border) bg-gray-50 text-[10px] font-bold uppercase text-gray-600">
+                        <th className="px-3 py-3">Thời gian nhận</th>
+                        {(currentConfig.fields || []).map((field) => (
+                          <th key={field.key} className="px-3 py-3">{field.label || field.key}</th>
+                        ))}
+                        <th className="px-3 py-3">Google Sheet</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-(--admin-border)/60">
+                      {submissions.map((submission) => (
+                        <tr key={submission.id} className="align-top hover:bg-gray-50/70">
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {submission.createdDate
+                              ? new Date(submission.createdDate).toLocaleString('vi-VN')
+                              : submission.data?.submittedAt || '—'}
+                          </td>
+                          {(currentConfig.fields || []).map((field) => {
+                            const value = submission.data?.[field.key];
+                            const displayValue = value == null
+                              ? '—'
+                              : typeof value === 'object'
+                                ? JSON.stringify(value)
+                                : String(value);
+                            return (
+                              <td key={field.key} className="max-w-[280px] whitespace-pre-wrap break-words px-3 py-3 text-gray-800">
+                                {displayValue}
+                              </td>
+                            );
+                          })}
+                          <td className="px-3 py-3">
+                            <span className={submission.syncedToSheet
+                              ? 'font-semibold text-emerald-700'
+                              : 'font-semibold text-amber-700'}
+                            >
+                              {submission.syncedToSheet ? 'Đã đồng bộ' : 'Đã lưu trong hệ thống'}
+                            </span>
+                            {submission.syncError && (
+                              <p className="mt-1 max-w-[220px] text-[10px] text-red-600">{submission.syncError}</p>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
           )}
 
           {/* Sub-Tab 3: Giao diện mẫu ngoài web (Preview) */}
           {activeSubTab === 'preview' && (
             <FormPreviewContainer formConfig={currentConfig} />
           )}
-
-          {/* Sub-Tab 4: Luồng hoạt động & Hướng dẫn */}
-          {activeSubTab === 'guide' && (
-            <FormIntegrationGuide
-              formConfig={currentConfig}
-              botEmail={serviceAccountInfo.botEmail}
-              sheetUrl={currentConfig.sheetUrl}
-            />
-          )}
         </div>
       </div>
     </div>
   );
 }
-

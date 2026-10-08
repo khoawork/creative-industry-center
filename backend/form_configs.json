@@ -419,5 +419,73 @@
     "updatedAt": "2026-10-06T08:56:19.164Z",
     "lastSyncedAt": "2026-10-06T08:56:19.164Z",
     "syncedSheetName": "DeXuatDuAn"
+  },
+  "forum_registration": {
+    "id": "forum_registration",
+    "title": "Đăng Ký Diễn Đàn Kinh Tế Kỷ Lục",
+    "subtitle": "Thông tin đại biểu đăng ký tham dự Diễn đàn Kinh tế Kỷ lục.",
+    "pagePath": "/forum",
+    "componentName": "ForumRegistration",
+    "badgeText": "ĐẠI BIỂU DIỄN ĐÀN",
+    "submitButtonText": "Xác nhận đăng ký",
+    "sheetUrl": "",
+    "sheetName": "DangKyDienDan",
+    "fields": [
+      {
+        "key": "fullName",
+        "label": "Họ và tên đại biểu 1122222222222",
+        "type": "text",
+        "placeholder": "Nguyễn Văn A",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "phone",
+        "label": "Số điện thoại liên hệ",
+        "type": "tel",
+        "placeholder": "0912 345 678",
+        "required": true,
+        "colSpan": 1
+      },
+      {
+        "key": "email",
+        "label": "Địa chỉ email công vụ",
+        "type": "email",
+        "placeholder": "daibieu@tochuc.vn",
+        "required": true,
+        "colSpan": 2
+      },
+      {
+        "key": "organization",
+        "label": "Cơ quan / Doanh nghiệp",
+        "type": "text",
+        "placeholder": "Tên cơ quan / doanh nghiệp",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "position",
+        "label": "Chức danh / Chức vụ",
+        "type": "text",
+        "placeholder": "Chức danh / chức vụ",
+        "required": false,
+        "colSpan": 1
+      },
+      {
+        "key": "session",
+        "label": "Phiên hội nghị đăng ký tham dự",
+        "type": "select",
+        "placeholder": "Chọn phiên tham dự",
+        "options": [
+          "Toàn bộ 4 phiên làm việc",
+          "Phiên I & II - Hội nghị Chiến lược",
+          "Phiên III - Triển lãm & Kết nối B2B",
+          "Phiên IV - Gala Vinh danh Doanh nghiệp"
+        ],
+        "required": true,
+        "colSpan": 2
+      }
+    ],
+    "updatedAt": "2026-10-08T05:27:22.322Z"
   }
 }
