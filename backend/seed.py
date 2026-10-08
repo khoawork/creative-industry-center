@@ -44,6 +44,16 @@ from models.EventModel import EventStatus
 from models.UserModel import RoleEnum
 from dto import introduce_dto
 from app import create_app
+from forum_seed_data import (
+    DEFAULT_FORUM_AGENDA,
+    DEFAULT_FORUM_AWARDS,
+    DEFAULT_FORUM_HEADER,
+    DEFAULT_FORUM_HERO,
+    DEFAULT_FORUM_PARTNERS,
+    DEFAULT_FORUM_PILLARS,
+    DEFAULT_FORUM_REGISTRATION,
+    DEFAULT_FORUM_SPEAKERS,
+)
 
 
 def _dto_data(schema, payload):
@@ -578,6 +588,8 @@ def seed_nav_pages():
         print(f"  + [{target_id}] {name} (slug: {slug}) -> header_order: {target_id}")
 
     db.session.commit()
+
+
     print("  -> Cập nhật 10 trang điều hướng thành công với id từ 1 đến 10!")
 
     def seed_awards():
@@ -815,6 +827,58 @@ def seed_nav_pages():
 
     seed_awards()
     seed_award_page()
+
+
+def seed_forum_page():
+    """Add missing forum page content without replacing admin-edited values."""
+    page = Page.query.filter_by(slug="forum").first()
+    if page is None:
+        page = db.session.get(Page, 8)
+        if page is not None and page.slug != "forum":
+            page = None
+
+    if page is None:
+        page = Page(
+            name="Diễn đàn Kinh tế Kỷ lục",
+            slug="forum",
+            props={},
+        )
+        if db.session.get(Page, 8) is None:
+            page.id = 8
+        db.session.add(page)
+
+    def merge_missing(current, defaults):
+        if not isinstance(current, dict):
+            return deepcopy(defaults)
+        merged = dict(current)
+        for key, value in defaults.items():
+            if key not in merged:
+                merged[key] = deepcopy(value)
+            elif isinstance(value, dict):
+                merged[key] = merge_missing(merged[key], value)
+        return merged
+
+    page.name = "Diễn đàn Kinh tế Kỷ lục"
+    page.slug = "forum"
+    if page.props is not None and not isinstance(page.props, dict):
+        raise ValueError("Props trang 'forum' không hợp lệ.")
+    props = merge_missing(page.props or {}, {
+        "header_section": DEFAULT_FORUM_HEADER,
+        "hero_section": DEFAULT_FORUM_HERO,
+        "pillars_section": DEFAULT_FORUM_PILLARS,
+        "speakers_section": DEFAULT_FORUM_SPEAKERS,
+        "agenda_section": DEFAULT_FORUM_AGENDA,
+        "awards_section": DEFAULT_FORUM_AWARDS,
+        "partners_section": DEFAULT_FORUM_PARTNERS,
+        "registration_section": DEFAULT_FORUM_REGISTRATION,
+    })
+    props.setdefault("show_in_header", True)
+    props.setdefault("header_order", 8)
+    page.props = props
+    flag_modified(page, "props")
+    db.session.commit()
+    print("  -> Đã seed nội dung trang Diễn đàn.")
+    return page
 
 
 def _upsert_page_with_defaults(page_id, name, slug, defaults):
@@ -1199,6 +1263,7 @@ def seed_database():
     # BƯỚC 5: HEADER NAVIGATION / PAGES
     # ========================================================
     seed_nav_pages()
+    seed_forum_page()
 
     # Cập nhật các section cấu hình của từng trang.
     seed_contact_page()
@@ -1655,6 +1720,11 @@ if __name__ == "__main__":
         action="store_true",
         help="Chỉ bổ sung/cập nhật trang Training.",
     )
+    seed_modes.add_argument(
+        "--forum-page-only",
+        action="store_true",
+        help="Chỉ bổ sung nội dung còn thiếu của trang Diễn đàn.",
+    )
     args = parser.parse_args()
 
     app = create_app()
@@ -1664,6 +1734,7 @@ if __name__ == "__main__":
             seed_introduce()
         elif args.nav_only:
             seed_nav_pages()
+            seed_forum_page()
         elif args.events_only:
             seed_events_page()
             seed_event_dates()
@@ -1671,6 +1742,8 @@ if __name__ == "__main__":
             seed_project_page()
         elif args.training_page_only:
             seed_training_page()
+        elif args.forum_page_only:
+            seed_forum_page()
         elif args.contact_only:
             seed_contact_page()
         else:

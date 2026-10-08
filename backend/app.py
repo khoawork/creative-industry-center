@@ -42,6 +42,16 @@ def create_app():
 
             migrations = [
                 (
+                    "page",
+                    "is_visible",
+                    "ALTER TABLE page ADD COLUMN is_visible BOOLEAN NOT NULL DEFAULT TRUE",
+                ),
+                (
+                    "page",
+                    "order_index",
+                    "ALTER TABLE page ADD COLUMN order_index INT NOT NULL DEFAULT 0",
+                ),
+                (
                     "event",
                     "event_date",
                     "ALTER TABLE event ADD COLUMN event_date DATE NULL AFTER location",
@@ -111,6 +121,7 @@ def create_app():
     from controllers.FormController import form_api
     from controllers.ProjectPageController import project_page_api
     from controllers.TrainingPageController import training_page_api
+    from controllers.ForumPageController import forum_page_api
     from controllers.SiteSettingsController import site_api
     from controllers.AuthController import auth_api
     from controllers.ActivityLogController import activity_api
@@ -133,6 +144,7 @@ def create_app():
     app.register_blueprint(form_api)
     app.register_blueprint(project_page_api)
     app.register_blueprint(training_page_api)
+    app.register_blueprint(forum_page_api)
     app.register_blueprint(site_api)
 
     @app.after_request

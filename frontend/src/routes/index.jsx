@@ -48,6 +48,7 @@ const AdminRecordPage = lazy(() => import("../pages/Admin/AdminRecordPage.jsx"))
 const AdminFormsPage = lazy(() => import("../pages/Admin/AdminFormsPage.jsx"));
 const AdminUsers = lazy(() => import("../pages/Admin/AdminUsers.jsx"));
 const AdminActivities = lazy(() => import("../pages/Admin/AdminActivities.jsx"));
+const AdminForum = lazy(() => import("../pages/Admin/AdminForum.jsx"));
 const AdminLogin = lazy(() => import("../pages/Admin/AdminLogin.jsx"));
 const ProtectedRoute = lazy(() => import("../components/Admin/ProtectedRoute.jsx"));
 
@@ -113,6 +114,8 @@ export const adminRoute = {
                 return <AdminUsers />;
               case "activities":
                 return <AdminActivities />;
+              case "forum":
+                return <AdminForum />;
               default:
                 return ["events", "awards"].includes(item.id) ? (
                   <AdminCatalog defaultTab={item.id} />
@@ -129,6 +132,10 @@ export const adminRoute = {
         {
           path: "activities",
           element: <AdminActivities />,
+        },
+        {
+          path: "forum",
+          element: <AdminForum />,
         },
         {
           path: "forms",

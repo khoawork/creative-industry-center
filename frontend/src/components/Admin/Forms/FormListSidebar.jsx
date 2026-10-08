@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Mail,
   UserCheck,
+  UsersRound,
   GraduationCap,
   MessageSquareText,
   Award,
@@ -18,6 +19,7 @@ import { formatRelativeTime } from '../../../services/googleSheetService.js';
 const FORM_ICONS = {
   event_newsletter: Mail,
   event_registration: UserCheck,
+  forum_registration: UsersRound,
   training_registration: GraduationCap,
   contact_feedback: MessageSquareText,
   record_nomination: Award,

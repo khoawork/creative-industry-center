@@ -8,7 +8,7 @@ import { PageAPI } from '../api/pageApi';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-// Cấu hình mẫu mặc định cho tất cả 7 Form trong toàn bộ hệ thống website
+// Cấu hình mẫu mặc định cho các biểu mẫu trên toàn bộ hệ thống website.
 export const DEFAULT_FORM_CONFIGS = {
   event_newsletter: {
     id: "event_newsletter",
@@ -127,6 +127,74 @@ export const DEFAULT_FORM_CONFIGS = {
         type: "textarea",
         placeholder: "Yêu cầu vị trí ngồi, tài liệu trước sự kiện...",
         required: false,
+        colSpan: 2,
+      },
+    ],
+  },
+
+  forum_registration: {
+    id: "forum_registration",
+    title: "Đăng Ký Diễn Đàn Kinh Tế Kỷ Lục",
+    subtitle: "Thông tin đại biểu đăng ký tham dự Diễn đàn Kinh tế Kỷ lục.",
+    pagePath: "/forum",
+    componentName: "ForumRegistration",
+    badgeText: "ĐẠI BIỂU DIỄN ĐÀN",
+    submitButtonText: "Xác nhận đăng ký",
+    sheetUrl: "",
+    sheetName: "DangKyDienDan",
+    fields: [
+      {
+        key: "fullName",
+        label: "Họ và tên đại biểu",
+        type: "text",
+        placeholder: "Nguyễn Văn A",
+        required: true,
+        colSpan: 1,
+      },
+      {
+        key: "phone",
+        label: "Số điện thoại liên hệ",
+        type: "tel",
+        placeholder: "0912 345 678",
+        required: true,
+        colSpan: 1,
+      },
+      {
+        key: "email",
+        label: "Địa chỉ email công vụ",
+        type: "email",
+        placeholder: "daibieu@tochuc.vn",
+        required: true,
+        colSpan: 2,
+      },
+      {
+        key: "organization",
+        label: "Cơ quan / Doanh nghiệp",
+        type: "text",
+        placeholder: "Tên cơ quan / doanh nghiệp",
+        required: false,
+        colSpan: 1,
+      },
+      {
+        key: "position",
+        label: "Chức danh / Chức vụ",
+        type: "text",
+        placeholder: "Chức danh / chức vụ",
+        required: false,
+        colSpan: 1,
+      },
+      {
+        key: "session",
+        label: "Phiên hội nghị đăng ký tham dự",
+        type: "select",
+        placeholder: "Chọn phiên tham dự",
+        options: [
+          "Toàn bộ 4 phiên làm việc",
+          "Phiên I & II - Hội nghị Chiến lược",
+          "Phiên III - Triển lãm & Kết nối B2B",
+          "Phiên IV - Gala Vinh danh Doanh nghiệp",
+        ],
+        required: true,
         colSpan: 2,
       },
     ],
@@ -445,11 +513,17 @@ export const getFormConfig = (formId) => {
 export const fetchFormConfig = async (formId) => {
   try {
     const res = await axios.get(`${API_BASE_URL}/forms/config/${formId}`);
-    if (res?.data?.data && res.data.data.sheetUrl) {
-      return res.data.data;
+    if (res?.data?.data && typeof res.data.data === "object") {
+      return {
+        ...getFormConfig(formId),
+        ...res.data.data,
+        fields: Array.isArray(res.data.data.fields)
+          ? res.data.data.fields
+          : getFormConfig(formId)?.fields || [],
+      };
     }
   } catch (e) {
-    // fallback
+    console.warn(`Không thể tải cấu hình biểu mẫu "${formId}" từ máy chủ:`, e);
   }
   return getFormConfig(formId);
 };
@@ -531,7 +605,7 @@ export const testSheetConnection = async (sheetUrl, sheetName = "DangKySuKien", 
 };
 
 /**
- * Đồng bộ tất cả 7 Form vào Google Sheet cùng lúc (1 lần duy nhất)
+ * Đồng bộ tất cả biểu mẫu vào Google Sheet cùng lúc (1 lần duy nhất)
  */
 export const syncAllFormsToSheet = async (sheetUrl, forms = []) => {
   try {
@@ -605,3 +679,7 @@ export const submitFormToBackend = async (formId, formData, formConfig) => {
   }
 };
 
+export const fetchFormSubmissions = async (formId) => {
+  const response = await axios.get(`${API_BASE_URL}/forms/submissions/${formId}`);
+  return response.data;
+};

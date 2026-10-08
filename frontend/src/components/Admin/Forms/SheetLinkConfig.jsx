@@ -31,6 +31,7 @@ export default function SheetLinkConfig({
   onCopyBotEmail,
   applyToAllForms = true,
   onToggleApplyToAll,
+  totalForms = 0,
 }) {
   const isAlreadySynced = Boolean(lastSyncedAt);
 
@@ -165,15 +166,15 @@ export default function SheetLinkConfig({
         </div>
       </div>
 
-      {/* Nút ĐỒNG BỘ TẤT CẢ 7 TAB (1 LẦN DUY NHẤT) */}
+      {/* Nút đồng bộ toàn bộ các tab (1 lần duy nhất) */}
       <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 font-bold text-xs text-amber-950">
             <Zap className="w-4 h-4 text-amber-600 fill-amber-500" />
-            <span>Đồng bộ 1 lần duy nhất cho toàn bộ 7 biểu mẫu</span>
+            <span>Đồng bộ 1 lần duy nhất cho toàn bộ {totalForms} biểu mẫu</span>
           </div>
           <p className="text-[11px] text-amber-900/80">
-            Tự động khởi tạo toàn bộ 7 trang tính tương ứng trong Google Sheet chỉ với 1 cú click. Sau đó không cần đồng bộ lại nữa.
+            Tự động khởi tạo toàn bộ {totalForms} trang tính tương ứng trong Google Sheet chỉ với 1 cú click. Sau đó không cần đồng bộ lại nữa.
           </p>
         </div>
 
@@ -184,7 +185,7 @@ export default function SheetLinkConfig({
           className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition cursor-pointer disabled:opacity-40"
         >
           <Zap className="w-3.5 h-3.5 fill-white" />
-          <span>{isSyncingAll ? 'Đang tạo cả 7 tab...' : '⚡ Đồng bộ tất cả 7 Tab (1 lần duy nhất)'}</span>
+          <span>{isSyncingAll ? `Đang tạo ${totalForms} tab...` : `⚡ Đồng bộ tất cả ${totalForms} tab (1 lần duy nhất)`}</span>
         </button>
       </div>
 
@@ -222,4 +223,3 @@ export default function SheetLinkConfig({
     </div>
   );
 }
-

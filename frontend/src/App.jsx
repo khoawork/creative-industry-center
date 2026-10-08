@@ -5,12 +5,15 @@ import Footer from "./layout/Footer";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import { AuthProvider } from "./context/AuthContext";
 import AdminLogin from "./pages/Admin/AdminLogin";
+import ForumPage from "./pages/ForumPage.jsx";
 
 function App() {
   return (
     <AuthProvider>
       <SiteSettingsProvider>
         <Routes>
+          <Route path="/forum" element={<ForumPage />} />
+
           {/* Giao diện website chính cho khách truy cập */}
           <Route
             element={
@@ -21,7 +24,7 @@ function App() {
               </div>
             }
           >
-            {routes.map((route, index) => {
+            {routes.filter((route) => route.path !== "/forum").map((route, index) => {
               const Page = route.page;
               return (
                 <Route
