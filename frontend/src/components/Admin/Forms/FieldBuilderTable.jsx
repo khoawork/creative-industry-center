@@ -112,13 +112,29 @@ export default function FieldBuilderTable({
 
                 {/* Placeholder */}
                 <td className="py-2.5 px-3">
-                  <input
-                    type="text"
-                    value={field.placeholder || ''}
-                    onChange={(e) => onUpdateField(index, 'placeholder', e.target.value)}
-                    placeholder="Nhập hướng dẫn gợi ý..."
-                    className="w-full px-2.5 py-1.5 text-xs rounded border border-gray-200 bg-white focus:outline-hidden focus:border-(--admin-heading)"
-                  />
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      value={field.placeholder || ''}
+                      onChange={(e) => onUpdateField(index, 'placeholder', e.target.value)}
+                      placeholder="Nhập hướng dẫn gợi ý..."
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-gray-200 bg-white focus:outline-hidden focus:border-(--admin-heading)"
+                    />
+                    {field.type === 'select' && (
+                      <textarea
+                        value={Array.isArray(field.options) ? field.options.join('\n') : ''}
+                        onChange={(e) => onUpdateField(
+                          index,
+                          'options',
+                          e.target.value.split('\n').map((option) => option.trim()).filter(Boolean),
+                        )}
+                        placeholder={'Mỗi lựa chọn một dòng'}
+                        rows={3}
+                        aria-label={`Các lựa chọn cho ${field.label || field.key}`}
+                        className="w-full resize-y px-2.5 py-1.5 text-xs rounded border border-gray-200 bg-white focus:outline-hidden focus:border-(--admin-heading)"
+                      />
+                    )}
+                  </div>
                 </td>
 
                 {/* Bắt buộc toggle */}

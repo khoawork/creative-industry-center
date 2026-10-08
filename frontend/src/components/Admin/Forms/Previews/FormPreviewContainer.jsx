@@ -28,6 +28,7 @@ export default function FormPreviewContainer({
       case 'event_newsletter':
         return <EventNewsletterPreview config={formConfig} />;
       case 'event_registration':
+      case 'forum_registration':
         return <EventRegisterPreview config={formConfig} />;
       case 'training_registration':
         return <TrainingRegisterPreview config={formConfig} />;
@@ -112,4 +113,3 @@ export default function FormPreviewContainer({
     </div>
   );
 }
-
