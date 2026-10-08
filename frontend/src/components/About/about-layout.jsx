@@ -88,7 +88,7 @@ export default function AboutLayout({ props }) {
       {sections.hero_section && <AboutHero section={sections.hero_section} />}
 
       {contentSections.length > 0 && (
-        <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-12 sm:space-y-12 sm:px-6 sm:py-16 lg:space-y-16 lg:px-12 lg:py-24">
+        <div className="mx-auto w-full max-w-7xl space-y-8 px-4  sm:space-y-12 sm:px-6 sm:py-16 lg:space-y-16 lg:px-12 l">
           {contentSections.map(({ key, Component }, index) => (
             <Fragment key={key}>
               {index > 0 && (

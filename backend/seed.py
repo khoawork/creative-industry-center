@@ -1349,6 +1349,13 @@ def seed_database():
             "action_button": {"text": "XEM TẤT CẢ CHƯƠNG TRÌNH", "link": "/trainings"},
             "children_id": training_ids,
         },
+        {
+            "id": 4,
+            "tag": "HỆ THỐNG DANH VỊ DANH DỰ",
+            "title_main": "GIẢI THƯỞNG & TÔN VINH DANH HIỆU",
+            "action_button": {"text": "XEM CHI TIẾT DANH MỤC GIẢI THƯỞNG", "link": "/awards"},
+            "children_id": [a["code"] for a in awards_data[:3]] if "awards_data" in locals() and awards_data else ["VK-AWD-01", "VK-AWD-02", "VK-AWD-03"],
+        },
     ]
     for nav in nav_sections_payload:
         NavSectionRequestDTO().load(nav)

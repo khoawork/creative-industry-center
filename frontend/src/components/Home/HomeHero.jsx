@@ -25,7 +25,7 @@ export default function HomeHero({ onNavigate }) {
       <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 py-16 lg:py-24 text-center flex flex-col items-center">
         {/* Seal Ribbon */}
         {hero.badge && (
-          <div className="inline-flex items-center gap-2.5 px-6 py-2 mb-8 rounded-full bg-white border border-[#ebd8b7] shadow-sm">
+          <div className="inline-flex items-center gap-2.5 px-6 py-3 mb-8 rounded-full bg-white border border-[#ebd8b7] shadow-sm">
             <Icon name="star" size={18} className="text-secondary" />
             <span className="text-xs text-primary-dark font-bold tracking-[0.2em] uppercase">{hero.badge}</span>
             <Icon name="star" size={18} className="text-secondary" />
@@ -33,7 +33,7 @@ export default function HomeHero({ onNavigate }) {
         )}
 
         {/* Main Symmetrical Headline */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary max-w-4xl tracking-tight uppercase mb-6 leading-[1.15]">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary max-w-4xl tracking-tight uppercase mb-6 leading-[1.15]">
           {hero.title}
         </h1>
 
@@ -49,13 +49,13 @@ export default function HomeHero({ onNavigate }) {
         {hero.slogan && (
           <div className="bg-primary/5 border border-primary/15 backdrop-blur-sm px-8 py-3.5 rounded-full shadow-sm mb-10">
             <p className="text-base md:text-lg text-primary font-bold tracking-wide">
-              {hero.slogan.startsWith('“') ? hero.slogan : `“${hero.slogan}”`}
+              {hero.slogan}
             </p>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full max-w-xl">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full max-w-2xl">
           {hero.buttons.map((button, index) => (
             <Button
               key={`${button.href}-${button.text}`}

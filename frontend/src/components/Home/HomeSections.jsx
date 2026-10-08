@@ -4,6 +4,7 @@ import {
   about,
   advisory,
   awards,
+  awardsSection,
   events,
   eventsSection,
   programs,
@@ -15,14 +16,14 @@ import { sectionIds } from '../../config/shared/site.js'
 
 function SectionHeading({ eyebrow, title, light = false, left = false }) {
   return (
-    <div className={`flex flex-col ${left ? 'items-start text-left' : 'items-center text-center'} mb-12 lg:mb-16`}>
-      <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-2 ${light ? 'text-secondary-bright' : 'text-secondary'}`}>
+    <div className={`flex flex-col ${left ? 'items-start text-left' : 'items-center text-center'} mb-12 lg:mb-12`}>
+      <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-4 ${light ? 'text-secondary-bright' : 'text-secondary'}`}>
         {eyebrow}
       </span>
-      <h2 className={`text-3xl md:text-4xl font-extrabold uppercase tracking-tight ${light ? 'text-white' : 'text-primary'}`}>
+      <h2 className={`text-3xl md:text-4xl font-bold uppercase tracking-tight ${light ? 'text-white' : 'text-primary'}`}>
         {title}
       </h2>
-      <div className="w-20 h-1 bg-secondary mt-4 rounded-full" aria-hidden="true" />
+      
     </div>
   )
 }
@@ -32,6 +33,7 @@ export function AboutSection() {
     <section className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.about}>
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         <SectionHeading eyebrow={about.eyebrow} title={about.title} />
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
           {/* Visual Column */}
           <div className="lg:col-span-5 relative w-full">
@@ -120,7 +122,7 @@ export function EventsSection() {
     <section className="w-full py-20 lg:py-24 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.events}>
       <div className="max-w-7xl mx-auto flex flex-col">
         {/* Section Header with Alignment */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-12 gap-6">
           <SectionHeading eyebrow={eventsSection.tag} title={eventsSection.title_main} left />
           {eventsSection.action_button?.text && eventsSection.action_button?.link && (
             <Button
@@ -195,12 +197,17 @@ export function EventsSection() {
 }
 
 export function AwardsSection() {
+  const eyebrow = awardsSection.tag || 'HỆ THỐNG DANH VỊ DANH DỰ'
+  const title = awardsSection.title_main || 'Giải thưởng & Tôn vinh Danh hiệu'
+  const buttonText = awardsSection.action_button?.text || 'Xem chi tiết danh mục giải thưởng'
+  const buttonLink = awardsSection.action_button?.link || `/${sectionIds.awards}`
+
   return (
     <section className="w-full py-20 lg:py-24 bg-primary-dark text-white px-6 lg:px-12 relative overflow-hidden border-t-2 border-secondary/50" id={sectionIds.awards}>
       {/* Decorative gold glow behind header */}
       <div className="absolute -right-32 -top-32 w-96 h-96 rounded-full bg-secondary/15 blur-3xl pointer-events-none" aria-hidden="true" />
       <div className="max-w-7xl mx-auto flex flex-col items-center relative z-10 w-full" id={sectionIds.records}>
-        <SectionHeading eyebrow="HỆ THỐNG DANH VỊ DANH DỰ" title="Giải thưởng & Tôn vinh Danh hiệu" light />
+        <SectionHeading eyebrow={eyebrow} title={title} light />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
           {awards.map((award) => (
@@ -265,18 +272,20 @@ export function AwardsSection() {
           ))}
         </div>
 
-        <div className="mt-14 text-center">
-          <Button
-            href={`#${sectionIds.awards}`}
-            variant="white"
-            size="md"
-            icon="arrow"
-            iconPosition="end"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-lg bg-white hover:bg-surface-container-low text-primary transition-all shadow-md text-sm uppercase tracking-wider font-bold"
-          >
-            Xem chi tiết danh mục giải thưởng
-          </Button>
-        </div>
+        {buttonText && buttonLink && (
+          <div className="mt-14 text-center">
+            <Button
+              href={buttonLink}
+              variant="white"
+              size="md"
+              icon="arrow"
+              iconPosition="end"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-lg bg-white hover:bg-surface-container-low text-primary transition-all shadow-md text-sm uppercase tracking-wider font-bold"
+            >
+              {buttonText}
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   )
@@ -353,49 +362,7 @@ export function ProjectsSection() {
   )
 }
 
-export function RecordsForumSection() {
-  return (
-    <section className="w-full py-20 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]" id="de-cu-va-dien-dan">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-8 items-center bg-white border border-[#e8dfd3] rounded-2xl p-6 md:p-10 shadow-sm">
-          <div className="lg:col-span-7 flex flex-col items-start gap-4">
-            <span className="px-3.5 py-1.5 rounded-full bg-secondary/15 text-primary-dark text-xs font-bold uppercase tracking-widest">
-              Liên Minh Chiến Lược
-            </span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-primary uppercase tracking-tight">
-              Đề cử kỷ lục & Diễn đàn kinh tế kỷ lục
-            </h2>
-            <p className="text-on-surface-variant text-sm md:text-base leading-relaxed">
-              Viện Kỷ lục Việt Nam mở cổng tiếp nhận hồ sơ đề cử công trình, sáng kiến và phát minh của các tổ chức, doanh nhân, nghệ nhân trên toàn quốc. Đồng thời định kỳ tổ chức Diễn đàn Kinh tế Kỷ lục kết nối chuyển giao công nghệ và hợp tác đầu tư.
-            </p>
-          </div>
-          <div className="lg:col-span-5 bg-surface-container-low border border-[#e8dfd3] rounded-xl p-6">
-            <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-5">
-              Quy trình nộp hồ sơ
-            </h3>
-            <div className="space-y-4">
-              {[
-                { step: 1, title: 'Điền thông tin cơ bản', desc: 'Hoàn thiện hồ sơ trực tuyến theo mẫu quy chuẩn của Viện Kỷ lục.' },
-                { step: 2, title: 'Hội đồng Viện xem xét thẩm định', desc: 'Hội đồng chuyên gia thẩm định hồ sơ thực tế và dữ liệu chứng minh.' },
-                { step: 3, title: 'Công bố và trao bằng kỷ lục', desc: 'Xác lập kỷ lục và tôn vinh tại Đại hội Thường niên Kỷ lục gia.' },
-              ].map((item) => (
-                <div key={item.step} className="flex items-start gap-3.5">
-                  <span className="w-7 h-7 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                    {item.step}
-                  </span>
-                  <div>
-                    <h4 className="text-sm font-bold text-on-surface leading-tight">{item.title}</h4>
-                    <p className="text-xs text-on-surface-variant mt-1 leading-normal">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+
 
 export function TrainingSection() {
   return (
@@ -404,6 +371,7 @@ export function TrainingSection() {
         <SectionHeading eyebrow={trainingSection.tag} title={trainingSection.title_main} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((program) => (
+    
             <article
               className="p-8 rounded-2xl bg-surface-container-low border border-[#e8dfd3] flex flex-col justify-between shadow-sm space-y-6 hover:border-secondary transition-colors"
               key={program.id}

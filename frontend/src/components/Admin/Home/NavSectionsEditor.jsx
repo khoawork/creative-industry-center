@@ -21,11 +21,23 @@ import {
 } from '../../../services/contentTablesService.js';
 
 export default function NavSectionsEditor({
-  navSections = [],
+  navSections: navSectionsProp,
+  initialData,
   onSaveSection,
+  onSave,
   onDeleteSection,
+  onDelete,
+  pageId,
   isSaving,
 }) {
+  const navSections = Array.isArray(navSectionsProp)
+    ? navSectionsProp
+    : Array.isArray(initialData)
+    ? initialData
+    : [];
+  const handleSaveCallback = onSaveSection || onSave;
+  const handleDeleteCallback = onDeleteSection || onDelete;
+
   const [, setContentDataVersion] = useState(0);
   const [editingId, setEditingId] = useState(null); // null, 'new', or number
   const [activeForm, setActiveForm] = useState({
@@ -63,16 +75,40 @@ export default function NavSectionsEditor({
     setErrors({});
   };
 
+const NAV_PRESETS = {
+  events: {
+    tag: 'DÒNG THỜI GIAN HOẠT ĐỘNG',
+    title_main: 'SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI',
+    action_button: { text: 'XEM TẤT CẢ SỰ KIỆN', link: '/events' },
+  },
+  projects: {
+    tag: 'HÀNH TRÌNH THỰC TIỄN',
+    title_main: 'DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP',
+    action_button: { text: 'XEM TẤT CẢ DỰ ÁN', link: '/projects' },
+  },
+  trainings: {
+    tag: 'BỒI DƯỠNG & LAN TỎA',
+    title_main: 'CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO',
+    action_button: { text: 'XEM TẤT CẢ CHƯƠNG TRÌNH', link: '/trainings' },
+  },
+  awards: {
+    tag: 'HỆ THỐNG DANH VỊ DANH DỰ',
+    title_main: 'GIẢI THƯỞNG & TÔN VINH DANH HIỆU',
+    action_button: { text: 'XEM CHI TIẾT DANH MỤC GIẢI THƯỞNG', link: '/awards' },
+  },
+};
+
   const startCreate = (presetKey = 'events') => {
     const template = navSections.find((section) => detectTableForNav(section) === presetKey);
+    const preset = NAV_PRESETS[presetKey] || NAV_PRESETS.events;
     setEditingId('new');
     setActiveForm({
       id: null,
-      tag: template?.tag || '',
-      title_main: template?.title_main || '',
+      tag: template?.tag || preset.tag,
+      title_main: template?.title_main || preset.title_main,
       action_button: {
-        text: template?.action_button?.text || '',
-        link: template?.action_button?.link || '',
+        text: template?.action_button?.text || preset.action_button.text,
+        link: template?.action_button?.link || preset.action_button.link,
       },
       children_id: template?.children_id ? [...template.children_id] : [],
     });
@@ -101,7 +137,9 @@ export default function NavSectionsEditor({
   const handleSave = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    await onSaveSection(activeForm);
+    if (handleSaveCallback) {
+      await handleSaveCallback(activeForm);
+    }
     setEditingId(null);
     setStatusMessage('Đã lưu chuyên mục thành công!');
     setTimeout(() => setStatusMessage(null), 3000);
@@ -404,7 +442,9 @@ export default function NavSectionsEditor({
                   type="button"
                   onClick={() => {
                     if (confirm(`Bạn có chắc muốn xóa chuyên mục "${nav.title_main}"?`)) {
-                      onDeleteSection(nav.id);
+                      if (handleDeleteCallback) {
+                        handleDeleteCallback(nav.id);
+                      }
                     }
                   }}
                   className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 cursor-pointer"

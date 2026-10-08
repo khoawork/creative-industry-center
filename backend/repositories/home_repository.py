@@ -89,7 +89,7 @@ def create_nav(page, data):
 def delete_nav(page, nav_id):
     current_props = dict(page.props or {})
     nav_sections = current_props.get("nav_sections", [])
-    remaining_sections = [nav for nav in nav_sections if nav.get("id") != nav_id]
+    remaining_sections = [nav for nav in nav_sections if str(nav.get("id")) != str(nav_id)]
 
     if len(remaining_sections) == len(nav_sections):
         raise NotFoundError(message=f"Không tìm thấy nav section với ID: {nav_id}")
@@ -108,7 +108,7 @@ def add_children_to_nav(page, nav_id, children_ids):
     target_nav = None
     
     for nav in current_props.get("nav_sections", []):
-        if nav.get("id") == nav_id:
+        if str(nav.get("id")) == str(nav_id):
             # Hỗ trợ lấy dữ liệu dù truyền vào dict hay list trực tiếp
             raw_ids = children_ids.get("children_id") if isinstance(children_ids, dict) else children_ids
             if isinstance(raw_ids, (int, str)):
@@ -146,7 +146,7 @@ def delete_children_to_nav(page, nav_id, children_id):
     nav_found = False
     target_nav = None
     for nav in current_props.get("nav_sections", []):
-        if nav.get("id") == nav_id:
+        if str(nav.get("id")) == str(nav_id):
             current_children = nav.get("children_id", [])
             nav["children_id"] = [x for x in current_children if str(x) not in targets_to_remove]
             
@@ -169,7 +169,7 @@ def get_nav(page, nav_id):
         raise NotFoundError(message="Không tìm thấy page hoặc props trống")
     nav_sections = page.props.get("nav_sections", [])
     for nav in nav_sections:
-        if nav.get("id") == nav_id:
+        if str(nav.get("id")) == str(nav_id):
             return nav            
     raise NotFoundError(message=f"Không tìm thấy nav section với ID: {nav_id}")
 
@@ -194,12 +194,12 @@ def update_nav(page, nav_id, data):
     nav_found = False
     target_nav = None
     for nav in current_props["nav_sections"]:
-        if nav.get("id") == nav_id:
+        if str(nav.get("id")) == str(nav_id):
             children_id_old = nav.get("children_id", [])
             
             nav.update(nav_data)
             
-            nav["id"] = nav_id
+            nav["id"] = int(nav_id) if str(nav_id).isdigit() else nav_id
             
             if "children_id" not in nav or nav["children_id"] is None:
                 nav["children_id"] = children_id_old

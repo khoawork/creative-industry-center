@@ -103,6 +103,7 @@ export const homeNavSections = navSections
 export const eventsSection = findNavSection(navSections, 'event') || {}
 export const projectsSection = findNavSection(navSections, 'project') || {}
 export const trainingSection = findNavSection(navSections, 'train') || {}
+export const awardsSection = findNavSection(navSections, 'award') || {}
 
 export const events = eventRecords === null
   ? []
@@ -120,7 +121,7 @@ export const events = eventRecords === null
 
 export const awards = awardRecords === null
   ? []
-  : awardRecords.map((award) => ({
+  : selectNavItems(awardRecords, awardsSection).map((award) => ({
       id: award.id,
       icon: award.props?.icon || 'trophy',
       title: award.name || award.title || '',

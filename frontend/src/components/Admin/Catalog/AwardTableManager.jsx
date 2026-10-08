@@ -257,7 +257,9 @@ export default function AwardTableManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-(--admin-border)">
-                {filteredAwards.map((item) => (
+                {filteredAwards.map((item) =>
+      (
+             
                   <tr key={item.id} className="hover:bg-(--admin-background)/40 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs font-semibold text-gray-500">{item.code}</td>
                     <td className="px-4 py-3 font-semibold text-(--admin-title)">

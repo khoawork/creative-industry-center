@@ -9,6 +9,10 @@ import {
   ChevronUp,
   CheckSquare,
   Square,
+  Calendar,
+  FolderKanban,
+  GraduationCap,
+  Trophy,
 } from 'lucide-react';
 import {
   DEFAULT_TABLE_DATA,
@@ -16,6 +20,13 @@ import {
   findItemById,
   detectTableForNav,
 } from '../../../services/contentTablesService.js';
+
+const SOURCE_TABLE_TABS = [
+  { key: 'events', label: 'Sự kiện & Hoạt động', icon: Calendar },
+  { key: 'projects', label: 'Dự án & Câu chuyện', icon: FolderKanban },
+  { key: 'trainings', label: 'Đào tạo & Hợp tác', icon: GraduationCap },
+  { key: 'awards', label: 'Giải thưởng & Kỷ lục', icon: Trophy },
+];
 
 export default function ChildrenIdTableSelector({
   selectedIds = [],
@@ -27,6 +38,14 @@ export default function ChildrenIdTableSelector({
     return detectTableForNav(navContext) || initialTableKey || 'events';
   }, [navContext, initialTableKey]);
 
+  const [activeTableKey, setActiveTableKey] = useState(detectedTableKey);
+
+  useEffect(() => {
+    if (detectedTableKey) {
+      setActiveTableKey(detectedTableKey);
+    }
+  }, [detectedTableKey]);
+
   const [tableItemsMap, setTableItemsMap] = useState(DEFAULT_TABLE_DATA);
   const [searchTerm, setSearchTerm] = useState('');
   const [manualIdInput, setManualIdInput] = useState('');
@@ -36,11 +55,11 @@ export default function ChildrenIdTableSelector({
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
-    fetchTableItems(detectedTableKey).then((items) => {
+    fetchTableItems(activeTableKey).then((items) => {
       if (isMounted) {
         setTableItemsMap((prev) => ({
           ...prev,
-          [detectedTableKey]: items,
+          [activeTableKey]: items,
         }));
         setIsLoading(false);
       }
@@ -48,9 +67,9 @@ export default function ChildrenIdTableSelector({
     return () => {
       isMounted = false;
     };
-  }, [detectedTableKey]);
+  }, [activeTableKey]);
 
-  const currentItems = tableItemsMap[detectedTableKey] || [];
+  const currentItems = tableItemsMap[activeTableKey] || [];
 
   // Lọc tìm kiếm
   const filteredItems = useMemo(() => {
@@ -130,6 +149,44 @@ export default function ChildrenIdTableSelector({
         </div>
       </div>
 
+      {/* 1.5. Nút chọn nguồn dữ liệu (Sự kiện / Dự án / Đào tạo / Giải thưởng) */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-(--admin-surface) rounded-lg border border-(--admin-border)">
+        <span className="text-[11px] font-bold text-gray-500 uppercase px-2 py-1">
+          Nguồn dữ liệu:
+        </span>
+        <div className="flex flex-wrap gap-1">
+          {SOURCE_TABLE_TABS.map((tab) => {
+            const IconComponent = tab.icon;
+            const isActive = activeTableKey === tab.key;
+            const count = tableItemsMap[tab.key]?.length;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTableKey(tab.key)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition cursor-pointer ${
+                  isActive
+                    ? 'bg-(--admin-heading) text-white shadow-xs'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                }`}
+              >
+                <IconComponent size={13} />
+                <span>{tab.label}</span>
+                {typeof count === 'number' && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 2. Thanh nhãn các mục đã chọn */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
@@ -154,7 +211,7 @@ export default function ChildrenIdTableSelector({
             </div>
           ) : (
             selectedIds.map((id) => {
-              const info = findItemById(id, detectedTableKey);
+              const info = findItemById(id, activeTableKey);
               return (
                 <span
                   key={id}

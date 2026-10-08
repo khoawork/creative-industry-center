@@ -1,5 +1,5 @@
 import HomeHero from '../../components/Home/HomeHero.jsx'
-import { AboutSection, EventsSection, AwardsSection, ProjectsSection, RecordsForumSection, TrainingSection } from '../../components/Home/HomeSections.jsx'
+import { AboutSection, EventsSection, AwardsSection, ProjectsSection, TrainingSection } from '../../components/Home/HomeSections.jsx'
 import useHome from '../../hooks/Home/useHome.js'
 
 export default function HomePage() {
@@ -21,7 +21,6 @@ export default function HomePage() {
           <EventsSection />
           <AwardsSection />
           <ProjectsSection />
-          <RecordsForumSection />
           <TrainingSection />
         </div>
       </main>

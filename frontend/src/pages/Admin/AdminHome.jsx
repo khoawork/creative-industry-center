@@ -56,12 +56,17 @@ export default function AdminHome() {
           const dataPayload = result.data || result;
           setHomeData(dataPayload);
           setIsLiveApi(result.isLive ?? true);
+          const dbNavs = Array.isArray(dataPayload.props?.nav_sections)
+            ? dataPayload.props.nav_sections
+            : [];
           try {
             const sections = await fetchNavSections(dataPayload.id);
-            if (isMounted) setNavSections(sections);
+            if (isMounted) {
+              setNavSections(Array.isArray(sections) && sections.length > 0 ? sections : dbNavs);
+            }
           } catch (error) {
             console.error('Lỗi khi tải nav sections từ database:', error);
-            if (isMounted) setNavSections(dataPayload.props?.nav_sections || []);
+            if (isMounted) setNavSections(dbNavs);
           }
         }
       })
@@ -131,20 +136,55 @@ export default function AdminHome() {
     setIsSaving(true);
 
     try {
-      const existingSection = navSections.find(
-        (section) => String(section.id) === String(savedSection.id)
-      );
+      const pageId = homeData.id || 1;
+      const isNew = !savedSection.id || savedSection.id === 'new';
+      const payload = {
+        tag: savedSection.tag,
+        title_main: savedSection.title_main,
+        action_button: {
+          text: savedSection.action_button?.text || '',
+          link: savedSection.action_button?.link || '',
+        },
+        children_id: savedSection.children_id || [],
+      };
+
+      let saveResponse;
+      if (!isNew) {
+        payload.id = Number(savedSection.id) || savedSection.id;
+        saveResponse = await HomeAPI.updateNav(pageId, savedSection.id, payload);
+      } else {
+        saveResponse = await HomeAPI.createNav(pageId, payload);
+      }
 
       let updatedSections = [];
-      if (existingSection) {
-        updatedSections = navSections.map((section) =>
-          String(section.id) === String(savedSection.id) ? savedSection : section
-        );
-      } else {
-        updatedSections = [...navSections, savedSection];
+      try {
+        const refreshed = await fetchNavSections(pageId);
+        if (Array.isArray(refreshed) && refreshed.length > 0) {
+          updatedSections = refreshed;
+        }
+      } catch (err) {
+        console.warn('Lỗi khi tải lại nav sections sau khi lưu:', err);
+      }
+
+      if (updatedSections.length === 0) {
+        const savedData = saveResponse?.data || {
+          ...payload,
+          id: !isNew ? savedSection.id : Date.now(),
+        };
+        const exists = navSections.some((s) => String(s.id) === String(savedData.id));
+        updatedSections = exists
+          ? navSections.map((s) => (String(s.id) === String(savedData.id) ? savedData : s))
+          : [...navSections, savedData];
       }
 
       setNavSections(updatedSections);
+      setHomeData((prev) => ({
+        ...prev,
+        props: {
+          ...(prev?.props || {}),
+          nav_sections: updatedSections,
+        },
+      }));
       showToast('Lưu chuyên mục thành công!');
     } catch (error) {
       console.error('Lỗi khi lưu nav section:', error);
@@ -159,10 +199,31 @@ export default function AdminHome() {
     setIsSaving(true);
 
     try {
-      const updatedSections = navSections.filter(
-        (section) => String(section.id) !== String(sectionId)
-      );
+      const pageId = homeData.id || 1;
+      await HomeAPI.deleteNav(pageId, sectionId);
+
+      let updatedSections = [];
+      try {
+        const refreshed = await fetchNavSections(pageId);
+        if (Array.isArray(refreshed)) {
+          updatedSections = refreshed;
+        }
+      } catch (err) {
+        console.warn('Lỗi khi tải lại nav sections sau khi xóa:', err);
+      }
+
+      if (updatedSections.length === 0) {
+        updatedSections = navSections.filter((s) => String(s.id) !== String(sectionId));
+      }
+
       setNavSections(updatedSections);
+      setHomeData((prev) => ({
+        ...prev,
+        props: {
+          ...(prev?.props || {}),
+          nav_sections: updatedSections,
+        },
+      }));
       showToast('Xóa chuyên mục thành công!');
     } catch (error) {
       console.error('Lỗi khi xóa nav section:', error);
@@ -249,9 +310,12 @@ export default function AdminHome() {
 
         {activeTab.id === 'nav' && (
           <NavSectionsEditor
+            navSections={navSections}
             initialData={navSections}
             pageId={homeData?.id}
+            onSaveSection={handleSaveNavSection}
             onSave={handleSaveNavSection}
+            onDeleteSection={handleDeleteNavSection}
             onDelete={handleDeleteNavSection}
             isSaving={isSaving}
           />

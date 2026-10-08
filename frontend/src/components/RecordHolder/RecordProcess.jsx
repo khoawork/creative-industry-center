@@ -11,7 +11,7 @@ export default function RecordProcess({ process }) {
             <span className="w-2 h-2 rounded-full bg-record-primary"></span>
             {process.subtitle}
           </div>
-          <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
+          <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold py-4">
             {process.title}
           </h2>
           <p className="font-body-md text-body-md text-record-on-surface-variant">
