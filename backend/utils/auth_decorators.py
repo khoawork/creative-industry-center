@@ -1,43 +1,54 @@
 from functools import wraps
 from flask import request, g
 from utils.json import error_response
-from utils.jwt_util import decode_token
+from utils.jwt_util import verify_token
+from utils.cookie_crypto import unseal_cookie_token
 from models.UserModel import User, RoleEnum
 
 
 def token_required(f):
     """
-    Decorator kiểm tra JWT token hợp lệ từ:
-    1. HttpOnly Cookie: 'admin_token'
-    2. Header: 'Authorization: Bearer <token>'
+    Decorator kiểm tra JWT access token hợp lệ từ:
+    1. Header: 'Authorization: Bearer <token>' (ưu tiên khi client chỉ định)
+    2. HttpOnly Cookie: 'admin_token' (được unseal từ chuỗi mã hóa/hash)
     """
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
 
-        # 1. Thử lấy từ Cookie
-        if "admin_token" in request.cookies:
-            token = request.cookies.get("admin_token")
-
-        # 2. Thử lấy từ Header Authorization
-        if not token and "Authorization" in request.headers:
+        # 1. Ưu tiên lấy từ Header Authorization nếu có
+        if "Authorization" in request.headers:
             auth_header = request.headers.get("Authorization", "")
             if auth_header.startswith("Bearer "):
-                token = auth_header.split(" ", 1)[1].strip()
+                raw_header_val = auth_header.split(" ", 1)[1].strip()
+                # Có thể là raw JWT hoặc sealed token
+                token = unseal_cookie_token(raw_header_val) or raw_header_val
+
+        # 2. Nếu Header không có, lấy từ Cookie 'admin_token' (đã được seal/mã hóa)
+        if not token and "admin_token" in request.cookies:
+            raw_cookie_val = request.cookies.get("admin_token")
+            token = unseal_cookie_token(raw_cookie_val)
 
         if not token:
             return error_response(
-                message="Phiên đăng nhập không tồn tại hoặc đã hết hạn. Vui lòng đăng nhập lại.",
+                message="Phiên đăng nhập không tồn tại. Vui lòng đăng nhập.",
                 status_code=401,
-                error_code="UNAUTHORIZED"
+                error_code="UNAUTHORIZED",
             )
 
-        payload = decode_token(token)
-        if not payload:
+        # Xác minh Access Token
+        payload, error_code = verify_token(token, expected_type="access")
+        if error_code == "TOKEN_EXPIRED":
             return error_response(
-                message="Mã xác thực không hợp lệ hoặc đã hết hạn.",
+                message="Phiên làm việc đã hết hạn. Vui lòng làm mới token.",
                 status_code=401,
-                error_code="TOKEN_EXPIRED"
+                error_code="TOKEN_EXPIRED",
+            )
+        elif not payload or error_code:
+            return error_response(
+                message="Mã xác thực không hợp lệ.",
+                status_code=401,
+                error_code="INVALID_TOKEN",
             )
 
         user_id = payload.get("sub")
@@ -45,11 +56,12 @@ def token_required(f):
             user = User.query.get(int(user_id))
         except (ValueError, TypeError):
             user = None
+
         if not user:
             return error_response(
                 message="Tài khoản không tồn tại trên hệ thống.",
                 status_code=401,
-                error_code="USER_NOT_FOUND"
+                error_code="USER_NOT_FOUND",
             )
 
         # Kiểm tra trạng thái tài khoản
@@ -57,7 +69,7 @@ def token_required(f):
             return error_response(
                 message="Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Quản trị viên tối cao.",
                 status_code=403,
-                error_code="ACCOUNT_LOCKED"
+                error_code="ACCOUNT_LOCKED",
             )
 
         # Kiểm tra quyền truy cập vào Admin Panel
@@ -65,7 +77,7 @@ def token_required(f):
             return error_response(
                 message="Tài khoản của bạn đã bị tắt quyền truy cập vào khu vực Quản trị.",
                 status_code=403,
-                error_code="ADMIN_ACCESS_REVOKED"
+                error_code="ADMIN_ACCESS_REVOKED",
             )
 
         # Gán thông tin user vào context request của Flask
@@ -78,7 +90,7 @@ def token_required(f):
 def roles_required(*allowed_roles):
     """
     Decorator kiểm tra xem user hiện tại có thuộc danh sách roles được phép hay không.
-    Ví dụ: @roles_required(RoleEnum.SUPER_ADMIN.value)
+    Ví dụ: @roles_required(RoleEnum.ADMIN.value)
     """
     def decorator(f):
         @wraps(f)
@@ -89,7 +101,7 @@ def roles_required(*allowed_roles):
                 return error_response(
                     message="Yêu cầu xác thực tài khoản.",
                     status_code=401,
-                    error_code="UNAUTHORIZED"
+                    error_code="UNAUTHORIZED",
                 )
 
             # ADMIN luôn có toàn quyền tối cao
@@ -99,9 +111,9 @@ def roles_required(*allowed_roles):
             # Kiểm tra role cụ thể
             if current_user.role not in allowed_roles:
                 return error_response(
-                    message="Bạn không có quyền thực hiện thao tác này. Quyền này chỉ dành cho cấp quản trị cao hơn.",
+                    message="Bạn không có quyền thực hiện thao tác này.",
                     status_code=403,
-                    error_code="FORBIDDEN"
+                    error_code="FORBIDDEN",
                 )
 
             return f(*args, **kwargs)

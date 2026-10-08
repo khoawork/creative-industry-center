@@ -36,11 +36,45 @@ def reindex_ids(items, key):
     return items
 
 
+def ensure_certificate_ids(page, cta_section):
+    certificates = cta_section.get("certificate", [])
+    if not isinstance(certificates, list):
+        certificates = []
+
+    needs_save = False
+    normalized = []
+    seen_ids = set()
+    for index, cert in enumerate(certificates, start=1):
+        item = to_dict(cert)
+        item_id = item.get("id")
+        if not item_id or item_id in seen_ids:
+            item_id = f"certificate_{index}"
+            item["id"] = item_id
+            needs_save = True
+        seen_ids.add(item_id)
+        normalized.append(item)
+
+    if needs_save:
+        cta_section["certificate"] = normalized
+        page.props = {
+            **(page.props or {}),
+            "cta_section": cta_section,
+        }
+        founder_repo.save_page(page)
+
+    return normalized
+
+
 def get_page_by_slug(slug):
     page = founder_repo.get_page_by_slug(slug)
 
     if not page:
         raise ValueError(f"Page with slug '{slug}' not found")
+
+    props = page.props or {}
+    cta_section = props.get("cta_section")
+    if cta_section and isinstance(cta_section, dict):
+        ensure_certificate_ids(page, cta_section)
 
     return page
 
@@ -221,7 +255,10 @@ def delete_founder_section(slug, section_id):
 
 def get_founder_cta(slug):
     page = get_page_by_slug(slug)
-
+    props = page.props or {}
+    cta_section = props.get("cta_section", {})
+    if cta_section:
+        ensure_certificate_ids(page, cta_section)
     return (page.props or {}).get("cta_section", {})
 
 
@@ -240,7 +277,7 @@ def create_founder_cta(slug, founder_cta_data):
     founder_cta_data["certificate"] = [
         {
             **to_dict(certificate),
-            "id": certificate.get("id", f"certificate_{index}"),
+            "id": to_dict(certificate).get("id") or f"certificate_{index}",
         }
         for index, certificate in enumerate(
             founder_cta_data.get("certificate", []),
@@ -270,6 +307,18 @@ def update_founder_cta(slug, founder_cta_data):
     if not current_cta:
         raise ValueError("CTA section not found")
 
+    # Nếu payload có certificate, đảm bảo mỗi certificate có id
+    if "certificate" in founder_cta_data and founder_cta_data["certificate"] is not None:
+        cert_list = []
+        for idx, cert in enumerate(founder_cta_data.get("certificate", []), start=1):
+            c_dict = to_dict(cert)
+            if not c_dict.get("id"):
+                c_dict["id"] = f"certificate_{idx}"
+            cert_list.append(c_dict)
+        founder_cta_data["certificate"] = cert_list
+    else:
+        founder_cta_data["certificate"] = current_cta.get("certificate", [])
+
     updated_cta = {
         **current_cta,
         **founder_cta_data,
@@ -296,8 +345,10 @@ def get_founder_certificates(slug):
     props = page.props or {}
 
     cta_section = props.get("cta_section", {})
+    if not cta_section:
+        return []
 
-    return cta_section.get("certificate", [])
+    return ensure_certificate_ids(page, cta_section)
 
 
 def create_founder_certificate(slug, certificate_data):
@@ -312,12 +363,12 @@ def create_founder_certificate(slug, certificate_data):
     if not cta_section:
         raise ValueError("CTA section not found")
 
-    certificates = cta_section.get("certificate", [])
+    certificates = ensure_certificate_ids(page, cta_section)
 
     if not isinstance(certificates, list):
         raise ValueError("cta_section['certificate'] must be a list")
 
-    certificate_data["id"] = create_id(cta_section, "certificate")
+    certificate_data["id"] = f"certificate_{len(certificates) + 1}"
 
     updated_certificates = [
         *certificates,
@@ -355,10 +406,11 @@ def update_founder_certificate(
     if not cta_section:
         raise ValueError("CTA section not found")
 
-    certificates = cta_section.get("certificate", [])
+    certificates = ensure_certificate_ids(page, cta_section)
 
+    str_cert_id = str(certificate_id).strip()
     target = next(
-        (item for item in certificates if item.get("id") == certificate_id),
+        (item for item in certificates if str(item.get("id")).strip() == str_cert_id),
         None,
     )
 
@@ -368,11 +420,11 @@ def update_founder_certificate(
     updated_certificate = {
         **target,
         **certificate_data,
-        "id": certificate_id,
+        "id": target.get("id", str_cert_id),
     }
 
     updated_certificates = [
-        updated_certificate if item.get("id") == certificate_id else item
+        updated_certificate if str(item.get("id")).strip() == str_cert_id else item
         for item in certificates
     ]
 
@@ -400,18 +452,18 @@ def delete_founder_certificate(slug, certificate_id):
     if not cta_section:
         raise ValueError("CTA section not found")
 
-    certificates = cta_section.get("certificate", [])
+    certificates = ensure_certificate_ids(page, cta_section)
 
     if not isinstance(certificates, list):
         raise ValueError("cta_section['certificate'] must be a list")
 
-    # Kiểm tra tồn tại
-    if not any(item.get("id") == certificate_id for item in certificates):
+    str_cert_id = str(certificate_id).strip()
+    if not any(str(item.get("id")).strip() == str_cert_id for item in certificates):
         raise ValueError(f"Certificate '{certificate_id}' not found")
 
     # Xóa
     updated_certificates = [
-        item for item in certificates if item.get("id") != certificate_id
+        item for item in certificates if str(item.get("id")).strip() != str_cert_id
     ]
 
     # Đánh lại ID
@@ -424,3 +476,4 @@ def delete_founder_certificate(slug, certificate_id):
     founder_repo.save_page(page)
 
     return updated_certificates
+

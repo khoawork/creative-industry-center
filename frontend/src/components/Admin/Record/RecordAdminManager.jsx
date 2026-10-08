@@ -266,7 +266,11 @@ export default function RecordAdminManager() {
           )}
 
           {activeTab === "honor_rolls" && (
-            <RecordHonorRollEditor data={honorRolls} onChange={setHonorRolls} />
+            <RecordHonorRollEditor
+              data={honorRolls}
+              onChange={setHonorRolls}
+              onSaveAll={handleSaveCurrent}
+            />
           )}
 
           {activeTab === "process" && (

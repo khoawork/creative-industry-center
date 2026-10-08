@@ -77,6 +77,7 @@ class FounderSectionResponseDto(BaseSchema):
 
 
 class FounderCertificateDto(BaseSchema):
+    id = fields.String(required=False, allow_none=True)
     name = fields.String(required=True)
 
 
@@ -92,8 +93,9 @@ class FounderCTADto(BaseSchema):
 
     btn_cta = fields.String(required=True)
     sub_btn_cta = fields.String(required=True)
+    form_url = fields.String(required=False, allow_none=True)
 
-    certificate = fields.List(fields.Nested(FounderCertificateDto), required=True)
+    certificate = fields.List(fields.Nested(FounderCertificateDto), required=False, allow_none=True)
 
 
 class FounderCTAResponseDto(BaseSchema):

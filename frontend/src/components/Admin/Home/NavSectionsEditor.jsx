@@ -19,6 +19,7 @@ import {
   findItemById,
   fetchTableItems,
 } from '../../../services/contentTablesService.js';
+import { AdminConfirmModal } from '../Common/index.js';
 
 export default function NavSectionsEditor({
   navSections = [],
@@ -37,6 +38,18 @@ export default function NavSectionsEditor({
   });
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Xóa chuyên mục',
+    type: 'danger',
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -272,6 +285,15 @@ export default function NavSectionsEditor({
 
   return (
     <div className="space-y-6">
+      <AdminConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        type={confirmModal.type}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+      />
       {/* Header bar */}
       <div className="border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] p-5 sm:p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -403,9 +425,17 @@ export default function NavSectionsEditor({
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm(`Bạn có chắc muốn xóa chuyên mục "${nav.title_main}"?`)) {
-                      onDeleteSection(nav.id);
-                    }
+                    setConfirmModal({
+                      isOpen: true,
+                      title: 'Xác nhận xóa chuyên mục',
+                      message: `Bạn có chắc chắn muốn xóa chuyên mục "${nav.title_main}" khỏi trang chủ không?`,
+                      confirmText: 'Xóa chuyên mục',
+                      type: 'danger',
+                      onConfirm: () => {
+                        closeConfirmModal();
+                        onDeleteSection(nav.id);
+                      },
+                    });
                   }}
                   className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 cursor-pointer"
                   title="Xóa chuyên mục"

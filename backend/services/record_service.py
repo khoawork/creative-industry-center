@@ -119,15 +119,21 @@ def get_honor_rolls_service():
 
 
 def create_honor_roll_service(data: dict):
-    return add_honor_roll(data)
+    import time
+    honors = get_honor_rolls()
+    # Tự sinh id mới tăng dần
+    existing_ids = [h.get("id", 0) for h in honors if isinstance(h.get("id"), int)]
+    new_id = (max(existing_ids) + 1) if existing_ids else 1
+    data["id"] = new_id
+    return add_honor_roll("records", data)
 
 
 def update_honor_roll_service(honor_id: int, data: dict):
-    return update_honor_roll(honor_id=honor_id, honor_data=data)
+    return update_honor_roll("records", honor_id=honor_id, honor_data=data)
 
 
 def delete_honor_roll_service(honor_id: int):
-    return delete_honor_roll(honor_id=honor_id)
+    return delete_honor_roll("records", honor_id=honor_id)
 
 
 # ---------- Process ----------

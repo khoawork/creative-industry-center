@@ -16,6 +16,8 @@ import {
   AdminCard,
   AdminButton,
   AdminToast,
+  AdminLoadingModal,
+  AdminConfirmModal,
 } from '../Common/index.js';
 
 const tabs = [
@@ -96,14 +98,20 @@ function toSectionPayload(data) {
   };
 }
 
-function toCtaPayload(data) {
+function toCtaPayload(data, currentCertificates = []) {
+  const certs = currentCertificates && currentCertificates.length > 0
+    ? currentCertificates
+    : (data.certificate || []);
   return {
     subtitle: data.subtitle,
     title: data.title,
     description: data.description,
     btn_cta: data.btn_cta,
     sub_btn_cta: data.sub_btn_cta,
-    certificate: (data.certificate || []).map(({ name }) => ({ name })),
+    certificate: certs.map((item) => ({
+      ...(item.id ? { id: item.id } : {}),
+      name: item.name,
+    })),
   };
 }
 
@@ -311,6 +319,12 @@ function SectionEditor({ section, saving, onSave, onCancel }) {
 function CtaEditor({ cta, saving, onSave }) {
   const [form, setForm] = useState({ ...emptyCta, ...(cta || {}) });
 
+  useEffect(() => {
+    if (cta) {
+      setForm((prev) => ({ ...emptyCta, ...prev, ...cta }));
+    }
+  }, [cta]);
+
   const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
 
   return (
@@ -345,10 +359,23 @@ export default function FounderAdminPanel() {
   const [selectedSectionId, setSelectedSectionId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [savingMessage, setSavingMessage] = useState('Đang lưu dữ liệu...');
   const [status, setStatus] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [certificateName, setCertificateName] = useState('');
   const [editingCertificateId, setEditingCertificateId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Xóa vĩnh viễn',
+    type: 'danger',
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   const sections = page?.props?.section || [];
   const selectedSection = sections.find((section) => section.id === selectedSectionId) || null;
@@ -371,9 +398,11 @@ export default function FounderAdminPanel() {
         ...pageCta,
         ...(ctaData && Object.keys(ctaData).length ? ctaData : {}),
       };
-      const mergedCertificates = Array.isArray(certificateData)
+      const mergedCertificates = Array.isArray(certificateData) && certificateData.length
         ? certificateData
-        : pageCta.certificate || [];
+        : Array.isArray(mergedCta.certificate)
+          ? mergedCta.certificate
+          : [];
       setCta({ ...mergedCta, certificate: mergedCertificates });
       setCertificates(mergedCertificates);
     } catch (error) {
@@ -397,13 +426,14 @@ export default function FounderAdminPanel() {
 
   async function saveHero(data) {
     setSaving(true);
+    setSavingMessage('Đang lưu cấu hình Hero Banner...');
     setStatus(null);
     try {
       const payload = toHeroPayload(data);
       const result = page?.props?.hero_section ? await FounderAPI.updateHero(payload) : await FounderAPI.createHero(payload);
       const savedHero = unwrap(result);
       setPage((current) => ({ ...current, props: { ...(current?.props || {}), hero_section: savedHero } }));
-      showSuccess('Đã lưu Hero thành công.');
+      showSuccess('Đã lưu Hero Banner thành công.');
     } catch (error) {
       showError(error);
     } finally {
@@ -413,6 +443,7 @@ export default function FounderAdminPanel() {
 
   async function saveSection(data) {
     setSaving(true);
+    setSavingMessage(selectedSectionId ? 'Đang cập nhật hồ sơ Founder...' : 'Đang tạo hồ sơ Founder mới...');
     setStatus(null);
     try {
       const result = selectedSectionId
@@ -427,7 +458,7 @@ export default function FounderAdminPanel() {
         return { ...current, props: { ...(current?.props || {}), section: nextSections } };
       });
       setSelectedSectionId(null);
-      showSuccess(selectedSectionId ? 'Đã cập nhật Founder.' : 'Đã tạo Founder mới.');
+      showSuccess(selectedSectionId ? 'Đã cập nhật Founder thành công.' : 'Đã tạo Founder mới thành công.');
     } catch (error) {
       showError(error);
     } finally {
@@ -435,16 +466,36 @@ export default function FounderAdminPanel() {
     }
   }
 
-  async function deleteSection(sectionId) {
-    if (!window.confirm('Bạn có chắc muốn xóa Founder này không?')) return;
+  function promptDeleteSection(section) {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Xác nhận xóa hồ sơ Founder',
+      message: `Bạn có chắc chắn muốn xóa hồ sơ "${section.name}" không?\nDữ liệu đã xóa sẽ không thể khôi phục.`,
+      confirmText: 'Xóa Founder',
+      type: 'danger',
+      onConfirm: () => performDeleteSection(section.id),
+    });
+  }
+
+  async function performDeleteSection(sectionId) {
+    closeConfirmModal();
     setSaving(true);
+    setSavingMessage('Đang xóa Founder...');
     setStatus(null);
     try {
       const result = await FounderAPI.deleteFounderSection(sectionId);
       const nextSections = unwrap(result);
-      setPage((current) => ({ ...current, props: { ...(current?.props || {}), section: Array.isArray(nextSections) ? nextSections : (current?.props?.section || []).filter((section) => section.id !== sectionId) } }));
+      setPage((current) => ({
+        ...current,
+        props: {
+          ...(current?.props || {}),
+          section: Array.isArray(nextSections)
+            ? nextSections
+            : (current?.props?.section || []).filter((section) => section.id !== sectionId),
+        },
+      }));
       if (selectedSectionId === sectionId) setSelectedSectionId(null);
-      showSuccess('Đã xóa Founder.');
+      showSuccess('Đã xóa Founder thành công.');
     } catch (error) {
       showError(error);
     } finally {
@@ -454,11 +505,17 @@ export default function FounderAdminPanel() {
 
   async function saveCta(data) {
     setSaving(true);
+    setSavingMessage('Đang lưu cấu hình CTA...');
     setStatus(null);
     try {
-      const result = cta ? await FounderAPI.updateFounderCta(toCtaPayload(data)) : await FounderAPI.createFounderCta(toCtaPayload(data));
-      setCta(unwrap(result));
-      showSuccess('Đã lưu CTA thành công.');
+      const payload = toCtaPayload(data, certificates);
+      const result = cta ? await FounderAPI.updateFounderCta(payload) : await FounderAPI.createFounderCta(payload);
+      const updatedCta = unwrap(result);
+      setCta(updatedCta);
+      if (Array.isArray(updatedCta?.certificate)) {
+        setCertificates(updatedCta.certificate);
+      }
+      showSuccess('Đã lưu cấu hình CTA thành công.');
     } catch (error) {
       showError(error);
     } finally {
@@ -468,24 +525,39 @@ export default function FounderAdminPanel() {
 
   async function saveCertificate(event) {
     event.preventDefault();
-    if (!certificateName.trim()) return;
+    const trimmedName = certificateName.trim();
+    if (!trimmedName) return;
     setSaving(true);
+    setSavingMessage(editingCertificateId ? 'Đang cập nhật chứng nhận...' : 'Đang thêm chứng nhận mới...');
     setStatus(null);
     try {
-      const result = editingCertificateId
-        ? await FounderAPI.updateFounderCertificate(editingCertificateId, { name: certificateName.trim() })
-        : await FounderAPI.createFounderCertificate({ name: certificateName.trim() });
-      const savedCertificate = unwrap(result);
-      setCertificates((current) => {
-        const nextCertificates = editingCertificateId
-          ? current.map((certificate) => certificate.id === editingCertificateId ? savedCertificate : certificate)
-          : [...current, savedCertificate];
-        setCta((currentCta) => ({ ...(currentCta || {}), certificate: nextCertificates }));
-        return nextCertificates;
-      });
+      if (editingCertificateId) {
+        const result = await FounderAPI.updateFounderCertificate(editingCertificateId, {
+          name: trimmedName,
+        });
+        const savedCertificate = unwrap(result);
+        setCertificates((current) => {
+          const nextCertificates = current.map((cert) =>
+            cert.id === editingCertificateId ? savedCertificate : cert
+          );
+          setCta((currentCta) => ({ ...(currentCta || {}), certificate: nextCertificates }));
+          return nextCertificates;
+        });
+        showSuccess(`Đã cập nhật chứng nhận "${trimmedName}" thành công.`);
+      } else {
+        const result = await FounderAPI.createFounderCertificate({
+          name: trimmedName,
+        });
+        const savedCertificate = unwrap(result);
+        setCertificates((current) => {
+          const nextCertificates = [...current, savedCertificate];
+          setCta((currentCta) => ({ ...(currentCta || {}), certificate: nextCertificates }));
+          return nextCertificates;
+        });
+        showSuccess(`Đã thêm chứng nhận "${trimmedName}" thành công.`);
+      }
       setCertificateName('');
       setEditingCertificateId(null);
-      showSuccess(editingCertificateId ? 'Đã cập nhật chứng nhận.' : 'Đã thêm chứng nhận.');
     } catch (error) {
       showError(error);
     } finally {
@@ -493,19 +565,40 @@ export default function FounderAdminPanel() {
     }
   }
 
-  async function deleteCertificate(certificateId) {
-    if (!window.confirm('Bạn có chắc muốn xóa chứng nhận này không?')) return;
+  function promptDeleteCertificate(certificate) {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Xác nhận xóa chứng nhận',
+      message: `Bạn có chắc chắn muốn xóa chứng nhận "${certificate.name}" khỏi danh sách không?`,
+      confirmText: 'Xóa chứng nhận',
+      type: 'danger',
+      onConfirm: () => performDeleteCertificate(certificate.id, certificate.name),
+    });
+  }
+
+  async function performDeleteCertificate(certificateId, certNameToDelete = '') {
+    closeConfirmModal();
+    if (!certificateId) {
+      showError(new Error('Mã chứng nhận không hợp lệ.'));
+      return;
+    }
+    const displayName = certNameToDelete || 'chứng nhận này';
     setSaving(true);
+    setSavingMessage('Đang xóa chứng nhận...');
     setStatus(null);
     try {
       const result = await FounderAPI.deleteFounderCertificate(certificateId);
       const nextCertificates = unwrap(result);
       const updatedCertificates = Array.isArray(nextCertificates)
         ? nextCertificates
-        : certificates.filter((certificate) => certificate.id !== certificateId);
+        : certificates.filter((cert) => cert.id !== certificateId);
       setCertificates(updatedCertificates);
       setCta((current) => ({ ...(current || {}), certificate: updatedCertificates }));
-      showSuccess('Đã xóa chứng nhận.');
+      if (editingCertificateId === certificateId) {
+        setEditingCertificateId(null);
+        setCertificateName('');
+      }
+      showSuccess(`Đã xóa "${displayName}" thành công.`);
     } catch (error) {
       showError(error);
     } finally {
@@ -530,6 +623,23 @@ export default function FounderAdminPanel() {
       <AdminToast
         toast={status ? { message: status.message, type: status.type } : null}
         onClose={() => setStatus(null)}
+      />
+
+      <AdminLoadingModal
+        show={saving}
+        title={savingMessage}
+        subtitle="Vui lòng chờ trong giây lát, dữ liệu đang được đồng bộ..."
+      />
+
+      <AdminConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        type={confirmModal.type}
+        loading={saving}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
       />
 
       {/* Header trang quản trị chuẩn hóa */}
@@ -623,7 +733,7 @@ export default function FounderAdminPanel() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => deleteSection(section.id)}
+                    onClick={() => promptDeleteSection(section)}
                     aria-label={`Xóa ${section.name}`}
                     className="flex size-8 shrink-0 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
                   >
@@ -704,34 +814,52 @@ export default function FounderAdminPanel() {
               </form>
 
               <div className="divide-y divide-(--admin-border) border-y border-(--admin-border)">
-                {certificates.map((certificate) => (
-                  <div key={certificate.id} className="flex min-h-12 items-center justify-between gap-3 py-2">
-                    <span className="text-sm font-semibold text-(--admin-title)">
-                      {certificate.name}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingCertificateId(certificate.id);
-                          setCertificateName(certificate.name);
-                        }}
-                        aria-label={`Sửa ${certificate.name}`}
-                        className="flex size-8 items-center justify-center rounded-lg text-(--admin-body)/60 hover:text-(--admin-accent) hover:bg-(--admin-background) transition cursor-pointer"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteCertificate(certificate.id)}
-                        aria-label={`Xóa ${certificate.name}`}
-                        className="flex size-8 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                {certificates.map((certificate, index) => {
+                  const certId = certificate.id || `temp_${index}`;
+                  const isEditing = editingCertificateId === certId;
+                  return (
+                    <div
+                      key={certId}
+                      className={`flex min-h-12 items-center justify-between gap-3 py-2.5 px-2 rounded-lg transition ${
+                        isEditing ? 'bg-(--admin-accent)/5 ring-1 ring-(--admin-accent)/20' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-(--admin-surface) text-xs font-semibold text-(--admin-body)/70 border border-(--admin-border)">
+                          {index + 1}
+                        </span>
+                        <span className="text-sm font-semibold text-(--admin-title) truncate">
+                          {certificate.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingCertificateId(certId);
+                            setCertificateName(certificate.name);
+                          }}
+                          aria-label={`Sửa ${certificate.name}`}
+                          className={`flex size-8 items-center justify-center rounded-lg transition cursor-pointer ${
+                            isEditing
+                              ? 'bg-(--admin-accent) text-white'
+                              : 'text-(--admin-body)/60 hover:text-(--admin-accent) hover:bg-(--admin-background)'
+                          }`}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => promptDeleteCertificate(certificate)}
+                          aria-label={`Xóa ${certificate.name}`}
+                          className="flex size-8 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition cursor-pointer"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {!certificates.length && (
                   <p className="py-6 text-center text-xs text-(--admin-body)/50 italic">
                     Chưa có chứng nhận nào trong danh sách.

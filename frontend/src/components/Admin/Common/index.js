@@ -6,3 +6,5 @@ export { default as AdminCard } from './AdminCard.jsx';
 export { default as AdminBadge } from './AdminBadge.jsx';
 export { AdminInput, AdminSelect } from './AdminInput.jsx';
 export { default as AdminImagePreview } from './AdminImagePreview.jsx';
+export { default as AdminLoadingModal } from './AdminLoadingModal.jsx';
+export { default as AdminConfirmModal } from './AdminConfirmModal.jsx';

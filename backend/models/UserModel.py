@@ -22,6 +22,7 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     can_admin_access = db.Column(db.Boolean, default=True, nullable=False)
     last_login_at = db.Column(db.DateTime, nullable=True)
+    refresh_token_hash = db.Column(db.String(255), nullable=True)
 
     def set_password(self, raw_password: str) -> None:
         """Mã hóa và lưu mật khẩu"""

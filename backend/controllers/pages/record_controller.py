@@ -1,3 +1,4 @@
+import uuid
 from flask import Blueprint, request
 from marshmallow import ValidationError as MarshmallowValidationError
 from utils.error import NotFoundError
@@ -221,12 +222,17 @@ def list_honor_rolls():
 
 @record_page_api.post("/honor-rolls")
 def create_honor_roll():
-    payload = RecordHonorRollDto().load(request.get_json() or {})
-    created = record_svc.create_honor_roll_service(vars(payload))
-    result = RecordHonorRollResponseDto().dump(created)
-    return success_response(
-        data=result, message="Tạo honor roll thành công.", status_code=201
-    )
+    try:
+        payload = RecordHonorRollDto().load(request.get_json() or {})
+        # dump để convert SimpleNamespace → dict (bao gồm nested)
+        clean_data = RecordHonorRollDto().dump(payload)
+        created = record_svc.create_honor_roll_service(clean_data)
+        result = RecordHonorRollResponseDto().dump(created)
+        return success_response(
+            data=result, message="Tạo honor roll thành công.", status_code=201
+        )
+    except Exception as e:
+        return error_response(str(e), 500)
 
 
 @record_page_api.get("/honor-rolls/<int:honor_id>")
@@ -243,10 +249,14 @@ def get_honor_roll(honor_id):
 @record_page_api.patch("/honor-rolls/<int:honor_id>")
 @record_page_api.put("/honor-rolls/<int:honor_id>")
 def update_honor_roll(honor_id):
-    payload = RecordHonorRollDto().load(request.get_json() or {}, partial=True)
-    updated = record_svc.update_honor_roll_service(honor_id, vars(payload))
-    result = RecordHonorRollResponseDto().dump(updated)
-    return success_response(data=result, message="Cập nhật honor roll thành công.")
+    try:
+        payload = RecordHonorRollDto().load(request.get_json() or {}, partial=True)
+        clean_data = RecordHonorRollDto().dump(payload)
+        updated = record_svc.update_honor_roll_service(honor_id, clean_data)
+        result = RecordHonorRollResponseDto().dump(updated)
+        return success_response(data=result, message="Cập nhật honor roll thành công.")
+    except Exception as e:
+        return error_response(str(e), 500)
 
 
 @record_page_api.delete("/honor-rolls/<int:honor_id>")

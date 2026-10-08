@@ -4,7 +4,7 @@ import { EventAPI } from '../../../api/eventApi.js'
 import { adminButton, adminPrimaryButton, adminPanel } from '../../../config/Admin/adminEvents.js'
 import { eventStatuses } from '../../../config/Events/eventsConfig.js'
 import { eventDraft } from '../../../config/Admin/adminEvents.js'
-import { eventError, requireEventData, validEventLink } from '../../../api/eventApi.js'
+import { eventError, requireEventData, validEventLink, normalizeEventLink } from '../../../api/eventApi.js'
 import Field from './EventField.jsx'
 import ImageUploadField from '../Catalog/ImageUploadField.jsx'
 
@@ -53,26 +53,88 @@ export default function EventEditor({ event, categories, onSaved, onClose, modal
   const save = async (e) => {
     e.preventDefault()
     if (busy.current) return
-    if (!draft.name.trim() || !draft.location.trim() || !draft.description.trim() || !draft.category_id) {
-      setError('Vui lòng nhập tên, địa điểm, mô tả và chọn chuyên mục.'); return
+
+    // 1. Kiểm tra các trường bắt buộc cơ bản
+    if (!draft.name?.trim() || !draft.location?.trim() || !draft.description?.trim() || !draft.category_id) {
+      setError('Vui lòng nhập tên, địa điểm, mô tả và chọn chuyên mục.')
+      return
     }
-    if ((!file && !validEventLink(draft.image, true)) || !validEventLink(draft.form_url, true)
-      || draft.speakers.some((item, index) => !item.name.trim() || (!speakerFiles[index] && !validEventLink(item.image, true)))) {
-      setError('Kiểm tra tên diễn giả và các đường dẫn: dùng URL http/https hoặc đường dẫn bắt đầu bằng /.'); return
+
+    // Tự động trim & chuẩn hóa liên kết
+    const cleanImage = normalizeEventLink(draft.image)
+    const cleanFormUrl = normalizeEventLink(draft.form_url)
+    const cleanBtnAction = draft.btn_action?.trim() || ''
+
+    // 2. Kiểm tra ảnh sự kiện
+    if (!file && cleanImage && !validEventLink(cleanImage, true)) {
+      setError('Đường dẫn hình ảnh sự kiện không hợp lệ: vui lòng dùng URL http/https hoặc đường dẫn bắt đầu bằng /.')
+      return
     }
-    if (Boolean(draft.btn_action.trim()) !== Boolean(draft.form_url.trim())) {
-      setError('Nhập cả nhãn và đường dẫn nút hành động, hoặc để trống cả hai.'); return
+
+    // 3. Kiểm tra nút hành động & form_url
+    if (Boolean(cleanBtnAction) !== Boolean(cleanFormUrl)) {
+      setError('Vui lòng nhập cả nhãn và đường dẫn nút hành động, hoặc để trống cả hai.')
+      return
     }
+    if (cleanFormUrl && !validEventLink(cleanFormUrl, true)) {
+      setError('Đường dẫn nút hành động không hợp lệ: vui lòng dùng URL http/https (ví dụ: https://forms.gle/...) hoặc đường dẫn bắt đầu bằng /.')
+      return
+    }
+
+    // 4. Lọc bỏ các diễn giả hoàn toàn trống (nếu người dùng bấm Thêm nhưng không điền gì)
+    const validSpeakers = []
+    const validSpeakerFiles = []
+    for (let i = 0; i < (draft.speakers || []).length; i++) {
+      const sp = draft.speakers[i]
+      const spFile = speakerFiles[i]
+      const hasAnyField = sp.name?.trim() || sp.role?.trim() || sp.description?.trim() || sp.image?.trim() || spFile
+      if (!hasAnyField) {
+        continue // Tự động bỏ qua dòng diễn giả chưa nhập gì
+      }
+      if (!sp.name?.trim()) {
+        setError(`Vui lòng nhập tên cho diễn giả #${i + 1} (hoặc bấm nút xóa nếu không có diễn giả này).`)
+        return
+      }
+      const cleanSpeakerImg = normalizeEventLink(sp.image)
+      if (!spFile && cleanSpeakerImg && !validEventLink(cleanSpeakerImg, true)) {
+        setError(`Đường dẫn ảnh của diễn giả "${sp.name}" không hợp lệ: vui lòng dùng URL http/https hoặc đường dẫn bắt đầu bằng /.`)
+        return
+      }
+      validSpeakers.push({
+        ...sp,
+        name: sp.name.trim(),
+        role: sp.role?.trim() || '',
+        description: sp.description?.trim() || '',
+        image: cleanSpeakerImg,
+      })
+      validSpeakerFiles.push(spFile)
+    }
+
     busy.current = true
-    setSaving(true); setError('')
+    setSaving(true)
+    setError('')
     try {
-      const payload = { ...draft, event_date: draft.event_date || null, category_id: Number(draft.category_id) }
-      const response = event?.id ? await EventAPI.updateEvent(event.id, payload, file, speakerFiles) : await EventAPI.createEvent(payload, file, speakerFiles)
+      const payload = {
+        ...draft,
+        image: cleanImage,
+        btn_action: cleanBtnAction,
+        form_url: cleanFormUrl,
+        speakers: validSpeakers,
+        event_date: draft.event_date || null,
+        category_id: Number(draft.category_id),
+      }
+      const response = event?.id
+        ? await EventAPI.updateEvent(event.id, payload, file, validSpeakerFiles)
+        : await EventAPI.createEvent(payload, file, validSpeakerFiles)
       const saved = requireEventData(response)
       if (!saved.id) throw new Error('Phản hồi lưu sự kiện không hợp lệ.')
       onSaved(saved)
-    } catch (err) { setError(eventError(err)) }
-    finally { busy.current = false; setSaving(false) }
+    } catch (err) {
+      setError(eventError(err))
+    } finally {
+      busy.current = false
+      setSaving(false)
+    }
   }
   return <form onSubmit={save} className={modal ? 'flex max-h-[calc(100dvh-2rem)] flex-col' : `${adminPanel} space-y-6`}>
     {modal && <div className="flex shrink-0 items-center justify-between border-b border-(--admin-border) px-6 py-4">

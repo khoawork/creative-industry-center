@@ -27,12 +27,13 @@ def create_user(data: dict, creator: Optional[User] = None) -> Dict[str, Any]:
     """
     schema = UserCreateRequestDTO()
     validated = schema.load(data)
+    val_dict = validated if isinstance(validated, dict) else vars(validated)
 
-    username = validated["username"].strip().lower()
-    email = validated["email"].strip().lower()
-    password = validated["password"].strip()
-    full_name = (validated.get("full_name") or username).strip()
-    role = (validated.get("role") or RoleEnum.MANAGER.value).strip().lower()
+    username = (val_dict.get("username") or "").strip().lower()
+    email = (val_dict.get("email") or "").strip().lower()
+    password = (val_dict.get("password") or "").strip()
+    full_name = (val_dict.get("full_name") or username).strip()
+    role = (val_dict.get("role") or RoleEnum.MANAGER.value).strip().lower()
 
     # Kiểm tra trùng username hoặc email
     if user_repo.get_user_by_username(username):
@@ -79,11 +80,12 @@ def update_user(user_id: int, data: dict, current_user: User) -> Dict[str, Any]:
 
     schema = UserUpdateRequestDTO()
     validated = schema.load(data)
+    val_dict = validated if isinstance(validated, dict) else vars(validated)
 
-    full_name = validated.get("full_name")
-    email = validated.get("email")
-    role = validated.get("role")
-    password = validated.get("password")
+    full_name = val_dict.get("full_name")
+    email = val_dict.get("email")
+    role = val_dict.get("role")
+    password = val_dict.get("password")
 
     changes = {}
 

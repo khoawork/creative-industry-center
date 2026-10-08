@@ -12,6 +12,7 @@ class RecordActionDto(BaseSchema):
 
 
 class RecordResquestDto(BaseSchema):
+    id = Field.String(load_default=None, allow_none=True)
     title = Field.String(required=True, validate=Field.validate.Length(min=1, max=255))
     subtitle = Field.String(
         validate=Field.validate.Length(min=1, max=255), allow_none=True
@@ -25,11 +26,11 @@ class RecordResquestDto(BaseSchema):
     criteria = Field.List(
         Field.String(validate=Field.validate.Length(min=1, max=255)), allow_none=True
     )
-    action = Field.Nested(RecordActionDto, allow_none=True)
+    action = Field.Raw(allow_none=True)
 
 
 class RecordResponseDto(RecordResquestDto):
-    id = Field.Integer(required=True)
+    id = Field.String(required=True)
 
 
 class RecordMetricsDto(BaseSchema):
@@ -119,18 +120,21 @@ class RecordHolderGovernanceResponseDto(RecordHolderGovernanceDto):
 
 
 class RecordHonorRollCardDto(BaseSchema):
-    year = Field.String(required=True, validate=Field.validate.Length(min=1, max=50))
+    id = Field.Raw(load_default=None, allow_none=True)
+    year = Field.String(load_default="Năm 2024", allow_none=True)
     title = Field.String(required=True, validate=Field.validate.Length(min=1, max=255))
-
     description = Field.String(
-        required=True, validate=Field.validate.Length(min=1, max=550), allow_none=True
+        load_default="", allow_none=True
     )
     category = Field.String(
-        required=True, validate=Field.validate.Length(min=1, max=255)
+        load_default="", allow_none=True
     )
-    image = Field.String(
-        validate=Field.validate.Length(min=1, max=255), allow_none=True
-    )
+    image = Field.String(load_default="", allow_none=True)
+    badge = Field.String(load_default="", allow_none=True)
+    award_title = Field.String(load_default="", allow_none=True)
+    icon = Field.String(load_default="trophy", allow_none=True)
+    is_visible = Field.Boolean(load_default=True, allow_none=True)
+    award_label = Field.String(load_default="Đề Cử Được Vinh Danh:", allow_none=True)
 
 
 class RecordHonorRollAwardDto(BaseSchema):
@@ -143,23 +147,26 @@ class RecordHonorRollAwardResponseDto(RecordHonorRollAwardDto):
 
 
 class RecordHonorRollDto(BaseSchema):
-    title = Field.String(required=True, validate=Field.validate.Length(min=1, max=255))
+    id = Field.Raw(load_default=None, allow_none=True)
+    title = Field.String(load_default="BẢNG VÀNG DANH DỰ", allow_none=True)
     subtitle = Field.String(
-        validate=Field.validate.Length(min=1, max=255), allow_none=True
+        load_default="Cá Nhân & Tập Thể Được Tôn Vinh Gần Đây", allow_none=True
     )
     description = Field.String(
-        required=True, validate=Field.validate.Length(min=1, max=550), allow_none=True
+        load_default="", allow_none=True
     )
-    award_nomination_name = Field.Nested(RecordHonorRollAwardResponseDto, required=True)
+    is_visible = Field.Boolean(load_default=True, allow_none=True)
+    award_nomination_name = Field.Nested(RecordHonorRollAwardDto, allow_none=True, load_default=None)
+    categories = Field.Raw(load_default=None, allow_none=True)
     cards = Field.List(
         Field.Nested(RecordHonorRollCardDto),
-        required=True,
+        load_default=[],
         allow_none=True,
     )
 
 
 class RecordHonorRollResponseDto(RecordHonorRollDto):
-    id = Field.Integer(required=True)
+    id = Field.Raw(allow_none=True)
 
 
 class RecordSectionProcessInfoDto(BaseSchema):
