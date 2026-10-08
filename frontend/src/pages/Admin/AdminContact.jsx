@@ -9,6 +9,7 @@ import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, req
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
+import { AdminPageHeader, AdminTabs, AdminToast } from '../../components/Admin/Common/index.js'
 
 function clone(value) {
   return structuredClone(value)
@@ -684,41 +685,48 @@ export default function AdminContact() {
     </form>
   }
 
-  return <section className="[font-family:Inter,sans-serif] text-(--admin-ink)">
-    <div className="flex flex-wrap items-start justify-between gap-4 border-b border-(--admin-border) pb-7">
-      <div>
-        <p className="mb-3 text-[11px] font-semibold tracking-[0.16em] text-(--admin-heading) uppercase">Khu vực quản trị</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">Liên hệ</h1>
-      </div>
+  return (
+    <div className="space-y-6">
+      <AdminPageHeader
+        badge="Khu vực quản trị"
+        title="Quản lý Liên hệ"
+        subtitle="Quản lý cấu hình biểu mẫu liên hệ, thông tin tiếp nhận hồ sơ và hộp thư liên hệ."
+      />
+
+      <AdminTabs
+        tabs={adminContactTabs}
+        activeTab={activeTab.id}
+        onChange={(id) => {
+          const tab = adminContactTabs.find((t) => t.id === id);
+          if (tab) selectTab(tab);
+        }}
+      />
+
+      {errorMessages.length > 0 && activeTab.id !== 'inbox' && (
+        <div ref={errorSummaryRef} tabIndex={-1} role="alert" className="space-y-2 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-sm text-(--admin-heading) focus:outline-2 focus:outline-(--admin-accent)">
+          <p className="font-semibold">Chưa thể lưu. Kiểm tra các mục sau trong Cấu hình Form và Thông tin liên hệ:</p>
+          <ul className="list-disc space-y-1 pl-5">{errorMessages.map((message, index) => <li key={index}>{message}</li>)}</ul>
+        </div>
+      )}
+
+      {adminContactTabs.map((tab) => (
+        <div key={tab.id} id={`contact-panel-${tab.id}`} role="tabpanel" aria-labelledby={`contact-tab-${tab.id}`} hidden={activeTab.id !== tab.id}>
+          {tab.id === 'inbox' ? (
+            <AdminContactInbox messages={adminMessages} />
+          ) : tab.id === 'form' ? (
+            renderSavedForm()
+          ) : tab.id === 'info' ? (
+            renderContactInfo()
+          ) : (
+            <section className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
+              <h2 className="text-lg font-semibold text-(--admin-title)">{tab.label}</h2>
+              <p className="mt-3 text-sm leading-6">{tab.description}</p>
+            </section>
+          )}
+        </div>
+      ))}
+
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
     </div>
-    <div role="tablist" aria-label="Quản lý trang Liên hệ" className="my-6 flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) p-1 [scrollbar-width:none]">
-      {adminContactTabs.map((tab, index) => {
-        const IconComponent = tab.icon
-        const isSelected = activeTab.id === tab.id
-        return <button key={tab.id} ref={(node) => { tabRefs.current[index] = node }} id={`contact-tab-${tab.id}`} type="button" role="tab" aria-selected={isSelected} aria-controls={`contact-panel-${tab.id}`} tabIndex={isSelected ? 0 : -1} onClick={() => selectTab(tab)} onKeyDown={(event) => {
-          let nextIndex
-          if (event.key === 'ArrowRight') nextIndex = (index + 1) % adminContactTabs.length
-          else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + adminContactTabs.length) % adminContactTabs.length
-          else if (event.key === 'Home') nextIndex = 0
-          else if (event.key === 'End') nextIndex = adminContactTabs.length - 1
-          else return
-          event.preventDefault()
-          selectTab(adminContactTabs[nextIndex])
-          tabRefs.current[nextIndex]?.focus()
-        }} className={`flex min-h-11 shrink-0 cursor-pointer items-center gap-2 border-b-2 px-4 text-sm font-semibold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) ${isSelected ? 'border-(--admin-accent) text-(--admin-title)' : 'border-transparent text-(--admin-heading) hover:bg-(--admin-background)'}`}><IconComponent size={16} aria-hidden="true" /><span>{tab.label}</span></button>
-      })}
-    </div>
-    {errorMessages.length > 0 && activeTab.id !== 'inbox' && <div ref={errorSummaryRef} tabIndex={-1} role="alert" className="mb-5 space-y-2 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-sm text-(--admin-heading) focus:outline-2 focus:outline-(--admin-accent)">
-      <p className="font-semibold">Chưa thể lưu. Kiểm tra các mục sau trong Cấu hình Form và Thông tin liên hệ:</p>
-      <ul className="list-disc space-y-1 pl-5">{errorMessages.map((message, index) => <li key={index}>{message}</li>)}</ul>
-    </div>}
-    {adminContactTabs.map((tab) => <div key={tab.id} id={`contact-panel-${tab.id}`} role="tabpanel" aria-labelledby={`contact-tab-${tab.id}`} hidden={activeTab.id !== tab.id}>
-      {tab.id === 'inbox' ? <AdminContactInbox messages={adminMessages} /> : tab.id === 'form' ? renderSavedForm() : tab.id === 'info' ? renderContactInfo() : <section className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]"><h2 className="text-lg font-semibold text-(--admin-title)">{tab.label}</h2><p className="mt-3 text-sm leading-6">{tab.description}</p></section>}
-    </div>)}
-    {toast && <div className="fixed right-4 bottom-4 z-40 flex w-[calc(100%-2rem)] max-w-sm items-start gap-3 rounded-lg border border-(--admin-heading) bg-(--admin-surface) p-4 text-(--admin-ink) shadow-lg sm:right-6 sm:bottom-6">
-      {toast.error ? <AlertCircle size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-(--admin-heading)" /> : <CheckCircle2 size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-(--admin-heading)" />}
-      <p role={toast.error ? 'alert' : 'status'} aria-atomic="true" className="min-w-0 flex-1 text-sm leading-6 wrap-anywhere">{toast.message}</p>
-      <button type="button" aria-label="Đóng thông báo" onClick={() => setToast(null)} className="inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded text-(--admin-ink)/70 hover:bg-(--admin-background) hover:text-(--admin-ink) focus-visible:outline-2 focus-visible:outline-(--color-brand-gold)"><X size={18} aria-hidden="true" /></button>
-    </div>}
-  </section>
+  )
 }

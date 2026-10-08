@@ -12,6 +12,7 @@ import {
   Award,
 } from 'lucide-react';
 import { TrainingAPI } from '../../../api/trainingApi.js';
+import { AdminCard, AdminButton, AdminBadge } from '../Common/index.js';
 
 export default function TrainingSelector({ initialSelectedIds = [], onSave, isSaving }) {
   const [allTrainings, setAllTrainings] = useState([]);
@@ -97,74 +98,65 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
   return (
     <div className="space-y-6">
       {/* Khối giới thiệu & điều khiển bộ chọn */}
-      <div className="p-6 rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-(--admin-border) pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <GraduationCap className="text-(--admin-accent)" size={20} />
-              <h3 className="text-base font-bold text-(--admin-title)">
-                Chọn lọc Khóa Đào tạo Hiển thị ngoài Website
-              </h3>
-            </div>
-            <p className="text-xs text-(--admin-heading) mt-1">
-              Dữ liệu được nạp trực tiếp từ bảng cơ sở dữ liệu khóa đào tạo. Tích chọn các khóa học bạn muốn giới thiệu trên trang công khai.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-              <Eye size={13} />
+      <AdminCard
+        title="Chọn lọc Khóa Đào tạo Hiển thị ngoài Website"
+        subtitle="Dữ liệu nạp trực tiếp từ cơ sở dữ liệu khóa đào tạo. Tích chọn các khóa học bạn muốn giới thiệu trên trang công khai."
+        actions={
+          <div className="flex items-center gap-2">
+            <AdminBadge variant="emerald">
               Đã chọn: {selectedIds.length} / {allTrainings.length} khóa
-            </span>
-
-            <button
+            </AdminBadge>
+            <AdminButton
               type="button"
+              variant="outline"
+              size="sm"
+              icon={RefreshCw}
               onClick={fetchTrainings}
-              className="p-2 text-gray-400 hover:text-(--admin-title) border border-(--admin-border) rounded-lg hover:bg-(--admin-background) transition cursor-pointer"
-              title="Làm mới danh sách từ database"
             >
-              <RefreshCw size={15} />
-            </button>
+              Làm mới
+            </AdminButton>
           </div>
-        </div>
-
+        }
+      >
         {/* Thanh tìm kiếm & Nút thao tác nhanh */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
           <div className="relative flex-1">
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-(--admin-body)/50"
             />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm theo mã khóa học, tên chuyên đề, chứng chỉ..."
-              className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+              className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs text-(--admin-title) placeholder:text-(--admin-body)/40 focus:outline-none focus:border-(--admin-accent)"
             />
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
+            <AdminButton
               type="button"
+              variant="outline"
+              size="sm"
+              icon={CheckSquare}
               onClick={handleSelectAll}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs font-medium text-(--admin-title) hover:bg-(--admin-surface) transition cursor-pointer"
             >
-              <CheckSquare size={14} className="text-emerald-500" />
               Chọn tất cả
-            </button>
+            </AdminButton>
 
-            <button
+            <AdminButton
               type="button"
+              variant="outline"
+              size="sm"
+              icon={Square}
               onClick={handleDeselectAll}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs font-medium text-(--admin-title) hover:bg-(--admin-surface) transition cursor-pointer"
             >
-              <Square size={14} className="text-gray-400" />
               Bỏ chọn tất cả
-            </button>
+            </AdminButton>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
       {/* Danh sách các thẻ khóa học */}
       {loading ? (
@@ -176,7 +168,7 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
         </div>
       ) : filteredTrainings.length === 0 ? (
         <div className="p-12 text-center rounded-xl border border-dashed border-(--admin-border) bg-(--admin-surface)">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-(--admin-body)/60">
             Không tìm thấy khóa đào tạo nào phù hợp với bộ lọc hiện tại.
           </p>
         </div>
@@ -194,7 +186,7 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
                 className={`relative flex flex-col justify-between p-5 rounded-xl border transition-all cursor-pointer select-none ${
                   isSelected
                     ? 'border-(--admin-accent) bg-(--admin-surface) shadow-sm ring-1 ring-(--admin-accent)/20'
-                    : 'border-(--admin-border) bg-(--admin-background) opacity-70 hover:opacity-100 hover:border-gray-400'
+                    : 'border-(--admin-border) bg-(--admin-background) opacity-70 hover:opacity-100 hover:border-(--admin-border-hover)'
                 }`}
               >
                 <div>
@@ -205,7 +197,7 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
                         {isSelected ? (
                           <CheckSquare size={18} className="text-(--admin-accent)" />
                         ) : (
-                          <Square size={18} className="text-gray-400" />
+                          <Square size={18} className="text-(--admin-body)/40" />
                         )}
                       </div>
                       <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-500/10 text-(--admin-title)">
@@ -217,7 +209,7 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
                       className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                         isSelected
                           ? 'bg-emerald-500/10 text-emerald-600'
-                          : 'bg-gray-500/10 text-gray-400'
+                          : 'bg-gray-500/10 text-(--admin-body)/50'
                       }`}
                     >
                       {isSelected ? <Eye size={11} /> : <EyeOff size={11} />}
@@ -231,13 +223,13 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
                   </h4>
 
                   {/* Mô tả tóm tắt */}
-                  <p className="text-xs text-(--admin-heading) leading-relaxed line-clamp-3 mb-3">
+                  <p className="text-xs text-(--admin-body)/70 leading-relaxed line-clamp-3 mb-3">
                     {desc}
                   </p>
                 </div>
 
                 {/* Footer thẻ: Chứng chỉ & Thời lượng */}
-                <div className="pt-3 border-t border-(--admin-border)/60 space-y-1.5 text-[11px]">
+                <div className="pt-3 border-t border-(--admin-border) space-y-1.5 text-[11px]">
                   {tr.certificate && (
                     <div className="flex items-center gap-1.5 text-amber-600 font-medium truncate">
                       <Award size={13} className="shrink-0" />
@@ -246,7 +238,7 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
                   )}
 
                   {highlight && (
-                    <div className="text-gray-400 truncate">
+                    <div className="text-(--admin-body)/60 truncate">
                       {highlight}
                     </div>
                   )}
@@ -273,15 +265,15 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
               <Check size={16} /> Đã lưu thành công!
             </span>
           )}
-          <button
+          <AdminButton
             type="button"
+            variant="primary"
             onClick={handleSave}
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--admin-accent) text-white font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition shadow-sm cursor-pointer"
+            loading={isSaving}
+            icon={Save}
           >
-            <Save size={16} />
-            {isSaving ? 'Đang lưu...' : 'Lưu danh sách hiển thị'}
-          </button>
+            Lưu danh sách hiển thị
+          </AdminButton>
         </div>
       </div>
     </div>

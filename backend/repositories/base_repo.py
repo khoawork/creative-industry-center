@@ -27,8 +27,8 @@ def getPageBySlug(slug: str = "home") -> Optional[Page]:
 
 
 def getAllPages() -> List[Page]:
-    """Lấy danh sách tất cả các trang (các mục header)"""
-    return Page.query.order_by(Page.id.asc()).all()
+    """Lấy danh sách tất cả các trang (các mục header) theo thứ tự order_index"""
+    return Page.query.order_by(Page.order_index.asc(), Page.id.asc()).all()
 
 
 def createPage(name: str, slug: str, props: Optional[dict] = None) -> Page:
@@ -43,7 +43,7 @@ def createPage(name: str, slug: str, props: Optional[dict] = None) -> Page:
     return new_page
 
 
-def updatePage(page: Page, name: Optional[str] = None, slug: Optional[str] = None, props: Optional[dict] = None) -> Page:
+def updatePage(page: Page, name: Optional[str] = None, slug: Optional[str] = None, props: Optional[dict] = None, is_visible: Optional[bool] = None, order_index: Optional[int] = None) -> Page:
     """Cập nhật thông tin của Page"""
     if name is not None:
         page.name = name
@@ -52,8 +52,30 @@ def updatePage(page: Page, name: Optional[str] = None, slug: Optional[str] = Non
     if props is not None:
         page.props = _to_dict(props)
         flag_modified(page, "props")
+    if is_visible is not None:
+        page.is_visible = bool(is_visible)
+    if order_index is not None:
+        page.order_index = int(order_index)
     db.session.commit()
     return page
+
+
+def reorderPages(orders: List[Any]) -> List[Page]:
+    """Cập nhật thứ tự order_index cho danh sách page theo [{id, order_index}]"""
+    for item in orders:
+        if isinstance(item, dict):
+            page_id = item.get("id")
+            new_order = item.get("order_index")
+        else:
+            page_id = getattr(item, "id", None)
+            new_order = getattr(item, "order_index", None)
+
+        if page_id is not None and new_order is not None:
+            page = Page.query.filter_by(id=page_id).first()
+            if page:
+                page.order_index = int(new_order)
+    db.session.commit()
+    return getAllPages()
 
 
 def deletePage(page: Page) -> bool:

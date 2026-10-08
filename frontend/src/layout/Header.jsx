@@ -90,14 +90,16 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
       .then((res) => {
         const items = res?.data || res;
         if (isMounted && Array.isArray(items) && items.length > 0) {
-          const mapped = items.map((p) => {
-            const isHome = p.slug === 'home' || p.slug === '';
-            return {
-              id: p.id,
-              label: p.name,
-              href: isHome ? '/' : `/${p.slug.replace(/^\/+/, '')}`,
-            };
-          });
+          const mapped = items
+            .filter((p) => p.is_visible !== false)
+            .map((p) => {
+              const isHome = p.slug === 'home' || p.slug === '';
+              return {
+                id: p.id,
+                label: p.name,
+                href: isHome ? '/' : `/${p.slug.replace(/^\/+/, '')}`,
+              };
+            });
           setNavItems(mapped);
         }
       })

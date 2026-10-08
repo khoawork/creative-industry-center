@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Plus, Trash2, Award, Users, Tag, Image as ImageIcon, Sparkles, Filter } from "lucide-react";
+import { Plus, Trash2, Award, Users, Filter, Image as ImageIcon } from "lucide-react";
+import { AdminCard, AdminButton, AdminBadge } from "../Common/index.js";
 
 const inputClass =
-  "w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3.5 py-2.5 text-sm text-[var(--admin-ink)] outline-none transition focus:border-[var(--admin-accent)] focus:ring-2 focus:ring-[var(--admin-accent)]/20";
+  "w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3.5 py-2.5 text-sm text-(--admin-title) placeholder:text-(--admin-body)/40 outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/10";
 const labelClass =
-  "block text-xs font-semibold uppercase tracking-wider text-[var(--admin-heading)] mb-1.5";
+  "block text-xs font-semibold uppercase tracking-wider text-(--admin-heading) mb-1.5";
 
 const DEFAULT_CATEGORIES = [
   { id: "all", label: "Tất cả" },
@@ -91,21 +92,10 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
   return (
     <div className="space-y-6">
       {/* 1. Thông tin chung Bảng vàng */}
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-xs">
-        <div className="flex items-center gap-2.5 border-b border-[var(--admin-border)] pb-4 mb-5">
-          <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-            <Award size={18} />
-          </span>
-          <div>
-            <h3 className="text-base font-bold text-[var(--admin-title)]">
-              Cấu hình Bảng vàng danh dự
-            </h3>
-            <p className="text-xs text-gray-500">
-              Tiêu đề, mô tả và nhãn danh hiệu chung của phần Bảng vàng
-            </p>
-          </div>
-        </div>
-
+      <AdminCard
+        title="Cấu hình Bảng vàng danh dự"
+        subtitle="Tiêu đề, mô tả và nhãn danh hiệu chung của phần Bảng vàng"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
             <label className={labelClass}>Nhãn phụ (Title badge)</label>
@@ -140,13 +130,13 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
             />
           </div>
 
-          <div className="md:col-span-2 p-4 rounded-xl bg-[var(--admin-background)] border border-[var(--admin-border)] space-y-3">
-            <span className="text-xs font-bold uppercase text-[var(--admin-heading)] block">
+          <div className="md:col-span-2 p-4 rounded-xl bg-(--admin-background) border border-(--admin-border) space-y-3">
+            <span className="text-xs font-bold uppercase text-(--admin-heading) block">
               Nhãn danh hiệu đề cử mặc định
             </span>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                   Nhãn hiển thị (Label)
                 </label>
                 <input
@@ -158,7 +148,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                   Tên danh hiệu chung (Value)
                 </label>
                 <input
@@ -172,112 +162,96 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
             </div>
           </div>
         </div>
-      </div>
+      </AdminCard>
 
       {/* 2. Quản lý Danh mục phân loại (Categories) */}
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-xs">
-        <div className="flex items-center gap-2.5 border-b border-[var(--admin-border)] pb-4 mb-4">
-          <span className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
-            <Filter size={18} />
-          </span>
-          <div>
-            <h3 className="text-base font-bold text-[var(--admin-title)]">
-              Quản lý các danh mục phân loại (Categories)
-            </h3>
-            <p className="text-xs text-gray-500">
-              Bộ lọc danh mục hiển thị trên giao diện công khai (Tất cả, Doanh nghiệp, Nghệ nhân,...)
-            </p>
+      <AdminCard
+        title="Quản lý các danh mục phân loại (Categories)"
+        subtitle="Bộ lọc danh mục hiển thị trên giao diện công khai (Tất cả, Doanh nghiệp, Nghệ nhân,...)"
+      >
+        <div className="space-y-4">
+          {/* Categories Badges list */}
+          <div className="flex flex-wrap items-center gap-2">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs font-semibold text-(--admin-title)"
+              >
+                <span>{cat.label}</span>
+                <span className="text-[10px] text-(--admin-body)/60 font-mono">({cat.id})</span>
+                {cat.id !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCategory(cat.id)}
+                    className="text-(--admin-body)/50 hover:text-red-500 transition cursor-pointer"
+                    title="Xóa danh mục"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Add category form */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 pt-3 border-t border-(--admin-border)">
+            <input
+              type="text"
+              value={newCatId}
+              onChange={(e) => setNewCatId(e.target.value)}
+              placeholder="Mã danh mục (slug, VD: nha-khoa-hoc)"
+              className={`${inputClass} sm:w-1/3`}
+            />
+            <input
+              type="text"
+              value={newCatLabel}
+              onChange={(e) => setNewCatLabel(e.target.value)}
+              placeholder="Tên hiển thị (VD: Nhà Khoa học)"
+              className={`${inputClass} flex-1`}
+            />
+            <AdminButton
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={Plus}
+              onClick={handleAddCategory}
+            >
+              Thêm danh mục
+            </AdminButton>
           </div>
         </div>
-
-        {/* Categories Badges list */}
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] text-xs font-semibold text-[var(--admin-title)]"
-            >
-              <span>{cat.label}</span>
-              <span className="text-[10px] text-gray-400 font-mono">({cat.id})</span>
-              {cat.id !== "all" && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveCategory(cat.id)}
-                  className="text-gray-400 hover:text-rose-500 transition cursor-pointer"
-                  title="Xóa danh mục"
-                >
-                  &times;
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Add category form */}
-        <div className="flex flex-col sm:flex-row items-center gap-2 pt-2 border-t border-[var(--admin-border)]/60">
-          <input
-            type="text"
-            value={newCatId}
-            onChange={(e) => setNewCatId(e.target.value)}
-            placeholder="Mã danh mục (slug, VD: nha-khoa-hoc)"
-            className={`${inputClass} sm:w-1/3`}
-          />
-          <input
-            type="text"
-            value={newCatLabel}
-            onChange={(e) => setNewCatLabel(e.target.value)}
-            placeholder="Tên hiển thị (VD: Nhà Khoa học)"
-            className={`${inputClass} flex-1`}
-          />
-          <button
-            type="button"
-            onClick={handleAddCategory}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold rounded-lg bg-[var(--admin-accent)] text-white hover:opacity-90 transition cursor-pointer shrink-0"
-          >
-            <Plus size={14} /> Thêm danh mục
-          </button>
-        </div>
-      </div>
+      </AdminCard>
 
       {/* 3. Danh sách Gương mặt vinh danh kèm Hình ảnh */}
-      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 shadow-xs">
-        <div className="flex items-center justify-between border-b border-[var(--admin-border)] pb-4 mb-5">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
-              <Users size={18} />
-            </span>
-            <div>
-              <h3 className="text-base font-bold text-[var(--admin-title)]">
-                Danh sách Gương mặt vinh danh ({honorRoll.cards?.length || 0})
-              </h3>
-              <p className="text-xs text-gray-500">
-                Thẻ chân dung kèm hình ảnh, danh hiệu, niên khóa và giải thưởng
-              </p>
-            </div>
-          </div>
-          <button
+      <AdminCard
+        title={`Danh sách Gương mặt vinh danh (${honorRoll.cards?.length || 0})`}
+        subtitle="Thẻ chân dung kèm hình ảnh, danh hiệu, niên khóa và giải thưởng"
+        actions={
+          <AdminButton
             type="button"
+            variant="primary"
+            size="sm"
+            icon={Plus}
             onClick={handleAddCard}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-[var(--admin-accent)] text-white hover:opacity-90 transition cursor-pointer"
           >
-            <Plus size={14} /> Thêm gương mặt
-          </button>
-        </div>
-
+            Thêm gương mặt
+          </AdminButton>
+        }
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {(honorRoll.cards || []).length === 0 ? (
-            <p className="col-span-2 text-center py-10 text-xs text-gray-400 italic">
+            <p className="col-span-2 text-center py-10 text-xs text-(--admin-body)/60 italic">
               Chưa có gương mặt nào trong bảng vàng. Bấm "Thêm gương mặt" để tạo mới.
             </p>
           ) : (
             (honorRoll.cards || []).map((card, idx) => (
               <div
                 key={card.id || idx}
-                className="p-5 rounded-2xl bg-[var(--admin-background)] border border-[var(--admin-border)] space-y-4 hover:border-[var(--admin-accent)]/40 transition duration-150"
+                className="p-5 rounded-2xl bg-(--admin-background) border border-(--admin-border) space-y-4 hover:border-(--admin-accent)/40 transition duration-150"
               >
                 {/* Header card */}
-                <div className="flex items-center justify-between pb-2 border-b border-[var(--admin-border)]/60">
-                  <span className="text-xs font-bold text-[var(--admin-heading)]">
+                <div className="flex items-center justify-between pb-2 border-b border-(--admin-border)">
+                  <span className="text-xs font-bold text-(--admin-heading)">
                     Gương mặt #{idx + 1}
                   </span>
                   <button
@@ -292,11 +266,11 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
 
                 {/* Hình ảnh (Image URL & Preview) */}
                 <div>
-                  <label className="text-[11px] font-semibold text-gray-400 mb-1.5 flex items-center gap-1.5">
+                  <label className="text-[11px] font-semibold text-(--admin-body) mb-1.5 flex items-center gap-1.5">
                     <ImageIcon size={13} /> URL Hình ảnh / Chân dung
                   </label>
                   <div className="flex items-start gap-3">
-                    <div className="w-16 h-20 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] overflow-hidden shrink-0 flex items-center justify-center text-gray-400">
+                    <div className="w-16 h-20 rounded-lg border border-(--admin-border) bg-(--admin-surface) overflow-hidden shrink-0 flex items-center justify-center text-(--admin-body)/50">
                       {card.image ? (
                         <img
                           src={card.image}
@@ -318,7 +292,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                         placeholder="VD: https://... hoặc /images/awards/story.jpg"
                         className={inputClass}
                       />
-                      <span className="text-[10px] text-gray-400 block">
+                      <span className="text-[10px] text-(--admin-body)/60 block">
                         Dán đường dẫn ảnh chân dung hoặc liên kết hình ảnh trực tuyến.
                       </span>
                     </div>
@@ -327,7 +301,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                    <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                       Họ tên cá nhân / tập thể *
                     </label>
                     <input
@@ -340,20 +314,20 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                    <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                       Huy hiệu / Danh hiệu (Badge)
                     </label>
                     <input
                       type="text"
                       value={card.badge || ""}
                       onChange={(e) => handleCardChange(idx, "badge", e.target.value)}
-                      placeholder="VD: Kỷ lục gia Nhân dân, Doanh nghiệp Tiên phong"
+                      placeholder="VD: Kỷ lục gia Nhân dân"
                       className={inputClass}
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                    <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                       Năm vinh danh
                     </label>
                     <input
@@ -366,7 +340,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                    <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                       Danh mục phân loại
                     </label>
                     <select
@@ -386,7 +360,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                  <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                     Đơn vị / Cơ sở / Địa chỉ (Description)
                   </label>
                   <input
@@ -399,14 +373,14 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
+                  <label className="text-[11px] font-semibold text-(--admin-body) mb-1 block">
                     Đề cử được vinh danh (Award Title)
                   </label>
                   <input
                     type="text"
                     value={card.award_title || ""}
                     onChange={(e) => handleCardChange(idx, "award_title", e.target.value)}
-                    placeholder="VD: Bàn Tay Vàng Kỷ Lục 2024, Hải Đăng Sáng Nghiệp 2024"
+                    placeholder="VD: Bàn Tay Vàng Kỷ Lục 2024"
                     className={inputClass}
                   />
                 </div>
@@ -414,7 +388,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange }) {
             ))
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 }

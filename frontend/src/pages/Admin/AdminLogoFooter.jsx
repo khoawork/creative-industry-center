@@ -17,9 +17,11 @@ import {
   Sparkles,
   Layers,
   Image as ImageIcon,
+  Loader2,
 } from 'lucide-react';
 import { SiteSettingsAPI } from '../../api/siteSettingsApi.js';
 import { useSiteSettings } from '../../context/SiteSettingsContext.jsx';
+import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminCard } from '../../components/Admin/Common';
 import defaultLogo from '../../assets/shared/logo/creative-industry-center-logo.png';
 
 const TABS = [
@@ -360,112 +362,72 @@ export default function AdminLogoFooter() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Toast Alert */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl transition-all duration-300 text-sm font-medium ${
-            toast.type === 'error'
-              ? 'bg-rose-50 border border-rose-200 text-rose-800'
-              : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-          }`}
-        >
-          {toast.type === 'error' ? (
-            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
-          ) : (
-            <Check className="w-5 h-5 text-emerald-600 shrink-0" />
-          )}
-          <span>{toast.message}</span>
-        </div>
-      )}
+    <>
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
 
       {/* Header Panel */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-[#680007]/10 text-[#680007]">
-              <Building className="w-6 h-6" />
-            </span>
-            <h1 className="text-2xl font-bold text-gray-900">Quản lý Logo & Footer</h1>
-          </div>
-          <p className="mt-1 text-sm text-gray-500">
-            Cấu hình nhận diện thương hiệu, tên công ty, biểu trưng logo và cấu trúc JSON Footer lưu trực tiếp vào database.
-          </p>
-        </div>
+      <AdminPageHeader
+        badge="Khu vực quản trị hệ thống"
+        title="Quản lý Logo & Footer"
+        description="Cấu hình nhận diện thương hiệu, tên tổ chức, biểu trưng logo và cấu trúc liên kết Footer của website."
+        actions={
+          <>
+            <AdminButton
+              variant="outline"
+              size="sm"
+              icon={RefreshCw}
+              loading={refreshing}
+              disabled={refreshing || saving}
+              onClick={() => fetchSettings(true)}
+            >
+              Làm mới
+            </AdminButton>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={() => fetchSettings(true)}
-            disabled={refreshing || saving}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>Làm mới</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#680007] hover:bg-[#850009] text-white text-sm font-semibold transition-colors disabled:opacity-50 shadow-md cursor-pointer"
-          >
-            {saving ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-            <span>{saving ? 'Đang lưu...' : 'Lưu thay đổi'}</span>
-          </button>
-        </div>
-      </div>
+            <AdminButton
+              variant="primary"
+              size="sm"
+              icon={Save}
+              loading={saving}
+              disabled={saving}
+              onClick={handleSave}
+            >
+              Lưu thay đổi
+            </AdminButton>
+          </>
+        }
+      />
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
-        {TABS.map((tab) => {
-          const IconComponent = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-[#680007] text-white shadow-xs font-semibold'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              <IconComponent className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <AdminTabs
+        tabs={TABS}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
+
+      <div className="space-y-6">
 
       {/* TAB 1: NHẬN DIỆN & LOGO */}
       {activeTab === 'brand' && (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-gray-200 space-y-6">
-          <div className="border-b border-gray-100 pb-4">
-            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Building className="w-5 h-5 text-[#680007]" />
-              Logo và Tên Tổ chức
-            </h2>
-            <p className="text-sm text-gray-500">
-              Cấu hình hình ảnh logo hiển thị trên Header (Navbar) và Footer của toàn bộ website.
-            </p>
-          </div>
-
+        <AdminCard
+          title="Logo và Tên Tổ chức"
+          subtitle="Cấu hình hình ảnh logo hiển thị trên Header (Navbar) và Footer của toàn bộ website."
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {/* Logo Preview & Upload */}
-            <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 flex flex-col items-center text-center space-y-4">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+            <div className="bg-(--admin-background) rounded-xl p-5 border border-(--admin-border) flex flex-col items-center text-center space-y-4">
+              <label className="text-xs font-bold uppercase tracking-wider text-(--admin-ink)/70">
                 Biểu trưng Logo hiện tại
               </label>
-              <div className="w-24 h-24 rounded-full bg-white p-2 border-2 border-amber-500/50 shadow-sm flex items-center justify-center overflow-hidden">
+              <div className="relative w-24 h-24 rounded-full bg-(--admin-surface) p-2 border-2 border-(--admin-accent) shadow-xs flex items-center justify-center overflow-hidden">
+                {uploadingLogo && (
+                  <div className="absolute inset-0 z-10 bg-(--admin-surface)/80 backdrop-blur-xs flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-(--admin-accent)" />
+                  </div>
+                )}
                 <img
                   src={previewLogoSrc}
                   alt="Logo Preview"
-                  className="w-full h-full object-contain"
+                  className={`w-full h-full object-contain ${uploadingLogo ? 'opacity-30' : 'opacity-100'}`}
                 />
               </div>
 
@@ -477,24 +439,22 @@ export default function AdminLogoFooter() {
                   accept="image/png,image/jpeg,image/webp"
                   className="hidden"
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                <AdminButton
+                  variant="primary"
+                  size="sm"
+                  icon={Upload}
+                  loading={uploadingLogo}
                   disabled={uploadingLogo}
-                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-900 hover:bg-black text-white text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full"
                 >
-                  {uploadingLogo ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Upload className="w-3.5 h-3.5" />
-                  )}
-                  <span>{uploadingLogo ? 'Đang tải lên...' : 'Tải ảnh logo mới'}</span>
-                </button>
+                  {uploadingLogo ? 'Đang tải lên...' : 'Tải ảnh logo mới'}
+                </AdminButton>
 
                 <button
                   type="button"
                   onClick={() => setFormData((p) => ({ ...p, logo: '' }))}
-                  className="w-full text-xs text-gray-500 hover:text-gray-800 underline py-1"
+                  className="w-full text-xs text-(--admin-ink)/60 hover:text-(--admin-ink) underline py-1 cursor-pointer transition"
                 >
                   Khôi phục logo mặc định
                 </button>
@@ -504,7 +464,7 @@ export default function AdminLogoFooter() {
             {/* Thông tin nhận diện */}
             <div className="md:col-span-2 space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                   Đường dẫn ảnh Logo (URL hoặc Relative Path)
                 </label>
                 <div className="relative">
@@ -513,18 +473,18 @@ export default function AdminLogoFooter() {
                     value={formData.logo}
                     onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
                     placeholder="/assets/shared/logo/creative-industry-center-logo.png hoặc https://..."
-                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <ImageIcon className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <ImageIcon className="w-4 h-4 text-(--admin-ink)/50 absolute left-3 top-3.5" />
                 </div>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-(--admin-ink)/50">
                   Để trống sẽ tự động dùng ảnh logo nội bộ sẵn có.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                     Tên đầy đủ công ty / trung tâm <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -532,13 +492,13 @@ export default function AdminLogoFooter() {
                     value={formData.company_name}
                     onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                     placeholder="Trung tâm Công nghiệp Sáng tạo"
-                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <span className="text-[11px] text-gray-400">Hiển thị ở Header & dòng bản quyền</span>
+                  <span className="text-[11px] text-(--admin-ink)/50">Hiển thị ở Header & dòng bản quyền</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                     Khẩu hiệu / Tagline (Header)
                   </label>
                   <input
@@ -546,15 +506,15 @@ export default function AdminLogoFooter() {
                     value={formData.company_tagline}
                     onChange={(e) => setFormData({ ...formData, company_tagline: e.target.value })}
                     placeholder="VIỆN KỲ LỤC VIỆT NAM - VIETKINGS"
-                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <span className="text-[11px] text-gray-400">Dòng chữ vàng kim dưới tên logo trên Header</span>
+                  <span className="text-[11px] text-(--admin-ink)/50">Dòng chữ vàng kim dưới tên logo trên Header</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                     Tên viết tắt (Footer Brand Title)
                   </label>
                   <input
@@ -567,13 +527,13 @@ export default function AdminLogoFooter() {
                       })
                     }
                     placeholder="TTCNST"
-                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <span className="text-[11px] text-gray-400">Hiển thị chữ đậm góc trái Footer</span>
+                  <span className="text-[11px] text-(--admin-ink)/50">Hiển thị chữ đậm góc trái Footer</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                     Tên Viện / Đơn vị chủ quản (Footer)
                   </label>
                   <input
@@ -586,14 +546,14 @@ export default function AdminLogoFooter() {
                       })
                     }
                     placeholder="VIỆN KỲ LỤC VIỆT NAM"
-                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <span className="text-[11px] text-gray-400">Hiển thị chữ vàng kim góc trái Footer</span>
+                  <span className="text-[11px] text-(--admin-ink)/50">Hiển thị chữ vàng kim góc trái Footer</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                   Đoạn mô tả sứ mệnh chân trang (Footer Description) <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -606,54 +566,46 @@ export default function AdminLogoFooter() {
                     })
                   }
                   placeholder="Cơ quan nghiên cứu, tôn vinh và thúc đẩy các giá trị sáng tạo quốc gia..."
-                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                 />
               </div>
             </div>
           </div>
-        </div>
+        </AdminCard>
       )}
 
       {/* TAB 2: CỘT LIÊN KẾT FOOTER */}
       {activeTab === 'groups' && (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-gray-200 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-[#680007]" />
-                Các Cột Danh mục Liên kết Footer
-              </h2>
-              <p className="text-sm text-gray-500">
-                Tùy biến các cột menu hiển thị tại phần giữa của Footer (Về Viện & Dự Án, Sự Kiện & Hoạt Động,...).
-              </p>
-            </div>
-
-            <button
-              type="button"
+        <AdminCard
+          title="Các Cột Danh mục Liên kết Footer"
+          subtitle="Tùy biến các cột menu hiển thị tại phần giữa của Footer (Về Viện & Dự Án, Sự Kiện & Hoạt Động,...)."
+          actions={
+            <AdminButton
+              variant="primary"
+              size="sm"
+              icon={Plus}
               onClick={handleAddGroup}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-semibold cursor-pointer shadow-xs"
             >
-              <Plus className="w-4 h-4" />
-              <span>Thêm cột nhóm mới</span>
-            </button>
-          </div>
-
+              Thêm cột nhóm mới
+            </AdminButton>
+          }
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {formData.footer.groups.map((group, groupIdx) => (
               <div
                 key={groupIdx}
-                className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4 relative"
+                className="bg-(--admin-background) border border-(--admin-border) rounded-xl p-5 space-y-4 relative"
               >
-                <div className="flex items-center justify-between gap-3 border-b border-gray-200 pb-3">
+                <div className="flex items-center justify-between gap-3 border-b border-(--admin-border) pb-3">
                   <div className="flex-1">
-                    <label className="text-[11px] font-bold uppercase text-gray-500 block mb-1">
+                    <label className="text-[11px] font-bold uppercase text-(--admin-ink)/60 block mb-1">
                       Tiêu đề cột #{groupIdx + 1}
                     </label>
                     <input
                       type="text"
                       value={group.title}
                       onChange={(e) => handleGroupTitleChange(groupIdx, e.target.value)}
-                      className="w-full px-3 py-1.5 text-sm font-bold text-[#680007] bg-white rounded-lg border border-gray-300 focus:outline-none focus:border-[#680007]"
+                      className="w-full px-3 py-1.5 text-sm font-bold text-(--admin-title) bg-(--admin-surface) rounded-lg border border-(--admin-border) focus:outline-hidden focus:border-(--admin-accent)"
                       placeholder="VD: VỀ VIỆN & DỰ ÁN"
                     />
                   </div>
@@ -661,7 +613,7 @@ export default function AdminLogoFooter() {
                   <button
                     type="button"
                     onClick={() => handleRemoveGroup(groupIdx)}
-                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                     title="Xóa cột này"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -671,11 +623,11 @@ export default function AdminLogoFooter() {
                 {/* Danh sách link trong cột */}
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-600">Danh sách liên kết</span>
+                    <span className="text-xs font-semibold text-(--admin-ink)/70">Danh sách liên kết</span>
                     <button
                       type="button"
                       onClick={() => handleAddLink(groupIdx)}
-                      className="text-xs font-semibold text-[#680007] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-semibold text-(--admin-accent) hover:underline flex items-center gap-1 cursor-pointer transition"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Thêm mục</span>
@@ -685,7 +637,7 @@ export default function AdminLogoFooter() {
                   {(group.links || []).map((link, linkIdx) => (
                     <div
                       key={linkIdx}
-                      className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200"
+                      className="flex items-center gap-2 bg-(--admin-surface) p-2 rounded-lg border border-(--admin-border)"
                     >
                       <input
                         type="text"
@@ -694,7 +646,7 @@ export default function AdminLogoFooter() {
                           handleLinkChange(groupIdx, linkIdx, 'label', e.target.value)
                         }
                         placeholder="Tên nhãn (Label)"
-                        className="flex-1 px-2.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-[#680007]"
+                        className="flex-1 px-2.5 py-1 text-xs border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) rounded focus:outline-hidden focus:border-(--admin-accent)"
                       />
                       <input
                         type="text"
@@ -703,12 +655,12 @@ export default function AdminLogoFooter() {
                           handleLinkChange(groupIdx, linkIdx, 'href', e.target.value)
                         }
                         placeholder="Đường dẫn (/about, /events)"
-                        className="flex-1 px-2.5 py-1 text-xs border border-gray-200 rounded font-mono text-gray-600 focus:outline-none focus:border-[#680007]"
+                        className="flex-1 px-2.5 py-1 text-xs border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) rounded font-mono focus:outline-hidden focus:border-(--admin-accent)"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemoveLink(groupIdx, linkIdx)}
-                        className="p-1 text-gray-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                        className="p-1 text-(--admin-ink)/50 hover:text-rose-500 rounded transition-colors cursor-pointer"
                         title="Xóa mục này"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -717,7 +669,7 @@ export default function AdminLogoFooter() {
                   ))}
 
                   {(!group.links || group.links.length === 0) && (
-                    <p className="text-xs text-gray-400 italic text-center py-2">
+                    <p className="text-xs text-(--admin-ink)/50 italic text-center py-2">
                       Chưa có liên kết nào. Nhấn "Thêm mục" để tạo mới.
                     </p>
                   )}
@@ -726,39 +678,35 @@ export default function AdminLogoFooter() {
             ))}
 
             {formData.footer.groups.length === 0 && (
-              <div className="lg:col-span-2 text-center py-10 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-500">
-                <Layers className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <div className="lg:col-span-2 text-center py-10 bg-(--admin-background) border-2 border-dashed border-(--admin-border) rounded-xl text-(--admin-ink)/60">
+                <Layers className="w-8 h-8 mx-auto mb-2 text-(--admin-ink)/40" />
                 <p className="text-sm">Hiện chưa có cột menu nào.</p>
-                <button
-                  type="button"
-                  onClick={handleAddGroup}
-                  className="mt-3 px-4 py-2 bg-[#680007] text-white text-xs font-semibold rounded-lg shadow-xs"
-                >
-                  Tạo cột menu đầu tiên
-                </button>
+                <div className="mt-3 flex justify-center">
+                  <AdminButton
+                    variant="primary"
+                    size="sm"
+                    icon={Plus}
+                    onClick={handleAddGroup}
+                  >
+                    Tạo cột menu đầu tiên
+                  </AdminButton>
+                </div>
               </div>
             )}
           </div>
-        </div>
+        </AdminCard>
       )}
 
       {/* TAB 3: LIÊN HỆ & BẢN QUYỀN */}
       {activeTab === 'contact' && (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-gray-200 space-y-6">
-          <div className="border-b border-gray-100 pb-4">
-            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-[#680007]" />
-              Thông Tin Liên Hệ & Bản Quyền
-            </h2>
-            <p className="text-sm text-gray-500">
-              Quản lý khối thông tin liên lạc (cột thứ 4 của footer) và dòng bản quyền dưới cùng.
-            </p>
-          </div>
-
+        <AdminCard
+          title="Thông Tin Liên Hệ & Bản Quyền"
+          subtitle="Quản lý khối thông tin liên lạc (cột thứ 4 của footer) và dòng bản quyền dưới cùng."
+        >
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                   Tiêu đề khối liên hệ
                 </label>
                 <input
@@ -774,12 +722,12 @@ export default function AdminLogoFooter() {
                     })
                   }
                   placeholder="THÔNG TIN LIÊN HỆ"
-                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                   Đường dây nóng (Hotline) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -800,15 +748,15 @@ export default function AdminLogoFooter() {
                       })
                     }
                     placeholder="(+84) 28 3847 7777"
-                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                   />
-                  <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                  <Phone className="w-4 h-4 text-(--admin-ink)/50 absolute left-3 top-3.5" />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                 Trụ sở chính <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -825,22 +773,22 @@ export default function AdminLogoFooter() {
                     })
                   }
                   placeholder="Trung tâm Công nghiệp Sáng tạo, Viện Kỷ lục Việt Nam, TP. Hồ Chí Minh & Hà Nội"
-                  className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
                 />
-                <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <MapPin className="w-4 h-4 text-(--admin-ink)/50 absolute left-3 top-3.5" />
               </div>
             </div>
 
             {/* Quản lý danh sách email */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                <label className="text-xs font-bold uppercase tracking-wider text-(--admin-ink)">
                   Danh sách Thư điện tử (Emails) <span className="text-red-500">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={handleAddEmail}
-                  className="text-xs font-semibold text-[#680007] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-semibold text-(--admin-accent) hover:underline flex items-center gap-1 cursor-pointer transition"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Thêm email</span>
@@ -856,14 +804,14 @@ export default function AdminLogoFooter() {
                         value={email}
                         onChange={(e) => handleEmailChange(idx, e.target.value)}
                         placeholder="contact@vietkings.org"
-                        className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                        className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent)"
                       />
-                      <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                      <Mail className="w-4 h-4 text-(--admin-ink)/50 absolute left-3 top-3" />
                     </div>
                     <button
                       type="button"
                       onClick={() => handleRemoveEmail(idx)}
-                      className="p-2 text-gray-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                      className="p-2 text-(--admin-ink)/50 hover:text-rose-500 rounded-lg transition-colors cursor-pointer"
                       title="Xóa email"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -874,8 +822,8 @@ export default function AdminLogoFooter() {
             </div>
 
             {/* Dòng bản quyền */}
-            <div className="pt-4 border-t border-gray-100">
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
+            <div className="pt-4 border-t border-(--admin-border)">
+              <label className="block text-xs font-bold uppercase tracking-wider text-(--admin-ink) mb-1.5">
                 Dòng chữ Bản quyền chân trang (Copyright text) <span className="text-red-500">*</span>
               </label>
               <input
@@ -888,22 +836,22 @@ export default function AdminLogoFooter() {
                   })
                 }
                 placeholder="© 2026 Bản quyền thuộc Trung tâm Công nghiệp Sáng tạo - VIỆN KỲ LỤC VIỆT NAM. Bảo lưu mọi quyền."
-                className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#680007]/20 focus:border-[#680007]"
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-(--admin-border) bg-(--admin-surface) text-(--admin-ink) focus:outline-hidden focus:border-(--admin-accent) focus:ring-1 focus:ring-(--admin-accent)"
               />
             </div>
           </div>
-        </div>
+        </AdminCard>
       )}
 
       {/* TAB 4: XEM TRƯỚC FOOTER TRỰC TIẾP */}
       {activeTab === 'preview' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-semibold text-(--admin-ink) flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-(--admin-accent)" />
               Xem trước giao diện Footer thực tế
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-(--admin-ink)/60">
               Giao diện sẽ hiển thị đúng như thiết kế màu rượu vang ({formData.footer.short_name})
             </span>
           </div>
@@ -980,7 +928,8 @@ export default function AdminLogoFooter() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

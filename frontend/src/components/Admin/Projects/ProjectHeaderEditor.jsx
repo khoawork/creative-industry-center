@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Save, Sparkles, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Save, Sparkles, Check, BarChart3 } from 'lucide-react';
+import { AdminCard, AdminInput, AdminButton, AdminBadge } from '../Common/index.js';
 
 export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -9,15 +10,28 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
     statistics: Array.isArray(initialData?.statistics) ? [...initialData.statistics] : [],
   });
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        badge: initialData.badge || '',
+        title: initialData.title || '',
+        description: initialData.description || '',
+        statistics: Array.isArray(initialData.statistics) ? [...initialData.statistics] : [],
+      });
+    }
+  }, [initialData]);
+
   const [errors, setErrors] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const getVal = (e) => (e && e.target ? e.target.value : e);
+
   const validate = () => {
     const errs = {};
-    if (!formData.badge.trim()) errs.badge = 'Badge danh mục là bắt buộc';
-    if (!formData.title.trim()) errs.title = 'Tiêu đề chính là bắt buộc';
-    if (!formData.description.trim()) errs.description = 'Mô tả là bắt buộc';
-    if (formData.statistics.length === 0) {
+    if (!formData.badge?.trim()) errs.badge = 'Badge danh mục là bắt buộc';
+    if (!formData.title?.trim()) errs.title = 'Tiêu đề chính là bắt buộc';
+    if (!formData.description?.trim()) errs.description = 'Mô tả là bắt buộc';
+    if (!formData.statistics || formData.statistics.length === 0) {
       errs.statistics = 'Cần ít nhất 1 số liệu thống kê';
     } else {
       formData.statistics.forEach((stat, idx) => {
@@ -32,7 +46,7 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!validate()) return;
     setSaveSuccess(false);
     await onSave(formData);
@@ -64,88 +78,85 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Thông tin chính */}
-      <div className="p-6 rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] space-y-5">
-        <div className="flex items-center gap-2 border-b border-(--admin-border) pb-3">
-          <Sparkles className="text-(--admin-accent)" size={18} />
-          <h3 className="text-base font-bold text-(--admin-title)">Thông tin Header &amp; Giới thiệu Dự án</h3>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-2">
-            Huy hiệu danh mục (Badge) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
+      {/* 1. Thông tin chính Header */}
+      <AdminCard
+        title="Thông tin Header & Giới thiệu Dự án"
+        subtitle="Quản lý thẻ phân loại, tiêu đề lớn và nội dung giới thiệu tổng quan trang dự án."
+        badge={<AdminBadge variant="burgundy">Hero Section</AdminBadge>}
+      >
+        <div className="space-y-4">
+          <AdminInput
+            label="Huy hiệu danh mục (Badge)"
+            required
             value={formData.badge}
-            onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, badge: getVal(e) })}
             placeholder="Ví dụ: DANH MỤC DỰ ÁN TRỌNG ĐIỂM"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-(--admin-border) bg-(--admin-background) text-sm text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+            error={errors.badge}
           />
-          {errors.badge && <p className="text-xs text-red-500 mt-1">{errors.badge}</p>}
-        </div>
 
-        <div>
-          <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-2">
-            Tiêu đề chính <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
+          <AdminInput
+            label="Tiêu đề chính"
+            required
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Ví dụ: CÁC DỰ ÁN NỔI BẬT"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-(--admin-border) bg-(--admin-background) text-sm text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+            onChange={(e) => setFormData({ ...formData, title: getVal(e) })}
+            placeholder="Ví dụ: CÁC DỰ ÁN TIÊU BIỂU"
+            error={errors.title}
           />
-          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
-        </div>
 
-        <div>
-          <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-2">
-            Mô tả giới thiệu <span className="text-red-500">*</span>
-          </label>
-          <textarea
+          <AdminInput
+            label="Mô tả giới thiệu"
+            required
+            multiline
             rows={4}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, description: getVal(e) })}
             placeholder="Mô tả định hướng và sứ mệnh của các công trình, dự án..."
-            className="w-full px-3.5 py-2.5 rounded-lg border border-(--admin-border) bg-(--admin-background) text-sm text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+            error={errors.description}
           />
-          {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description}</p>}
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Số liệu thống kê */}
-      <div className="p-6 rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] space-y-4">
-        <div className="flex items-center justify-between border-b border-(--admin-border) pb-3">
-          <h3 className="text-base font-bold text-(--admin-title)">Chỉ số thống kê nổi bật (Statistics)</h3>
-          <button
+      {/* 2. Số liệu thống kê */}
+      <AdminCard
+        title="Chỉ số Thống kê Nổi bật (Statistics)"
+        subtitle="Hiển thị các con số bảo chứng ấn tượng về số lượng dự án, đối tác và quy mô tác động."
+        badge={<AdminBadge variant="amber">Key Numbers</AdminBadge>}
+        actions={
+          <AdminButton
             type="button"
+            variant="outline"
+            size="sm"
+            icon={Plus}
             onClick={handleAddStat}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-(--admin-accent) text-white hover:opacity-90 transition"
           >
-            <Plus size={14} /> Thêm chỉ số
-          </button>
-        </div>
-
-        {errors.statistics && <p className="text-xs text-red-500">{errors.statistics}</p>}
+            Thêm chỉ số
+          </AdminButton>
+        }
+      >
+        {errors.statistics && <p className="text-xs text-red-500 mb-3">{errors.statistics}</p>}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {formData.statistics.map((stat, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-lg border border-(--admin-border) bg-(--admin-background) space-y-3 relative group"
+              className="p-4 rounded-xl border border-(--admin-border) bg-(--admin-background) space-y-3 relative group"
             >
-              <button
-                type="button"
-                onClick={() => handleRemoveStat(idx)}
-                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 p-1 rounded"
-                title="Xóa chỉ số"
-              >
-                <Trash2 size={15} />
-              </button>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-(--admin-heading)">
+                  Chỉ số #{idx + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveStat(idx)}
+                  className="text-gray-400 hover:text-red-500 p-1 rounded transition"
+                  title="Xóa chỉ số"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-(--admin-heading) uppercase mb-1">
+                <label className="block text-[10px] font-bold text-(--admin-heading) uppercase mb-1">
                   Nhãn chỉ số <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -153,57 +164,67 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
                   value={stat.label}
                   onChange={(e) => handleStatChange(idx, 'label', e.target.value)}
                   placeholder="Ví dụ: DỰ ÁN ĐANG TRIỂN KHAI"
-                  className="w-full px-3 py-1.5 rounded border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title)"
+                  className="w-full px-2.5 py-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] font-bold text-(--admin-heading) uppercase mb-1">
+                  <label className="block text-[10px] font-bold text-(--admin-heading) uppercase mb-1">
                     Giá trị <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={stat.value}
                     onChange={(e) => handleStatChange(idx, 'value', e.target.value)}
-                    placeholder="24+"
-                    className="w-full px-3 py-1.5 rounded border border-(--admin-border) bg-(--admin-surface) text-xs font-bold text-(--admin-title)"
+                    placeholder="Ví dụ: 24+"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) text-xs font-bold text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-(--admin-heading) uppercase mb-1">
+                  <label className="block text-[10px] font-bold text-(--admin-heading) uppercase mb-1">
                     Ghi chú phụ (nếu có)
                   </label>
                   <input
                     type="text"
                     value={stat.sublabel || ''}
                     onChange={(e) => handleStatChange(idx, 'sublabel', e.target.value)}
-                    placeholder="Tỉnh thành"
-                    className="w-full px-3 py-1.5 rounded border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title)"
+                    placeholder="Ví dụ: Tỉnh thành"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
                   />
                 </div>
               </div>
-              {errors[`stat_${idx}`] && <p className="text-[11px] text-red-500">{errors[`stat_${idx}`]}</p>}
+              {errors[`stat_${idx}`] && (
+                <p className="text-[11px] text-red-500 mt-1">{errors[`stat_${idx}`]}</p>
+              )}
             </div>
           ))}
         </div>
-      </div>
+      </AdminCard>
 
-      {/* Nút lưu */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <Check size={16} /> Đã lưu thành công!
-          </span>
-        )}
-        <button
+      {/* Thanh hành động lưu */}
+      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-xl border border-(--admin-border) bg-(--admin-surface)/95 p-4 shadow-lg backdrop-blur-md">
+        <div>
+          {saveSuccess ? (
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+              <Check size={16} /> Đã lưu Header thành công!
+            </span>
+          ) : (
+            <span className="text-xs text-(--admin-ink)/60">
+              Nhấn lưu để đồng bộ thông tin giới thiệu và chỉ số thống kê ra website.
+            </span>
+          )}
+        </div>
+
+        <AdminButton
           type="submit"
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--admin-accent) text-white font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition shadow-sm"
+          variant="primary"
+          size="md"
+          icon={Save}
+          loading={isSaving}
         >
-          <Save size={16} />
           {isSaving ? 'Đang lưu...' : 'Lưu phần Header'}
-        </button>
+        </AdminButton>
       </div>
     </form>
   );

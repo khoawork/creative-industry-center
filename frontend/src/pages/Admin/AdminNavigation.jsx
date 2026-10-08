@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, RefreshCw, Search, Check, AlertTriangle, Sparkles } from 'lucide-react';
+import { RefreshCw, Search, Check, AlertTriangle, Sparkles, ShieldAlert } from 'lucide-react';
 import { PageAPI } from '../../api/pageApi.js';
 import { site } from '../../config/shared/site.js';
 import {
   NavTable,
   NavEditModal,
-  NavAddModal,
-  NavDeleteModal,
+  NavStatsCards,
 } from '../../components/Admin/MenuNav';
+import {
+  AdminPageHeader,
+  AdminToast,
+  AdminButton,
+  AdminBadge,
+} from '../../components/Admin/Common/index.js';
 
 export default function AdminNavigation() {
   const [pages, setPages] = useState([]);
@@ -16,10 +21,8 @@ export default function AdminNavigation() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLiveApi, setIsLiveApi] = useState(false);
 
-  // State các Modal thao tác
+  // State Modal chỉnh sửa
   const [editingPage, setEditingPage] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [deletingPage, setDeletingPage] = useState(null);
 
   // State Toast thông báo
   const [toast, setToast] = useState(null);
@@ -61,26 +64,13 @@ export default function AdminNavigation() {
     fetchPages();
   }, []);
 
-  // Helper tự động tạo slug từ tên trang
-  const slugify = (text) => {
-    return text
-      .toString()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9 -]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  };
-
   // Helper tạo đường dẫn public từ slug
   const getPublicHref = (slug) => {
     if (!slug || slug === 'home') return '/';
     return `/${slug.replace(/^\/+/, '')}`;
   };
 
-  // Lưu chỉnh sửa Tên menu và Slug
+  // Lưu chỉnh sửa Tên menu và Trạng thái ẩn/hiện
   const handleSaveEdit = async (pageId, payload) => {
     try {
       const response = await PageAPI.updatePage(pageId, payload);
@@ -90,7 +80,7 @@ export default function AdminNavigation() {
         prev.map((item) => (item.id === pageId ? { ...item, ...updatedData } : item))
       );
 
-      showToast(`Cập nhật menu "${payload.name}" thành công!`);
+      showToast(`Cập nhật trang "${payload.name}" thành công!`);
     } catch (error) {
       console.error('Lỗi khi cập nhật menu:', error);
       const message =
@@ -100,40 +90,72 @@ export default function AdminNavigation() {
     }
   };
 
-  // Thêm mục Menu / Page mới
-  const handleSaveAdd = async (payload) => {
+  // Bật / Tắt Ẩn Hiện nhanh ngay trên bảng
+  const handleToggleVisibility = async (page) => {
+    const nextVisibility = !(page.is_visible !== false);
     try {
-      const response = await PageAPI.createPage(payload);
-      const newPage = response?.data || response;
-
-      if (newPage?.id) {
-        setPages((prev) => [...prev, newPage]);
-      } else {
-        await fetchPages();
-      }
-
-      showToast(`Đã thêm menu "${payload.name}" thành công!`);
+      await PageAPI.updatePage(page.id, {
+        name: page.name,
+        is_visible: nextVisibility,
+      });
+      setPages((prev) =>
+        prev.map((item) =>
+          item.id === page.id ? { ...item, is_visible: nextVisibility } : item
+        )
+      );
+      showToast(
+        nextVisibility
+          ? `Đã hiển thị trang "${page.name}" lên Menu Header!`
+          : `Đã ẩn trang "${page.name}" khỏi Menu Header!`
+      );
     } catch (error) {
-      console.error('Lỗi khi tạo menu mới:', error);
-      const message =
-        error.response?.data?.message || 'Có lỗi xảy ra khi tạo menu mới.';
-      showToast(message, 'error');
-      throw error;
+      console.error('Lỗi khi bật/tắt hiển thị menu:', error);
+      showToast('Có lỗi xảy ra khi cập nhật trạng thái hiển thị.', 'error');
     }
   };
 
-  // Xóa mục Menu / Page
-  const handleConfirmDelete = async (pageId) => {
+  // State Reorder đang xử lý & ID dòng vừa được di chuyển (phục vụ animation)
+  const [isReordering, setIsReordering] = useState(false);
+  const [movedId, setMovedId] = useState(null);
+
+  // Đổi vị trí các page trên navigation
+  const handleMove = async (index, direction) => {
+    if (isReordering) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= pages.length) return;
+
+    const previousPages = [...pages];
+    const newPages = [...pages];
+    const [movedItem] = newPages.splice(index, 1);
+    newPages.splice(targetIndex, 0, movedItem);
+
+    // Kích hoạt animation highlight cho dòng vừa đổi vị trí
+    setMovedId(movedItem.id);
+    setTimeout(() => {
+      setMovedId((current) => (current === movedItem.id ? null : current));
+    }, 1200);
+
+    // Cập nhật lại order_index theo thứ tự mới
+    const orders = newPages.map((item, idx) => ({
+      id: item.id,
+      order_index: idx + 1,
+    }));
+
+    // Cập nhật ngay UI cho mượt mà (Optimistic Update)
+    setPages(newPages.map((item, idx) => ({ ...item, order_index: idx + 1 })));
+    setIsReordering(true);
+
     try {
-      await PageAPI.deletePage(pageId);
-      setPages((prev) => prev.filter((item) => item.id !== pageId));
-      showToast(`Đã xóa mục menu thành công!`);
+      await PageAPI.reorderPages(orders);
+      showToast(`Đã chuyển menu "${movedItem.name}" sang vị trí #${targetIndex + 1}!`);
     } catch (error) {
-      console.error('Lỗi khi xóa menu:', error);
-      const message =
-        error.response?.data?.message || 'Có lỗi xảy ra khi xóa menu.';
-      showToast(message, 'error');
-      throw error;
+      console.error('Lỗi khi cập nhật vị trí menu:', error);
+      // Revert lại nếu có lỗi
+      setPages(previousPages);
+      setMovedId(null);
+      showToast('Có lỗi xảy ra khi đổi vị trí menu.', 'error');
+    } finally {
+      setIsReordering(false);
     }
   };
 
@@ -150,67 +172,42 @@ export default function AdminNavigation() {
   }, [pages, searchQuery]);
 
   return (
-    <>
-      {/* Toast Notification */}
-      {toast && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-4 py-3 shadow-lg transition-all animate-bounce">
-          {toast.type === 'error' ? (
-            <AlertTriangle className="size-5 text-red-500 shrink-0" />
-          ) : (
-            <Check className="size-5 text-emerald-500 shrink-0" />
-          )}
-          <span className="text-sm font-medium text-(--admin-title)">{toast.message}</span>
-        </div>
-      )}
+    <div className="space-y-6">
+      <AdminToast toast={toast ? { message: toast.message, error: toast.type === 'error' } : null} onClose={() => setToast(null)} />
 
-      {/* Header trang quản trị */}
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-(--admin-border) pb-7">
-        <div>
-          <p className="mb-3 text-[11px] font-semibold tracking-[0.16em] text-(--admin-heading) uppercase">
-            Hệ thống &amp; Cấu hình
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-(--admin-title) sm:text-3xl">
-            Menu &amp; Điều hướng (Navigation)
-          </h1>
-          <p className="mt-3 text-sm leading-6">
-            Quản lý các mục menu trên thanh điều hướng chính theo model <code className="px-1.5 py-0.5 rounded bg-(--admin-accent)/15 text-(--admin-heading) font-mono text-xs">Page</code>. Cho phép chỉnh sửa tên menu, đường dẫn (slug) và xóa các trang.
-          </p>
-        </div>
+      {/* Header khu vực quản trị */}
+      <AdminPageHeader
+        badge="Hệ thống & Cấu hình"
+        title="Menu & Điều hướng (Navigation)"
+        subtitle="Quản lý hiển thị các mục menu trên thanh điều hướng chính theo model Page. Cho phép chỉnh sửa Tên trang và bật/tắt Ẩn/Hiện khỏi thanh Header. Đường dẫn slug và cấu trúc trang được giữ cố định."
+        actions={
+          <div className="flex items-center gap-2">
+            {isLiveApi ? (
+              <AdminBadge variant="success">
+                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse mr-1 inline-block" />
+                API Trực tiếp
+              </AdminBadge>
+            ) : (
+              <AdminBadge variant="accent" icon={Sparkles}>
+                Đang kết nối API
+              </AdminBadge>
+            )}
 
-        <div className="flex items-center gap-2">
-          {isLiveApi ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800">
-              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              API Trực tiếp
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-accent) px-3 py-1.5 text-[11px] text-(--admin-heading)">
-              <Sparkles size={13} aria-hidden="true" />
-              Đang kết nối API
-            </span>
-          )}
+            <AdminButton
+              variant="secondary"
+              icon={RefreshCw}
+              loading={refreshing}
+              onClick={() => fetchPages(true)}
+              title="Tải lại danh sách từ server"
+            >
+              Làm mới
+            </AdminButton>
+          </div>
+        }
+      />
 
-          <button
-            type="button"
-            onClick={() => fetchPages(true)}
-            disabled={refreshing}
-            className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-[11px] font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer disabled:opacity-50"
-            title="Tải lại danh sách từ server"
-          >
-            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
-            Làm mới
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-full bg-(--admin-accent) px-4 py-1.5 text-[11px] font-bold text-(--admin-black) hover:opacity-90 transition cursor-pointer shadow-xs"
-          >
-            <Plus size={14} />
-            Thêm Menu Mới
-          </button>
-        </div>
-      </div>
+      {/* Thẻ thống kê */}
+      <NavStatsCards pages={pages} />
 
       {/* Thanh tìm kiếm & lọc */}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-(--admin-border) bg-(--admin-surface) p-3 rounded-xl shadow-[var(--admin-panel-shadow)]">
@@ -239,19 +236,22 @@ export default function AdminNavigation() {
         </div>
       </div>
 
-      {/* Bảng danh sách Menu Nav */}
+      {/* Bảng danh sách Menu Nav (chỉ cho phép Sửa và Bật/Tắt Ẩn/Hiện, không cho xóa) */}
       <div className="mt-4">
         <NavTable
           pages={filteredPages}
           loading={loading}
           searchQuery={searchQuery}
           onEdit={(page) => setEditingPage(page)}
-          onDelete={(page) => setDeletingPage(page)}
+          onToggleVisibility={handleToggleVisibility}
+          onMove={handleMove}
+          isReordering={isReordering}
+          movedId={movedId}
           getPublicHref={getPublicHref}
         />
       </div>
 
-      {/* Modal Sửa Menu và Slug */}
+      {/* Modal Sửa Tên Menu và Trạng thái Ẩn/Hiện (Slug cố định) */}
       <NavEditModal
         page={editingPage}
         onClose={() => setEditingPage(null)}
@@ -259,26 +259,10 @@ export default function AdminNavigation() {
         getPublicHref={getPublicHref}
       />
 
-      {/* Modal Thêm Menu Mới */}
-      <NavAddModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveAdd}
-        slugify={slugify}
-        getPublicHref={getPublicHref}
-      />
-
-      {/* Modal Xác nhận Xóa */}
-      <NavDeleteModal
-        page={deletingPage}
-        onClose={() => setDeletingPage(null)}
-        onConfirm={handleConfirmDelete}
-      />
-
       {/* Footer ghi chú */}
-      <p className="mt-12 border-t border-(--admin-border) pt-5 text-[11px] leading-5 text-gray-500">
+      <p className="mt-12 border-t border-(--admin-border) pt-5 text-[11px] leading-5 text-(--admin-ink)/60">
         Khu vực quản trị điều hướng menu · Viện Kỷ lục Việt Nam (VIETKINGS) · {site.name}
       </p>
-    </>
+    </div>
   );
 }

@@ -26,6 +26,7 @@ import {
   FormIntegrationGuide,
   FormPreviewContainer,
 } from '../../components/Admin/Forms';
+import { AdminPageHeader, AdminToast, AdminButton } from '../../components/Admin/Common';
 
 export default function AdminFormsPage() {
   const [allConfigs, setAllConfigs] = useState({});
@@ -319,65 +320,46 @@ export default function AdminFormsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Toast thông báo */}
-      {toast && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-4 py-3 shadow-lg transition-all animate-bounce">
-          {toast.type === 'error' ? (
-            <AlertTriangle className="size-5 text-red-500 shrink-0" />
-          ) : (
-            <Check className="size-5 text-emerald-500 shrink-0" />
-          )}
-          <span className="text-sm font-medium text-(--admin-title)">{toast.message}</span>
-        </div>
-      )}
+      {/* Toast thông báo chuẩn */}
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
 
-      {/* Header trang quản trị */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-(--admin-border) pb-5">
-        <div>
-          <p className="text-[11px] font-semibold tracking-wider text-(--admin-heading) uppercase">
-            Hệ thống &amp; Tích hợp Dữ liệu
-          </p>
-          <h1 className="text-2xl font-bold tracking-tight text-(--admin-title) sm:text-3xl flex items-center gap-2.5 mt-1">
-            <FileSpreadsheet className="w-7 h-7 text-(--admin-heading)" />
-            Quản Lý Biểu Mẫu &amp; Tích Hợp Google Sheet
-          </h1>
-          <p className="mt-1 text-xs sm:text-sm text-gray-500 max-w-3xl">
-            Tất cả 7 biểu mẫu trên website được quản lý tập trung. Bạn chỉ cần đồng bộ 1 lần duy nhất, các lần sau dữ liệu người dùng gửi sẽ tự động lưu vào trang tính mà không cần đồng bộ lại.
-          </p>
-        </div>
+      {/* Header trang quản trị chuẩn hóa */}
+      <AdminPageHeader
+        badge="Hệ thống & Tích hợp Dữ liệu"
+        title="Quản Lý Biểu Mẫu & Google Sheet"
+        description="Tất cả biểu mẫu trên website được quản lý tập trung. Dữ liệu người dùng gửi từ website sẽ tự động lưu vào Google Sheet tương ứng."
+        actions={
+          <div className="flex items-center gap-2">
+            <AdminButton
+              variant="accent"
+              icon={Zap}
+              loading={isSyncingAll}
+              disabled={!currentConfig.sheetUrl}
+              onClick={handleSyncAllForms}
+              title="Tự động khởi tạo cả 7 tab trong Google Sheet trong 1 lần bấm"
+            >
+              {isSyncingAll ? 'Đang sync 7 tab...' : 'Đồng bộ tất cả'}
+            </AdminButton>
 
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={handleSyncAllForms}
-            disabled={isSyncingAll || !currentConfig.sheetUrl}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition cursor-pointer disabled:opacity-40"
-            title="Tự động khởi tạo cả 7 tab trong Google Sheet trong 1 lần bấm"
-          >
-            <Zap className="w-3.5 h-3.5 fill-white" />
-            <span>{isSyncingAll ? 'Đang sync 7 tab...' : '⚡ Đồng bộ tất cả (1 lần)'}</span>
-          </button>
+            <AdminButton
+              variant="secondary"
+              icon={RefreshCw}
+              onClick={handleResetDefault}
+            >
+              Mặc định
+            </AdminButton>
 
-          <button
-            type="button"
-            onClick={handleResetDefault}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border border-(--admin-border) bg-(--admin-surface) text-gray-600 hover:text-gray-900 transition cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Mặc định
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg bg-(--admin-heading) text-white shadow-sm hover:opacity-95 transition cursor-pointer disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
-          </button>
-        </div>
-      </div>
+            <AdminButton
+              variant="primary"
+              icon={Save}
+              loading={isSaving}
+              onClick={handleSave}
+            >
+              {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
+            </AdminButton>
+          </div>
+        }
+      />
 
       {/* LAYOUT 2 CỘT: Cột trái (Sidebar chọn form) & Cột phải (Cấu hình chi tiết form) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">

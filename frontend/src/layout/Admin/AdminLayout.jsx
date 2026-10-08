@@ -5,8 +5,11 @@ import AdminTopbar from '../../components/Admin/AdminTopbar.jsx';
 import { findAdminItem } from '../../config/Admin/adminNavigation.js';
 import { site } from '../../config/shared/site.js';
 import useAdminTheme from '../../hooks/Admin/useAdminTheme.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 
-export default function AdminLayout({ user, unreadCount }) {
+export default function AdminLayout({ user: initialUser, unreadCount }) {
+  const { user: authUser, logout } = useAuth();
+  const user = authUser || initialUser;
   const { theme, toggleTheme } = useAdminTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -52,7 +55,7 @@ export default function AdminLayout({ user, unreadCount }) {
         Chuyển đến nội dung chính
       </a>
       <AdminSidebar collapsed={collapsed} mobileOpen={mobileOpen} onClose={closeMobile} user={user} unreadCount={unreadCount}
-        onToggleCollapse={() => setCollapsed((value) => !value)} desktopToggleRef={desktopToggleRef} />
+        onToggleCollapse={() => setCollapsed((value) => !value)} desktopToggleRef={desktopToggleRef} onLogout={logout} />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <AdminTopbar label={label} mobileOpen={mobileOpen} onOpenMobile={() => setMobileOpen(true)} theme={theme} onToggleTheme={toggleTheme} />
         <main id="admin-main" ref={contentRef} tabIndex={-1}

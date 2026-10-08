@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AwardAPI } from "../../../api/awardApi.js";
 import { UploadAPI } from "../../../api/uploadApi.js";
+import { AdminCard, AdminButton } from "../Common/index.js";
 
 const emptyHeader = { tittle: "", sub_title: "", description: "" };
 const emptyHonor = {
@@ -180,7 +181,7 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-4 shadow-[var(--admin-panel-shadow)]">
+    <div className="space-y-6">
       {honorProgress !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border border-(--admin-border) bg-(--admin-surface) p-6 text-center shadow-2xl">
@@ -194,175 +195,166 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
                 style={{ width: `${honorProgress}%` }}
               />
             </div>
-            <p className="mt-2 text-xs font-semibold text-gray-500">
+            <p className="mt-2 text-xs font-semibold text-(--admin-body)/60">
               {honorProgress}%
             </p>
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-base font-bold text-(--admin-title)">
-            Nội dung trang award
-          </h2>
+
+      {message && (
+        <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-xs font-semibold text-emerald-600">
+          {message}
         </div>
-        {message && <span className="text-xs text-emerald-600">{message}</span>}
-      </div>
+      )}
 
-      <form
-        id="award-header"
-        onSubmit={saveHeader}
-        className={`${activeSection === "header" ? "" : "hidden"} grid gap-3 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-4 shadow-[var(--admin-panel-shadow)] md:grid-cols-2`}
-      >
-        <label>
-          <span className={labelClass}>Tiêu đề header</span>
-          <input
-            value={header.tittle}
-            onChange={(event) =>
-              setHeader({ ...header, tittle: event.target.value })
-            }
-            className={inputClass}
-          />
-        </label>
-        <label>
-          <span className={labelClass}>Tiêu đề phụ</span>
-          <input
-            value={header.sub_title}
-            onChange={(event) =>
-              setHeader({ ...header, sub_title: event.target.value })
-            }
-            className={inputClass}
-          />
-        </label>
-        <label className="md:col-span-2">
-          <span className={labelClass}>Mô tả header</span>
-          <textarea
-            value={header.description}
-            onChange={(event) =>
-              setHeader({ ...header, description: event.target.value })
-            }
-            rows={3}
-            className={inputClass}
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={saving}
-          className="inline-flex min-h-10 w-fit items-center gap-1.5 rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-bold text-(--admin-black) transition hover:opacity-90 disabled:opacity-50"
+      {/* Tab 1: Header & Tiêu đề */}
+      {activeSection === "header" && (
+        <AdminCard
+          title="Cấu hình Header & Tiêu đề"
+          subtitle="Tiêu đề chính, tiêu đề phụ và nội dung mô tả phần đầu trang Giải thưởng"
         >
-          <Check size={14} />
-          Lưu header
-        </button>
-      </form>
+          <form id="award-header" onSubmit={saveHeader} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label>
+                <span className={labelClass}>Tiêu đề header</span>
+                <input
+                  value={header.tittle}
+                  onChange={(event) =>
+                    setHeader({ ...header, tittle: event.target.value })
+                  }
+                  className={inputClass}
+                />
+              </label>
+              <label>
+                <span className={labelClass}>Tiêu đề phụ</span>
+                <input
+                  value={header.sub_title}
+                  onChange={(event) =>
+                    setHeader({ ...header, sub_title: event.target.value })
+                  }
+                  className={inputClass}
+                />
+              </label>
+              <label className="md:col-span-2">
+                <span className={labelClass}>Mô tả header</span>
+                <textarea
+                  value={header.description}
+                  onChange={(event) =>
+                    setHeader({ ...header, description: event.target.value })
+                  }
+                  rows={3}
+                  className={inputClass}
+                />
+              </label>
+            </div>
+            <div className="flex justify-end pt-2">
+              <AdminButton
+                type="submit"
+                variant="primary"
+                loading={saving}
+                icon={Check}
+              >
+                Lưu header
+              </AdminButton>
+            </div>
+          </form>
+        </AdminCard>
+      )}
 
-      <section
-        id="award-selection"
-        className={`${activeSection === "selection" ? "" : "hidden"} rounded-xl border border-(--admin-border) bg-(--admin-surface) p-4 shadow-[var(--admin-panel-shadow)]`}
-      >
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-bold text-(--admin-heading)">
-              Award hiển thị
-            </h3>
-            <p className="text-xs text-gray-500">
-              Chọn các award xuất hiện trong danh sách công khai.
-            </p>
-            {/* Year filter */}
-            <div className="flex items-center mt-2 gap-2">
-              <label className={labelClass}>Năm</label>
+      {/* Tab 2: Award hiển thị */}
+      {activeSection === "selection" && (
+        <AdminCard
+          title={`Award hiển thị (${selectedAwardIds.length} / ${awards.length})`}
+          subtitle="Chọn các giải thưởng xuất hiện trong danh sách hiển thị công khai trên website"
+          actions={
+            <AdminButton
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={saveAwardSelection}
+              loading={saving}
+              icon={Check}
+            >
+              Lưu lựa chọn
+            </AdminButton>
+          }
+        >
+          <div className="space-y-4">
+            {/* Bộ lọc theo Năm */}
+            <div className="flex items-center gap-2 pb-2 border-b border-(--admin-border)">
+              <span className="text-xs font-bold text-(--admin-heading) uppercase">Năm:</span>
               <select
-                className="rounded border px-2 py-1 text-xs"
+                className="rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-1.5 text-xs text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
               >
-                <option value="">Tất cả</option>
+                <option value="">Tất cả các năm</option>
                 {yearsList.map((y) => (
                   <option key={y} value={String(y)}>{y}</option>
                 ))}
               </select>
             </div>
-          </div>
-          <button
-            type="button"
-            onClick={saveAwardSelection}
-            disabled={saving}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-bold text-(--admin-black) transition hover:opacity-90 disabled:opacity-50"
-          >
-            <Check size={14} />
-            Lưu lựa chọn
-          </button>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {awards.map((award) => {
-            const awardId = String(award.id);
-            const checked = selectedAwardIds.includes(awardId);
-            return (
-              <label
-                key={award.id}
-                className={`group relative flex aspect-square cursor-pointer flex-col overflow-hidden rounded-2xl border transition ${checked ? "border-(--admin-accent) bg-(--admin-accent)/10 shadow-md ring-2 ring-(--admin-accent)/20" : "border-(--admin-border) bg-(--admin-background) hover:border-(--admin-accent)/60 hover:shadow-sm"}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() =>
-                    setSelectedAwardIds((current) =>
-                      checked
-                        ? current.filter((id) => id !== awardId)
-                        : [...current, awardId],
-                    )
-                  }
-                  className="absolute right-3 top-3 z-10 size-5 accent-(--admin-accent)"
-                />
-                <div className="relative min-h-0 flex-1 overflow-hidden bg-(--admin-surface)">
-                  <img
-                    src={award.image}
-                    alt={award.name}
-                    className="size-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/65 to-transparent" />
-                  <span className="absolute bottom-3 left-3 rounded-md bg-black/55 px-2 py-1 font-mono text-[10px] font-bold tracking-wide text-white">
-                    {award.code}
-                  </span>
-                </div>
-                <div className="space-y-1.5 p-3">
-                  <span className="block truncate text-sm font-bold text-(--admin-title)">
-                    {award.name}
-                  </span>
-                  <span className="block truncate text-xs text-gray-500">
-                    {award.title}
-                  </span>
-                </div>
-              </label>
-            );
-          })}
-        </div>
-      </section>
 
-      <div
-        id="award-honors"
-        className={`${activeSection === "honors" ? "" : "hidden"} rounded-2xl border border-(--admin-border) bg-(--admin-surface) p-5 shadow-[var(--admin-panel-shadow)]`}
-      >
-        <div className="mb-5 flex flex-col gap-3 border-b border-(--admin-border) pb-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <span className="rounded-xl border border-amber-400/20 bg-amber-400/10 p-3 text-amber-400">
-              <Trophy className="size-5" />
-            </span>
-            <div>
-              <h3 className="text-lg font-bold text-(--admin-title)">
-                Bảng vàng tôn vinh
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Quản lý các cá nhân và tập thể đang hiển thị trên trang công
-                khai.
-              </p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {awards.map((award) => {
+                const awardId = String(award.id);
+                const checked = selectedAwardIds.includes(awardId);
+                return (
+                  <label
+                    key={award.id}
+                    className={`group relative flex aspect-square cursor-pointer flex-col overflow-hidden rounded-xl border transition ${
+                      checked
+                        ? "border-(--admin-accent) bg-(--admin-accent)/5 shadow-sm ring-1 ring-(--admin-accent)/20"
+                        : "border-(--admin-border) bg-(--admin-surface) hover:border-(--admin-border-hover)"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setSelectedAwardIds((current) =>
+                          checked
+                            ? current.filter((id) => id !== awardId)
+                            : [...current, awardId],
+                        )
+                      }
+                      className="absolute right-3 top-3 z-10 size-4 accent-(--admin-accent)"
+                    />
+                    <div className="relative min-h-0 flex-1 overflow-hidden bg-(--admin-background)">
+                      <img
+                        src={award.image}
+                        alt={award.name}
+                        className="size-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+                      <span className="absolute bottom-2 left-2 rounded-md bg-black/60 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-white">
+                        {award.code}
+                      </span>
+                    </div>
+                    <div className="space-y-1 p-3">
+                      <span className="block truncate text-sm font-bold text-(--admin-title)">
+                        {award.name}
+                      </span>
+                      <span className="block truncate text-xs text-(--admin-body)/60">
+                        {award.title}
+                      </span>
+                    </div>
+                  </label>
+                );
+              })}
             </div>
           </div>
-          <span className="w-fit rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-500">
-            {honors.length} hồ sơ
-          </span>
-        </div>
+        </AdminCard>
+      )}
 
-        <div className="grid items-stretch gap-6 lg:grid-cols-[2fr_3fr]">
+      {/* Tab 3: Bảng vàng vinh danh */}
+      {activeSection === "honors" && (
+        <AdminCard
+          title={`Bảng vàng tôn vinh (${honors.length} hồ sơ)`}
+          subtitle="Quản lý các cá nhân và tập thể được tôn vinh hiển thị trên trang công khai"
+        >
+          <div className="grid items-stretch gap-6 lg:grid-cols-[2fr_3fr]">
           {/* Danh sách bảng vàng */}
           <div
             className={`h-full space-y-3 ${honors.length > 4 ? "max-h-[570px] overflow-y-auto pr-2" : ""}`}
@@ -610,33 +602,36 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
             </div>
 
             {/* Footer Form */}
-            <div className="flex items-center justify-end gap-2 border-t border-(--admin-border) px-5 py-3 bg-(--admin-surface)/50">
+            <div className="flex items-center justify-end gap-2 border-t border-(--admin-border) px-5 py-3 bg-(--admin-background)">
               {editingId && (
-                <button
+                <AdminButton
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => {
                     setEditingId(null);
                     setHonorImageFile(null);
                     setHonorForm(emptyHonor);
                   }}
-                  className="rounded-lg px-4 py-2 text-xs font-semibold text-(--admin-muted) transition hover:bg-(--admin-border) hover:text-(--admin-heading)"
                 >
                   Hủy
-                </button>
+                </AdminButton>
               )}
 
-              <button
+              <AdminButton
                 type="submit"
-                disabled={saving}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-bold text-(--admin-black) transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                variant="primary"
+                size="sm"
+                loading={saving}
+                icon={editingId ? Check : Plus}
               >
-                {editingId ? <Check size={14} /> : <Plus size={14} />}
                 {editingId ? "Lưu bảng vàng" : "Thêm bảng vàng"}
-              </button>
+              </AdminButton>
             </div>
           </form>
         </div>
-      </div>
-    </div>
-  );
+      </AdminCard>
+    )}
+  </div>
+);
 }

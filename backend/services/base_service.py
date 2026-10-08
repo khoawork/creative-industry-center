@@ -11,6 +11,8 @@ def _serialize_page(page: Page) -> Dict[str, Any]:
         "name": page.name,
         "slug": page.slug,
         "props": page.props or {},
+        "is_visible": bool(page.is_visible) if hasattr(page, "is_visible") and page.is_visible is not None else True,
+        "order_index": int(page.order_index) if hasattr(page, "order_index") and page.order_index is not None else 0,
         "created_date": page.created_date.isoformat() if hasattr(page, "created_date") and page.created_date else None,
         "updated_date": page.updated_date.isoformat() if hasattr(page, "updated_date") and page.updated_date else None,
     }
@@ -46,15 +48,18 @@ def get_all_pages() -> List[Dict[str, Any]]:
 
 
 def get_header_items() -> List[Dict[str, Any]]:
-    """Lấy danh sách các trang rút gọn (id, name, slug) phục vụ riêng cho Menu Header"""
+    """Lấy danh sách các trang rút gọn (id, name, slug) phục vụ riêng cho Menu Header (chỉ lấy trang đang hiển thị)"""
     pages = base_repo.getAllPages()
     return [
         {
             "id": p.id,
             "name": p.name,
-            "slug": p.slug
+            "slug": p.slug,
+            "is_visible": bool(p.is_visible) if hasattr(p, "is_visible") and p.is_visible is not None else True,
+            "order_index": int(p.order_index) if hasattr(p, "order_index") and p.order_index is not None else 0
         }
         for p in pages
+        if getattr(p, "is_visible", True) is not False
     ]
 
 
@@ -76,33 +81,67 @@ def get_page_by_slug(slug: str) -> Dict[str, Any]:
 
 
 def update_page(page_id: int, data) -> Dict[str, Any]:
-    """Cập nhật thông tin trang"""
+    """Cập nhật thông tin trang: chỉ cho phép sửa tên trang và trạng thái ẩn/hiện, không cho đổi slug"""
+    from services import audit_service
+
     page = base_repo.getPageById(page_id)
     if not page:
         raise NotFoundError(message=f"Không tìm thấy trang với ID {page_id} để cập nhật")
+
+    old_name = page.name
+    old_visible = page.is_visible
 
     name = getattr(data, "name", None)
     if name is not None:
         name = name.strip()
 
-    slug = getattr(data, "slug", None)
-    if slug is not None:
-        slug = slug.strip().strip("/")
-        if not slug:
-            raise ConflictError(message="Đường dẫn (slug) không được để trống")
-        if slug != page.slug:
-            existing = base_repo.getPageBySlug(slug)
-            if existing and existing.id != page_id:
-                raise ConflictError(message=f"Đường dẫn (slug) '{slug}' đã được sử dụng bởi trang khác")
-
+    is_visible = getattr(data, "is_visible", None)
     props = getattr(data, "props", None)
 
-    updated = base_repo.updatePage(page=page, name=name, slug=slug, props=props)
+    # KHÔNG cho phép chỉnh sửa slug (giữ nguyên slug hệ thống)
+    updated = base_repo.updatePage(page=page, name=name, slug=None, props=props, is_visible=is_visible)
+
+    # Ghi nhận Nhật ký
+    changes = {}
+    summaries = []
+    if name is not None and name != old_name:
+        changes["name"] = {"old": old_name, "new": name}
+        summaries.append(f"Đã đổi tên trang từ '{old_name}' thành '{name}'")
+    if is_visible is not None and is_visible != old_visible:
+        status_text = "hiển thị" if is_visible else "ẩn"
+        changes["is_visible"] = {"old": old_visible, "new": is_visible}
+        summaries.append(f"Đã chuyển trang '{updated.name}' sang trạng thái {status_text} trên Menu")
+
+    if summaries:
+        audit_service.log_activity(
+            action="UPDATE",
+            module="Menu & Điều hướng",
+            summary="; ".join(summaries),
+            target_id=page_id,
+            changes=changes
+        )
+
     return _serialize_page(updated)
 
 
 def delete_page(page_id: int) -> bool:
-    page = base_repo.getPageById(page_id)
-    if not page:
-        raise NotFoundError(message=f"Không tìm thấy trang với ID {page_id} để xóa")
-    return base_repo.deletePage(page)
+    """Chặn xóa trang: Hệ thống không cho phép xóa, chỉ cho phép ẩn trang"""
+    raise ConflictError(message="Hệ thống không cho phép xóa trang. Bạn vui lòng sử dụng chức năng 'Ẩn trang khỏi Menu'.")
+
+
+def reorder_pages(orders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Cập nhật thứ tự hiển thị của các trang navigation"""
+    from services import audit_service
+
+    updated_pages = base_repo.reorderPages(orders)
+
+    # Ghi nhận nhật ký đổi thứ tự
+    audit_service.log_activity(
+        action="REORDER",
+        module="Menu & Điều hướng",
+        summary=f"Đã sắp xếp lại thứ tự {len(orders)} mục trên Menu điều hướng",
+        changes={"orders": orders}
+    )
+
+    return [_serialize_page(p) for p in updated_pages]
+

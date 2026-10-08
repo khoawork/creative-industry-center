@@ -13,6 +13,7 @@ import {
   TrainingCertificationEditor,
   TrainingSelector,
 } from '../../components/Admin/Training';
+import { AdminPageHeader, AdminTabs, AdminToast, AdminButton } from '../../components/Admin/Common/index.js';
 
 const adminTrainingTabs = [
   { id: 'header', label: 'Header & Giới thiệu', icon: Sparkles },
@@ -29,6 +30,7 @@ export default function AdminTraining() {
   const [trainingData, setTrainingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
 
   const tabRefs = useRef([]);
 
@@ -41,7 +43,7 @@ export default function AdminTraining() {
       }
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu trang Hợp tác & Đào tạo:', error);
-      alert('Không thể kết nối đến máy chủ để tải dữ liệu trang Hợp tác & Đào tạo.');
+      setToast({ message: 'Không thể kết nối đến máy chủ để tải dữ liệu trang Hợp tác & Đào tạo.', error: true });
     } finally {
       setLoading(false);
     }
@@ -66,10 +68,10 @@ export default function AdminTraining() {
         header_section: savedHeader,
       };
       setTrainingData({ ...trainingData, props: updatedProps });
-      alert('Cập nhật phần Header thành công!');
+      setToast({ message: 'Cập nhật phần Header thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Header:', error);
-      alert('Có lỗi xảy ra khi lưu Header lên hệ thống.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu Header lên hệ thống.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -86,10 +88,10 @@ export default function AdminTraining() {
         models_section: savedModels,
       };
       setTrainingData({ ...trainingData, props: updatedProps });
-      alert('Cập nhật phần Mô hình hợp tác thành công!');
+      setToast({ message: 'Cập nhật phần Mô hình hợp tác thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Mô hình hợp tác:', error);
-      alert('Có lỗi xảy ra khi lưu Mô hình hợp tác lên hệ thống.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu Mô hình hợp tác lên hệ thống.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -106,18 +108,16 @@ export default function AdminTraining() {
         certification_section: savedCert,
       };
       setTrainingData({ ...trainingData, props: updatedProps });
-      alert('Cập nhật phần Cam kết & Chứng nhận thành công!');
+      setToast({ message: 'Cập nhật phần Cam kết & Chứng nhận thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Cam kết & Chứng nhận:', error);
-      alert('Có lỗi xảy ra khi lưu Cam kết & Chứng nhận lên hệ thống.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu Cam kết & Chứng nhận lên hệ thống.', error: true });
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleSaveSelected = async (selectedIds) => {
-
-
     if (!trainingData) return;
     setIsSaving(true);
     try {
@@ -128,10 +128,10 @@ export default function AdminTraining() {
         selected_training_ids: updatedIds,
       };
       setTrainingData({ ...trainingData, props: updatedProps });
-      alert('Cập nhật danh sách khóa đào tạo hiển thị thành công!');
+      setToast({ message: 'Cập nhật danh sách khóa đào tạo hiển thị thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu danh sách khóa đào tạo hiển thị:', error);
-      alert('Có lỗi xảy ra khi lưu danh sách khóa đào tạo hiển thị.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu danh sách khóa đào tạo hiển thị.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -151,82 +151,34 @@ export default function AdminTraining() {
   return (
     <div className="space-y-6">
       {/* Header trang quản trị */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-(--admin-border) pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-(--admin-title)">
-              Quản trị Trang Hợp tác &amp; Đào tạo
-            </h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-              <Sparkles size={12} /> Live API
-            </span>
-          </div>
-          <p className="mt-1 text-xs sm:text-sm text-(--admin-heading)">
-            Tùy biến tiêu đề banner, số liệu thống kê, cấu hình động form đăng ký (FormBuilder) và chọn lọc các khóa đào tạo giới thiệu ngoài website
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
+      <AdminPageHeader
+        badge="Live API"
+        title="Quản trị Trang Hợp tác & Đào tạo"
+        subtitle="Tùy biến tiêu đề banner, số liệu thống kê, cấu hình động form đăng ký (FormBuilder) và chọn lọc các khóa đào tạo giới thiệu ngoài website."
+        actions={
+          <AdminButton
+            variant="outline"
+            size="sm"
+            icon={RefreshCw}
             onClick={loadData}
-            className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-[11px] font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer"
-            title="Làm mới dữ liệu từ server"
           >
-            <RefreshCw size={13} />
             Làm mới
-          </button>
-        </div>
-      </div>
+          </AdminButton>
+        }
+      />
 
       {/* Tabs navigation */}
-      <div
-        role="tablist"
-        aria-label="Cấu hình trang Hợp tác & Đào tạo"
-        className="flex border-b border-(--admin-border) overflow-x-auto gap-2"
-      >
-        {adminTrainingTabs.map((tab, index) => {
-          const isSelected = activeTab.id === tab.id;
-          const IconComponent = tab.icon;
-
-          return (
-            <button
-              key={tab.id}
-              ref={(el) => (tabRefs.current[index] = el)}
-              role="tab"
-              id={`training-tab-${tab.id}`}
-              aria-selected={isSelected}
-              aria-controls={`training-panel-${tab.id}`}
-              tabIndex={isSelected ? 0 : -1}
-              onClick={() => selectTab(tab)}
-              onKeyDown={(event) => {
-                let nextIndex = index;
-                if (event.key === 'ArrowRight') {
-                  nextIndex = (index + 1) % adminTrainingTabs.length;
-                } else if (event.key === 'ArrowLeft') {
-                  nextIndex = (index - 1 + adminTrainingTabs.length) % adminTrainingTabs.length;
-                } else if (event.key === 'Home') nextIndex = 0;
-                else if (event.key === 'End') nextIndex = adminTrainingTabs.length - 1;
-                else return;
-                event.preventDefault();
-                selectTab(adminTrainingTabs[nextIndex]);
-                tabRefs.current[nextIndex]?.focus();
-              }}
-              className={`min-h-11 shrink-0 cursor-pointer border-b-2 px-4 text-sm font-semibold whitespace-nowrap flex items-center gap-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) transition-colors ${
-                isSelected
-                  ? 'border-(--admin-accent) text-(--admin-title)'
-                  : 'border-transparent text-(--admin-heading) hover:bg-(--admin-background)'
-              }`}
-            >
-              <IconComponent size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <AdminTabs
+        tabs={adminTrainingTabs}
+        activeTab={activeTab.id}
+        onChange={(id) => {
+          const tab = adminTrainingTabs.find((t) => t.id === id);
+          if (tab) selectTab(tab);
+        }}
+      />
 
       {/* Tab Panels */}
-      <div className="mt-4">
+      <div>
         {/* Tab 1: Header */}
         <div
           id="training-panel-header"
@@ -297,6 +249,8 @@ export default function AdminTraining() {
           )}
         </div>
       </div>
+
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }

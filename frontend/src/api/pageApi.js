@@ -37,4 +37,9 @@ export const PageAPI = {
     const response = await axios.delete(`${API_BASE_URL}/pages/${id}`);
     return response.data;
   },
+
+  reorderPages: async (orders) => {
+    const response = await axios.put(`${API_BASE_URL}/pages/reorder`, { orders });
+    return response.data;
+  },
 };

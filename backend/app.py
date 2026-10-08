@@ -24,6 +24,8 @@ def create_app():
         "http://127.0.0.1:5173",
         "http://localhost:5174",
         "http://127.0.0.1:5174",
+        "*",
+        "https://creative-industry-center.vercel.app"
     ]
     CORS(
         app,
@@ -110,7 +112,11 @@ def create_app():
     from controllers.ProjectPageController import project_page_api
     from controllers.TrainingPageController import training_page_api
     from controllers.SiteSettingsController import site_api
+    from controllers.AuthController import auth_api
+    from controllers.ActivityLogController import activity_api
 
+    app.register_blueprint(auth_api)
+    app.register_blueprint(activity_api)
     app.register_blueprint(founder_page_api)
     app.register_blueprint(award_page_api)
     app.register_blueprint(user_api)
@@ -128,6 +134,16 @@ def create_app():
     app.register_blueprint(project_page_api)
     app.register_blueprint(training_page_api)
     app.register_blueprint(site_api)
+
+    @app.after_request
+    def record_activity_log(response):
+        try:
+            from flask import request
+            from services.audit_service import auto_log_request
+            auto_log_request(request, response)
+        except Exception as e:
+            app.logger.warning(f"Auto activity log error: {e}")
+        return response
 
     return app
 

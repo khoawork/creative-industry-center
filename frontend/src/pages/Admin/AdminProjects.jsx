@@ -15,6 +15,7 @@ import {
   ProjectProposalEditor,
   ProjectSelector,
 } from '../../components/Admin/Projects';
+import { AdminPageHeader, AdminTabs, AdminToast, AdminButton } from '../../components/Admin/Common/index.js';
 
 const adminProjectTabs = [
   { id: 'header', label: 'Header & Giới thiệu', icon: Layout },
@@ -31,6 +32,7 @@ export default function AdminProjects() {
   const [projectData, setProjectData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
 
   const selectTab = (tab) => {
     setSearchParams((current) => {
@@ -50,7 +52,7 @@ export default function AdminProjects() {
       })
       .catch((err) => {
         console.error('Lỗi khi tải dữ liệu trang Dự án từ API:', err);
-        alert('Không thể kết nối lấy dữ liệu trang dự án từ API.');
+        setToast({ message: 'Không thể kết nối lấy dữ liệu trang dự án từ API.', error: true });
       })
       .finally(() => {
         setLoading(false);
@@ -71,10 +73,10 @@ export default function AdminProjects() {
         header_section: response.data || newHeaderData,
       };
       setProjectData({ ...projectData, props: updatedProps });
-      alert('Cập nhật phần Header thành công!');
+      setToast({ message: 'Cập nhật phần Header thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Header:', error);
-      alert('Có lỗi xảy ra khi lưu Header lên hệ thống.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu Header lên hệ thống.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -91,10 +93,10 @@ export default function AdminProjects() {
         proposal_section: savedProposal,
       };
       setProjectData({ ...projectData, props: updatedProps });
-      alert('Cập nhật phần Đề xuất thành công!');
+      setToast({ message: 'Cập nhật phần Đề xuất thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Đề xuất:', error);
-      alert('Có lỗi xảy ra khi lưu Đề xuất lên hệ thống.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu Đề xuất lên hệ thống.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -111,10 +113,10 @@ export default function AdminProjects() {
         selected_project_ids: updatedIds,
       };
       setProjectData({ ...projectData, props: updatedProps });
-      alert('Cập nhật danh sách dự án hiển thị thành công!');
+      setToast({ message: 'Cập nhật danh sách dự án hiển thị thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu danh sách dự án hiển thị:', error);
-      alert('Có lỗi xảy ra khi lưu danh sách dự án hiển thị.');
+      setToast({ message: 'Có lỗi xảy ra khi lưu danh sách dự án hiển thị.', error: true });
     } finally {
       setIsSaving(false);
     }
@@ -134,92 +136,46 @@ export default function AdminProjects() {
   return (
     <div className="space-y-6">
       {/* Header trang quản trị */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-(--admin-border) pb-5">
-        <div>
+      <AdminPageHeader
+        badge="Live API"
+        title="Quản trị Trang Dự án"
+        subtitle="Tùy biến nội dung tiêu đề, chỉ số thống kê, form đề xuất và chọn lọc các dự án hiển thị ngoài website."
+        actions={
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-(--admin-title)">
-              Quản trị Trang Dự án
-            </h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-              <Sparkles size={12} /> Live API
-            </span>
+            <AdminButton
+              variant="outline"
+              size="sm"
+              icon={RefreshCw}
+              onClick={loadData}
+            >
+              Làm mới
+            </AdminButton>
+
+            <a
+              href="/projects"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer"
+            >
+              <ExternalLink size={14} />
+              Xem trang dự án
+            </a>
           </div>
-          <p className="mt-1 text-xs sm:text-sm text-(--admin-heading)">
-            Tùy biến nội dung tiêu đề, chỉ số thống kê, form đề xuất và chọn lọc các dự án hiển thị ngoài website
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={loadData}
-            className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-[11px] font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer"
-            title="Làm mới dữ liệu từ server"
-          >
-            <RefreshCw size={13} />
-            Làm mới
-          </button>
-
-          <a
-            href="/projects"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-(--admin-border) bg-(--admin-surface) px-3 py-1.5 text-[11px] font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition cursor-pointer"
-          >
-            <ExternalLink size={13} />
-            Xem trang dự án
-          </a>
-        </div>
-      </div>
+        }
+      />
 
       {/* Tabs Danh mục */}
-      <div
-        role="tablist"
-        aria-label="Quản lý trang dự án"
-        className="my-6 flex max-w-full gap-1 overflow-x-auto border-b border-(--admin-border) bg-(--admin-surface) p-1 [scrollbar-width:none]"
-      >
-        {adminProjectTabs.map((tab, index) => {
-          const IconComponent = tab.icon;
-          const isSelected = activeTab.id === tab.id;
-          return (
-            <button
-              key={tab.id}
-              ref={(node) => {
-                tabRefs.current[index] = node;
-              }}
-              id={`project-tab-${tab.id}`}
-              type="button"
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={`project-panel-${tab.id}`}
-              tabIndex={isSelected ? 0 : -1}
-              onClick={() => selectTab(tab)}
-              onKeyDown={(event) => {
-                let nextIndex;
-                if (event.key === 'ArrowRight') nextIndex = (index + 1) % adminProjectTabs.length;
-                else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + adminProjectTabs.length) % adminProjectTabs.length;
-                else if (event.key === 'Home') nextIndex = 0;
-                else if (event.key === 'End') nextIndex = adminProjectTabs.length - 1;
-                else return;
-                event.preventDefault();
-                selectTab(adminProjectTabs[nextIndex]);
-                tabRefs.current[nextIndex]?.focus();
-              }}
-              className={`min-h-11 shrink-0 cursor-pointer border-b-2 px-4 text-sm font-semibold whitespace-nowrap flex items-center gap-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) transition-colors ${
-                isSelected
-                  ? 'border-(--admin-accent) text-(--admin-title)'
-                  : 'border-transparent text-(--admin-heading) hover:bg-(--admin-background)'
-              }`}
-            >
-              <IconComponent size={16} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      <AdminTabs
+        tabs={adminProjectTabs}
+        activeTab={activeTab.id}
+        onChange={(id) => {
+          const tab = adminProjectTabs.find((t) => t.id === id);
+          if (tab) selectTab(tab);
+        }}
+      />
 
       {/* Tab Panels */}
-      <div className="mt-4">
+      <div>
         {/* Tab 1: Header */}
         <div
           id="project-panel-header"
@@ -271,6 +227,8 @@ export default function AdminProjects() {
           )}
         </div>
       </div>
+
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }

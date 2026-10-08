@@ -11,6 +11,10 @@ class APIException(Exception):
         self.details = details
 
 
+# Alias thuận tiện
+AppError = APIException
+
+
 class BadRequestError(APIException):
     def __init__(self, message="Yêu cầu không hợp lệ", details=None):
         super().__init__(message=message, status_code=400, error_code="BAD_REQUEST", details=details)
