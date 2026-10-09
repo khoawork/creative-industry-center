@@ -496,7 +496,7 @@ export default function TrainingTableManager() {
       {/* Modal Thêm / Chỉnh Sửa Khóa Đào Tạo */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="w-full max-w-2xl border border-(--admin-border) bg-(--admin-surface) rounded-2xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95">
+          <div className="w-full max-w-none overflow-hidden rounded-2xl border border-(--admin-border) bg-(--admin-surface) shadow-2xl my-8 md:w-[50vw] animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-(--admin-border) px-6 py-4 bg-(--admin-background)/40">
               <div className="flex items-center gap-2">
                 <GraduationCap className="text-(--admin-accent)" size={20} />

@@ -6,28 +6,37 @@ import AdminModuleCard from '../../components/Admin/AdminModuleCard.jsx';
 import AdminRecentMessages from '../../components/Admin/AdminRecentMessages.jsx';
 import { adminContentModules, adminItemsById, adminRoot } from '../../config/Admin/adminNavigation.js';
 import { site } from '../../config/shared/site.js';
-import { adminDemoUser, adminMessages, adminStats, adminUnreadCount } from '../../data/Admin/adminDashboardData.js';
+import { adminDemoUser } from '../../data/Admin/adminDashboardData.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { ActivityLogAPI } from '../../api/activityLogApi.js';
+import { DashboardAPI } from '../../api/dashboardApi.js';
 import { AdminPageHeader, AdminBadge, AdminCard } from '../../components/Admin/Common/index.js';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const [stats, setStats] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
-  const [loadingActivities, setLoadingActivities] = useState(true);
+  const [recentMessages, setRecentMessages] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadRecent() {
+    async function loadDashboardData() {
       try {
-        const res = await ActivityLogAPI.getActivities({ limit: 5 });
-        setRecentActivities(res?.data?.items || []);
+        setLoading(true);
+        const res = await DashboardAPI.getStats();
+        if (res?.success && res?.data) {
+          setStats(res.data.stats || []);
+          setRecentActivities(res.data.recentActivities || []);
+          setRecentMessages(res.data.recentMessages || []);
+          setUnreadCount(res.data.counts?.unreadMessages ?? 0);
+        }
       } catch (err) {
-        console.error('Lỗi tải nhật ký dashboard:', err);
+        console.error('Lỗi tải dữ liệu bảng điều khiển:', err);
       } finally {
-        setLoadingActivities(false);
+        setLoading(false);
       }
     }
-    loadRecent();
+    loadDashboardData();
   }, []);
 
   const displayName = user?.full_name || user?.username || adminDemoUser.name;
@@ -45,8 +54,24 @@ export default function AdminDashboard() {
         }
       />
 
-      <section aria-label="Thống kê tổng quan minh họa" className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-        {adminStats.map((stat) => <AdminStatCard key={stat.moduleId} item={adminItemsById[stat.moduleId]} label={stat.label} value={stat.value} detail={stat.detail} />)}
+      <section aria-label="Thống kê tổng quan hệ thống" className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="h-44 animate-pulse rounded-lg border border-(--admin-border) bg-(--admin-surface) p-5" />
+          ))
+        ) : (
+          stats
+            .filter((stat) => adminItemsById[stat.moduleId])
+            .map((stat) => (
+              <AdminStatCard
+                key={stat.moduleId}
+                item={adminItemsById[stat.moduleId]}
+                label={stat.label}
+                value={stat.value}
+                detail={stat.detail}
+              />
+            ))
+        )}
       </section>
 
       <div className="mt-8 grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
@@ -80,7 +105,7 @@ export default function AdminDashboard() {
             bodyClassName="p-4"
           >
             <div className="divide-y divide-(--admin-border)">
-              {loadingActivities ? (
+              {loading ? (
                 <div className="py-4 text-center text-xs text-gray-500">Đang tải nhật ký...</div>
               ) : recentActivities.length === 0 ? (
                 <div className="py-4 text-center text-xs text-gray-400">Chưa có bản ghi hoạt động nào.</div>
@@ -103,7 +128,7 @@ export default function AdminDashboard() {
             </div>
           </AdminCard>
 
-          <AdminRecentMessages messages={adminMessages} unreadCount={adminUnreadCount} />
+          <AdminRecentMessages messages={recentMessages} unreadCount={unreadCount} />
         </div>
       </div>
       <p className="mt-8 border-t border-(--admin-border) pt-5 text-[11px] leading-5 text-(--admin-ink)/60">Không gian quản trị nội dung · {site.name}</p>

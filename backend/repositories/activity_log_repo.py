@@ -24,9 +24,13 @@ def create_activity_log(
         target_id=target_id,
         changes=changes
     )
-    db.session.add(log)
-    db.session.commit()
-    return log
+    try:
+        db.session.add(log)
+        db.session.commit()
+        return log
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def get_activity_logs(

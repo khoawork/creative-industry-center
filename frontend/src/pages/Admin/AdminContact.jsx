@@ -9,6 +9,7 @@ import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, req
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
+import { DashboardAPI } from '../../api/dashboardApi.js'
 import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common/index.js'
 
 function clone(value) {
@@ -115,6 +116,31 @@ export default function AdminContact() {
   const [toast, setToast] = useState(null)
   const [attempt, setAttempt] = useState(0)
   const [formErrors, setFormErrors] = useState({})
+  const [messages, setMessages] = useState([])
+
+  const loadSubmissions = () => {
+    DashboardAPI.getSubmissions()
+      .then((res) => {
+        if (res?.messages?.length) {
+          setMessages(res.messages)
+        }
+      })
+      .catch((err) => console.error('Lỗi tải danh sách phản hồi:', err))
+  }
+
+  const handleMarkRead = (id) => {
+    DashboardAPI.markSubmissionRead(id, true)
+      .then(() => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === id ? { ...m, unread: false } : m))
+        )
+      })
+      .catch((err) => console.error('Lỗi cập nhật đã đọc:', err))
+  }
+
+  useEffect(() => {
+    loadSubmissions()
+  }, [])
 
   const dirty = Boolean(content && draftProps && JSON.stringify(content.props) !== JSON.stringify(draftProps))
   const errorMessages = Object.values(formErrors).filter(Boolean)
@@ -764,7 +790,11 @@ export default function AdminContact() {
       {adminContactTabs.map((tab) => (
         <div key={tab.id} id={`contact-panel-${tab.id}`} role="tabpanel" aria-labelledby={`contact-tab-${tab.id}`} hidden={activeTab.id !== tab.id}>
           {tab.id === 'inbox' ? (
-            <AdminContactInbox messages={adminMessages} />
+            <AdminContactInbox
+              messages={messages.length ? messages : adminMessages}
+              onRefresh={loadSubmissions}
+              onMarkRead={handleMarkRead}
+            />
           ) : tab.id === 'form' ? (
             renderSavedForm()
           ) : tab.id === 'info' ? (

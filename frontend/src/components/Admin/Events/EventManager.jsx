@@ -669,7 +669,7 @@ export default function EventManager({
               role="dialog"
               aria-modal="true"
               aria-label={editing.id ? "Chỉnh sửa sự kiện" : "Thêm sự kiện"}
-              className="w-full max-w-lg overflow-hidden rounded-2xl border border-(--admin-border) bg-(--admin-surface) shadow-2xl"
+              className="w-full max-w-none overflow-hidden rounded-2xl border border-(--admin-border) bg-(--admin-surface) shadow-2xl md:w-[50vw]"
             >
               <EventEditor
                 modal

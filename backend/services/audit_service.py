@@ -4,7 +4,19 @@ from flask import g
 from repositories import activity_log_repo
 from dto.activity_log_dto import ActivityLogResponseDTO
 
+from types import SimpleNamespace
+
 logger = logging.getLogger(__name__)
+
+
+def _to_serializable(obj: Any) -> Any:
+    if isinstance(obj, SimpleNamespace):
+        return {k: _to_serializable(v) for k, v in vars(obj).items()}
+    if isinstance(obj, dict):
+        return {k: _to_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [_to_serializable(x) for x in obj]
+    return obj
 
 
 def log_activity(
@@ -30,6 +42,8 @@ def log_activity(
             user_name = "Quản trị viên"
             user_role = "admin"
 
+        safe_changes = _to_serializable(changes) if changes is not None else None
+
         activity_log_repo.create_activity_log(
             user_id=user_id,
             user_name=user_name,
@@ -38,7 +52,7 @@ def log_activity(
             module=module,
             summary=summary,
             target_id=target_id,
-            changes=changes
+            changes=safe_changes
         )
         # Đánh dấu request này đã được ghi log thành công
         setattr(g, "_activity_logged", True)

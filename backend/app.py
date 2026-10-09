@@ -76,6 +76,11 @@ def create_app():
                     "code",
                     "ALTER TABLE project ADD COLUMN code VARCHAR(50) NULL AFTER id",
                 ),
+                (
+                    "form_submission",
+                    "is_read",
+                    "ALTER TABLE form_submission ADD COLUMN is_read BOOLEAN NOT NULL DEFAULT FALSE",
+                ),
             ]
             for table, col, sql in migrations:
                 try:
@@ -130,8 +135,10 @@ def create_app():
     from controllers.SiteSettingsController import site_api
     from controllers.AuthController import auth_api
     from controllers.ActivityLogController import activity_api
+    from controllers.DashboardController import dashboard_api
 
     app.register_blueprint(auth_api)
+    app.register_blueprint(dashboard_api)
     app.register_blueprint(activity_api)
     app.register_blueprint(founder_page_api)
     app.register_blueprint(award_page_api)
