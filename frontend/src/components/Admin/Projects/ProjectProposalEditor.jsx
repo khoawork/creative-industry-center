@@ -725,7 +725,7 @@ export default function ProjectProposalEditor({
                 <span>{formData.tag}</span>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold uppercase font-serif leading-tight">
+              <h3 className="text-xl sm:text-2xl font-bold uppercase  leading-tight">
                 {formData.title}
               </h3>
 
@@ -753,7 +753,7 @@ export default function ProjectProposalEditor({
 
             {/* Cột phải Form Preview */}
             <div className="bg-white text-gray-800 p-5 sm:p-6 rounded-xl shadow-xl lg:col-span-5 w-full">
-              <h4 className="text-lg font-bold text-[#710008] font-serif mb-1">
+              <h4 className="text-lg font-bold text-[#710008] mb-1">
                 {formData.form_title}
               </h4>
               <p className="text-[11px] text-gray-500 mb-4 leading-relaxed">

@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Save,
   Search,
+  Tags,
   Trash2,
   X,
 } from "lucide-react";
@@ -43,6 +44,7 @@ export default function EventManager({
   displayedEventIds,
   onDisplayedEventsSaved,
   selectionMode = false,
+  onOpenCategories,
 }) {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -277,6 +279,17 @@ export default function EventManager({
               ))}
             </select>
             <div className="flex shrink-0 items-center gap-2">
+              {onOpenCategories && (
+                <button
+                  type="button"
+                  onClick={onOpenCategories}
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) focus-visible:outline-2 focus-visible:outline-(--admin-accent)"
+                  title="Quản lý danh sách chuyên mục sự kiện (Thêm, Sửa, Xóa)"
+                >
+                  <Tags size={13} aria-hidden="true" />
+                  <span>Chuyên mục ({categories.length})</span>
+                </button>
+              )}
               <button
                 type="button"
                 disabled={loading || busy}
@@ -333,10 +346,21 @@ export default function EventManager({
           ) : (
             <>
               {categories.length === 0 && !error && (
-                <p className="text-sm">
-                  Chưa có chuyên mục. Thêm chuyên mục trong phần Bộ lọc trước
-                  khi tạo sự kiện.
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-sm text-amber-900">
+                  <p>
+                    Chưa có chuyên mục sự kiện nào. Bạn cần tạo ít nhất một chuyên mục trước khi tạo sự kiện.
+                  </p>
+                  {onOpenCategories && (
+                    <button
+                      type="button"
+                      onClick={onOpenCategories}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-amber-700 transition"
+                    >
+                      <Plus size={13} />
+                      <span>Thêm chuyên mục ngay</span>
+                    </button>
+                  )}
+                </div>
               )}
               {selectionMode && (
                 <div className={`${adminPanel} grid gap-4 md:grid-cols-3`}>

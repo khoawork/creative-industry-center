@@ -10,6 +10,7 @@ from services.google_sheets_service import (
     sync_fields_to_worksheet,
     sync_all_worksheets,
     append_row_to_google_sheet,
+    fetch_rows_from_google_sheet,
     extract_spreadsheet_id,
     BACKEND_DIR,
 )
@@ -85,6 +86,7 @@ def save_backend_form_config(form_id, config_data):
 def get_service_account_info():
     """
     Lấy thông tin tài khoản dịch vụ Google Service Account (email bot để share quyền trên Google Sheet).
+    Sử dụng hoàn toàn từ biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON.
     """
     try:
         info = get_service_account_credentials_info()
@@ -93,11 +95,33 @@ def get_service_account_info():
             "configured": info["configured"],
             "botEmail": info["email"],
             "type": info["type"],
-            "keyFilePath": info["path"],
-            "message": "Đã cấu hình Google Service Account thành công!" if info["configured"] else "Chưa tìm thấy file service_account.json trong thư mục backend. Hãy đặt file key vào thư mục backend/service_account.json.",
+            "keyFilePath": None,
+            "message": "Đã cấu hình Google Service Account qua biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON thành công!" if info["configured"] else "Chưa cấu hình biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON trong file .env.",
         }), 200
     except Exception as e:
         logger.error(f"Lỗi khi lấy thông tin Service Account: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@form_api.route("/sheet-data/<form_id>", methods=["GET"])
+def get_sheet_data(form_id):
+    """
+    Lấy toàn bộ dữ liệu từ Google Sheet (file excel) của biểu mẫu theo cấu trúc mẫu hiện tại.
+    """
+    try:
+        configs = load_backend_form_configs()
+        form_cfg = configs.get(form_id) or {}
+        sheet_url = request.args.get("sheetUrl") or form_cfg.get("sheetUrl")
+        sheet_name = request.args.get("sheetName") or form_cfg.get("sheetName") or "Trang tính1"
+
+        if not sheet_url:
+            return jsonify({"success": False, "message": "Chưa có đường dẫn Google Sheet cho biểu mẫu này!"}), 400
+
+        result = fetch_rows_from_google_sheet(sheet_url, sheet_name)
+        status_code = 200 if result.get("success") else 400
+        return jsonify(result), status_code
+    except Exception as e:
+        logger.error(f"Lỗi lấy dữ liệu từ Google Sheet cho {form_id}: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
 
