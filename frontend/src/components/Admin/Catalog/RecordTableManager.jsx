@@ -444,7 +444,7 @@ export default function RecordTableManager() {
       {/* Modal Thêm / Sửa */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="w-full max-w-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="w-full max-w-none overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] rounded-2xl shadow-2xl md:w-[50vw] animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-6 py-4">
               <h3 className="text-base font-bold text-[var(--admin-title)]">
                 {editingItem ? "Chỉnh sửa Kỷ Lục" : "Thêm Mới Kỷ Lục"}

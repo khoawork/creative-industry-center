@@ -605,7 +605,7 @@ export default function ProjectTableManager() {
       {/* Modal Thêm / Chỉnh Sửa Dự Án */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-(--admin-black)/60 backdrop-blur-xs animate-fade-in">
-          <div className="w-full max-w-2xl border border-(--admin-border) bg-(--admin-surface) rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-none overflow-hidden rounded-2xl border border-(--admin-border) bg-(--admin-surface) shadow-2xl flex flex-col max-h-[90vh] md:w-[50vw]">
             {/* Modal Header */}
             <div className="flex shrink-0 items-center justify-between border-b border-(--admin-border) px-6 py-4">
               <h3 className="text-base font-bold text-(--admin-title)">

@@ -300,6 +300,36 @@ def submit_form():
     }), 200
 
 
+@form_api.route("/submissions", methods=["GET"])
+def get_all_submissions():
+    """
+    Lấy danh sách tất cả submission (kèm định dạng messages cho hộp thư quản trị).
+    """
+    try:
+        form_id = request.args.get("form_id")
+        limit = int(request.args.get("limit", 100))
+        offset = int(request.args.get("offset", 0))
+
+        query = FormSubmission.query
+        if form_id:
+            query = query.filter_by(form_id=form_id)
+
+        total = query.count()
+        unread_count = query.filter_by(is_read=False).count()
+        submissions = query.order_by(FormSubmission.id.desc()).offset(offset).limit(limit).all()
+
+        return jsonify({
+            "success": True,
+            "data": [s.to_dict() for s in submissions],
+            "messages": [s.to_message_dict() for s in submissions],
+            "total": total,
+            "unreadCount": unread_count,
+        }), 200
+    except Exception as e:
+        logger.error(f"Lỗi khi lấy danh sách submissions: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
 @form_api.route("/submissions/<form_id>", methods=["GET"])
 def get_submissions(form_id):
     """
@@ -310,8 +340,34 @@ def get_submissions(form_id):
         return jsonify({
             "success": True,
             "data": [s.to_dict() for s in submissions],
+            "messages": [s.to_message_dict() for s in submissions],
             "total": len(submissions),
         }), 200
     except Exception as e:
         logger.error(f"Lỗi khi lấy danh sách submissions: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@form_api.route("/submissions/<int:submission_id>/read", methods=["PUT"])
+def mark_submission_read(submission_id):
+    """
+    Đánh dấu submission đã đọc hoặc chưa đọc.
+    """
+    try:
+        sub = FormSubmission.query.get(submission_id)
+        if not sub:
+            return jsonify({"success": False, "message": "Không tìm thấy bản ghi"}), 404
+
+        payload = request.get_json(silent=True) or {}
+        is_read = payload.get("is_read", True)
+        sub.is_read = bool(is_read)
+        db.session.commit()
+        return jsonify({
+            "success": True,
+            "data": sub.to_dict(),
+            "message": "Cập nhật trạng thái thành công"
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Lỗi đánh dấu đã đọc: {e}")
         return jsonify({"success": False, "message": str(e)}), 500

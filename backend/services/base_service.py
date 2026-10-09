@@ -129,19 +129,31 @@ def delete_page(page_id: int) -> bool:
     raise ConflictError(message="Hệ thống không cho phép xóa trang. Bạn vui lòng sử dụng chức năng 'Ẩn trang khỏi Menu'.")
 
 
-def reorder_pages(orders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def reorder_pages(orders: List[Any]) -> List[Dict[str, Any]]:
     """Cập nhật thứ tự hiển thị của các trang navigation"""
     from services import audit_service
 
-    updated_pages = base_repo.reorderPages(orders)
+    clean_orders: List[Dict[str, Any]] = []
+    for item in orders:
+        if isinstance(item, dict):
+            pid = item.get("id")
+            idx = item.get("order_index")
+        else:
+            pid = getattr(item, "id", None)
+            idx = getattr(item, "order_index", None)
+        if pid is not None and idx is not None:
+            clean_orders.append({"id": int(pid), "order_index": int(idx)})
+
+    updated_pages = base_repo.reorderPages(clean_orders)
 
     # Ghi nhận nhật ký đổi thứ tự
     audit_service.log_activity(
         action="REORDER",
         module="Menu & Điều hướng",
-        summary=f"Đã sắp xếp lại thứ tự {len(orders)} mục trên Menu điều hướng",
-        changes={"orders": orders}
+        summary=f"Đã sắp xếp lại thứ tự {len(clean_orders)} mục trên Menu điều hướng",
+        changes={"orders": clean_orders}
     )
 
     return [_serialize_page(p) for p in updated_pages]
+
 

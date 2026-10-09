@@ -2,13 +2,27 @@ import { useState } from 'react';
 import { Inbox, MailOpen, RefreshCw } from 'lucide-react';
 import AdminTimestamp from './AdminTimestamp.jsx';
 
-export default function AdminContactInbox({ messages }) {
+export default function AdminContactInbox({ messages, onRefresh, onMarkRead }) {
   const [filter, setFilter] = useState('all');
   const [selectedId, setSelectedId] = useState(null);
   const [refreshed, setRefreshed] = useState(false);
   const unreadCount = messages.filter((message) => message.unread).length;
   const visibleMessages = filter === 'unread' ? messages.filter((message) => message.unread) : messages;
   const selectedMessage = visibleMessages.find((message) => message.id === selectedId);
+
+  const handleSelectMessage = (message) => {
+    setSelectedId(message.id);
+    setRefreshed(false);
+    if (message.unread && onMarkRead) {
+      onMarkRead(message.id);
+    }
+  };
+
+  const handleRefresh = () => {
+    setSelectedId(null);
+    setRefreshed(true);
+    if (onRefresh) onRefresh();
+  };
 
   return (
     <>
@@ -23,12 +37,12 @@ export default function AdminContactInbox({ messages }) {
             Chưa đọc ({unreadCount})
           </button>
         </div>
-        <button type="button" onClick={() => { setSelectedId(null); setRefreshed(true); }}
+        <button type="button" onClick={handleRefresh}
           className="inline-flex min-h-11 cursor-pointer items-center gap-2 px-4 text-sm font-semibold text-(--admin-heading) hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--admin-heading)">
           <RefreshCw size={15} aria-hidden="true" />Làm mới
         </button>
       </div>
-      {refreshed && <p role="status" className="mb-4 text-xs leading-5">Đã tải lại danh sách minh họa. Hộp thư chưa kết nối dữ liệu thực tế.</p>}
+      {refreshed && <p role="status" className="mb-4 text-xs leading-5 text-emerald-600 font-medium">Đã cập nhật danh sách hộp thư mới nhất.</p>}
       <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-2">
         <section aria-label="Danh sách thư" className="min-w-0 border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)]">
           {visibleMessages.length ? (
@@ -36,7 +50,7 @@ export default function AdminContactInbox({ messages }) {
               {visibleMessages.map((message) => (
                 <li key={message.id}>
                   <button type="button" aria-pressed={selectedId === message.id} aria-controls="admin-message-detail"
-                    onClick={() => { setSelectedId(message.id); setRefreshed(false); }}
+                    onClick={() => handleSelectMessage(message)}
                     className={`block w-full cursor-pointer border-l-[3px] p-5 text-left transition-colors duration-150 motion-reduce:transition-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--admin-heading) ${selectedId === message.id ? 'border-(--admin-accent) bg-(--admin-background)' : 'border-transparent hover:bg-(--admin-background)'}`}>
                     <span className="flex flex-wrap items-center justify-between gap-2">
                       <span className="text-sm font-semibold">{message.sender}</span>
@@ -61,7 +75,9 @@ export default function AdminContactInbox({ messages }) {
               <p className="mt-3 text-sm">Người gửi: <strong>{selectedMessage.sender}</strong></p>
               <div className="mt-1"><AdminTimestamp value={selectedMessage.receivedAt} /></div>
               <p className="mt-5 border-t border-(--admin-border) pt-5 text-sm leading-7 whitespace-pre-line break-words">{selectedMessage.body}</p>
-              <p className="mt-6 text-xs leading-5 text-(--admin-heading)">Bản xem trước dữ liệu minh họa. Trạng thái đã đọc và trả lời thư chưa được lưu.</p>
+              {selectedMessage.rawData?.submittedAt && (
+                <p className="mt-6 text-xs leading-5 text-(--admin-heading)">Thời điểm gửi dữ liệu: {selectedMessage.rawData.submittedAt}</p>
+              )}
             </>
           ) : (
             <div className="flex items-center gap-3 text-sm leading-6 text-(--admin-heading)">
