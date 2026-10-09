@@ -16,7 +16,7 @@ import { sectionIds } from '../../config/shared/site.js'
 
 function SectionHeading({ eyebrow, title, light = false, left = false }) {
   return (
-    <div className={`flex flex-col ${left ? 'items-start text-left' : 'items-center text-center'} mb-12 lg:mb-12`}>
+    <div className={`wow animate__slideInDown flex flex-col ${left ? 'items-start text-left' : 'items-center text-center'} mb-12 lg:mb-12`}>
       <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-4 ${light ? 'text-secondary-bright' : 'text-secondary'}`}>
         {eyebrow}
       </span>
@@ -36,7 +36,7 @@ export function AboutSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
           {/* Visual Column */}
-          <div className="lg:col-span-5 relative w-full">
+          <div className="wow animate__slideInLeft lg:col-span-5 relative w-full">
             <div className="rounded-2xl overflow-hidden shadow-xl bg-surface-container-high relative aspect-[4/5] border border-[#e5dfd3]">
               {about?.image && (
                 <img
@@ -63,7 +63,7 @@ export function AboutSection() {
           </div>
 
           {/* Narrative Column */}
-          <div className="lg:col-span-7 flex flex-col space-y-7 w-full">
+          <div className="wow animate__slideInRight lg:col-span-7 flex flex-col space-y-7 w-full">
             {(about.missionTitle || about.mission) && (
               <article className="p-8 rounded-2xl bg-surface-container-low border border-[#ebe5dc] shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export function EventsSection() {
               variant="text"
               icon="arrow"
               iconPosition="end"
-              className="inline-flex items-center gap-2 text-sm text-primary hover:text-secondary font-bold uppercase tracking-wider transition-colors mb-2 md:mb-8"
+              className="wow animate__slideInRight inline-flex items-center gap-2 text-sm text-primary hover:text-secondary font-bold uppercase tracking-wider transition-colors mb-2 md:mb-8"
             >
               {eventsSection.action_button.text}
             </Button>
@@ -138,7 +138,7 @@ export function EventsSection() {
         </div>
 
         {/* 3-Column Event Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
             <article className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-[#e8dfd3] transition-all duration-300 group" key={event.id}>
               {event.image && (
@@ -209,7 +209,7 @@ export function AwardsSection() {
       <div className="max-w-7xl mx-auto flex flex-col items-center relative z-10 w-full" id={sectionIds.records}>
         <SectionHeading eyebrow={eyebrow} title={title} light />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
+        <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
           {awards.map((award) => (
             <article
               key={award.id}
@@ -273,7 +273,7 @@ export function AwardsSection() {
         </div>
 
         {buttonText && buttonLink && (
-          <div className="mt-14 text-center">
+          <div className="wow animate__slideInUp mt-14 text-center">
             <Button
               href={buttonLink}
               variant="white"
@@ -297,7 +297,7 @@ export function ProjectsSection() {
       <div className="max-w-7xl mx-auto flex flex-col">
         <SectionHeading eyebrow={projectsSection.tag} title={projectsSection.title_main} />
         {/* Dual Mosaic Grid (Project vs Patriarch/Founder) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="wow animate__slideInUp grid grid-cols-1 lg:grid-cols-2 gap-10">
           {projects.map((project) => (
             <article
               className="bg-surface-container-low rounded-2xl p-8 flex flex-col justify-between shadow-sm border border-[#e8dfd3] space-y-6 group"
@@ -369,7 +369,7 @@ export function TrainingSection() {
     <section className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.training}>
       <div className="max-w-7xl mx-auto flex flex-col">
         <SectionHeading eyebrow={trainingSection.tag} title={trainingSection.title_main} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((program) => (
     
             <article
@@ -410,7 +410,7 @@ export function TrainingSection() {
         </div>
 
         {/* Bottom Advisory Banner */}
-        <div className="mt-16 p-8 rounded-2xl bg-surface-container-low border border-[#e0d8cc] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+        <div className="wow animate__slideInUp mt-16 p-8 rounded-2xl bg-surface-container-low border border-[#e0d8cc] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-5 w-full md:w-auto">
             <div className="p-3 bg-secondary/15 rounded-xl text-secondary shrink-0">
               <Icon name="headset" size={40} />

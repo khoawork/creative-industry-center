@@ -6,7 +6,8 @@ import { sectionIds } from '../../config/shared/site.js'
 export default function HomeHero({ onNavigate }) {
   return (
     <section
-      className="relative w-full min-h-[calc(100vh-6rem)] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#fbfbfa] via-[#f7f5f0] to-[#ffffff]"
+
+      className=" relative w-full min-h-[calc(100vh-6rem)] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#fbfbfa] via-[#f7f5f0] to-[#ffffff]"
       id={sectionIds.home}
     >
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.06] pointer-events-none" aria-hidden="true">
@@ -20,12 +21,12 @@ export default function HomeHero({ onNavigate }) {
       </div>
 
       {/* Soft Radial Scrim */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/[0.04] via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+      <div className=" absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/[0.04] via-transparent to-transparent pointer-events-none" aria-hidden="true" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 py-16 lg:py-24 text-center flex flex-col items-center">
+      <div className=" relative z-10 max-w-6xl mx-auto px-6 lg:px-12 py-16 lg:py-24 text-center flex flex-col items-center">
         {/* Seal Ribbon */}
         {hero.badge && (
-          <div className="inline-flex items-center gap-2.5 px-6 py-3 mb-8 rounded-full bg-white border border-[#ebd8b7] shadow-sm">
+          <div className="wow animate__zoomIn inline-flex items-center gap-2.5 px-6 py-3 mb-8 rounded-full bg-white border border-[#ebd8b7] shadow-sm">
             <Icon name="star" size={18} className="text-secondary" />
             <span className="text-xs text-primary-dark font-bold tracking-[0.2em] uppercase">{hero.badge}</span>
             <Icon name="star" size={18} className="text-secondary" />
@@ -33,21 +34,21 @@ export default function HomeHero({ onNavigate }) {
         )}
 
         {/* Main Symmetrical Headline */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary max-w-4xl tracking-tight uppercase mb-6 leading-[1.15]">
+        <h1 className="wow animate__zoomIn text-4xl md:text-5xl lg:text-6xl font-bold text-primary max-w-4xl tracking-tight uppercase mb-6 leading-[1.15]">
           {hero.title}
         </h1>
 
         <div className="w-36 h-1.5 bg-secondary mb-6 rounded-full mx-auto" aria-hidden="true" />
 
         {hero.subtitle && (
-          <p className="text-lg md:text-xl text-on-surface-variant max-w-3xl font-semibold mb-7 uppercase tracking-wider">
+          <p className="wow animate__zoomIn text-lg md:text-xl text-on-surface-variant max-w-3xl font-semibold mb-7 uppercase tracking-wider">
             {hero.subtitle}
           </p>
         )}
 
         {/* Slogan */}
         {hero.slogan && (
-          <div className="bg-primary/5 border border-primary/15 backdrop-blur-sm px-8 py-3.5 rounded-full shadow-sm mb-10">
+          <div className="wow animate__zoomIn bg-primary/5 border border-primary/15 backdrop-blur-sm px-8 py-3.5 rounded-full shadow-sm mb-10">
             <p className="text-base md:text-lg text-primary font-bold tracking-wide">
               {hero.slogan}
             </p>
@@ -55,7 +56,7 @@ export default function HomeHero({ onNavigate }) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 w-full max-w-2xl">
+        <div className="wow animate__zoomIn flex flex-col sm:flex-row items-center justify-center gap-5 w-full max-w-2xl">
           {hero.buttons.map((button, index) => (
             <Button
               key={`${button.href}-${button.text}`}
@@ -78,7 +79,7 @@ export default function HomeHero({ onNavigate }) {
 
         {/* Key Stat Pillars */}
         {statistics.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full mt-16 pt-8 bg-white border border-[#e8dfd3] rounded-2xl p-6 shadow-sm" aria-label="Thành tựu nổi bật">
+          <div className="wow animate__slideInUp grid grid-cols-2 md:grid-cols-4 gap-6 w-full mt-16 pt-8 bg-white border border-[#e8dfd3] rounded-2xl p-6 shadow-sm" aria-label="Thành tựu nổi bật">
             {statistics.map((stat, index) => (
               <div
                 className={`flex flex-col items-center p-3 ${

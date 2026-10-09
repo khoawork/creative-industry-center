@@ -235,5 +235,6 @@ export default function RegistrationForm({ training = {} }) {
         </form>
       )}
     </div>
+    </div>
   );
 }

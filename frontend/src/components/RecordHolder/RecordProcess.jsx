@@ -29,6 +29,7 @@ export default function RecordProcess({ process }) {
           </div>
           <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold py-4">
             {process.title}
+            </h2>
           <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
             {process.title || "QUY TRÌNH 4 BƯỚC THẨM ĐỊNH & XÁC LẬP ĐỀ CỬ KỶ LỤC"}
           </h2>

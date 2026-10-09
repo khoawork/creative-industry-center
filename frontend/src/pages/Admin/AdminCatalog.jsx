@@ -28,11 +28,11 @@ const TABS = [
     icon: Award,
   },
   {
-    id: 'training',
+    id: 'trainings',
     label: 'Đào tạo (Training)',
     icon: GraduationCap,
   },
-  {
+  { 
     id: 'projects',
     label: 'Dự án (Projects)',
     icon: FolderKanban,
