@@ -11,22 +11,26 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
   const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.founder_story_submission);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    founderName: '',
-    brandName: '',
-    category: 'craft',
-    email: '',
-    phone: '',
-    storySummary: '',
-  });
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     fetchFormConfig('founder_story_submission').then((loaded) => {
-      if (loaded) setConfig(loaded);
+      if (loaded) {
+        setConfig(loaded);
+        const initial = {};
+        (loaded.fields || []).forEach((f) => {
+          initial[f.key] = '';
+        });
+        setFormData(initial);
+      }
     });
   }, []);
 
   if (!isOpen) return null;
+
+  const handleChange = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +55,8 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const fields = config.fields || [];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-amber-900/10 relative">
@@ -60,8 +66,8 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold">Gửi Câu Chuyện Sáng Nghiệp</h3>
-              <p className="text-xs text-amber-200/80">Chia sẻ hành trình của bạn cùng Trung tâm</p>
+              <h3 className="text-lg font-bold">{config.title || "Gửi Câu Chuyện Sáng Nghiệp"}</h3>
+              <p className="text-xs text-amber-200/80">{config.subtitle || "Chia sẻ hành trình của bạn cùng Trung tâm"}</p>
             </div>
           </div>
           <button
@@ -86,95 +92,64 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Họ và tên nhà sáng lập *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.founderName}
-                    onChange={(e) => setFormData({ ...formData, founderName: e.target.value })}
-                    placeholder="VD: Nguyễn Văn A"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
-                  />
-                </div>
+              <div className="grid grid-cols-12 gap-3.5">
+                {fields.map((field, idx) => {
+                  const key = field.key || `field_${idx}`;
+                  const colSpan =
+                    field.width === 'half' || field.colSpan === 1
+                      ? 'col-span-12 sm:col-span-6'
+                      : field.width === 'third'
+                      ? 'col-span-12 sm:col-span-4'
+                      : 'col-span-12';
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Tên thương hiệu / Doanh nghiệp *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.brandName}
-                    onChange={(e) => setFormData({ ...formData, brandName: e.target.value })}
-                    placeholder="VD: Gốm Sứ Bát Tràng"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
-                  />
-                </div>
-              </div>
+                  return (
+                    <div key={key} className={colSpan}>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        {field.label} {field.required && <span className="text-red-500">*</span>}
+                      </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Lĩnh vực hoạt động
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent bg-white"
-                  >
-                    {CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Số điện thoại liên hệ *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="0912 345 678"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Email liên hệ *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="email@doanhnghiep.vn"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Tóm tắt câu chuyện / Dự án sáng tạo *
-                </label>
-                <textarea
-                  required
-                  rows="3"
-                  value={formData.storySummary}
-                  onChange={(e) => setFormData({ ...formData, storySummary: e.target.value })}
-                  placeholder="Chia sẻ ngắn gọn về hành trình khởi nghiệp, khó khăn đã vượt qua hoặc dấu ấn đặc biệt..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
-                ></textarea>
+                      {field.type === 'textarea' ? (
+                        <textarea
+                          required={field.required}
+                          rows={3}
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          placeholder={field.placeholder || ''}
+                          className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
+                        />
+                      ) : field.type === 'select' ? (
+                        <select
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          required={field.required}
+                          className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent bg-white"
+                        >
+                          <option value="">{field.placeholder || '-- Chọn --'}</option>
+                          {key === 'category' && (!field.options || field.options.length === 0)
+                            ? CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                  {cat.label}
+                                </option>
+                              ))
+                            : (field.options || []).map((opt, oIdx) => (
+                                <option key={oIdx} value={typeof opt === 'object' ? opt.value : opt}>
+                                  {typeof opt === 'object' ? opt.label : opt}
+                                </option>
+                              ))}
+                        </select>
+                      ) : (
+                        <input
+                          type={field.type || 'text'}
+                          required={field.required}
+                          value={formData[key] ?? ''}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          placeholder={field.placeholder || ''}
+                          className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-[#710008] focus:border-transparent"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-3">

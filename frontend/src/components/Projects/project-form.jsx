@@ -209,16 +209,25 @@ export default function ProjectForm({ formData }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-12 gap-3.5">
                 {formFields.map((field, idx) => {
                   const fieldKey = field.id || `field_${idx}`;
-                  const isHalf = field.width === "half";
                   const isRequired = Boolean(field.required);
+                  const colSpan =
+                    field.width === 'half' || field.colSpan === 1
+                      ? 'col-span-12 sm:col-span-6'
+                      : field.width === 'third'
+                      ? 'col-span-12 sm:col-span-4'
+                      : field.width === 'quarter'
+                      ? 'col-span-12 sm:col-span-3'
+                      : field.width === 'two-thirds'
+                      ? 'col-span-12 sm:col-span-8'
+                      : 'col-span-12';
 
                   return (
                     <div
                       key={fieldKey}
-                      className={isHalf ? "col-span-1" : "col-span-1 sm:col-span-2"}
+                      className={colSpan}
                     >
                       <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5 text-[11px]">
                         {field.label}

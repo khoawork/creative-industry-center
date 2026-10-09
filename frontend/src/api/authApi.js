@@ -1,27 +1,26 @@
 import axios from 'axios';
+import { setupAuthInterceptor, performTokenRefresh } from './authInterceptor.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-// Tạo instance axios riêng hoặc dùng axios kèm withCredentials
+// Tạo instance axios riêng cho Auth
 const authClient = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // Cho phép truyền và nhận HttpOnly Cookie
+  withCredentials: true,
 });
 
-// Interceptor tự động thêm Bearer token từ localStorage nếu cookie bị giới hạn bởi domain
-authClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Gắn interceptor tự động retry và refresh token
+setupAuthInterceptor(authClient);
 
 export const AuthAPI = {
   login: async (username, password) => {
     const response = await authClient.post('/auth/login', { username, password });
-    if (response.data?.data?.token) {
-      localStorage.setItem('admin_token', response.data.data.token);
+    const payload = response.data?.data;
+    if (payload?.token) {
+      localStorage.setItem('admin_token', payload.token);
+    }
+    if (payload?.refresh_token) {
+      localStorage.setItem('admin_refresh_token', payload.refresh_token);
     }
     return response.data;
   },
@@ -31,7 +30,12 @@ export const AuthAPI = {
       await authClient.post('/auth/logout');
     } finally {
       localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_refresh_token');
     }
+  },
+
+  refreshToken: async () => {
+    return performTokenRefresh();
   },
 
   getMe: async () => {
@@ -39,4 +43,3 @@ export const AuthAPI = {
     return response.data;
   },
 };
-

@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Save, X } from 'lucide-react'
 import { IntroduceAPI } from '../../api/introduceApi.js'
-import { aboutAdminButton, aboutAdminPrimaryButton, aboutAdminTabs, emptyAboutSection } from '../../config/Admin/adminAbout.js'
-import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton } from '../../components/Admin/Common'
+import { aboutAdminTabs, emptyAboutSection } from '../../config/Admin/adminAbout.js'
+import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common'
 import HeroEditor from '../../components/Admin/About/HeroEditor.jsx'
 import OverviewEditor from '../../components/Admin/About/OverviewEditor.jsx'
 import VisionEditor from '../../components/Admin/About/VisionEditor.jsx'
@@ -183,8 +183,8 @@ export default function AdminAbout() {
                 ) : (
                   <p>Dữ liệu không hợp lệ. Vui lòng nhập lại.</p>
                 )}
-                <div className="flex items-center justify-between border-t border-(--admin-border) pt-4">
-                  {(!editable || Object.keys(errors).length > 0) ? (
+                {(!editable || Object.keys(errors).length > 0) && (
+                  <div className="flex items-center justify-start border-t border-(--admin-border) pt-4">
                     <AdminButton
                       variant="outline"
                       size="sm"
@@ -192,21 +192,20 @@ export default function AdminAbout() {
                     >
                       Nhập lại phần này
                     </AdminButton>
-                  ) : <div />}
-                  <AdminButton
-                    type="submit"
-                    variant="primary"
-                    size="sm"
-                    icon={Save}
-                    loading={saving === active.key}
-                    disabled={!dirty || Boolean(saving)}
-                  >
-                    {saving === active.key ? 'Đang lưu…' : 'Lưu thay đổi'}
-                  </AdminButton>
-                </div>
+                  </div>
+                )}
               </fieldset>
             </form>
           </AdminCard>
+          <AdminStickySaveBar
+            form={`form-${active.key}`}
+            type="submit"
+            isSaving={saving === active.key}
+            disabled={!dirty || Boolean(saving)}
+            buttonText="Lưu thay đổi"
+            savingText="Đang lưu…"
+            hintMessage="Nhấn lưu để đồng bộ thông tin giới thiệu ra ngoài website."
+          />
         </>
       )}
     </section>

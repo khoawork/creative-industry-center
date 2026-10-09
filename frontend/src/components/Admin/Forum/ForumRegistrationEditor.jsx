@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Phone, Mail, MapPin, ShieldCheck, Sliders } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 import { FormBuilder } from '../Base/index.js';
 
 const DEFAULT_FIELDS = [
@@ -207,6 +207,7 @@ export default function ForumRegistrationEditor({ initialData, onSave, isSaving 
 
       {/* 2. Cấu hình các trường đăng ký (FormBuilder - Chuyển từ Forms sang đây) */}
       <FormBuilder
+        formId="forum_registration"
         value={{
           form_fields: formData.form_fields || [],
         }}
@@ -292,6 +293,16 @@ export default function ForumRegistrationEditor({ initialData, onSave, isSaving 
           </div>
         </div>
       </AdminCard>
+      <AdminStickySaveBar
+        type="button"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu Cấu Hình thành công!"
+        hintMessage="Nhấn lưu để đồng bộ cấu hình form đăng ký diễn đàn ra website."
+        buttonText="Lưu Thay Đổi"
+        savingText="Đang lưu..."
+        onSave={handleSubmit}
+      />
     </div>
   );
 }

@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Plus,
   Trash2,
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import { AdminCard, AdminButton, AdminInput } from "../Common";
+import { AdminCard, AdminButton, AdminInput, AdminConfirmModal } from "../Common";
 
 const COLOR_OPTIONS = [
+  { value: "primary", label: "Đỏ đô Kỷ lục (Primary)", badge: "border-red-900/30 text-red-900 bg-red-900/10" },
+  { value: "secondary", label: "Vàng kim Hội đồng (Secondary)", badge: "border-amber-500/30 text-amber-600 bg-amber-500/10" },
   { value: "amber", label: "Vàng kim (Amber)", badge: "border-amber-500/30 text-amber-500 bg-amber-500/10" },
   { value: "sky", label: "Xanh da trời (Sky)", badge: "border-sky-500/30 text-sky-500 bg-sky-500/10" },
   { value: "indigo", label: "Xanh chàm (Indigo)", badge: "border-indigo-500/30 text-indigo-500 bg-indigo-500/10" },
@@ -50,13 +52,45 @@ export default function RecordProcessEditor({ data = {}, onChange }) {
     onChange({ ...process, cards: [...cards, newCard] });
   };
 
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Xác nhận",
+    type: "danger",
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
+
   const handleDeleteCard = (index) => {
     if (cards.length <= 1) {
-      alert("Quy trình cần tối thiểu 1 bước.");
+      setConfirmModal({
+        isOpen: true,
+        title: "Không thể xóa bước",
+        message: "Quy trình cần tối thiểu 1 bước. Bạn không thể xóa bước duy nhất này.",
+        confirmText: "Đã hiểu",
+        type: "warning",
+        onConfirm: closeConfirmModal,
+      });
       return;
     }
-    const updatedCards = cards.filter((_, idx) => idx !== index);
-    onChange({ ...process, cards: updatedCards });
+
+    const stepTitle = cards[index]?.title || `Bước ${index + 1}`;
+    setConfirmModal({
+      isOpen: true,
+      title: "Xác nhận xóa bước quy trình",
+      message: `Bạn có chắc chắn muốn xóa "${stepTitle}" không?\nThứ tự các bước tiếp theo sẽ tự động được điều chỉnh lại.`,
+      confirmText: "Xóa bước này",
+      type: "danger",
+      onConfirm: () => {
+        closeConfirmModal();
+        const updatedCards = cards.filter((_, idx) => idx !== index);
+        onChange({ ...process, cards: updatedCards });
+      },
+    });
   };
 
   const handleMoveCard = (index, direction) => {
@@ -71,6 +105,15 @@ export default function RecordProcessEditor({ data = {}, onChange }) {
 
   return (
     <div className="space-y-6">
+      <AdminConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        type={confirmModal.type}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+      />
       {/* Cấu hình chung cho phần Quy trình */}
       <AdminCard
         title="Tiêu đề & Giới thiệu Quy trình Thẩm định"

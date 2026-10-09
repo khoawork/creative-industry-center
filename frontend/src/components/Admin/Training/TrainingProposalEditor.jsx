@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Send, Check } from 'lucide-react';
 import { FormBuilder } from '../Base';
+import { AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import { fetchFormConfig, DEFAULT_FORM_CONFIGS } from '../../../services/googleSheetService.js';
 
 export default function TrainingProposalEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -17,10 +19,55 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
       initialData?.form_description ||
       'Ban Tuyển sinh & Hợp tác Chiến lược sẽ liên hệ phản hồi trong 24 giờ làm việc.',
     button_text: initialData?.button_text || 'GỬI HỒ SƠ ĐĂNG KÝ',
-    form_fields: Array.isArray(initialData?.form_fields)
+    form_fields: Array.isArray(initialData?.form_fields) && initialData.form_fields.length > 0
       ? [...initialData.form_fields]
       : [],
   });
+
+  // Tải cấu hình form hiện tại theo slug/id nếu form_fields đang trống
+  useEffect(() => {
+    fetchFormConfig('training_registration').then((cfg) => {
+      const activeCfg = cfg || DEFAULT_FORM_CONFIGS.training_registration;
+      setFormData((prev) => {
+        let currentFields = Array.isArray(prev.form_fields) && prev.form_fields.length > 0
+          ? [...prev.form_fields]
+          : (activeCfg.fields || []);
+
+        // Đảm bảo luôn có 2 trường cố định courseCode và courseName
+        const hasCode = currentFields.some((f) => (f.key === 'courseCode' || f.id === 'courseCode'));
+        const hasName = currentFields.some((f) => (f.key === 'courseName' || f.id === 'courseName'));
+        const prefix = [];
+        if (!hasCode) {
+          prefix.push({
+            key: 'courseCode',
+            id: 'courseCode',
+            label: 'Mã khóa học',
+            type: 'text',
+            placeholder: 'Mã khóa học',
+            required: true,
+            readOnly: true,
+            width: 'half',
+          });
+        }
+        if (!hasName) {
+          prefix.push({
+            key: 'courseName',
+            id: 'courseName',
+            label: 'Tên khóa học',
+            type: 'text',
+            placeholder: 'Tên khóa học đăng ký',
+            required: true,
+            readOnly: true,
+            width: 'half',
+          });
+        }
+        return {
+          ...prev,
+          form_fields: [...prefix, ...currentFields],
+        };
+      });
+    });
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -120,11 +167,22 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Thông tin kêu gọi hợp tác */}
       <div className="p-6 rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] space-y-5">
-        <div className="flex items-center gap-2 border-b border-(--admin-border) pb-3">
-          <Send className="text-(--admin-accent)" size={18} />
-          <h3 className="text-base font-bold text-(--admin-title)">
-            Phần Kêu gọi Đăng ký &amp; Hợp tác Đào tạo (CTA Section)
-          </h3>
+        <div className="flex items-center justify-between border-b border-(--admin-border) pb-3">
+          <div className="flex items-center gap-2">
+            <Send className="text-(--admin-accent)" size={18} />
+            <h3 className="text-base font-bold text-(--admin-title)">
+              Phần Kêu gọi Đăng ký &amp; Hợp tác Đào tạo (CTA Section)
+            </h3>
+          </div>
+          <AdminButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+          >
+            {isSaving ? 'Đang lưu...' : 'Lưu cấu hình Đăng ký & Form'}
+          </AdminButton>
         </div>
 
         <div>
@@ -214,6 +272,7 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
 
       {/* Component Reusable FormBuilder từ Base */}
       <FormBuilder
+        formId="training_registration"
         value={{
           form_title: formData.form_title,
           form_description: formData.form_description,
@@ -228,21 +287,15 @@ export default function TrainingProposalEditor({ initialData, onSave, isSaving }
       />
 
       {/* Nút lưu */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <Check size={16} /> Đã lưu thành công!
-          </span>
-        )}
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-(--admin-accent) text-white font-semibold text-sm hover:opacity-90 disabled:opacity-50 transition shadow-sm cursor-pointer"
-        >
-          <Save size={16} />
-          {isSaving ? 'Đang lưu...' : 'Lưu cấu hình Đăng ký & Form'}
-        </button>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công!"
+        hintMessage="Nhấn lưu để đồng bộ cấu hình form và thông tin đào tạo ra website."
+        buttonText="Lưu cấu hình Đăng ký & Form"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

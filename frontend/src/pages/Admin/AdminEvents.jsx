@@ -16,7 +16,7 @@ import { eventError, requireEventData } from "../../api/eventApi.js";
 import PageSectionFields from "../../components/Admin/Events/PageSectionFields.jsx";
 import EventCategories from "../../components/Admin/Events/EventCategories.jsx";
 import EventManager from "../../components/Admin/Events/EventManager.jsx";
-import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton } from "../../components/Admin/Common/index.js";
+import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton, AdminStickySaveBar } from "../../components/Admin/Common/index.js";
 
 export default function AdminEvents() {
   const [params, setParams] = useSearchParams();
@@ -64,13 +64,43 @@ export default function AdminEvents() {
           throw new Error("Nội dung trang Sự kiện không hợp lệ.");
         setPageId(page.id);
         setSaved(page.props);
-        setDrafts(
-          Object.fromEntries(
-            eventsAdminTabs
-              .filter(({ key }) => key !== "events")
-              .map(({ key }) => [key, eventSectionDraft(key, page.props[key])]),
-          ),
+        const pageDrafts = Object.fromEntries(
+          eventsAdminTabs
+            .filter(({ key }) => key !== "events")
+            .map(({ key }) => [key, eventSectionDraft(key, page.props[key])]),
         );
+
+        // Đảm bảo newsletter_section luôn có danh sách fields đầy đủ từ form config
+        const currentNlFields = pageDrafts?.newsletter_section?.form_fields;
+        if (!Array.isArray(currentNlFields) || currentNlFields.length === 0) {
+          import('../../services/googleSheetService.js').then(({ fetchFormConfig, DEFAULT_FORM_CONFIGS }) => {
+            fetchFormConfig('event_newsletter').then((cfg) => {
+              const activeCfg = cfg || DEFAULT_FORM_CONFIGS.event_newsletter;
+              const defaultFields = (activeCfg?.fields || []).map((f) => ({
+                id: f.id || f.key,
+                key: f.key || f.id,
+                label: f.label || '',
+                type: f.type || 'text',
+                placeholder: f.placeholder || '',
+                required: Boolean(f.required),
+                width: f.width || (f.colSpan === 1 ? 'half' : 'full'),
+                options: Array.isArray(f.options) ? f.options : [],
+                helpText: f.helpText || '',
+              }));
+              if (defaultFields.length > 0) {
+                setDrafts((prev) => ({
+                  ...prev,
+                  newsletter_section: {
+                    ...prev.newsletter_section,
+                    form_fields: defaultFields,
+                  },
+                }));
+              }
+            });
+          });
+        }
+
+        setDrafts(pageDrafts);
       })
       .catch((err) => {
         if (!controller.signal.aborted) setLoadError(eventError(err));
@@ -124,6 +154,34 @@ export default function AdminEvents() {
         ...current,
         [key]: eventSectionDraft(key, data),
       }));
+
+      // Đồng bộ cấu hình ô nhập liệu sang trang Quản lý Biểu mẫu nếu lưu newsletter_section
+      if (key === "newsletter_section") {
+        try {
+          const { saveFormConfig } = await import('../../services/googleSheetService.js');
+          const nlData = drafts[key] || {};
+          const nlFields = Array.isArray(nlData.form_fields) ? nlData.form_fields : [];
+          if (nlFields.length > 0) {
+            await saveFormConfig('event_newsletter', {
+              title: nlData.title || "Đăng Ký Nhận Bản Tin & Thông Báo Sự Kiện",
+              subtitle: nlData.description || "Nhận thư mời ưu tiên, tài liệu kỷ yếu...",
+              button_text: nlData.button_text || "Xác Nhận Đăng Ký Thông Báo",
+              fields: nlFields.map((f) => ({
+                key: f.id || f.key,
+                label: f.label,
+                type: f.type,
+                placeholder: f.placeholder,
+                required: Boolean(f.required),
+                colSpan: f.width === 'half' ? 1 : 2,
+                options: f.options,
+              })),
+            });
+          }
+        } catch (syncErr) {
+          console.warn("Lỗi sync event_newsletter config:", syncErr);
+        }
+      }
+
       setToast({ message: "Đã lưu thay đổi." });
     } catch (err) {
       const details = err.response?.data?.error?.details;
@@ -225,60 +283,59 @@ export default function AdminEvents() {
                     </AdminButton>
                   </div>
                 ) : (
-                  <AdminCard
-                    title={tab.label}
-                    subtitle={tab.description || "Tùy biến nội dung chi tiết của phần này trên trang Sự kiện."}
-                    actions={
-                      <AdminButton
-                        type="submit"
-                        form={`events-form-${tab.key}`}
-                        variant="primary"
-                        size="sm"
-                        icon={Save}
-                        loading={saving}
-                        disabled={!dirtyKeys.includes(tab.key) || saving}
-                      >
-                        {saving ? "Đang lưu…" : "Lưu thay đổi"}
-                      </AdminButton>
-                    }
-                  >
-                    <form id={`events-form-${tab.key}`} onSubmit={save} className="space-y-5">
-                      {!saved?.[tab.key] && (
-                        <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm bg-(--admin-background)/50 rounded-r-lg">
-                          Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
-                          trang Sự kiện.
-                        </p>
-                      )}
-                      <fieldset
-                        disabled={saving}
-                        className="min-w-0 space-y-5 disabled:opacity-60"
-                      >
-                        <PageSectionFields
-                          section={tab.key}
-                          value={drafts[tab.key]}
-                          onChange={(value) => {
-                            setDrafts((current) => ({
-                              ...current,
-                              [tab.key]: value,
-                            }));
-                            setToast(null);
-                          }}
-                        />
-                        <div className="flex justify-end border-t border-(--admin-border) pt-4">
-                          <AdminButton
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            icon={Save}
-                            loading={saving}
-                            disabled={!dirtyKeys.includes(tab.key) || saving}
-                          >
-                            {saving ? "Đang lưu…" : "Lưu thay đổi"}
-                          </AdminButton>
-                        </div>
-                      </fieldset>
-                    </form>
-                  </AdminCard>
+                  <>
+                    <AdminCard
+                      title={tab.label}
+                      subtitle={tab.description || "Tùy biến nội dung chi tiết của phần này trên trang Sự kiện."}
+                      actions={
+                        <AdminButton
+                          type="submit"
+                          form={`events-form-${tab.key}`}
+                          variant="primary"
+                          size="sm"
+                          icon={Save}
+                          loading={saving}
+                          disabled={!dirtyKeys.includes(tab.key) || saving}
+                        >
+                          {saving ? "Đang lưu…" : "Lưu thay đổi"}
+                        </AdminButton>
+                      }
+                    >
+                      <form id={`events-form-${tab.key}`} onSubmit={save} className="space-y-5">
+                        {!saved?.[tab.key] && (
+                          <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm bg-(--admin-background)/50 rounded-r-lg">
+                            Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
+                            trang Sự kiện.
+                          </p>
+                        )}
+                        <fieldset
+                          disabled={saving}
+                          className="min-w-0 space-y-5 disabled:opacity-60"
+                        >
+                          <PageSectionFields
+                            section={tab.key}
+                            value={drafts[tab.key]}
+                            onChange={(value) => {
+                              setDrafts((current) => ({
+                                ...current,
+                                [tab.key]: value,
+                              }));
+                              setToast(null);
+                            }}
+                          />
+                        </fieldset>
+                      </form>
+                    </AdminCard>
+                    <AdminStickySaveBar
+                      form={`events-form-${tab.key}`}
+                      type="submit"
+                      isSaving={saving}
+                      disabled={!dirtyKeys.includes(tab.key) || saving}
+                      buttonText="Lưu thay đổi"
+                      savingText="Đang lưu…"
+                      hintMessage="Nhấn lưu để đồng bộ thông tin phần này ra ngoài trang Sự kiện."
+                    />
+                  </>
                 )}
                 {tab.key === "filter_section" && (
                   <AdminCard

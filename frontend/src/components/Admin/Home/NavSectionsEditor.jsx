@@ -19,6 +19,7 @@ import {
   findItemById,
   fetchTableItems,
 } from '../../../services/contentTablesService.js';
+import { AdminConfirmModal } from '../Common/index.js';
 
 export default function NavSectionsEditor({
   navSections: navSectionsProp,
@@ -49,6 +50,18 @@ export default function NavSectionsEditor({
   });
   const [errors, setErrors] = useState({});
   const [statusMessage, setStatusMessage] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Xóa chuyên mục',
+    type: 'danger',
+    onConfirm: null,
+  });
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -75,40 +88,16 @@ export default function NavSectionsEditor({
     setErrors({});
   };
 
-const NAV_PRESETS = {
-  events: {
-    tag: 'DÒNG THỜI GIAN HOẠT ĐỘNG',
-    title_main: 'SỰ KIỆN NỔI BẬT & HOẠT ĐỘNG MỚI',
-    action_button: { text: 'XEM TẤT CẢ SỰ KIỆN', link: '/events' },
-  },
-  projects: {
-    tag: 'HÀNH TRÌNH THỰC TIỄN',
-    title_main: 'DỰ ÁN TIÊU BIỂU & CHUYỆN NHÀ SÁNG NGHIỆP',
-    action_button: { text: 'XEM TẤT CẢ DỰ ÁN', link: '/projects' },
-  },
-  trainings: {
-    tag: 'BỒI DƯỠNG & LAN TỎA',
-    title_main: 'CHƯƠNG TRÌNH HỢP TÁC & ĐÀO TẠO',
-    action_button: { text: 'XEM TẤT CẢ CHƯƠNG TRÌNH', link: '/trainings' },
-  },
-  awards: {
-    tag: 'HỆ THỐNG DANH VỊ DANH DỰ',
-    title_main: 'GIẢI THƯỞNG & TÔN VINH DANH HIỆU',
-    action_button: { text: 'XEM CHI TIẾT DANH MỤC GIẢI THƯỞNG', link: '/awards' },
-  },
-};
-
   const startCreate = (presetKey = 'events') => {
     const template = navSections.find((section) => detectTableForNav(section) === presetKey);
-    const preset = NAV_PRESETS[presetKey] || NAV_PRESETS.events;
     setEditingId('new');
     setActiveForm({
       id: null,
-      tag: template?.tag || preset.tag,
-      title_main: template?.title_main || preset.title_main,
+      tag: template?.tag || '',
+      title_main: template?.title_main || '',
       action_button: {
-        text: template?.action_button?.text || preset.action_button.text,
-        link: template?.action_button?.link || preset.action_button.link,
+        text: template?.action_button?.text || '',
+        link: template?.action_button?.link || '',
       },
       children_id: template?.children_id ? [...template.children_id] : [],
     });
@@ -310,6 +299,15 @@ const NAV_PRESETS = {
 
   return (
     <div className="space-y-6">
+      <AdminConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        type={confirmModal.type}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+      />
       {/* Header bar */}
       <div className="border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)] p-5 sm:p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -441,6 +439,17 @@ const NAV_PRESETS = {
                 <button
                   type="button"
                   onClick={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      title: 'Xác nhận xóa chuyên mục',
+                      message: `Bạn có chắc chắn muốn xóa chuyên mục "${nav.title_main}" khỏi trang chủ không?`,
+                      confirmText: 'Xóa chuyên mục',
+                      type: 'danger',
+                      onConfirm: () => {
+                        closeConfirmModal();
+                        onDeleteSection(nav.id);
+                      },
+                    });
                     if (confirm(`Bạn có chắc muốn xóa chuyên mục "${nav.title_main}"?`)) {
                       if (handleDeleteCallback) {
                         handleDeleteCallback(nav.id);

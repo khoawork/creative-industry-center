@@ -8,6 +8,7 @@ from services.google_sheets_service import (
     get_service_account_credentials_info,
     test_sheet_connection,
     sync_fields_to_worksheet,
+    sync_all_worksheets,
     append_row_to_google_sheet,
     extract_spreadsheet_id,
     BACKEND_DIR,
@@ -32,12 +33,52 @@ def load_backend_form_configs():
 
 def save_backend_form_config(form_id, config_data):
     configs = load_backend_form_configs()
-    configs[form_id] = config_data
+    existing = configs.get(form_id) or {}
+
+    # Merge an toàn: không làm mất sheetUrl, sheetName, lastSyncedAt của form
+    merged = {**existing, **config_data}
+    if not config_data.get("sheetUrl") and existing.get("sheetUrl"):
+        merged["sheetUrl"] = existing["sheetUrl"]
+    if not config_data.get("sheetName") and existing.get("sheetName"):
+        merged["sheetName"] = existing["sheetName"]
+    if existing.get("lastSyncedAt") and not config_data.get("lastSyncedAt"):
+        merged["lastSyncedAt"] = existing["lastSyncedAt"]
+
+    # Đảm bảo trường cố định của hệ thống không bị mất
+    if form_id == "training_registration":
+        fields = list(merged.get("fields") or [])
+        keys = [f.get("key") for f in fields]
+        system_fields = []
+        if "courseCode" not in keys:
+            system_fields.append({
+                "key": "courseCode",
+                "label": "Mã khóa học",
+                "type": "text",
+                "placeholder": "Mã khóa học",
+                "required": True,
+                "readOnly": True,
+                "colSpan": 1,
+            })
+        if "courseName" not in keys:
+            system_fields.append({
+                "key": "courseName",
+                "label": "Tên khóa học",
+                "type": "text",
+                "placeholder": "Tên khóa học đăng ký",
+                "required": True,
+                "readOnly": True,
+                "colSpan": 1,
+            })
+        if system_fields:
+            merged["fields"] = system_fields + fields
+
+    configs[form_id] = merged
     try:
         with open(CONFIGS_FILE, "w", encoding="utf-8") as f:
             json.dump(configs, f, ensure_ascii=False, indent=2)
     except Exception as e:
         logger.error(f"Lỗi ghi form_configs.json: {e}")
+    return merged
 
 
 @form_api.route("/service-account", methods=["GET"])
@@ -60,6 +101,15 @@ def get_service_account_info():
         return jsonify({"success": False, "message": str(e)}), 500
 
 
+@form_api.route("/configs", methods=["GET"])
+def get_all_form_configs():
+    """
+    Lấy toàn bộ cấu hình biểu mẫu từ file form_configs.json trong backend.
+    """
+    configs = load_backend_form_configs()
+    return jsonify({"success": True, "data": configs}), 200
+
+
 @form_api.route("/config/<form_id>", methods=["GET", "POST"])
 def form_config_endpoint(form_id):
     """
@@ -67,12 +117,12 @@ def form_config_endpoint(form_id):
     """
     if request.method == "POST":
         config_data = request.get_json(silent=True) or {}
-        save_backend_form_config(form_id, config_data)
+        saved_config = save_backend_form_config(form_id, config_data)
 
         # Tự động đồng bộ các cột fields lên đúng tab trang tính trên Google Sheet (KHÔNG ghi dữ liệu test)
-        sheet_url = config_data.get("sheetUrl")
-        sheet_name = config_data.get("sheetName") or "DangKySuKien"
-        fields = config_data.get("fields") or []
+        sheet_url = saved_config.get("sheetUrl")
+        sheet_name = saved_config.get("sheetName") or "DangKySuKien"
+        fields = saved_config.get("fields") or []
         sync_result = None
         if sheet_url:
             try:
@@ -84,6 +134,7 @@ def form_config_endpoint(form_id):
             "success": True,
             "message": "Đã lưu cấu hình và đồng bộ các cột vào Google Sheet!",
             "syncResult": sync_result,
+            "data": saved_config,
         }), 200
 
     configs = load_backend_form_configs()
@@ -137,55 +188,27 @@ def sync_all_forms():
     # Nếu frontend gửi danh sách forms
     forms_to_sync = forms_payload if forms_payload else [{"id": k, **v} for k, v in backend_configs.items()]
 
-    for item in forms_to_sync:
-        fid = item.get("id")
-        sname = item.get("sheetName") or "Trang tính1"
-        fields = item.get("fields") or []
+    sync_response = sync_all_worksheets(sheet_url, forms_to_sync)
 
-        try:
-            res = sync_fields_to_worksheet(sheet_url, sname, fields)
-            if res.get("success"):
+    if sync_response.get("success"):
+        for res_item in sync_response.get("results", []):
+            if res_item.get("success"):
+                fid = res_item.get("formId")
                 if fid in backend_configs:
                     backend_configs[fid]["lastSyncedAt"] = now_iso
                     backend_configs[fid]["sheetUrl"] = sheet_url
-                    backend_configs[fid]["syncedSheetName"] = sname
-                results.append({
-                    "formId": fid,
-                    "sheetName": sname,
-                    "success": True,
-                    "message": f"Đã đồng bộ tab '{sname}'"
-                })
-            else:
-                results.append({
-                    "formId": fid,
-                    "sheetName": sname,
-                    "success": False,
-                    "message": res.get("message", "Lỗi tạo tab")
-                })
+                    backend_configs[fid]["syncedSheetName"] = res_item.get("sheetName")
+
+        # Lưu lại trạng thái lastSyncedAt vào file JSON
+        try:
+            with open(CONFIGS_FILE, "w", encoding="utf-8") as f:
+                json.dump(backend_configs, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            results.append({
-                "formId": fid,
-                "sheetName": sname,
-                "success": False,
-                "message": str(e)
-            })
+            logger.error(f"Lỗi lưu lastSyncedAt vào form_configs.json: {e}")
 
-    # Lưu lại trạng thái lastSyncedAt vào file JSON
-    try:
-        with open(CONFIGS_FILE, "w", encoding="utf-8") as f:
-            json.dump(backend_configs, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        logger.error(f"Lỗi lưu lastSyncedAt vào form_configs.json: {e}")
-
-    successful_count = sum(1 for r in results if r["success"])
-    return jsonify({
-        "success": successful_count > 0,
-        "syncedAt": now_iso,
-        "total": len(forms_to_sync),
-        "successful": successful_count,
-        "results": results,
-        "message": f"Đã đồng bộ thành công {successful_count}/{len(forms_to_sync)} trang tính vào Google Sheet!"
-    }), 200
+    sync_response["syncedAt"] = now_iso
+    status_code = 200 if sync_response.get("success") else 400
+    return jsonify(sync_response), status_code
 
 
 @form_api.route("/test-connection", methods=["POST"])

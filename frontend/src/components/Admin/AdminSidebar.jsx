@@ -106,7 +106,7 @@ function SidebarContent({ collapsed = false, user, unreadCount, onNavigate, onCl
                   {user?.full_name || user?.username || 'Người dùng'}
                 </p>
                 <p className="mt-0.5 truncate text-[10px] font-semibold text-(--admin-accent) uppercase tracking-wider">
-                  {user?.role === 'administrator' ? 'Administrator' : user?.role === 'manager' ? 'Manager' : user?.role === 'editor' ? 'Editor' : 'User'}
+                  {user?.role === 'admin' ? 'Administrator' : user?.role === 'manager' ? 'Manager' : user?.role === 'editor' ? 'Editor' : 'User'}
                 </p>
               </div>
             )}

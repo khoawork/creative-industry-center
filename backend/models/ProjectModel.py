@@ -5,6 +5,7 @@ from extensions import db
 class Project(BaseModel):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    code = db.Column(db.String(50), nullable=True)
     name = db.Column(db.String(255), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)

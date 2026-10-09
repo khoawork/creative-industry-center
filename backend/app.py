@@ -71,6 +71,11 @@ def create_app():
                     "year",
                     "ALTER TABLE award ADD COLUMN year INT NULL AFTER props",
                 ),
+                (
+                    "project",
+                    "code",
+                    "ALTER TABLE project ADD COLUMN code VARCHAR(50) NULL AFTER id",
+                ),
             ]
             for table, col, sql in migrations:
                 try:

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileSpreadsheet,
   Save,
@@ -9,9 +10,17 @@ import {
   Eye,
   Zap,
   ClipboardList,
+  Lock,
+  ExternalLink,
+  Table,
+  Columns,
+  Info,
+  CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import {
   getAllFormConfigs,
+  fetchAllFormConfigs,
   saveFormConfig,
   getServiceAccountInfo,
   syncFieldsToSheet,
@@ -24,13 +33,66 @@ import {
 import {
   FormListSidebar,
   SheetLinkConfig,
-  FieldBuilderTable,
   FormPreviewContainer,
 } from '../../components/Admin/Forms';
-import { FormBuilder } from '../../components/Admin/Base';
 import { AdminPageHeader, AdminToast, AdminButton } from '../../components/Admin/Common';
 
+const FORM_ADMIN_INFO = {
+  event_newsletter: {
+    pageTitle: 'Quản trị Sự kiện & Hoạt động',
+    sectionName: 'Mục Đăng ký nhận Bản tin & Thông báo Sự kiện',
+    adminPath: '/admin/events',
+  },
+  event_registration: {
+    pageTitle: 'Quản trị Sự kiện & Hoạt động',
+    sectionName: 'Form Đăng ký tham gia Sự kiện (Đại biểu)',
+    adminPath: '/admin/events',
+  },
+  forum_registration: {
+    pageTitle: 'Quản trị Diễn đàn Kinh tế Kỷ lục',
+    sectionName: 'Tab Đăng ký tham dự Diễn đàn',
+    adminPath: '/admin/forum',
+  },
+  training_registration: {
+    pageTitle: 'Quản trị Hợp tác & Đào tạo',
+    sectionName: 'Tab Form Đăng ký / Đề xuất',
+    adminPath: '/admin/training',
+  },
+  contact_feedback: {
+    pageTitle: 'Quản trị Liên hệ & Đề xuất',
+    sectionName: 'Tab Cấu hình Form Liên hệ',
+    adminPath: '/admin/contact',
+  },
+  record_nomination: {
+    pageTitle: 'Quản trị Bảng vàng & Kỷ lục',
+    sectionName: 'Mục Đề cử Kỷ lục Mới',
+    adminPath: '/admin/records',
+  },
+  founder_story_submission: {
+    pageTitle: 'Quản trị Chuyện Nhà Sáng Nghiệp',
+    sectionName: 'Mục Tiếp nhận Câu chuyện Nhà Sáng Nghiệp',
+    adminPath: '/admin/founder',
+  },
+  project_proposal: {
+    pageTitle: 'Quản trị Dự án Tiêu biểu',
+    sectionName: 'Tab Đề xuất Dự án Sáng tạo Mới',
+    adminPath: '/admin/projects',
+  },
+};
+
+const getExcelColumnName = (colIndex) => {
+  let dividend = colIndex + 1;
+  let columnName = '';
+  while (dividend > 0) {
+    const modulo = (dividend - 1) % 26;
+    columnName = String.fromCharCode(65 + modulo) + columnName;
+    dividend = Math.floor((dividend - modulo) / 26);
+  }
+  return columnName;
+};
+
 export default function AdminFormsPage() {
+  const navigate = useNavigate();
   const [allConfigs, setAllConfigs] = useState({});
   const [activeFormId, setActiveFormId] = useState('event_newsletter');
   const [currentConfig, setCurrentConfig] = useState(null);
@@ -106,8 +168,18 @@ export default function AdminFormsPage() {
 
   // Tải cấu hình form & thông tin Service Account khi trang khởi động
   useEffect(() => {
+    // Nạp nhanh từ local storage trước
     const loaded = getAllFormConfigs();
     setAllConfigs(loaded);
+
+    // Sau đó tải mới nhất từ backend API
+    fetchAllFormConfigs().then((liveConfigs) => {
+      if (liveConfigs) {
+        setAllConfigs(liveConfigs);
+        const activeRaw = liveConfigs[activeFormId] || DEFAULT_FORM_CONFIGS[activeFormId];
+        setCurrentConfig(JSON.parse(JSON.stringify(activeRaw)));
+      }
+    });
 
     // Tìm URL Google Sheet dùng chung sẵn có (nếu form nào đó đã lưu)
     let commonSheetUrl = '';
@@ -171,40 +243,6 @@ export default function AdminFormsPage() {
     }
   };
 
-  // Thao tác Fields
-  const handleAddField = () => {
-    const newKey = `truong_${Date.now().toString().slice(-4)}`;
-    const newField = {
-      key: newKey,
-      label: 'Trường thông tin mới',
-      type: 'text',
-      placeholder: 'Nhập thông tin...',
-      required: false,
-      colSpan: 1,
-    };
-    setCurrentConfig((prev) => ({
-      ...prev,
-      fields: [...(prev.fields || []), newField],
-    }));
-  };
-
-  const handleUpdateField = (index, fieldKey, value) => {
-    setCurrentConfig((prev) => {
-      const nextFields = [...prev.fields];
-      nextFields[index] = {
-        ...nextFields[index],
-        [fieldKey]: value,
-      };
-      return { ...prev, fields: nextFields };
-    });
-  };
-
-  const handleRemoveField = (index) => {
-    setCurrentConfig((prev) => {
-      const nextFields = prev.fields.filter((_, i) => i !== index);
-      return { ...prev, fields: nextFields };
-    });
-  };
 
   // Đồng bộ tiêu đề các cột vào đúng Tab Google Sheet (Chỉ ghi Row 1, không ghi test data)
   const handleSyncToSheet = async () => {
@@ -335,23 +373,12 @@ export default function AdminFormsPage() {
         ...prev,
         [activeFormId]: currentConfig,
       }));
-      showToast(`Đã lưu cấu hình biểu mẫu "${currentConfig.title}" thành công!`);
+      showToast(`Đã lưu cấu hình liên kết Google Sheet cho "${currentConfig.title}" thành công!`);
     } catch (error) {
       console.error('Lỗi khi lưu biểu mẫu:', error);
       showToast('Có lỗi xảy ra khi lưu cấu hình biểu mẫu.', 'error');
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  // Khôi phục mặc định
-  const handleResetDefault = () => {
-    if (window.confirm(`Khôi phục các trường mặc định cho biểu mẫu "${currentConfig?.title}"?`)) {
-      const def = DEFAULT_FORM_CONFIGS[activeFormId] || DEFAULT_FORM_CONFIGS.event_newsletter;
-      const next = JSON.parse(JSON.stringify(def));
-      if (currentConfig?.sheetUrl) next.sheetUrl = currentConfig.sheetUrl;
-      setCurrentConfig(next);
-      showToast('Đã khôi phục danh sách trường mặc định.');
     }
   };
 
@@ -368,6 +395,12 @@ export default function AdminFormsPage() {
     return <div className="p-8 text-center text-gray-500">Đang tải cấu hình biểu mẫu...</div>;
   }
 
+  const currentAdminInfo = FORM_ADMIN_INFO[activeFormId] || {
+    pageTitle: 'Trang Quản trị Chức năng',
+    sectionName: 'Cấu hình Biểu mẫu',
+    adminPath: currentConfig.pagePath,
+  };
+
   return (
     <div className="space-y-6">
       {/* Toast thông báo chuẩn */}
@@ -377,7 +410,7 @@ export default function AdminFormsPage() {
       <AdminPageHeader
         badge="Hệ thống & Tích hợp Dữ liệu"
         title="Quản Lý Biểu Mẫu & Google Sheet"
-        description="Tất cả biểu mẫu trên website được quản lý tập trung. Dữ liệu người dùng gửi từ website sẽ tự động lưu vào Google Sheet tương ứng."
+        description="Quản lý tập trung liên kết Google Sheet cho các biểu mẫu. Trường dữ liệu được thiết kế tại trang quản trị chức năng tương ứng và tự động ánh xạ thành các cột trong Sheet."
         actions={
           <div className="flex items-center gap-2">
             <AdminButton
@@ -392,20 +425,12 @@ export default function AdminFormsPage() {
             </AdminButton>
 
             <AdminButton
-              variant="secondary"
-              icon={RefreshCw}
-              onClick={handleResetDefault}
-            >
-              Mặc định
-            </AdminButton>
-
-            <AdminButton
               variant="primary"
               icon={Save}
               loading={isSaving}
               onClick={handleSave}
             >
-              {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
+              {isSaving ? 'Đang lưu...' : 'Lưu liên kết Sheet'}
             </AdminButton>
           </div>
         }
@@ -481,8 +506,8 @@ export default function AdminFormsPage() {
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <Sliders className="w-4 h-4" />
-                2. Cột Dữ Liệu ({currentConfig.fields?.length || 0} Fields)
+                <Columns className="w-4 h-4" />
+                2. Cột Trong Google Sheet ({(currentConfig.fields?.length || 0) + 1} Cột - Chỉ xem)
               </button>
 
               <button
@@ -538,73 +563,197 @@ export default function AdminFormsPage() {
             />
           )}
 
-          {/* Sub-Tab 2: Cấu hình Fields */}
+          {/* Sub-Tab 2: Cột Dữ Liệu Trong Google Sheet (Chỉ xem - Không cho sửa form tại đây) */}
           {activeSubTab === 'fields' && (
             <div className="space-y-4">
-              {activeFormId === 'forum_registration' && (
-                <section className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-5 shadow-2xs">
-                  <h3 className="mb-1 text-sm font-bold text-(--admin-title)">Nội dung hiển thị của biểu mẫu</h3>
-                  <p className="mb-4 text-xs text-gray-500">
-                    Cấu hình tiêu đề, phần mô tả và nút gửi của form đăng ký Forum.
-                  </p>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {[
-                      ['title', 'Tiêu đề biểu mẫu'],
-                      ['badgeText', 'Nhãn nhận diện'],
-                      ['submitButtonText', 'Nhãn nút gửi'],
-                    ].map(([field, label]) => (
-                      <label key={field} className="block text-xs font-semibold text-gray-700">
-                        {label}
-                        <input
-                          type="text"
-                          value={currentConfig[field] || ''}
-                          onChange={(event) => handleUpdateConfigField(field, event.target.value)}
-                          className="mt-1.5 w-full rounded-lg border border-(--admin-border) bg-white px-3 py-2 text-sm"
-                        />
-                      </label>
-                    ))}
-                    <label className="block text-xs font-semibold text-gray-700 md:col-span-2">
-                      Mô tả biểu mẫu
-                      <textarea
-                        value={currentConfig.subtitle || ''}
-                        onChange={(event) => handleUpdateConfigField('subtitle', event.target.value)}
-                        rows={2}
-                        className="mt-1.5 w-full rounded-lg border border-(--admin-border) bg-white px-3 py-2 text-sm"
-                      />
-                    </label>
-                  </div>
-                </section>
-              )}
-              {activeFormId === 'forum_registration' ? (
-                <FormBuilder
-                  value={{
-                    form_fields: (currentConfig.fields || []).map((field) => ({
-                      ...field,
-                      id: field.key,
-                      width: field.colSpan === 1 ? 'half' : 'full',
-                    })),
-                  }}
-                  onChange={(updated) => handleUpdateConfigField(
-                    'fields',
-                    (updated.form_fields || []).map(({ id, width, ...field }) => ({
-                      ...field,
-                      key: id,
-                      colSpan: width === 'half' ? 1 : 2,
-                    })),
-                  )}
-                  showFormMeta={false}
-                  showPreview={false}
-                  title="Cấu hình các trường đăng ký"
-                  description="Thêm, sắp xếp và tùy chỉnh các ô nhập liệu hiển thị trong form đăng ký Forum."
-                />
-              ) : (
-                <FieldBuilderTable
-                  fields={currentConfig.fields || []}
-                  onAddField={handleAddField}
-                  onUpdateField={handleUpdateField}
-                  onRemoveField={handleRemoveField}
-                />
-              )}
+              {/* Alert Banner thông báo nguồn biểu mẫu và nút điều hướng */}
+              {(() => {
+                const adminInfo = currentAdminInfo;
+                const fieldsList = currentConfig.fields || [];
+
+                return (
+                  <>
+                    <div className="rounded-xl border border-amber-200/90 bg-amber-50/80 p-4 text-amber-950 shadow-2xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="rounded-lg bg-amber-100 p-2 text-amber-800 shrink-0 mt-0.5 sm:mt-0">
+                            <Lock className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-bold text-amber-950">
+                                Chế độ Chỉ Xem (Read-Only)
+                              </h3>
+                              <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-900 uppercase">
+                                Được đồng bộ tự động
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-amber-800 leading-relaxed">
+                              Biểu mẫu này được thiết kế và quản lý tại{' '}
+                              <strong className="font-semibold underline decoration-amber-400">
+                                {adminInfo.pageTitle}
+                              </strong>{' '}
+                              ({adminInfo.sectionName}). Mọi chỉnh sửa về nhãn, trường nhập liệu, kiểu dữ liệu tại trang đó sẽ tự động phản ánh sang đây và sẵn sàng ghi vào Google Sheet.
+                            </p>
+                          </div>
+                        </div>
+
+                        <AdminButton
+                          variant="primary"
+                          icon={ExternalLink}
+                          className="shrink-0 text-xs shadow-xs"
+                          onClick={() => navigate(adminInfo.adminPath)}
+                        >
+                          Chỉnh sửa tại {adminInfo.pageTitle.replace('Quản trị ', '')}
+                        </AdminButton>
+                      </div>
+                    </div>
+
+                    {/* Card Danh sách các Cột Trong Google Sheet */}
+                    <div className="rounded-2xl border border-(--admin-border) bg-(--admin-surface) shadow-2xs overflow-hidden">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--admin-border) px-5 py-4 bg-gray-50/50">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-bold text-(--admin-title)">
+                              Danh Sách Các Cột Trong Google Sheet
+                            </h3>
+                            <span className="rounded-full bg-(--admin-heading)/10 text-(--admin-heading) px-2 py-0.5 text-xs font-bold">
+                              {fieldsList.length + 1} Cột
+                            </span>
+                          </div>
+                          <p className="mt-0.5 text-xs text-gray-500">
+                            Thứ tự và tên các cột sẽ xuất hiện ở dòng đầu tiên (Row 1 Header) trong tab tính "{currentConfig.sheetName || 'DangKySuKien'}".
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <AdminButton
+                            variant="secondary"
+                            size="sm"
+                            icon={RefreshCw}
+                            loading={isSyncing}
+                            disabled={!currentConfig.sheetUrl}
+                            onClick={handleSyncToSheet}
+                            title="Đồng bộ lại tiêu đề các cột này vào tab tính hiện tại trên Google Sheet"
+                          >
+                            {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ Tab này'}
+                          </AdminButton>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full min-w-[680px] border-collapse text-left text-xs">
+                          <thead>
+                            <tr className="border-b border-(--admin-border) bg-gray-100/70 text-[11px] font-bold uppercase text-gray-600">
+                              <th className="px-4 py-3 text-center w-24">Vị trí Cột</th>
+                              <th className="px-4 py-3">Tiêu đề Cột (Row 1 trong Sheet)</th>
+                              <th className="px-4 py-3">Mã trường (Field Key / ID)</th>
+                              <th className="px-4 py-3">Kiểu dữ liệu</th>
+                              <th className="px-4 py-3 text-center">Bắt buộc</th>
+                              <th className="px-4 py-3">Ghi chú</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-(--admin-border)/60">
+                            {/* Cột A Cố định: Thời gian gửi */}
+                            <tr className="bg-emerald-50/40 hover:bg-emerald-50/60 transition">
+                              <td className="px-4 py-3 text-center font-mono font-bold text-emerald-800">
+                                <span className="inline-flex items-center justify-center w-14 py-1 rounded bg-emerald-100 text-emerald-900 font-bold text-xs">
+                                  Cột A
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 font-semibold text-emerald-950">
+                                Thời gian gửi
+                              </td>
+                              <td className="px-4 py-3 font-mono text-gray-600">
+                                <span className="bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                  submittedAt / createdDate
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-gray-600">
+                                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700">
+                                  Ngày / Giờ (ISO)
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                  Tự động ghi
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-gray-500 text-[11px]">
+                                Tự động ghi thời gian người dùng gửi form
+                              </td>
+                            </tr>
+
+                            {/* Các cột dữ liệu từ cấu hình fields */}
+                            {fieldsList.map((field, idx) => {
+                              const colLetter = getExcelColumnName(idx + 1);
+                              const fieldKey = field.key || field.id || `field_${idx + 1}`;
+                              const fieldLabel = field.label || field.placeholder || fieldKey;
+                              const isRequired = Boolean(field.required);
+
+                              return (
+                                <tr key={fieldKey} className="hover:bg-gray-50 transition">
+                                  <td className="px-4 py-3 text-center font-mono font-bold">
+                                    <span className="inline-flex items-center justify-center w-14 py-1 rounded bg-blue-50 text-blue-800 font-bold text-xs border border-blue-200">
+                                      Cột {colLetter}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 font-semibold text-gray-900">
+                                    {fieldLabel}
+                                  </td>
+                                  <td className="px-4 py-3 font-mono text-gray-600">
+                                    <span className="bg-gray-100 px-2 py-0.5 rounded text-[11px]">
+                                      {fieldKey}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-gray-600">
+                                    <span className="inline-flex items-center gap-1 text-[11px] uppercase font-mono px-2 py-0.5 rounded bg-gray-100 text-gray-700">
+                                      {field.type || 'text'}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    {isRequired ? (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800">
+                                        Bắt buộc *
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                                        Tùy chọn
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-gray-500 text-[11px]">
+                                    {field.placeholder ? `Gợi ý: "${field.placeholder}"` : '—'}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Footer thông tin tóm tắt */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 bg-gray-50 border-t border-(--admin-border) text-xs text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                          <span>
+                            Dữ liệu người dùng nộp sẽ tự động xếp vào hàng tiếp theo trong Google Sheet theo đúng các cột trên.
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setActiveSubTab('sheet')}
+                            className="text-xs font-semibold text-(--admin-heading) hover:underline cursor-pointer flex items-center gap-1"
+                          >
+                            Cấu hình Google Sheet <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           )}
 

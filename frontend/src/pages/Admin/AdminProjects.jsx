@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 
 import { ProjectPageAPI } from '../../api/projectPageApi.js';
+import { saveFormConfig } from '../../services/googleSheetService.js';
 import {
   ProjectHeaderEditor,
   ProjectProposalEditor,
@@ -93,7 +94,29 @@ export default function AdminProjects() {
         proposal_section: savedProposal,
       };
       setProjectData({ ...projectData, props: updatedProps });
-      setToast({ message: 'Cập nhật phần Đề xuất thành công!', error: false });
+
+      // Tự động đồng bộ cấu hình form sang trang Quản lý biểu mẫu
+      try {
+        const fields = (savedProposal.form_fields || []).map((f) => ({
+          key: f.id || f.key,
+          label: f.label || f.placeholder || f.id,
+          type: f.type || 'text',
+          placeholder: f.placeholder || '',
+          required: Boolean(f.required),
+          colSpan: f.width === 'half' ? 1 : 2,
+          options: f.options || [],
+        }));
+        await saveFormConfig('project_proposal', {
+          title: savedProposal.form_title || 'Đề Xuất Dự Án Sáng Tạo Mới',
+          subtitle: savedProposal.form_description || '',
+          submitButtonText: savedProposal.button_text || 'Gửi Hồ Sơ Dự Án',
+          fields,
+        });
+      } catch (errSync) {
+        console.warn('Lỗi khi đồng bộ cấu hình form project_proposal:', errSync);
+      }
+
+      setToast({ message: 'Cập nhật phần Đề xuất dự án & đồng bộ biểu mẫu thành công!', error: false });
     } catch (error) {
       console.error('Lỗi khi lưu Đề xuất:', error);
       setToast({ message: 'Có lỗi xảy ra khi lưu Đề xuất lên hệ thống.', error: true });

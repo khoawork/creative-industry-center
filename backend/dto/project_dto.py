@@ -23,6 +23,7 @@ class ProjectInfo(BaseSchema):
 
 
 class ProjectRequest(BaseSchema):
+    code = fields.String(allow_none=True)
     name = fields.String(required=True)
     title = fields.String(required=True)
     description = fields.String(required=True)
@@ -35,6 +36,7 @@ class ProjectRequest(BaseSchema):
 
 class ProjectResponse(BaseSchema):
     id = fields.Integer(required=True)
+    code = fields.String(allow_none=True)
     name = fields.String(required=True)
     title = fields.String(required=True)
     description = fields.String(allow_none=True)

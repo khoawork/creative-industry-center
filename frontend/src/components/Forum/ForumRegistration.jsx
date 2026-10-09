@@ -101,7 +101,20 @@ export default function ForumRegistration({ data, isOpen, onClose }) {
         </select>
       );
     }
-    const supportedTypes = ['text', 'email', 'tel', 'number', 'date'];
+    if (field.type === 'checkbox') {
+      return (
+        <label className="flex items-center gap-2 pt-1 cursor-pointer text-xs text-slate-800">
+          <input
+            type="checkbox"
+            checked={Boolean(form[field.key])}
+            onChange={(e) => handleChange({ target: { name: field.key, value: e.target.checked } })}
+            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span>{field.placeholder || field.label}</span>
+        </label>
+      );
+    }
+    const supportedTypes = ['text', 'email', 'tel', 'number', 'date', 'time'];
     const type = supportedTypes.includes(field.type) ? field.type : 'text';
     return <input {...commonProps} type={type} />;
   };
@@ -297,19 +310,32 @@ export default function ForumRegistration({ data, isOpen, onClose }) {
                 {!formConfig?.fields?.length ? (
                   <p className="text-sm text-slate-500">Đang tải cấu hình biểu mẫu...</p>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {formConfig.fields.map((field) => (
-                      <div key={field.key} className={field.colSpan === 2 ? 'sm:col-span-2' : ''}>
-                        <label
-                          htmlFor={`forum-registration-${field.key}`}
-                          className="mb-1 block text-xs font-semibold text-slate-700"
-                        >
-                          {field.label}
-                          {field.required && <span className="text-red-500"> *</span>}
-                        </label>
-                        {renderField(field)}
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-12 gap-4">
+                    {formConfig.fields.map((field) => {
+                      const colSpan =
+                        field.width === 'half' || field.colSpan === 1
+                          ? 'col-span-12 sm:col-span-6'
+                          : field.width === 'third'
+                          ? 'col-span-12 sm:col-span-4'
+                          : field.width === 'quarter'
+                          ? 'col-span-12 sm:col-span-3'
+                          : field.width === 'two-thirds'
+                          ? 'col-span-12 sm:col-span-8'
+                          : 'col-span-12';
+
+                      return (
+                        <div key={field.key} className={colSpan}>
+                          <label
+                            htmlFor={`forum-registration-${field.key}`}
+                            className="mb-1 block text-xs font-semibold text-slate-700"
+                          >
+                            {field.label}
+                            {field.required && <span className="text-red-500"> *</span>}
+                          </label>
+                          {renderField(field)}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 

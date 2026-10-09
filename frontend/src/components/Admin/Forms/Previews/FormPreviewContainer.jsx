@@ -14,16 +14,18 @@ import ContactFeedbackPreview from './ContactFeedbackPreview.jsx';
 import RecordNominationPreview from './RecordNominationPreview.jsx';
 import FounderStoryPreview from './FounderStoryPreview.jsx';
 import ProjectProposalPreview from './ProjectProposalPreview.jsx';
+import DynamicFormRenderer from '../../../shared/DynamicFormRenderer.jsx';
 
 export default function FormPreviewContainer({
   formConfig,
 }) {
   const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'mobile'
+  const [previewMode, setPreviewMode] = useState('dynamic'); // 'dynamic' | 'legacy'
 
   if (!formConfig) return null;
 
-  // Lựa chọn component preview tương ứng với formId
-  const renderPreviewContent = () => {
+  // Lựa chọn component preview tương ứng với formId (Legacy)
+  const renderLegacyPreviewContent = () => {
     switch (formConfig.id) {
       case 'event_newsletter':
         return <EventNewsletterPreview config={formConfig} />;
@@ -45,6 +47,13 @@ export default function FormPreviewContainer({
     }
   };
 
+  const renderPreviewContent = () => {
+    if (previewMode === 'dynamic') {
+      return <DynamicFormRenderer config={formConfig} preview={true} />;
+    }
+    return renderLegacyPreviewContent();
+  };
+
   return (
     <div className="space-y-4">
       {/* Thanh công cụ điều khiển Preview */}
@@ -59,32 +68,61 @@ export default function FormPreviewContainer({
           </span>
         </div>
 
-        {/* Chuyển đổi Desktop / Mobile */}
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
-          <button
-            type="button"
-            onClick={() => setDeviceView('desktop')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
-              deviceView === 'desktop'
-                ? 'bg-white text-gray-900 shadow-xs'
-                : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <Monitor className="w-3.5 h-3.5" />
-            Desktop
-          </button>
-          <button
-            type="button"
-            onClick={() => setDeviceView('mobile')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
-              deviceView === 'mobile'
-                ? 'bg-white text-gray-900 shadow-xs'
-                : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            Mobile
-          </button>
+        <div className="flex items-center gap-2">
+          {/* Chuyển đổi Dynamic / Legacy */}
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setPreviewMode('dynamic')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
+                previewMode === 'dynamic'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Cấu hình động (Thực tế)
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewMode('legacy')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
+                previewMode === 'legacy'
+                  ? 'bg-white text-gray-900 shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Giao diện gốc
+            </button>
+          </div>
+
+          {/* Chuyển đổi Desktop / Mobile */}
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setDeviceView('desktop')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
+                deviceView === 'desktop'
+                  ? 'bg-white text-gray-900 shadow-xs'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              Desktop
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeviceView('mobile')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md transition cursor-pointer ${
+                deviceView === 'mobile'
+                  ? 'bg-white text-gray-900 shadow-xs'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              Mobile
+            </button>
+          </div>
         </div>
       </div>
 

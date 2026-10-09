@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { setupAuthInterceptor } from './authInterceptor.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -7,13 +8,7 @@ const activityClient = axios.create({
   withCredentials: true,
 });
 
-activityClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+setupAuthInterceptor(activityClient);
 
 export const ActivityLogAPI = {
   getActivities: async ({ page = 1, limit = 30, module, action } = {}) => {
@@ -27,4 +22,3 @@ export const ActivityLogAPI = {
     return response.data;
   },
 };
-

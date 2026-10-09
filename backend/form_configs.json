@@ -1,8 +1,8 @@
 {
   "event_newsletter": {
     "id": "event_newsletter",
-    "title": "Đăng Ký Nhận Bản Tin & Thông Báo Sự Kiện",
-    "subtitle": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức từ Ban Thư ký Trung tâm.",
+    "title": "Đăng Ký Nhận Thông Báo Sự Kiện Sớm",
+    "subtitle": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức trực tiếp từ Ban Thư ký Trung tâm Công nghiệp Sáng tạo.",
     "pagePath": "/events",
     "componentName": "EventNewsletter",
     "badgeText": "BẢN TIN SỰ KIỆN",
@@ -15,7 +15,8 @@
         "type": "text",
         "placeholder": "Nguyễn Văn A",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "organization",
@@ -23,7 +24,8 @@
         "type": "text",
         "placeholder": "Tên cơ quan, tổ chức hoặc doanh nghiệp",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "email",
@@ -31,7 +33,8 @@
         "type": "email",
         "placeholder": "daibieu@tochuc.vn",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "phone",
@@ -39,7 +42,8 @@
         "type": "tel",
         "placeholder": "0901234567",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "note",
@@ -47,12 +51,23 @@
         "type": "textarea",
         "placeholder": "Nêu rõ lĩnh vực quan tâm hoặc yêu cầu đặc biệt...",
         "required": false,
-        "colSpan": 2
+        "colSpan": 2,
+        "options": []
+      },
+      {
+        "key": "h",
+        "label": "helloworld",
+        "type": "text",
+        "placeholder": "Nhập thông tin...",
+        "required": false,
+        "colSpan": 2,
+        "options": []
       }
     ],
     "lastSyncedAt": "2026-10-06T14:54:00.292Z",
     "syncedSheetName": "DangKySuKien",
-    "updatedAt": "2026-10-06T14:54:00.292Z"
+    "updatedAt": "2026-10-09T02:27:05.293Z",
+    "button_text": "Xác Nhận Đăng Ký Thông Báo"
   },
   "event_registration": {
     "id": "event_registration",
@@ -61,7 +76,7 @@
     "pagePath": "/events",
     "componentName": "EventRegisterModal",
     "badgeText": "ĐẠI BIỂU SỰ KIỆN",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "ThamGiaSuKien",
     "fields": [
       {
@@ -121,9 +136,8 @@
         "colSpan": 2
       }
     ],
-    "lastSyncedAt": "2026-10-06T14:53:17.928Z",
-    "syncedSheetName": "ThamGiaSuKien",
-    "updatedAt": "2026-10-06T14:53:17.928Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:09.425Z"
   },
   "training_registration": {
     "id": "training_registration",
@@ -132,16 +146,26 @@
     "pagePath": "/training",
     "componentName": "RegistrationForm",
     "badgeText": "TUYỂN SINH ĐÀO TẠO",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "DangKyDaoTao",
     "fields": [
       {
-        "key": "trainingCourse",
-        "label": "Khóa đào tạo / Mã chương trình",
+        "key": "courseCode",
+        "label": "Mã khóa học",
         "type": "text",
-        "placeholder": "Mã hoặc tên khóa học",
+        "placeholder": "Mã khóa học",
         "required": true,
-        "colSpan": 2
+        "readOnly": true,
+        "colSpan": 1
+      },
+      {
+        "key": "courseName",
+        "label": "Tên khóa học",
+        "type": "text",
+        "placeholder": "Tên khóa học đăng ký",
+        "required": true,
+        "readOnly": true,
+        "colSpan": 1
       },
       {
         "key": "fullName",
@@ -168,9 +192,8 @@
         "colSpan": 2
       }
     ],
-    "lastSyncedAt": "2026-10-06T14:53:26.122Z",
-    "syncedSheetName": "DangKyDaoTao",
-    "updatedAt": "2026-10-06T14:53:26.122Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:18.216Z"
   },
   "contact_feedback": {
     "id": "contact_feedback",
@@ -179,7 +202,7 @@
     "pagePath": "/contact",
     "componentName": "ContactForm",
     "badgeText": "TIẾP NHẬN LIÊN HỆ",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "LienHeTuVan",
     "fields": [
       {
@@ -223,9 +246,8 @@
         "colSpan": 2
       }
     ],
-    "lastSyncedAt": "2026-10-06T14:54:19.665Z",
-    "syncedSheetName": "LienHeTuVan",
-    "updatedAt": "2026-10-06T14:54:19.665Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:22.885Z"
   },
   "record_nomination": {
     "id": "record_nomination",
@@ -234,7 +256,7 @@
     "pagePath": "/records",
     "componentName": "NominationDialog",
     "badgeText": "ĐỀ CỬ KỶ LỤC",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "DeCuKyLuc",
     "fields": [
       {
@@ -286,9 +308,8 @@
         "colSpan": 2
       }
     ],
-    "lastSyncedAt": "2026-10-06T14:54:35.133Z",
-    "syncedSheetName": "DeCuKyLuc",
-    "updatedAt": "2026-10-06T14:54:35.133Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:27.285Z"
   },
   "founder_story_submission": {
     "id": "founder_story_submission",
@@ -297,7 +318,7 @@
     "pagePath": "/founder",
     "componentName": "SubmitStoryModal",
     "badgeText": "CÂU CHUYỆN SÁNG NGHIỆP",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=1908405271#gid=1908405271",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "CauChuyenSangNghiep",
     "fields": [
       {
@@ -349,75 +370,80 @@
         "colSpan": 2
       }
     ],
-    "lastSyncedAt": "2026-10-07T04:11:25.709Z",
-    "syncedSheetName": "CauChuyenSangNghiep",
-    "updatedAt": "2026-10-07T04:11:25.709Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:32.655Z"
   },
   "project_proposal": {
     "id": "project_proposal",
-    "title": "Đề Xuất Dự Án Sáng Tạo Mới",
-    "subtitle": "Kết nối cùng các chuyên gia và mạng lưới Kỷ lục để thẩm định, cố vấn và hiện thực hóa dự án của bạn.",
+    "title": "Gửi Đề Xuất Dự Án Mới",
+    "subtitle": "Ban Thư ký Hội đồng Khoa học sẽ phản hồi văn bản trong vòng 03 ngày làm việc.",
     "pagePath": "/projects",
     "componentName": "ProjectProposal",
     "badgeText": "CỔNG ĐỀ XUẤT DỰ ÁN",
-    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?gid=0#gid=0",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "DeXuatDuAn",
     "fields": [
       {
-        "key": "authorName",
-        "label": "Họ và tên người đại diện",
+        "key": "org_name",
+        "label": "TÊN CƠ QUAN / CHỦ NHIỆM DỰ ÁN",
         "type": "text",
-        "placeholder": "Nguyễn Văn B",
+        "placeholder": "Ví dụ: Tập đoàn Công nghệ & Di sản Văn hóa...",
         "required": true,
-        "colSpan": 1
+        "colSpan": 2,
+        "options": []
       },
       {
-        "key": "organization",
-        "label": "Tổ chức / Nhóm dự án",
+        "key": "project_name",
+        "label": "TÊN DỰ ÁN SÁNG TẠO",
         "type": "text",
-        "placeholder": "Công ty / Studio / Nhóm nghiên cứu",
-        "required": false,
-        "colSpan": 1
-      },
-      {
-        "key": "email",
-        "label": "Email liên hệ",
-        "type": "email",
-        "placeholder": "project@creative.vn",
+        "placeholder": "Ví dụ: Khu bảo tồn tương tác nghệ thuật số...",
         "required": true,
-        "colSpan": 1
+        "colSpan": 2,
+        "options": []
       },
       {
         "key": "phone",
-        "label": "Số điện thoại",
+        "label": "SỐ ĐIỆN THOẠI",
         "type": "tel",
-        "placeholder": "0912345678",
+        "placeholder": "0987xxxxxx",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
-        "key": "projectTitle",
-        "label": "Tên dự án sáng tạo",
-        "type": "text",
-        "placeholder": "Ví dụ: Không gian trải nghiệm văn hóa số đa giác quan...",
+        "key": "location",
+        "label": "ĐỊA BÀN TRIỂN KHAI",
+        "type": "select",
+        "placeholder": "Chọn địa bàn",
         "required": true,
-        "colSpan": 2
+        "colSpan": 1,
+        "options": [
+          "Toàn quốc",
+          "Miền Bắc",
+          "Miền Trung",
+          "Miền Nam",
+          "TP. Hồ Chí Minh",
+          "Hà Nội"
+        ]
       },
       {
-        "key": "projectSummary",
-        "label": "Tóm tắt nội dung và mục tiêu dự án",
-        "type": "textarea",
-        "placeholder": "Mô tả ngắn gọn về ý tưởng, quy mô và đối tượng thụ hưởng...",
+        "key": "collaboration_need",
+        "label": "NHU CẦU HỢP TÁC",
+        "type": "select",
+        "placeholder": "Chọn nhu cầu hợp tác",
         "required": true,
-        "colSpan": 2
+        "colSpan": 2,
+        "options": [
+          "Đề cử xác lập Kỷ lục Quốc gia & Cố vấn chuyên môn",
+          "Tư vấn chiến lược & Bảo trợ truyền thông",
+          "Đầu tư sản xuất & Thương mại hóa",
+          "Kết nối mạng lưới chuyên gia & Nhà khoa học"
+        ]
       }
     ],
-    "trustBadge": "Bảo mật ý tưởng và thông tin sở hữu trí tuệ của tác giả.",
-    "submitButtonText": "Gửi Đề Xuất Dự Án",
-    "successTitle": "Đã gửi đề xuất thành công!",
-    "successMessage": "Ban Thư ký đã nhận được thông tin dự án và sẽ liên hệ phản hồi trong vòng 3-5 ngày làm việc.",
-    "updatedAt": "2026-10-06T08:56:19.164Z",
-    "lastSyncedAt": "2026-10-06T08:56:19.164Z",
+    "lastSyncedAt": "2026-10-08T08:12:46.811Z",
+    "updatedAt": "2026-10-08T08:12:46.811Z",
+    "submitButtonText": "Gửi Hồ Sơ Dự Án",
     "syncedSheetName": "DeXuatDuAn"
   },
   "forum_registration": {
@@ -428,12 +454,12 @@
     "componentName": "ForumRegistration",
     "badgeText": "ĐẠI BIỂU DIỄN ĐÀN",
     "submitButtonText": "Xác nhận đăng ký",
-    "sheetUrl": "",
+    "sheetUrl": "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link",
     "sheetName": "DangKyDienDan",
     "fields": [
       {
         "key": "fullName",
-        "label": "Họ và tên đại biểu 1122222222222",
+        "label": "Họ và tên đại biểu",
         "type": "text",
         "placeholder": "Nguyễn Văn A",
         "required": true,
@@ -486,6 +512,7 @@
         "colSpan": 2
       }
     ],
-    "updatedAt": "2026-10-08T05:27:22.322Z"
+    "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
+    "updatedAt": "2026-10-08T07:33:13.846Z"
   }
 }

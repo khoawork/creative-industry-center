@@ -1,18 +1,40 @@
+import { useEffect } from 'react'
 import { ArrowDown, ArrowUp, Eye, Plus, Send, Sliders, Trash2 } from 'lucide-react'
 import Field from './EventField.jsx'
 import EventStatusMultiSelect from './EventStatusMultiSelect.jsx'
 import { FormBuilder } from '../Base/index.js'
 import EventNewsletter from '../../event-actis/EventNewsletter.jsx'
 import { adminButton } from '../../../config/Admin/adminEvents.js'
-
-const defaultNewsletterFields = (value) => [
-  { id: 'full_name', label: value.full_name_label || 'Họ và tên', placeholder: value.full_name_placeholder || 'Nguyễn Văn A', type: 'text', options: [], required: true, width: 'half' },
-  { id: 'organization', label: value.organization_label || 'Đơn vị / Doanh nghiệp', placeholder: value.organization_placeholder || 'Tổ chức / Doanh nghiệp', type: 'text', options: [], required: false, width: 'half' },
-  { id: 'email', label: value.email_label || 'Địa chỉ Email đại biểu', placeholder: value.email_placeholder || 'daibieu@tochuc.vn', type: 'email', options: [], required: true, width: 'full' },
-]
+import { fetchFormConfig, DEFAULT_FORM_CONFIGS } from '../../../services/googleSheetService.js'
 
 export default function PageSectionFields({ section, value, onChange }) {
   const update = (key, next) => onChange({ ...value, [key]: next })
+
+  // Tự động tải cấu hình form hiện tại của event_newsletter nếu form_fields đang trống
+  useEffect(() => {
+    if (section !== 'newsletter_section') return
+    const currentFields = Array.isArray(value?.form_fields) ? value.form_fields : []
+    if (currentFields.length === 0) {
+      fetchFormConfig('event_newsletter').then((cfg) => {
+        const activeCfg = cfg || DEFAULT_FORM_CONFIGS.event_newsletter
+        const existingFields = activeCfg?.fields || []
+        if (existingFields.length > 0) {
+          update('form_fields', existingFields.map((f) => ({
+            id: f.id || f.key,
+            key: f.key || f.id,
+            label: f.label || '',
+            type: f.type || 'text',
+            placeholder: f.placeholder || '',
+            required: Boolean(f.required),
+            width: f.width || (f.colSpan === 1 ? 'half' : 'full'),
+            options: Array.isArray(f.options) ? f.options : [],
+            helpText: f.helpText || '',
+          })))
+        }
+      })
+    }
+  }, [section])
+
   const labels = section === 'hero_section'
     ? { badge: 'Nhãn đầu trang', title: 'Tiêu đề', description: 'Mô tả' }
     : section === 'filter_section'
@@ -25,7 +47,6 @@ export default function PageSectionFields({ section, value, onChange }) {
     statuses: Array.isArray(filter.statuses) ? filter.statuses : filter.status ? [filter.status] : [],
   }))
   const newsletterFields = Array.isArray(value.form_fields) ? value.form_fields : []
-  const newsletterPreviewFields = [...defaultNewsletterFields(value), ...newsletterFields]
   const move = (index, direction) => {
     const next = [...statistics]
     ;[next[index], next[index + direction]] = [next[index + direction], next[index]]
@@ -112,6 +133,7 @@ export default function PageSectionFields({ section, value, onChange }) {
           <Field compact label="Thông báo đăng ký thành công" labelClassName="text-(--admin-heading)" required multiline value={value.success_message || ''} placeholder="Ví dụ: Cảm ơn Quý vị! Đăng ký nhận thông tin sự kiện đã được ghi nhận." onChange={(next) => update('success_message', next)} />
         </fieldset>
           <div className="[&_button:not([title])]:text-(--admin-black) [&_button[title]]:text-(--admin-heading) [&_button[title]]:hover:text-(--admin-accent) [&_button[title]]:hover:bg-(--admin-background)"><FormBuilder
+          formId="event_newsletter"
           value={{ form_fields: newsletterFields }}
           onChange={(updated) => update('form_fields', Array.isArray(updated.form_fields) ? updated.form_fields : [])}
           showFormMeta={false}
@@ -124,7 +146,7 @@ export default function PageSectionFields({ section, value, onChange }) {
       <div className="rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
         <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-(--admin-title)"><Eye size={16} className="text-(--admin-accent)" />Xem trước Giao diện Form thực tế</h3>
         <fieldset disabled className="pointer-events-none min-w-0 overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-background)">
-          <EventNewsletter section={{ ...value, form_fields: newsletterPreviewFields }} />
+          <EventNewsletter section={{ ...value, form_fields: newsletterFields }} />
         </fieldset>
       </div>
     </>}

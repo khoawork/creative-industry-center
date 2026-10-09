@@ -70,7 +70,7 @@ export default function RecordHolderBody({ onNominate }) {
         }
         
         const honorsList = honorsVal || pageProps.honor_rolls || null;
-        setHonorRollsData(Array.isArray(honorsList) ? honorsList[0] : honorsList);
+        setHonorRollsData(honorsList);
         
         setProcessData(processVal || pageProps.process || null);
         setRecordsConfig({

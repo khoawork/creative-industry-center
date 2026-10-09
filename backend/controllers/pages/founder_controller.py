@@ -756,6 +756,7 @@ def update_founder_cta():
 def get_founder_certificates():
     try:
         result = founder_service.get_founder_certificates(SLUG)
+        result = founder_dto.FounderCertificateResponseDto(many=True).dump(result)
 
         return success_response(
             data=result,
@@ -936,6 +937,7 @@ def delete_founder_certificate(certificate_id):
             SLUG,
             certificate_id,
         )
+        result = founder_dto.FounderCertificateResponseDto(many=True).dump(result)
 
         return success_response(
             data=result,

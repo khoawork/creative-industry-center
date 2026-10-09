@@ -61,14 +61,11 @@ export default function NominationDialog({ award, onClose }) {
     const form = new FormData(event.currentTarget);
     setIsSubmitting(true);
 
-    const payload = {
-      award: award || "",
-      name: form.get("name") || "",
-      phone: form.get("phone") || "",
-      email: form.get("email") || "",
-      organization: form.get("organization") || "",
-      summary: form.get("summary") || "",
-    };
+    const payload = {};
+    for (const [k, v] of form.entries()) {
+      payload[k] = v;
+    }
+    if (award) payload.award = award;
 
     try {
       await submitFormToBackend("record_nomination", payload, config);
@@ -88,6 +85,8 @@ export default function NominationDialog({ award, onClose }) {
       setIsSubmitting(false);
     }
   }
+
+  const fields = (config.fields || []).filter((f) => f.key !== "award");
 
   return (
     <div
@@ -114,114 +113,105 @@ export default function NominationDialog({ award, onClose }) {
         </button>
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gold">
           <Icon name="check" size={18} />
-          Đề cử chính thức
+          {config.badgeText || "Đề cử chính thức"}
         </p>
         <h2
           id="nomination-title"
           className="mt-3 pr-7 text-2xl font-bold text-primary"
         >
-          {award}
+          {award || config.title}
         </h2>
         <p
           id="nomination-description"
           className="mt-3 text-sm leading-6 text-black/70"
         >
-          Vui lòng điền thông tin ban đầu. Ứng dụng email sẽ mở để bạn gửi hồ sơ
-          đến Ban Thư ký.
+          {config.subtitle ||
+            "Vui lòng điền thông tin ban đầu để Ban Thư ký Trung tâm tiếp nhận và hỗ trợ."}
         </p>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label
-            className="block text-sm font-semibold text-primary"
-            htmlFor="nomination-name"
-          >
-            Họ tên người đại diện / Cá nhân đề cử *
-            <input
-              id="nomination-name"
-              name="name"
-              className={inputClasses}
-              placeholder="Ví dụ: Nghệ nhân Nguyễn Văn A hoặc Ông Lê Quốc B"
-              autoComplete="name"
-              required
-            />
-          </label>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label
-              className="block text-sm font-semibold text-primary"
-              htmlFor="nomination-phone"
-            >
-              Số điện thoại liên hệ *
-              <input
-                id="nomination-phone"
-                name="phone"
-                className={inputClasses}
-                type="tel"
-                autoComplete="tel"
-                placeholder="0901 234 567"
-                required
-              />
-            </label>
-            <label
-              className="block text-sm font-semibold text-primary"
-              htmlFor="nomination-email"
-            >
-              Email liên hệ *
-              <input
-                id="nomination-email"
-                name="email"
-                className={inputClasses}
-                type="email"
-                autoComplete="email"
-                placeholder="name@company.vn"
-                required
-              />
-            </label>
+          <div className="grid grid-cols-12 gap-3.5">
+            {fields.map((field, idx) => {
+              const key = field.key || `field_${idx}`;
+              const colSpan =
+                field.width === "half" || field.colSpan === 1
+                  ? "col-span-12 sm:col-span-6"
+                  : field.width === "third"
+                    ? "col-span-12 sm:col-span-4"
+                    : "col-span-12";
+
+              return (
+                <div key={key} className={colSpan}>
+                  <label
+                    className="block text-sm font-semibold text-primary mb-1"
+                    htmlFor={`nomination-${key}`}
+                  >
+                    {field.label}{" "}
+                    {field.required && <span className="text-red-500">*</span>}
+                  </label>
+                  {field.type === "textarea" ? (
+                    <textarea
+                      id={`nomination-${key}`}
+                      name={key}
+                      className={inputClasses}
+                      rows={3}
+                      placeholder={field.placeholder || ""}
+                      required={field.required}
+                    />
+                  ) : field.type === "select" ? (
+                    <select
+                      id={`nomination-${key}`}
+                      name={key}
+                      className={inputClasses}
+                      required={field.required}
+                    >
+                      <option value="">
+                        {field.placeholder || "-- Chọn --"}
+                      </option>
+                      {(field.options || []).map((opt, oIdx) => (
+                        <option
+                          key={oIdx}
+                          value={typeof opt === "object" ? opt.value : opt}
+                        >
+                          {typeof opt === "object" ? opt.label : opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id={`nomination-${key}`}
+                      name={key}
+                      type={field.type || "text"}
+                      className={inputClasses}
+                      placeholder={field.placeholder || ""}
+                      required={field.required}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <label
-            className="block text-sm font-semibold text-primary"
-            htmlFor="nomination-organization"
-          >
-            Tên tổ chức, đơn vị hoặc làng nghề
-            <input
-              id="nomination-organization"
-              name="organization"
-              className={inputClasses}
-              autoComplete="organization"
-              placeholder="Công ty TNHH Sáng tạo Việt / Làng nghề Gốm..."
-            />
-          </label>
-          <label
-            className="block text-sm font-semibold text-primary"
-            htmlFor="nomination-summary"
-          >
-            Tóm tắt thành tựu / Đề tài nổi bật
-            <textarea
-              id="nomination-summary"
-              name="summary"
-              className={inputClasses}
-              rows="3"
-              placeholder="Mô tả ngắn gọn về giải pháp, sản phẩm hoặc năm cống hiến..."
-            />
-          </label>
           {submitted && (
             <p
               role="status"
               className="rounded-lg bg-emerald-50 border border-emerald-200 p-3 text-sm leading-6 text-emerald-800 font-medium"
             >
-              Hồ sơ đề cử kỷ lục đã được gửi thành công! Ban Thư ký Trung tâm sẽ liên hệ thẩm định trong vòng 48 giờ làm việc.
+              Hồ sơ đề cử kỷ lục đã được gửi thành công! Ban Thư ký Trung tâm sẽ
+              liên hệ thẩm định trong vòng 48 giờ làm việc.
             </p>
           )}
           <div className="flex flex-wrap justify-end gap-3 pt-2">
             <button
               type="button"
-              className="rounded-lg bg-cream px-5 py-3 text-sm font-semibold text-primary hover:bg-gold cursor-pointer"
+              className="rounded-lg border border-black bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-black hover:text-white transition-colors cursor-pointer"
               onClick={onClose}
             >
               Hủy bỏ
             </button>
+
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-gold hover:text-primary cursor-pointer disabled:opacity-50"
+              className="rounded-lg border border-black bg-[#490003] px-5 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? "Đang gửi hồ sơ..." : "Gửi hồ sơ đề cử ngay"}
             </button>

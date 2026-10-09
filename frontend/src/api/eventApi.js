@@ -105,9 +105,30 @@ export function requireEventData(response, list = false) {
 export function eventError(error) {
   return error.response?.data?.message || error.message || 'Không thể kết nối máy chủ.'
 }
+export function normalizeEventLink(value) {
+  if (!value || typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  if (trimmed.startsWith('/') || trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  // Tự động thêm https:// nếu là domain (forms.gle, google.com,...)
+  if (/^[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
+}
+
 export function validEventLink(value, optional = false) {
-  if (!value) return optional
-  if (/\s|\\/.test(value) || value.startsWith('//')) return false
-  if (value.startsWith('/')) return true
-  try { return ['http:', 'https:'].includes(new URL(value).protocol) } catch { return false }
+  if (!value) return optional;
+  const trimmed = typeof value === 'string' ? value.trim() : '';
+  if (!trimmed) return optional;
+  if (/\\/.test(trimmed) || trimmed.startsWith('//')) return false;
+  if (trimmed.startsWith('/') || trimmed.startsWith('#')) return true;
+  try {
+    const url = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed}`);
+    return ['http:', 'https:'].includes(url.protocol);
+  } catch {
+    return false;
+  }
 }

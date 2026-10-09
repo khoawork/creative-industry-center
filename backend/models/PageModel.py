@@ -9,5 +9,5 @@ class Page(BaseModel):
     slug = db.Column(db.String(255), nullable=False)
     props = db.Column(db.JSON, nullable=False)
     is_visible = db.Column(db.Boolean, default=True, nullable=False)
-    order_index = db.Column(db.Integer, nullable=False)
+    order_index = db.Column(db.Integer, default=0, nullable=False)
 

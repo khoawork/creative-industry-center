@@ -125,6 +125,12 @@ export default function AdminUsers() {
     );
   };
 
+  // Hàm trích xuất an toàn giá trị nhập liệu (tránh lưu SyntheticEvent object)
+  const handleInputChange = (field, eOrVal) => {
+    const value = eOrVal && typeof eOrVal === 'object' && 'target' in eOrVal ? eOrVal.target.value : eOrVal;
+    setCreateForm((prev) => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div className="space-y-6">
       <AdminToast toast={toast ? { message: toast.message, error: toast.type === 'error' } : null} onClose={() => setToast(null)} />
@@ -283,7 +289,7 @@ export default function AdminUsers() {
                 label="Tên đăng nhập (Username)"
                 required
                 value={createForm.username}
-                onChange={(val) => setCreateForm({ ...createForm, username: val })}
+                onChange={(e) => handleInputChange('username', e)}
                 placeholder="ví dụ: tran_manager"
               />
 
@@ -292,14 +298,14 @@ export default function AdminUsers() {
                 type="email"
                 required
                 value={createForm.email}
-                onChange={(val) => setCreateForm({ ...createForm, email: val })}
+                onChange={(e) => handleInputChange('email', e)}
                 placeholder="manager@vietkings.org"
               />
 
               <AdminInput
                 label="Họ và tên"
                 value={createForm.full_name}
-                onChange={(val) => setCreateForm({ ...createForm, full_name: val })}
+                onChange={(e) => handleInputChange('full_name', e)}
                 placeholder="Nguyễn Văn A"
               />
 
@@ -308,7 +314,7 @@ export default function AdminUsers() {
                 type="password"
                 required
                 value={createForm.password}
-                onChange={(val) => setCreateForm({ ...createForm, password: val })}
+                onChange={(e) => handleInputChange('password', e)}
                 placeholder="Tối thiểu 6 ký tự"
               />
 
@@ -316,7 +322,7 @@ export default function AdminUsers() {
                 label="Vai trò phân quyền"
                 required
                 value={createForm.role}
-                onChange={(val) => setCreateForm({ ...createForm, role: val })}
+                onChange={(val) => handleInputChange('role', val)}
                 options={[
                   { value: 'manager', label: 'Manager (Quản lý - Toàn quyền nội dung & hệ thống, trừ tạo tài khoản)' },
                   { value: 'admin', label: 'Admin (Quản trị viên - Toàn quyền hệ thống & tạo tài khoản)' },

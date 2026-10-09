@@ -11,7 +11,7 @@ import {
   Handshake,
   CheckCircle2,
 } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 const ICON_OPTIONS = [
   { value: 'award', label: 'Chứng nhận / Giải thưởng (Award)', icon: Award },
@@ -150,6 +150,17 @@ export default function TrainingCertificationEditor({ initialData, onSave, isSav
       <AdminCard
         title="Thông tin Cam Kết Chất Lượng & Bảo Chứng"
         subtitle="Cấu hình tiêu đề, mô tả và huy hiệu bảo chứng học thuật của Viện Kỷ lục Việt Nam"
+        actions={
+          <AdminButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+          >
+            {isSaving ? 'Đang lưu...' : 'Lưu Cam kết & Chứng nhận'}
+          </AdminButton>
+        }
       >
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -357,21 +368,15 @@ export default function TrainingCertificationEditor({ initialData, onSave, isSav
       </AdminCard>
 
       {/* Nút lưu */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <Check size={16} /> Đã lưu thành công!
-          </span>
-        )}
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={isSaving}
-          icon={Save}
-        >
-          Lưu thông tin Cam kết & Chứng nhận
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công!"
+        hintMessage="Nhấn lưu để đồng bộ thông tin cam kết và chứng nhận ra website."
+        buttonText="Lưu Cam kết & Chứng nhận"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

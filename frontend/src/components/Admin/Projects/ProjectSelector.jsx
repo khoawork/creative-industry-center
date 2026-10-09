@@ -12,7 +12,7 @@ import {
   Check,
 } from 'lucide-react';
 import { ProjectAPI } from '../../../api/projectApi.js';
-import { AdminCard, AdminButton, AdminBadge } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminBadge, AdminStickySaveBar } from '../Common/index.js';
 
 export default function ProjectSelector({ initialSelectedIds = [], onSave, isSaving }) {
   const [allProjects, setAllProjects] = useState([]);
@@ -128,6 +128,18 @@ export default function ProjectSelector({ initialSelectedIds = [], onSave, isSav
           <AdminBadge variant="amber">
             Đã chọn {selectedIds.length} / {allProjects.length}
           </AdminBadge>
+        }
+        actions={
+          <AdminButton
+            type="button"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+            onClick={handleSubmit}
+          >
+            {isSaving ? 'Đang lưu...' : 'Lưu danh sách hiển thị'}
+          </AdminButton>
         }
       >
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
@@ -275,30 +287,15 @@ export default function ProjectSelector({ initialSelectedIds = [], onSave, isSav
       )}
 
       {/* Sticky Save Notification Bar */}
-      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-xl border border-(--admin-border) bg-(--admin-surface)/95 p-4 shadow-lg backdrop-blur-md">
-        <div>
-          {saveSuccess ? (
-            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-              <CheckCircle2 size={16} /> Đã cập nhật danh sách hiển thị thành công!
-            </span>
-          ) : (
-            <span className="text-xs text-(--admin-ink)/60">
-              Nhấn <strong>"Lưu danh sách hiển thị"</strong> để áp dụng thay đổi ra ngoài trang công khai.
-            </span>
-          )}
-        </div>
-
-        <AdminButton
-          type="button"
-          variant="primary"
-          size="md"
-          icon={Save}
-          loading={isSaving}
-          onClick={handleSubmit}
-        >
-          {isSaving ? 'Đang lưu...' : 'Lưu danh sách hiển thị'}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="button"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã cập nhật danh sách hiển thị thành công!"
+        hintMessage='Nhấn "Lưu danh sách hiển thị" để áp dụng thay đổi ra ngoài trang công khai.'
+        buttonText="Lưu danh sách hiển thị"
+        onSave={handleSubmit}
+      />
     </div>
   );
 }

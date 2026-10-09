@@ -12,7 +12,7 @@ import {
   Award,
 } from 'lucide-react';
 import { TrainingAPI } from '../../../api/trainingApi.js';
-import { AdminCard, AdminButton, AdminBadge } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminBadge, AdminStickySaveBar } from '../Common/index.js';
 
 export default function TrainingSelector({ initialSelectedIds = [], onSave, isSaving }) {
   const [allTrainings, setAllTrainings] = useState([]);
@@ -114,6 +114,16 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
               onClick={fetchTrainings}
             >
               Làm mới
+            </AdminButton>
+            <AdminButton
+              type="button"
+              variant="primary"
+              size="sm"
+              icon={saveSuccess ? Check : Save}
+              loading={isSaving}
+              onClick={handleSave}
+            >
+              {isSaving ? 'Đang lưu...' : 'Lưu danh sách hiển thị'}
             </AdminButton>
           </div>
         }
@@ -250,32 +260,15 @@ export default function TrainingSelector({ initialSelectedIds = [], onSave, isSa
       )}
 
       {/* Thanh lưu trạng thái cố định phía dưới */}
-      <div className="sticky bottom-4 p-4 rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-lg flex items-center justify-between gap-4">
-        <div className="text-xs text-(--admin-heading)">
-          Đã chọn{' '}
-          <span className="font-bold text-(--admin-title)">
-            {selectedIds.length}
-          </span>{' '}
-          khóa đào tạo để hiển thị trên trang chủ &amp; trang Hợp tác &amp; Đào tạo.
-        </div>
-
-        <div className="flex items-center gap-3">
-          {saveSuccess && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-              <Check size={16} /> Đã lưu thành công!
-            </span>
-          )}
-          <AdminButton
-            type="button"
-            variant="primary"
-            onClick={handleSave}
-            loading={isSaving}
-            icon={Save}
-          >
-            Lưu danh sách hiển thị
-          </AdminButton>
-        </div>
-      </div>
+      <AdminStickySaveBar
+        type="button"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công!"
+        hintMessage={`Đã chọn ${selectedIds.length} khóa đào tạo để hiển thị trên trang chủ & trang Hợp tác & Đào tạo.`}
+        buttonText="Lưu danh sách hiển thị"
+        onSave={handleSave}
+      />
     </div>
   );
 }

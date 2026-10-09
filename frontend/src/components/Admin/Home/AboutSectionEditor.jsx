@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Plus, Trash2, Save, Sparkles, Check, Image as ImageIcon, Upload } from 'lucide-react';
+import { AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -140,9 +141,20 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
                 Quản lý sứ mệnh, hình ảnh nổi bật, giá trị cốt lõi và nút hành động
               </p>
             </div>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-(--admin-accent)/20 text-(--admin-heading) font-semibold">
-              Khối Giới thiệu
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-(--admin-accent)/20 text-(--admin-heading) font-semibold">
+                Khối Giới thiệu
+              </span>
+              <AdminButton
+                type="submit"
+                variant="primary"
+                size="sm"
+                icon={saveSuccess ? Check : Save}
+                loading={isSaving}
+              >
+                {isSaving ? 'Đang lưu...' : 'Lưu About Section'}
+              </AdminButton>
+            </div>
           </div>
 
           <div className="mt-5 space-y-4">
@@ -392,27 +404,15 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
         </div>
 
         {/* Submit Bar */}
-        <div className="flex items-center justify-between pt-2">
-          {saveSuccess ? (
-            <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
-              <Check size={14} /> Đã lưu About Section thành công!
-            </span>
-          ) : (
-            <span className="text-xs text-gray-500 flex items-center gap-1.5">
-              <Sparkles size={14} className="text-(--admin-heading)" />
-              Sẵn sàng lưu cập nhật
-            </span>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--admin-hover) text-(--admin-hover-text) text-sm font-semibold hover:opacity-90 shadow-md transition disabled:opacity-50 cursor-pointer"
-          >
-            <Save size={16} />
-            <span>{isSaving ? 'Đang lưu...' : 'Lưu About Section'}</span>
-          </button>
-        </div>
+        <AdminStickySaveBar
+          type="submit"
+          isSaving={isSaving}
+          saveSuccess={saveSuccess}
+          successMessage="Đã lưu About Section thành công!"
+          hintMessage="Nhấn lưu để đồng bộ thông tin giới thiệu, sứ mệnh và nút hành động ra trang chủ."
+          buttonText="Lưu About Section"
+          savingText="Đang lưu..."
+        />
       </form>
 
       {/* Live Preview Column (5 cols) */}
