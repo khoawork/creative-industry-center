@@ -234,7 +234,7 @@ def logout():
         elif "Authorization" in request.headers:
             auth_header = request.headers.get("Authorization", "")
             if auth_header.startswith("Bearer "):
-                token = unseal_cookie_token(auth_header.split(" ", 1)[1].strip())
+                token = auth_header.split(" ", 1)[1].strip()
 
         if token:
             payload, _ = verify_token(token)
