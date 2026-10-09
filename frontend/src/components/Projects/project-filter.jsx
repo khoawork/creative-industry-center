@@ -35,7 +35,7 @@ export default function ProjectFilter({
             <button
               key={index}
               onClick={() => setActiveCategory(cat.name)}
-              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs md:text-[13px] font-semibold transition cursor-pointer whitespace-nowrap ${
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-lg md:text-[12px] font-semibold transition cursor-pointer whitespace-nowrap ${
                 isActive
                   ? "bg-[#710008] text-white shadow-sm"
                   : "text-[#710008] hover:bg-[#710008]/10"

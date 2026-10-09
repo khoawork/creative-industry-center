@@ -11,7 +11,6 @@ const ICON_MAP = {
 
 export const AwardCard = ({ award, onSelectAward }) => {
   const IconComponent = ICON_MAP[award.iconName] || Trophy;
-
   return (
     <article className="group grid overflow-hidden rounded-2xl border border-[#710008]/15 bg-white shadow-sm transition-all duration-300 hover:border-[#710008] hover:shadow-xl md:grid-cols-12">
       {/* Left Column: Image with Badge Overlay */}
@@ -38,10 +37,10 @@ export const AwardCard = ({ award, onSelectAward }) => {
           {/* Top Meta Line: Code & Scope */}
           <div className="mb-3 flex items-center justify-between gap-2">
             <span className="rounded bg-[#710008]/10 px-2.5 py-1 font-mono text-xs font-bold text-[#710008]">
-              {award.code}
+              MÃ HIỆU: {award.code}
             </span>
             <span className="truncate text-xs font-medium text-[#58413f]">
-              {award.scope}
+              {award.decision_number}
             </span>
           </div>
 
@@ -59,12 +58,12 @@ export const AwardCard = ({ award, onSelectAward }) => {
           </div>
 
           {/* Subtitle in Gold/Amber Accent */}
-          <p className="mb-3 pl-[3.25rem] text-xs font-semibold uppercase tracking-wider text-[#805600]">
+          <p className="mb-3 pl-[3.25rem] text-sm font-semibold uppercase tracking-wider text-[#805600]">
             {award.subtitle}
           </p>
 
           {/* Description */}
-          <p className="border-t border-dashed border-[#710008]/15 pt-3 text-sm font-medium leading-relaxed text-[#58413f] line-clamp-4 pl-[3.25rem]">
+          <p className="border-t border-dashed border-[#710008]/15 pt-3 text-base font-medium leading-relaxed text-[#58413f] line-clamp-4 pl-[3.25rem]">
             {award.description}
           </p>
         </div>

@@ -16,7 +16,7 @@ export const HonoreesList = ({
             BẢNG VÀNG TÔN VINH GẦN NHẤT
           </span>
 
-          <h2 className="text-2xl font-extrabold tracking-tight text-[#710008] md:text-3xl">
+          <h2 className="text-xl font-extrabold tracking-tight text-[#710008] md:text-2xl">
             Gương Mặt &amp; Tập Thể Xuất Sắc Vừa Được Ghi Danh
           </h2>
         </div>

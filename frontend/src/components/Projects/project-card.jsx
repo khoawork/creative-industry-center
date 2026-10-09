@@ -63,12 +63,12 @@ export default function ProjectCard({ project }) {
             {categoryTag}
           </span>
 
-          {/* Mã dự án và Tiêu đề nằm đè lên phần dưới của ảnh */}
+          {/* Mã dự án và Tiêu đề nằm đè lên phần dưới của ảnh (Cho phép tối đa 2 dòng, quá 2 dòng tự động thêm dấu ...) */}
           <div className="absolute bottom-3 left-3 right-3 text-white">
             <p className="text-[13px] font-semibold tracking-wide text-[#e7c393] mb-0.5">
               {code}
             </p>
-            <h3 className="font-bold text-[18px] leading-snug line-clamp-2">
+            <h3 className="font-bold text-[18px] leading-snug line-clamp-1">
               {title}
             </h3>
           </div>
@@ -76,21 +76,21 @@ export default function ProjectCard({ project }) {
 
         {/* Nội dung chi tiết bên dưới */}
         <div className="p-4 px-6">
-          <h4 className="text-lg text-[#4a0000] font-bold mb-1.5 line-clamp-1">{name}</h4>
+          <h4 className="text-lg text-[#4a0000] font-bold mb-1.5 line-clamp-2">{name}</h4>
           <p className="text-sm text-[#433b35] mb-4 line-clamp-3 leading-relaxed">
             {description}
           </p>
 
-          {/* Khối thông tin chi tiết phụ có kèm icon tương ứng */}
+          {/* Khối thông tin chi tiết phụ có kèm icon tương ứng - Đã căn lề trái */}
           {details.length > 0 && (
             <div className="bg-[#f4f3f1] rounded-lg p-3 space-y-2 text-xs mb-2">
               {details.map((item, index) => (
-                <div key={index} className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 text-gray-500">
-                    {getDetailIcon(item.label)}
+                <div key={index} className="flex items-start justify-start gap-2">
+                  <div className="flex items-center gap-1.5 text-gray-500 shrink-0">
+                    {/* {getDetailIcon(item.label)} */}
                     <span>{item.label}:</span>
                   </div>
-                  <span className="font-bold text-gray-900 text-right truncate max-w-[55%]">{item.value}</span>
+                  <span className="font-bold text-gray-900 text-left">{item.value}</span>
                 </div>
               ))}
             </div>

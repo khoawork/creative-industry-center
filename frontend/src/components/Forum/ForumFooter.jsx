@@ -16,7 +16,7 @@ export default function ForumFooter({ data = {} }) {
   };
 
   return (
-    <footer className="bg-[#001233] text-slate-300 border-t border-blue-900/40 pt-16 pb-12">
+    <footer className="bg-[#002868] text-slate-300 border-t border-blue-900/40 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-blue-900/40">
           {/* Brand & Mission */}
@@ -37,7 +37,7 @@ export default function ForumFooter({ data = {} }) {
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-blue-200/80 leading-relaxed max-w-md">
+            <p className="text-xl sm:text-sm text-blue-200/80 leading-relaxed max-w-md">
               {hero.motto}
             </p>
 
@@ -51,10 +51,10 @@ export default function ForumFooter({ data = {} }) {
 
           {/* Quick Anchor Links */}
           <div className="lg:col-span-3 space-y-3">
-            <h4 className="text-xs font-extrabold tracking-widest uppercase text-white mb-2">
+            <h4 className="text-base font-extrabold tracking-widest uppercase text-white mb-2">
               Chuyên Mục Sự Kiện
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-sm">
               {navItems.map((item, index) => (
                 <li key={`${item.href}-${index}`}>
                   <a href={item.href} className="hover:text-white transition-colors">
@@ -67,10 +67,10 @@ export default function ForumFooter({ data = {} }) {
 
           {/* Contact Details & Back to Portal */}
           <div className="lg:col-span-4 space-y-3">
-            <h4 className="text-xs font-extrabold tracking-widest uppercase text-white mb-2">
+            <h4 className="text-base font-extrabold tracking-widest uppercase text-white mb-2">
               Liên Hệ Ban Thư Ký
             </h4>
-            <div className="space-y-2 text-xs text-blue-200/80">
+            <div className="space-y-2 text-base text-blue-200/80">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-amber-400 shrink-0" />
                 <span>{registration.hotline}</span>
@@ -97,7 +97,7 @@ export default function ForumFooter({ data = {} }) {
         </div>
 
         {/* Bottom Credits & Back to Top */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-blue-300/60">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-base text-blue-300/60">
           <div>
             © {new Date().getFullYear()} {organizerName}. All rights reserved.
           </div>

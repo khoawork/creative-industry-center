@@ -157,15 +157,14 @@ export default function ProjectForm({ formData }) {
         {/* Cột trái: Thông tin giới thiệu & Quyền lợi */}
         <div className="lg:col-span-7 space-y-6">
           <div className="inline-flex items-center gap-2 bg-[#ffffff18] border border-amber-300/30 text-amber-200 px-3.5 py-1.5 rounded-md text-xs font-semibold tracking-wider uppercase backdrop-blur-xs">
-            <Sparkles size={14} className="text-amber-300" />
             <span>{tag}</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight uppercase font-serif tracking-tight text-white">
+          <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold leading-tight uppercase  tracking-tight text-white">
             {title}
           </h2>
 
-          <p className="text-sm sm:text-base text-[#f7c2b6] leading-relaxed max-w-2xl font-light">
+          <p className="text-sm sm:text-base text-[#ffb4ac] leading-relaxed max-w-2xl font-light">
             {description}
           </p>
 
@@ -191,10 +190,10 @@ export default function ProjectForm({ formData }) {
 
         {/* Cột phải: Form nộp hồ sơ */}
         <div className="bg-white text-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl lg:col-span-5 w-full border border-white/20">
-          <h3 className="text-xl sm:text-2xl font-bold text-[#710008] font-serif mb-1.5">
+          <h3 className="text-xl sm:text-2xl font-bold text-[#710008] mb-1.5">
             {formTitle}
           </h3>
-          <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+          <p className="text-sm text-gray-500 mb-6 leading-relaxed">
             {formDescription}
           </p>
 
@@ -270,7 +269,7 @@ export default function ProjectForm({ formData }) {
                           onChange={(e) =>
                             handleInputChange(fieldKey, e.target.value)
                           }
-                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-xs placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
+                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-sm px-3.5 py-2.5 text-gray-800 text-xs placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
                         />
                       )}
                     </div>
