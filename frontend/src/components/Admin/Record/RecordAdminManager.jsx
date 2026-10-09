@@ -18,7 +18,7 @@ import RecordGovernanceEditor from "./RecordGovernanceEditor.jsx";
 import RecordItemsEditor from "./RecordItemsEditor.jsx";
 import RecordHonorRollEditor from "./RecordHonorRollEditor.jsx";
 import RecordProcessEditor from "./RecordProcessEditor.jsx";
-import { AdminPageHeader, AdminTabs, AdminButton, AdminToast, AdminBadge } from "../Common";
+import { AdminPageHeader, AdminTabs, AdminButton, AdminToast, AdminBadge, AdminStickySaveBar } from "../Common";
 
 const TABS = [
   {
@@ -276,6 +276,18 @@ export default function RecordAdminManager() {
           {activeTab === "process" && (
             <RecordProcessEditor data={process} onChange={setProcess} />
           )}
+
+          <AdminStickySaveBar
+            type="button"
+            isSaving={saving}
+            saveSuccess={feedback?.type === 'success'}
+            successMessage={feedback?.text || "Đã lưu thay đổi thành công!"}
+            hintMessage="Nhấn lưu để đồng bộ thông tin và chỉ số trang Kỷ lục ra ngoài website."
+            buttonText="Lưu thay đổi"
+            savingText="Đang lưu..."
+            onSave={handleSaveCurrent}
+            disabled={loading || saving}
+          />
         </div>
       )}
     </div>

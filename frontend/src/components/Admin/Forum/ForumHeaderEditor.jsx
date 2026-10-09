@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Plus, Trash2, Link as LinkIcon, Compass, Phone } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -332,6 +332,15 @@ export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
           </div>
         </div>
       </AdminCard>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu Header thành công!"
+        hintMessage="Nhấn lưu để đồng bộ thông tin thanh thông báo và menu Diễn đàn."
+        buttonText="Lưu Thay Đổi"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

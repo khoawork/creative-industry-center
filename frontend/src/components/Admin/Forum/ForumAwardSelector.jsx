@@ -10,7 +10,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { AwardAPI } from '../../../api/awardApi.js';
-import { AdminCard, AdminButton, AdminBadge } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminBadge, AdminStickySaveBar } from '../Common/index.js';
 
 export default function ForumAwardSelector({ initialData, onSave, isSaving }) {
   const [allAwards, setAllAwards] = useState([]);
@@ -336,6 +336,14 @@ export default function ForumAwardSelector({ initialData, onSave, isSaving }) {
           </div>
         )}
       </AdminCard>
+
+      <AdminStickySaveBar
+        onSave={handleSave}
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        buttonText={saveSuccess ? 'Đã lưu Giải Thưởng!' : isSaving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+        hintMessage={`Đã chọn ${selectedIds.length} giải thưởng hiển thị.`}
+      />
     </div>
   );
 }

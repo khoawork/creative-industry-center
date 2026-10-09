@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Plus, Trash2, User } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 import ForumImageUploadField from './ForumImageUploadField.jsx';
 
 export default function ForumSpeakersEditor({ initialData, onSave, isSaving }) {
@@ -70,13 +70,14 @@ export default function ForumSpeakersEditor({ initialData, onSave, isSaving }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form id="forum-speakers-form" onSubmit={handleSubmit} className="space-y-6">
       <AdminCard
         title="Tiêu Đề & Giới Thiệu Hội Đồng Diễn Giả"
         subtitle="Cấu hình tiêu đề và mô tả của khối diễn giả thượng đỉnh."
         actions={
           <AdminButton
             type="submit"
+            form="forum-speakers-form"
             variant="primary"
             icon={saveSuccess ? Check : Save}
             loading={isSaving}
@@ -246,6 +247,15 @@ export default function ForumSpeakersEditor({ initialData, onSave, isSaving }) {
           )}
         </div>
       </AdminCard>
+
+      <AdminStickySaveBar
+        form="forum-speakers-form"
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        buttonText={saveSuccess ? 'Đã lưu Diễn Giả!' : isSaving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+        hintMessage="Nhấn lưu để đồng bộ dữ liệu diễn giả ra ngoài website."
+      />
     </form>
   );
 }

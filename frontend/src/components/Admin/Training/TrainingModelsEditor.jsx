@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Layers, Check } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 const ICON_OPTIONS = [
   { value: 'hub', label: 'Liên kết mạng lưới (Hub)' },
@@ -79,15 +79,26 @@ export default function TrainingModelsEditor({ initialData, onSave, isSaving }) 
         title={`Các Mô hình Hợp tác Chiến lược (${models.length})`}
         subtitle="Hiển thị các khối mô hình giới thiệu ngay dưới Banner đầu trang"
         actions={
-          <AdminButton
-            type="button"
-            variant="primary"
-            size="sm"
-            icon={Plus}
-            onClick={handleAddModel}
-          >
-            Thêm mô hình
-          </AdminButton>
+          <div className="flex items-center gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="sm"
+              icon={Plus}
+              onClick={handleAddModel}
+            >
+              Thêm mô hình
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              variant="primary"
+              size="sm"
+              icon={saveSuccess ? Check : Save}
+              loading={isSaving}
+            >
+              {isSaving ? 'Đang lưu...' : 'Lưu danh sách Mô hình'}
+            </AdminButton>
+          </div>
         }
       >
         <div className="space-y-4">
@@ -198,21 +209,15 @@ export default function TrainingModelsEditor({ initialData, onSave, isSaving }) 
         </div>
       </AdminCard>
 
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <Check size={16} /> Đã lưu thành công!
-          </span>
-        )}
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={isSaving}
-          icon={Save}
-        >
-          Lưu danh sách Mô hình
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công!"
+        hintMessage="Nhấn lưu để đồng bộ danh sách mô hình hợp tác ra ngoài website."
+        buttonText="Lưu danh sách Mô hình"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

@@ -1,8 +1,8 @@
 {
   "event_newsletter": {
     "id": "event_newsletter",
-    "title": "Đăng Ký Nhận Bản Tin & Thông Báo Sự Kiện",
-    "subtitle": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức từ Ban Thư ký Trung tâm.",
+    "title": "Đăng Ký Nhận Thông Báo Sự Kiện Sớm",
+    "subtitle": "Nhận thư mời ưu tiên, tài liệu kỷ yếu và thông cáo báo chí chính thức trực tiếp từ Ban Thư ký Trung tâm Công nghiệp Sáng tạo.",
     "pagePath": "/events",
     "componentName": "EventNewsletter",
     "badgeText": "BẢN TIN SỰ KIỆN",
@@ -15,7 +15,8 @@
         "type": "text",
         "placeholder": "Nguyễn Văn A",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "organization",
@@ -23,7 +24,8 @@
         "type": "text",
         "placeholder": "Tên cơ quan, tổ chức hoặc doanh nghiệp",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "email",
@@ -31,7 +33,8 @@
         "type": "email",
         "placeholder": "daibieu@tochuc.vn",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "phone",
@@ -39,7 +42,8 @@
         "type": "tel",
         "placeholder": "0901234567",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": []
       },
       {
         "key": "note",
@@ -47,12 +51,23 @@
         "type": "textarea",
         "placeholder": "Nêu rõ lĩnh vực quan tâm hoặc yêu cầu đặc biệt...",
         "required": false,
-        "colSpan": 2
+        "colSpan": 2,
+        "options": []
+      },
+      {
+        "key": "h",
+        "label": "helloworld",
+        "type": "text",
+        "placeholder": "Nhập thông tin...",
+        "required": false,
+        "colSpan": 2,
+        "options": []
       }
     ],
     "lastSyncedAt": "2026-10-06T14:54:00.292Z",
     "syncedSheetName": "DangKySuKien",
-    "updatedAt": "2026-10-06T14:54:00.292Z"
+    "updatedAt": "2026-10-09T02:27:05.293Z",
+    "button_text": "Xác Nhận Đăng Ký Thông Báo"
   },
   "event_registration": {
     "id": "event_registration",

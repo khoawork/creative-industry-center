@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Plus, Trash2 } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 export default function ForumAgendaEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -81,13 +81,14 @@ export default function ForumAgendaEditor({ initialData, onSave, isSaving }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form id="forum-agenda-form" onSubmit={handleSubmit} className="space-y-6">
       <AdminCard
         title="Tiêu Đề & Chứng Nhận Tham Dự"
         subtitle="Cấu hình thông tin giới thiệu và thông điệp chứng nhận đại biểu trên khối lịch trình."
         actions={
           <AdminButton
             type="submit"
+            form="forum-agenda-form"
             variant="primary"
             icon={saveSuccess ? Check : Save}
             loading={isSaving}
@@ -290,6 +291,15 @@ export default function ForumAgendaEditor({ initialData, onSave, isSaving }) {
           )}
         </div>
       </AdminCard>
+
+      <AdminStickySaveBar
+        form="forum-agenda-form"
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        buttonText={saveSuccess ? 'Đã lưu Lịch Trình!' : isSaving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+        hintMessage="Nhấn lưu để đồng bộ dữ liệu lịch trình ra ngoài website."
+      />
     </form>
   );
 }

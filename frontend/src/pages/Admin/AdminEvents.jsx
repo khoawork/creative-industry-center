@@ -16,7 +16,7 @@ import { eventError, requireEventData } from "../../api/eventApi.js";
 import PageSectionFields from "../../components/Admin/Events/PageSectionFields.jsx";
 import EventCategories from "../../components/Admin/Events/EventCategories.jsx";
 import EventManager from "../../components/Admin/Events/EventManager.jsx";
-import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton } from "../../components/Admin/Common/index.js";
+import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton, AdminStickySaveBar } from "../../components/Admin/Common/index.js";
 
 export default function AdminEvents() {
   const [params, setParams] = useSearchParams();
@@ -283,60 +283,59 @@ export default function AdminEvents() {
                     </AdminButton>
                   </div>
                 ) : (
-                  <AdminCard
-                    title={tab.label}
-                    subtitle={tab.description || "Tùy biến nội dung chi tiết của phần này trên trang Sự kiện."}
-                    actions={
-                      <AdminButton
-                        type="submit"
-                        form={`events-form-${tab.key}`}
-                        variant="primary"
-                        size="sm"
-                        icon={Save}
-                        loading={saving}
-                        disabled={!dirtyKeys.includes(tab.key) || saving}
-                      >
-                        {saving ? "Đang lưu…" : "Lưu thay đổi"}
-                      </AdminButton>
-                    }
-                  >
-                    <form id={`events-form-${tab.key}`} onSubmit={save} className="space-y-5">
-                      {!saved?.[tab.key] && (
-                        <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm bg-(--admin-background)/50 rounded-r-lg">
-                          Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
-                          trang Sự kiện.
-                        </p>
-                      )}
-                      <fieldset
-                        disabled={saving}
-                        className="min-w-0 space-y-5 disabled:opacity-60"
-                      >
-                        <PageSectionFields
-                          section={tab.key}
-                          value={drafts[tab.key]}
-                          onChange={(value) => {
-                            setDrafts((current) => ({
-                              ...current,
-                              [tab.key]: value,
-                            }));
-                            setToast(null);
-                          }}
-                        />
-                        <div className="flex justify-end border-t border-(--admin-border) pt-4">
-                          <AdminButton
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            icon={Save}
-                            loading={saving}
-                            disabled={!dirtyKeys.includes(tab.key) || saving}
-                          >
-                            {saving ? "Đang lưu…" : "Lưu thay đổi"}
-                          </AdminButton>
-                        </div>
-                      </fieldset>
-                    </form>
-                  </AdminCard>
+                  <>
+                    <AdminCard
+                      title={tab.label}
+                      subtitle={tab.description || "Tùy biến nội dung chi tiết của phần này trên trang Sự kiện."}
+                      actions={
+                        <AdminButton
+                          type="submit"
+                          form={`events-form-${tab.key}`}
+                          variant="primary"
+                          size="sm"
+                          icon={Save}
+                          loading={saving}
+                          disabled={!dirtyKeys.includes(tab.key) || saving}
+                        >
+                          {saving ? "Đang lưu…" : "Lưu thay đổi"}
+                        </AdminButton>
+                      }
+                    >
+                      <form id={`events-form-${tab.key}`} onSubmit={save} className="space-y-5">
+                        {!saved?.[tab.key] && (
+                          <p className="border-l-2 border-(--admin-accent) px-3 py-2 text-sm bg-(--admin-background)/50 rounded-r-lg">
+                            Phần này chưa có nội dung. Nhập và lưu để hiển thị trên
+                            trang Sự kiện.
+                          </p>
+                        )}
+                        <fieldset
+                          disabled={saving}
+                          className="min-w-0 space-y-5 disabled:opacity-60"
+                        >
+                          <PageSectionFields
+                            section={tab.key}
+                            value={drafts[tab.key]}
+                            onChange={(value) => {
+                              setDrafts((current) => ({
+                                ...current,
+                                [tab.key]: value,
+                              }));
+                              setToast(null);
+                            }}
+                          />
+                        </fieldset>
+                      </form>
+                    </AdminCard>
+                    <AdminStickySaveBar
+                      form={`events-form-${tab.key}`}
+                      type="submit"
+                      isSaving={saving}
+                      disabled={!dirtyKeys.includes(tab.key) || saving}
+                      buttonText="Lưu thay đổi"
+                      savingText="Đang lưu…"
+                      hintMessage="Nhấn lưu để đồng bộ thông tin phần này ra ngoài trang Sự kiện."
+                    />
+                  </>
                 )}
                 {tab.key === "filter_section" && (
                   <AdminCard

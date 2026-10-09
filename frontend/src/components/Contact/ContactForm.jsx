@@ -139,6 +139,7 @@ export default function ContactForm({
     }
 
     setIsSubmitting(true);
+    setAttempted(false);
     try {
       const payload = {};
       formFields.forEach((field, index) => {
@@ -149,17 +150,21 @@ export default function ContactForm({
         payload.message = values.get("message");
       }
 
-      await submitFormToBackend("contact_feedback", payload, config);
+      const res = await submitFormToBackend("contact_feedback", payload, config);
+      if (res && res.success === false) {
+        throw new Error(res.message || "Gửi thất bại");
+      }
       setIsSuccess(true);
+      setAttempted(false);
       formElement.reset();
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (err) {
       console.error("Lỗi khi gửi liên hệ:", err);
+      setIsSuccess(false);
       setAttempted(true);
     } finally {
       setIsSubmitting(false);
     }
-    setAttempted(true);
   }
 
   function clearFieldError(event) {
@@ -354,7 +359,7 @@ export default function ContactForm({
           </button>
         </div>
         <div role="status" aria-live="polite" aria-atomic="true">
-          {attempted && (
+          {!isSuccess && attempted && (
             <p className="rounded-[4px] border border-[var(--contact-red)] p-3 text-sm text-[var(--contact-red)]">
               Có lỗi xảy ra hoặc chưa thể kết nối. Quý vị vui lòng thử lại hoặc
               liên hệ qua email Ban Thư ký.

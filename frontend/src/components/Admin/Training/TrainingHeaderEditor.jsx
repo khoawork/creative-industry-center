@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Sparkles, Check } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -84,6 +84,17 @@ export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) 
       <AdminCard
         title="Thông tin Header & Giới thiệu Đào tạo"
         subtitle="Cấu hình danh hiệu huy hiệu, tiêu đề chính và mô tả tóm tắt đầu trang"
+        actions={
+          <AdminButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+          >
+            {isSaving ? 'Đang lưu...' : 'Lưu thông tin Header'}
+          </AdminButton>
+        }
       >
         <div className="space-y-4">
           <div>
@@ -211,21 +222,15 @@ export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) 
       </AdminCard>
 
       {/* Nút lưu */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {saveSuccess && (
-          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
-            <Check size={16} /> Đã lưu thành công!
-          </span>
-        )}
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={isSaving}
-          icon={Save}
-        >
-          Lưu thông tin Header
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công!"
+        hintMessage="Nhấn lưu để đồng bộ thông tin giới thiệu và chỉ số thống kê ra website."
+        buttonText="Lưu thông tin Header"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

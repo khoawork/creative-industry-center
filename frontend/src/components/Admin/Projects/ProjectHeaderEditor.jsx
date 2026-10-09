@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Sparkles, Check, BarChart3 } from 'lucide-react';
-import { AdminCard, AdminInput, AdminButton, AdminBadge } from '../Common/index.js';
+import { AdminCard, AdminInput, AdminButton, AdminBadge, AdminStickySaveBar } from '../Common/index.js';
 
 export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -83,6 +83,17 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
         title="Thông tin Header & Giới thiệu Dự án"
         subtitle="Quản lý thẻ phân loại, tiêu đề lớn và nội dung giới thiệu tổng quan trang dự án."
         badge={<AdminBadge variant="burgundy">Hero Section</AdminBadge>}
+        actions={
+          <AdminButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+          >
+            {isSaving ? 'Đang lưu...' : 'Lưu phần Header'}
+          </AdminButton>
+        }
       >
         <div className="space-y-4">
           <AdminInput
@@ -203,29 +214,15 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
       </AdminCard>
 
       {/* Thanh hành động lưu */}
-      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-xl border border-(--admin-border) bg-(--admin-surface)/95 p-4 shadow-lg backdrop-blur-md">
-        <div>
-          {saveSuccess ? (
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-              <Check size={16} /> Đã lưu Header thành công!
-            </span>
-          ) : (
-            <span className="text-xs text-(--admin-ink)/60">
-              Nhấn lưu để đồng bộ thông tin giới thiệu và chỉ số thống kê ra website.
-            </span>
-          )}
-        </div>
-
-        <AdminButton
-          type="submit"
-          variant="primary"
-          size="md"
-          icon={Save}
-          loading={isSaving}
-        >
-          {isSaving ? 'Đang lưu...' : 'Lưu phần Header'}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu Header thành công!"
+        hintMessage="Nhấn lưu để đồng bộ thông tin giới thiệu và chỉ số thống kê ra website."
+        buttonText="Lưu phần Header"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

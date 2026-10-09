@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Save, Sparkles, Check, Headphones } from 'lucide-react';
+import { AdminButton, AdminStickySaveBar } from '../Common/index.js';
 
 export default function SupportBannerEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -46,9 +47,20 @@ export default function SupportBannerEditor({ initialData, onSave, isSaving }) {
                 Quản lý thông điệp hỗ trợ và nút kết nối cuối trang
               </p>
             </div>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-(--admin-accent)/20 text-(--admin-heading) font-semibold">
-              Khối Hỗ trợ
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-(--admin-accent)/20 text-(--admin-heading) font-semibold">
+                Khối Hỗ trợ
+              </span>
+              <AdminButton
+                type="submit"
+                variant="primary"
+                size="sm"
+                icon={saveSuccess ? Check : Save}
+                loading={isSaving}
+              >
+                {isSaving ? 'Đang lưu...' : 'Lưu Support Banner'}
+              </AdminButton>
+            </div>
           </div>
 
           <div className="mt-5 space-y-4">
@@ -114,27 +126,15 @@ export default function SupportBannerEditor({ initialData, onSave, isSaving }) {
         </div>
 
         {/* Submit bar */}
-        <div className="flex items-center justify-between pt-2">
-          {saveSuccess ? (
-            <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
-              <Check size={14} /> Đã lưu Support Banner thành công!
-            </span>
-          ) : (
-            <span className="text-xs text-gray-500 flex items-center gap-1.5">
-              <Sparkles size={14} className="text-(--admin-heading)" />
-              Sẵn sàng lưu cập nhật
-            </span>
-          )}
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--admin-hover) text-(--admin-hover-text) text-sm font-semibold hover:opacity-90 shadow-md transition disabled:opacity-50 cursor-pointer"
-          >
-            <Save size={16} />
-            <span>{isSaving ? 'Đang lưu...' : 'Lưu Support Banner'}</span>
-          </button>
-        </div>
+        <AdminStickySaveBar
+          type="submit"
+          isSaving={isSaving}
+          saveSuccess={saveSuccess}
+          successMessage="Đã lưu Support Banner thành công!"
+          hintMessage="Nhấn lưu để đồng bộ thông điệp hỗ trợ và nút kết nối ra trang chủ."
+          buttonText="Lưu Support Banner"
+          savingText="Đang lưu..."
+        />
       </form>
 
       {/* Live Preview (5 cols) */}

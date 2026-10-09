@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Calendar, MapPin } from 'lucide-react';
-import { AdminCard, AdminButton } from '../Common/index.js';
+import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
 import ForumImageUploadField from './ForumImageUploadField.jsx';
 
 export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
@@ -240,6 +240,15 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
           </div>
         </div>
       </AdminCard>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu Hero thành công!"
+        hintMessage="Nhấn lưu để đồng bộ thông điệp chiến lược và khẩu hiệu Diễn đàn ra website."
+        buttonText="Lưu Thay Đổi"
+        savingText="Đang lưu..."
+      />
     </form>
   );
 }

@@ -329,152 +329,126 @@ export default function ProjectTableManager() {
   }, [projects, searchQuery, categoryFilter]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Toast Alert */}
       {toast && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border text-sm font-medium transition-all duration-300 animate-slide-up ${
-            toast.type === "error"
-              ? "bg-rose-950/90 border-rose-500/50 text-rose-200"
-              : "bg-emerald-950/90 border-emerald-500/50 text-emerald-200"
-          }`}
-        >
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-4 py-3 shadow-lg">
           {toast.type === "error" ? (
-            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+            <AlertTriangle className="size-5 text-rose-500 shrink-0" />
           ) : (
-            <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+            <Check className="size-5 text-emerald-500 shrink-0" />
           )}
-          <span>{toast.message}</span>
+          <span className="text-sm font-medium text-(--admin-title)">
+            {toast.message}
+          </span>
         </div>
       )}
-
-      {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--admin-surface)] p-5 rounded-2xl border border-[var(--admin-border)] shadow-sm">
-        <div>
-          <h2 className="text-xl font-bold text-[var(--admin-text)] flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20">
-              <FolderKanban className="w-5 h-5" />
-            </span>
-            Quản lý Danh mục Dự án
-          </h2>
-          <p className="text-xs sm:text-sm text-[var(--admin-text-muted)] mt-1">
-            Tổng cộng:{" "}
-            <strong className="text-[var(--admin-text)]">
-              {projects.length}
-            </strong>{" "}
-            dự án được công bố
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => fetchData(true)}
-            disabled={refreshing || loading}
-            title="Làm mới dữ liệu"
-            className="p-2.5 rounded-xl border border-[var(--admin-border)] hover:bg-white/5 text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] transition disabled:opacity-50"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
-            />
-          </button>
-          <button
-            onClick={handleOpenAdd}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm transition shadow-lg shadow-violet-600/20 active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Thêm dự án mới</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Search & Filters bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[var(--admin-surface)] p-3 sm:p-4 rounded-2xl border border-[var(--admin-border)] shadow-sm">
-        <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] w-4 h-4" />
+      {/* Toolbar chuẩn hóa theo EventManager */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border border-(--admin-border) bg-(--admin-surface) p-3 rounded-xl shadow-[var(--admin-panel-shadow)]">
+        <div className="relative flex-1 min-w-[280px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-(--admin-ink)/60 size-4" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm kiếm dự án theo tên, tiêu đề, khẩu hiệu..."
-            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500 transition"
+            placeholder="Tìm kiếm dự án theo mã, tên, tiêu đề, khẩu hiệu…"
+            className="w-full pl-9 pr-8 py-2 text-sm rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent)"
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)] hover:text-[var(--admin-text)]"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-(--admin-ink)/60 hover:text-(--admin-title)"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="size-4" />
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-[var(--admin-text-muted)] whitespace-nowrap font-medium">
-            Danh mục:
-          </span>
+        <div className="flex items-center gap-2">
           <select
+            aria-label="Lọc danh mục"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="text-xs py-2 px-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text)] focus:outline-none focus:border-violet-500 cursor-pointer"
+            className="rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-xs sm:text-sm text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent)"
           >
-            <option value="ALL">Tất cả phân loại ({projects.length})</option>
+            <option value="ALL">Tất cả danh mục ({projects.length})</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
           </select>
+
+          <button
+            type="button"
+            onClick={() => fetchData(true)}
+            disabled={refreshing || loading}
+            className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+            Làm mới
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-bold text-(--admin-black) shadow-xs hover:opacity-90 transition"
+          >
+            <Plus size={14} />
+            Thêm Dự Án
+          </button>
         </div>
       </div>
-
-      {/* Table view */}
-      <div className="border border-[var(--admin-border)] rounded-2xl bg-[var(--admin-surface)] overflow-hidden shadow-sm">
+      {/* Table Content */}
+      <div className="overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-surface) shadow-[var(--admin-panel-shadow)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-white/5 border-b border-[var(--admin-border)] text-xs uppercase tracking-wider text-[var(--admin-text-muted)]">
+          <table className="w-full border-collapse text-left text-sm">
+            <thead className="border-b border-(--admin-border) bg-(--admin-background) text-sm font-semibold uppercase tracking-wider text-(--admin-ink)/70">
               <tr>
-                <th className="py-3.5 px-4 font-semibold w-16 text-center">
+                <th className="w-16 whitespace-nowrap px-5 py-4 text-center">
                   STT
                 </th>
-                <th className="py-3.5 px-4 font-semibold w-24">Hình ảnh</th>
-                <th className="py-3.5 px-4 font-semibold">Tên & Tiêu đề</th>
-                <th className="py-3.5 px-4 font-semibold">Danh mục</th>
-                <th className="py-3.5 px-4 font-semibold">
-                  Khẩu hiệu (Slogan)
-                </th>
-                <th className="py-3.5 px-4 font-semibold">
-                  Nghiên cứu / Chỉ số
-                </th>
-                <th className="py-3.5 px-4 font-semibold text-right pr-6 w-28">
+                <th className="w-32 px-5 py-4">Hình ảnh</th>
+                <th className="min-w-[260px] px-5 py-4">Tên & Tiêu đề</th>
+                <th className="min-w-[160px] px-5 py-4">Danh mục</th>
+                <th className="min-w-[220px] px-5 py-4">Khẩu hiệu (Slogan)</th>
+                <th className="min-w-[280px] px-5 py-4">Thông số nghiên cứu</th>
+                <th className="w-44 whitespace-nowrap px-5 py-4 pr-6 text-right">
                   Thao tác
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--admin-border)]">
+
+            <tbody className="divide-y divide-(--admin-border)">
               {loading ? (
                 <tr>
                   <td
-                    colSpan="7"
-                    className="py-12 text-center text-[var(--admin-text-muted)]"
+                    colSpan={7}
+                    className="py-16 text-center text-(--admin-ink)/60"
                   >
                     <div className="flex flex-col items-center justify-center gap-3">
-                      <RefreshCw className="w-6 h-6 animate-spin text-violet-500" />
-                      <span>Đang tải danh sách dự án...</span>
+                      <RefreshCw className="size-7 animate-spin text-(--admin-heading)" />
+                      <span className="text-base font-medium">
+                        Đang tải danh sách dự án…
+                      </span>
                     </div>
                   </td>
                 </tr>
               ) : filteredProjects.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="7"
-                    className="py-12 text-center text-[var(--admin-text-muted)]"
+                    colSpan={7}
+                    className="py-16 text-center text-(--admin-ink)/60"
                   >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <FolderKanban className="w-8 h-8 opacity-40 text-violet-400" />
-                      <p className="font-medium text-base">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <FolderKanban
+                        className="size-12 text-(--admin-ink)/30"
+                        strokeWidth={1.5}
+                      />
+                      <p className="text-base font-semibold text-(--admin-title)">
                         Không tìm thấy dự án nào
                       </p>
-                      <p className="text-xs">
+                      <p className="text-sm text-(--admin-ink)/60">
                         Thử đổi từ khóa tìm kiếm hoặc nhấn Thêm dự án mới.
                       </p>
                     </div>
@@ -484,95 +458,140 @@ export default function ProjectTableManager() {
                 filteredProjects.map((project, idx) => (
                   <tr
                     key={project.id || idx}
-                    className="hover:bg-white/[0.02] transition-colors group"
+                    className="transition-colors hover:bg-(--admin-background)/50"
                   >
-                    <td className="py-3.5 px-4 text-center font-mono text-xs text-[var(--admin-text-muted)]">
+                    {/* STT */}
+                    <td className="px-5 py-5 text-center align-top font-mono text-sm text-(--admin-ink)/60">
                       {idx + 1}
                     </td>
-                    <td className="py-3.5 px-4">
-                      <div className="w-14 h-11 rounded-lg bg-black/20 border border-[var(--admin-border)] overflow-hidden shrink-0 flex items-center justify-center">
+
+                    {/* Hình ảnh */}
+                    <td className="px-5 py-5 align-top">
+                      <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-(--admin-border) bg-(--admin-background)">
                         {project.image ? (
                           <img
                             src={project.image}
-                            alt={project.name}
-                            className="w-full h-full object-cover"
+                            alt={project.name || "Hình ảnh dự án"}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
                             }}
                           />
                         ) : (
-                          <ImageIcon className="w-5 h-5 text-[var(--admin-text-muted)] opacity-40" />
+                          <ImageIcon className="size-8 text-(--admin-ink)/40" />
                         )}
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <div className="flex items-center gap-1.5 line-clamp-1">
+
+                    {/* Tên và tiêu đề */}
+                    <td className="max-w-[340px] px-5 py-5 align-top">
+                      <div className="flex flex-wrap items-center gap-2">
                         {project.code && (
-                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30 shrink-0">
+                          <span className="shrink-0 rounded-md border border-(--admin-accent)/20 bg-(--admin-accent)/10 px-2 py-1 font-mono text-xs font-bold text-(--admin-accent)">
                             {project.code}
                           </span>
                         )}
-                        <span className="font-semibold text-[var(--admin-text)] truncate">
+
+                        <span
+                          className="line-clamp-2 text-base font-semibold text-(--admin-title)"
+                          title={project.name}
+                        >
                           {project.name}
                         </span>
                       </div>
-                      <div className="text-xs text-[var(--admin-text-muted)] line-clamp-1 mt-0.5">
-                        {project.title}
-                      </div>
+
+                      {project.title && (
+                        <p
+                          className="mt-2 line-clamp-3 text-sm leading-6 text-(--admin-ink)/70"
+                          title={project.title}
+                        >
+                          {project.title}
+                        </p>
+                      )}
                     </td>
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-500/10 text-violet-300 border border-violet-500/20">
-                        <Tag className="w-3 h-3" />
+
+                    {/* Danh mục */}
+                    <td className="px-5 py-5 align-top">
+                      <span className="inline-flex items-center gap-2 rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm font-medium text-(--admin-ink)/80">
+                        <Tag
+                          size={16}
+                          className="shrink-0 text-(--admin-accent)"
+                        />
                         {project.category?.name || "Chung"}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <p className="text-xs text-[var(--admin-text)] italic line-clamp-2">
-                        "{project.slogan}"
-                      </p>
+
+                    {/* Slogan */}
+                    <td className="max-w-[300px] px-5 py-5 align-top">
+                      {project.slogan ? (
+                        <p
+                          className="line-clamp-4 text-sm italic leading-6 text-(--admin-ink)/80"
+                          title={project.slogan}
+                        >
+                          “{project.slogan}”
+                        </p>
+                      ) : (
+                        <span className="text-sm italic text-(--admin-ink)/45">
+                          Chưa có khẩu hiệu
+                        </span>
+                      )}
                     </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <div className="flex flex-wrap gap-1">
-                        {Array.isArray(project.research_info) &&
-                        project.research_info.length > 0 ? (
-                          project.research_info
-                            .slice(0, 2)
+
+                    {/* Thông số nghiên cứu */}
+                    <td className="max-w-[360px] px-5 py-5 align-top">
+                      {Array.isArray(project.research_info) &&
+                      project.research_info.length > 0 ? (
+                        <div className="flex flex-col items-start gap-2">
+                          {project.research_info
+                            .slice(0, 3)
                             .map((item, rIdx) => (
-                              <span
+                              <div
                                 key={rIdx}
-                                className="text-[11px] px-2 py-0.5 rounded bg-white/5 border border-[var(--admin-border)] text-[var(--admin-text-muted)]"
+                                className="max-w-full rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm leading-5 text-(--admin-ink)/80"
+                                title={`${item.label}: ${item.value}`}
                               >
-                                <strong>{item.label}:</strong> {item.value}
-                              </span>
-                            ))
-                        ) : (
-                          <span className="text-xs text-[var(--admin-text-muted)] italic">
-                            Chưa có thông số
-                          </span>
-                        )}
-                        {Array.isArray(project.research_info) &&
-                          project.research_info.length > 2 && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[var(--admin-text-muted)]">
-                              +{project.research_info.length - 2}
+                                <span className="font-semibold text-(--admin-title)">
+                                  {item.label}:
+                                </span>{" "}
+                                {item.value}
+                              </div>
+                            ))}
+
+                          {project.research_info.length > 3 && (
+                            <span className="rounded-md border border-(--admin-border) bg-(--admin-surface) px-2.5 py-1 text-xs font-semibold text-(--admin-accent)">
+                              +{project.research_info.length - 3} thông số khác
                             </span>
                           )}
-                      </div>
+                        </div>
+                      ) : (
+                        <span className="text-sm italic text-(--admin-ink)/45">
+                          Chưa có thông số
+                        </span>
+                      )}
                     </td>
-                    <td className="py-3.5 px-4 text-right pr-6">
-                      <div className="flex items-center justify-end gap-1.5">
+
+                    {/* Thao tác */}
+                    <td className="px-5 py-5 pr-6 text-right align-top">
+                      <div className="inline-flex flex-col items-stretch gap-2">
                         <button
+                          type="button"
                           onClick={() => handleOpenEdit(project)}
                           title="Chỉnh sửa dự án"
-                          className="p-1.5 rounded-lg border border-[var(--admin-border)] hover:bg-violet-500/10 hover:border-violet-500/30 text-[var(--admin-text-muted)] hover:text-violet-300 transition"
+                          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-(--admin-border) bg-(--admin-surface) px-3 py-2.5 text-sm font-semibold text-(--admin-title) transition-colors hover:bg-(--admin-background) hover:text-(--admin-accent)"
                         >
-                          <Pencil className="w-3.5 h-3.5" />
+                          <Pencil size={16} />
+                          Sửa
                         </button>
+
                         <button
+                          type="button"
                           onClick={() => setDeletingItem(project)}
                           title="Xóa dự án"
-                          className="p-1.5 rounded-lg border border-[var(--admin-border)] hover:bg-rose-500/10 hover:border-rose-500/30 text-[var(--admin-text-muted)] hover:text-rose-400 transition"
+                          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-rose-500/20 bg-rose-500/5 px-3 py-2.5 text-sm font-semibold text-rose-500 transition-colors hover:bg-rose-500/10"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 size={16} />
+                          Xóa
                         </button>
                       </div>
                     </td>
@@ -583,311 +602,330 @@ export default function ProjectTableManager() {
           </table>
         </div>
       </div>
-
-      {/* Modal Thêm / Chỉnh Sửa */}
+      {/* Modal Thêm / Chỉnh Sửa Dự Án */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--admin-border)] bg-white/[0.02]">
-              <div className="flex items-center gap-2.5">
-                <span className="p-2 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                  <FolderKanban className="w-5 h-5" />
-                </span>
-                <h3 className="font-bold text-lg text-[var(--admin-text)]">
-                  {editingItem ? "Cập nhật Dự án" : "Thêm Dự án mới"}
-                </h3>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-(--admin-black)/60 backdrop-blur-xs animate-fade-in">
+          <div className="w-full max-w-2xl border border-(--admin-border) bg-(--admin-surface) rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex shrink-0 items-center justify-between border-b border-(--admin-border) px-6 py-4">
+              <h3 className="text-base font-bold text-(--admin-title)">
+                {editingItem ? "Chỉnh sửa Dự án" : "Thêm mới Dự án"}
+              </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] hover:bg-white/5 transition"
+                className="cursor-pointer text-(--admin-ink)/60 hover:text-(--admin-title) transition"
               >
-                <X className="w-5 h-5" />
+                <X size={20} />
               </button>
             </div>
 
+            {/* Modal Form Body */}
             <form
               onSubmit={handleSubmit}
-              className="p-6 overflow-y-auto space-y-4"
+              className="flex flex-col min-h-0 flex-1"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                <div className="sm:col-span-4">
-                  <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                    Mã dự án (Code)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="VD: PRJ-01, DA-02..."
-                    value={formData.code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, code: e.target.value })
-                    }
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-[var(--admin-border)] bg-black/20 text-[var(--admin-text)] font-mono focus:outline-none focus:border-violet-500 transition"
-                  />
+              <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider mb-1.5">
+                      Mã dự án (Code)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="VD: PRJ-01, DA-02..."
+                      value={formData.code}
+                      onChange={(e) =>
+                        setFormData({ ...formData, code: e.target.value })
+                      }
+                      className="w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) font-mono placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent) transition"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider mb-1.5">
+                      Tên dự án (Tên ngắn){" "}
+                      <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="VD: Không gian Văn hóa Sáng tạo..."
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className={`w-full rounded-lg border bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent) transition ${
+                        errors.name
+                          ? "border-rose-500 focus:outline-rose-500"
+                          : "border-(--admin-border)"
+                      }`}
+                    />
+                    {errors.name && (
+                      <p className="text-xs text-rose-500 mt-1">
+                        {errors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider">
+                        Danh mục <span className="text-rose-500">*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingCategory((value) => !value)}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-(--admin-title) hover:underline cursor-pointer"
+                      >
+                        <Plus size={12} /> Thêm mới
+                      </button>
+                    </div>
+                    <select
+                      value={formData.category_id}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          category_id: e.target.value,
+                        })
+                      }
+                      className={`w-full rounded-lg border bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent) transition cursor-pointer ${
+                        errors.category_id
+                          ? "border-rose-500 focus:outline-rose-500"
+                          : "border-(--admin-border)"
+                      }`}
+                    >
+                      <option value="">Chọn danh mục</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category_id && (
+                      <p className="text-xs text-rose-500 mt-1">
+                        {errors.category_id}
+                      </p>
+                    )}
+                    {isAddingCategory && (
+                      <div className="mt-2 flex gap-2">
+                        <input
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          className="min-w-0 flex-1 px-3 py-1.5 text-xs rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent)"
+                          placeholder="Tên danh mục mới…"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCreateCategory}
+                          disabled={
+                            isCreatingCategory || !newCategoryName.trim()
+                          }
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-(--admin-accent) text-(--admin-black) disabled:opacity-50 cursor-pointer shadow-xs"
+                        >
+                          {isCreatingCategory ? (
+                            <RefreshCw size={12} className="animate-spin" />
+                          ) : (
+                            <Check size={12} />
+                          )}
+                          Lưu
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="sm:col-span-4">
-                  <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                    Tên dự án (Tên ngắn){" "}
-                    <span className="text-rose-500">*</span>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider mb-1.5">
+                    Tiêu đề đầy đủ <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="VD: Không gian Văn hóa Sáng tạo..."
-                    value={formData.name}
+                    placeholder="VD: Phát triển Trung tâm Công nghiệp Sáng tạo & Tôn vinh Kỷ lục"
+                    value={formData.title}
                     onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
+                      setFormData({ ...formData, title: e.target.value })
                     }
-                    className={`w-full px-3.5 py-2 text-sm rounded-xl border bg-black/20 text-[var(--admin-text)] focus:outline-none transition ${
-                      errors.name
-                        ? "border-rose-500"
-                        : "border-[var(--admin-border)] focus:border-violet-500"
+                    className={`w-full rounded-lg border bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent) transition ${
+                      errors.title
+                        ? "border-rose-500 focus:outline-rose-500"
+                        : "border-(--admin-border)"
                     }`}
                   />
-                  {errors.name && (
-                    <p className="text-xs text-rose-400 mt-1">{errors.name}</p>
+                  {errors.title && (
+                    <p className="text-xs text-rose-500 mt-1">{errors.title}</p>
                   )}
                 </div>
 
-                <div className="sm:col-span-4">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider">
-                      Danh mục dự án <span className="text-rose-500">*</span>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider mb-1.5">
+                    Khẩu hiệu / Slogan <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="VD: Nơi hội tụ các giá trị tinh hoa và tài năng kỷ lục"
+                    value={formData.slogan}
+                    onChange={(e) =>
+                      setFormData({ ...formData, slogan: e.target.value })
+                    }
+                    className={`w-full rounded-lg border bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent) transition ${
+                      errors.slogan
+                        ? "border-rose-500 focus:outline-rose-500"
+                        : "border-(--admin-border)"
+                    }`}
+                  />
+                  {errors.slogan && (
+                    <p className="text-xs text-rose-500 mt-1">
+                      {errors.slogan}
+                    </p>
+                  )}
+                </div>
+
+                <ImageUploadField
+                  label="Hình ảnh Dự án"
+                  value={formData.image}
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  selectedFile={selectedImageFile}
+                  onFileChange={setSelectedImageFile}
+                  required
+                  error={errors.image}
+                  placeholder="VD: https://... hoặc chọn ảnh từ máy tính"
+                />
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider mb-1.5">
+                    Mô tả chi tiết dự án{" "}
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    rows="3"
+                    placeholder="Giới thiệu mục tiêu, đối tác đồng hành và giá trị cốt lõi của dự án..."
+                    value={formData.description}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
+                    className={`w-full rounded-lg border bg-(--admin-background) px-3.5 py-2 text-sm text-(--admin-ink) placeholder:text-(--admin-ink)/40 focus:outline-2 focus:outline-(--admin-accent) transition ${
+                      errors.description
+                        ? "border-rose-500 focus:outline-rose-500"
+                        : "border-(--admin-border)"
+                    }`}
+                  />
+                  {errors.description && (
+                    <p className="text-xs text-rose-500 mt-1">
+                      {errors.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Research Info items */}
+                <div className="pt-2 border-t border-(--admin-border)">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-semibold uppercase text-(--admin-heading) tracking-wider">
+                      Thông số & Dữ liệu nghiên cứu (Research Info)
                     </label>
                     <button
                       type="button"
-                      onClick={() => setIsAddingCategory((value) => !value)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-violet-400 hover:text-violet-300"
+                      onClick={handleAddResearchRow}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-(--admin-title) hover:underline cursor-pointer"
                     >
-                      <Plus className="w-3.5 h-3.5" /> Thêm danh mục
+                      <Plus size={12} /> Thêm chỉ số
                     </button>
                   </div>
-                  <select
-                    value={formData.category_id}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category_id: e.target.value })
-                    }
-                    className={`w-full px-3.5 py-2 text-sm rounded-xl border bg-black/20 text-[var(--admin-text)] focus:outline-none transition ${
-                      errors.category_id
-                        ? "border-rose-500"
-                        : "border-[var(--admin-border)] focus:border-violet-500"
-                    }`}
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
+
+                  <div className="space-y-2">
+                    {formData.research_info.map((r, rIdx) => (
+                      <div key={rIdx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Tiêu chí (VD: Quy mô)"
+                          value={r.label}
+                          onChange={(e) =>
+                            handleResearchChange(rIdx, "label", e.target.value)
+                          }
+                          className="w-1/3 px-3 py-1.5 text-xs rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent)"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Giá trị (VD: 500+ doanh nghiệp)"
+                          value={r.value}
+                          onChange={(e) =>
+                            handleResearchChange(rIdx, "value", e.target.value)
+                          }
+                          className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-ink) focus:outline-2 focus:outline-(--admin-accent)"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveResearchRow(rIdx)}
+                          className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 cursor-pointer"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     ))}
-                  </select>
-                  {errors.category_id && (
-                    <p className="text-xs text-rose-400 mt-1">
-                      {errors.category_id}
-                    </p>
-                  )}
-                  {isAddingCategory && (
-                    <div className="mt-2 flex gap-2">
-                      <input
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        className="min-w-0 flex-1 px-3 py-2 text-sm rounded-xl border border-[var(--admin-border)] bg-black/20 text-[var(--admin-text)]"
-                        placeholder="Tên danh mục mới"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleCreateCategory}
-                        disabled={isCreatingCategory || !newCategoryName.trim()}
-                        className="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-xl bg-violet-600 text-white disabled:opacity-50"
-                      >
-                        {isCreatingCategory ? (
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Check className="w-3.5 h-3.5" />
-                        )}
-                        Lưu
-                      </button>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                  Tiêu đề đầy đủ <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="VD: Phát triển Trung tâm Công nghiệp Sáng tạo & Tôn vinh Kỷ lục"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className={`w-full px-3.5 py-2 text-sm rounded-xl border bg-black/20 text-[var(--admin-text)] focus:outline-none transition ${
-                    errors.title
-                      ? "border-rose-500"
-                      : "border-[var(--admin-border)] focus:border-violet-500"
-                  }`}
-                />
-                {errors.title && (
-                  <p className="text-xs text-rose-400 mt-1">{errors.title}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                  Khẩu hiệu / Slogan <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="VD: Nơi hội tụ các giá trị tinh hoa và tài năng kỷ lục"
-                  value={formData.slogan}
-                  onChange={(e) =>
-                    setFormData({ ...formData, slogan: e.target.value })
-                  }
-                  className={`w-full px-3.5 py-2 text-sm rounded-xl border bg-black/20 text-[var(--admin-text)] focus:outline-none transition ${
-                    errors.slogan
-                      ? "border-rose-500"
-                      : "border-[var(--admin-border)] focus:border-violet-500"
-                  }`}
-                />
-                {errors.slogan && (
-                  <p className="text-xs text-rose-400 mt-1">{errors.slogan}</p>
-                )}
-              </div>
-
-              <ImageUploadField
-                label="Hình ảnh Dự án"
-                value={formData.image}
-                onChange={(url) => setFormData({ ...formData, image: url })}
-                selectedFile={selectedImageFile}
-                onFileChange={setSelectedImageFile}
-                required
-                error={errors.image}
-                placeholder="VD: https://... hoặc chọn ảnh từ máy tính"
-              />
-
-              <div>
-                <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider mb-1.5">
-                  Mô tả chi tiết dự án <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  rows="3"
-                  placeholder="Giới thiệu mục tiêu, đối tác đồng hành và giá trị cốt lõi của dự án..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  className={`w-full px-3.5 py-2 text-sm rounded-xl border bg-black/20 text-[var(--admin-text)] focus:outline-none transition ${
-                    errors.description
-                      ? "border-rose-500"
-                      : "border-[var(--admin-border)] focus:border-violet-500"
-                  }`}
-                />
-                {errors.description && (
-                  <p className="text-xs text-rose-400 mt-1">
-                    {errors.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Research Info items */}
-              <div className="pt-2 border-t border-[var(--admin-border)]">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-semibold text-[var(--admin-text)] uppercase tracking-wider">
-                    Thông số & Dữ liệu nghiên cứu (Research Info)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAddResearchRow}
-                    className="text-xs flex items-center gap-1 text-violet-400 hover:text-violet-300 font-medium"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Thêm chỉ số
-                  </button>
-                </div>
-
-                <div className="space-y-2">
-                  {formData.research_info.map((r, rIdx) => (
-                    <div key={rIdx} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="Tiêu chí (VD: Quy mô)"
-                        value={r.label}
-                        onChange={(e) =>
-                          handleResearchChange(rIdx, "label", e.target.value)
-                        }
-                        className="w-1/3 px-3 py-1.5 text-xs rounded-lg border border-[var(--admin-border)] bg-black/20 text-[var(--admin-text)] focus:outline-none focus:border-violet-500"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Giá trị (VD: 500+ doanh nghiệp)"
-                        value={r.value}
-                        onChange={(e) =>
-                          handleResearchChange(rIdx, "value", e.target.value)
-                        }
-                        className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-[var(--admin-border)] bg-black/20 text-[var(--admin-text)] focus:outline-none focus:border-violet-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveResearchRow(rIdx)}
-                        className="p-1.5 rounded-lg text-[var(--admin-text-muted)] hover:text-rose-400 hover:bg-rose-500/10"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--admin-border)]">
+              {/* Modal Footer */}
+              <div className="flex shrink-0 items-center justify-end gap-2 border-t border-(--admin-border) bg-(--admin-surface) p-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] hover:bg-white/5 transition"
+                  className="cursor-pointer rounded-lg border border-(--admin-border) bg-(--admin-surface) px-4 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex items-center gap-2 px-5 py-2 text-sm rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium transition shadow-lg shadow-violet-600/20 disabled:opacity-50"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-bold text-(--admin-black) shadow-xs hover:opacity-90 disabled:opacity-50 transition"
                 >
-                  {isSaving && <RefreshCw className="w-4 h-4 animate-spin" />}
-                  <span>{editingItem ? "Lưu cập nhật" : "Thêm mới"}</span>
+                  {isSaving ? (
+                    <RefreshCw size={13} className="animate-spin" />
+                  ) : (
+                    <Check size={14} />
+                  )}
+                  <span>
+                    {isSaving
+                      ? "Đang lưu…"
+                      : editingItem
+                        ? "Lưu thay đổi"
+                        : "Tạo dự án"}
+                  </span>
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
       {/* Modal Xác Nhận Xóa */}
       {deletingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[var(--admin-surface)] border border-[var(--admin-border)] w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                <AlertTriangle className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-(--admin-black)/60 backdrop-blur-xs animate-fade-in">
+          <div className="w-full max-w-md border border-(--admin-border) bg-(--admin-surface) rounded-2xl shadow-2xl p-6 space-y-4">
+            <div className="flex items-center gap-3 text-rose-500">
+              <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                <AlertTriangle size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-[var(--admin-text)]">
+                <h3 className="font-bold text-base text-(--admin-title)">
                   Xác nhận xóa dự án
                 </h3>
-                <p className="text-xs text-[var(--admin-text-muted)]">
+                <p className="text-xs text-(--admin-ink)/60">
                   Hành động này không thể hoàn tác.
                 </p>
               </div>
             </div>
 
-            <p className="text-sm text-[var(--admin-text)] leading-relaxed">
+            <p className="text-sm text-(--admin-ink) leading-relaxed">
               Bạn có chắc chắn muốn xóa dự án{" "}
-              <strong className="text-rose-400">"{deletingItem.name}"</strong>?
+              <strong className="text-rose-500">"{deletingItem.name}"</strong>?
               Toàn bộ dữ liệu liên quan sẽ bị xóa khỏi hệ thống.
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-3">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setDeletingItem(null)}
-                className="px-4 py-2 text-sm rounded-xl border border-[var(--admin-border)] text-[var(--admin-text-muted)] hover:text-[var(--admin-text)] hover:bg-white/5 transition"
+                className="cursor-pointer rounded-lg border border-(--admin-border) bg-(--admin-surface) px-4 py-2 text-xs font-semibold text-(--admin-heading) hover:bg-(--admin-background) transition"
               >
                 Hủy
               </button>
@@ -895,10 +933,14 @@ export default function ProjectTableManager() {
                 type="button"
                 disabled={isDeleting}
                 onClick={handleDeleteConfirm}
-                className="flex items-center gap-2 px-5 py-2 text-sm rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-medium transition shadow-lg shadow-rose-600/20 disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-rose-700 disabled:opacity-50 transition"
               >
-                {isDeleting && <RefreshCw className="w-4 h-4 animate-spin" />}
-                <span>Xóa vĩnh viễn</span>
+                {isDeleting ? (
+                  <RefreshCw size={13} className="animate-spin" />
+                ) : (
+                  <Trash2 size={13} />
+                )}
+                <span>{isDeleting ? "Đang xóa…" : "Xóa vĩnh viễn"}</span>
               </button>
             </div>
           </div>

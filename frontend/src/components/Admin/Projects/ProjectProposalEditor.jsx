@@ -22,6 +22,7 @@ import {
   AdminInput,
   AdminButton,
   AdminBadge,
+  AdminStickySaveBar,
 } from "../Common/index.js";
 
 // Bộ icon biểu tượng cam kết hỗ trợ
@@ -325,6 +326,17 @@ export default function ProjectProposalEditor({
         title="Thông tin Kêu gọi Đề xuất (Cột Trái CTA)"
         subtitle="Quản lý thẻ phân loại, tiêu đề in hoa, nội dung sứ mệnh và 3 cam kết hỗ trợ đồng hành."
         badge={<AdminBadge variant="burgundy">CTA Section</AdminBadge>}
+        actions={
+          <AdminButton
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={saveSuccess ? Check : Save}
+            loading={isSaving}
+          >
+            {isSaving ? "Đang lưu..." : "Lưu cấu hình Đề xuất & Form"}
+          </AdminButton>
+        }
       >
         <div className="space-y-4">
           <AdminInput
@@ -779,29 +791,15 @@ export default function ProjectProposalEditor({
       </AdminCard>
 
       {/* Thanh hành động lưu */}
-      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-xl border border-(--admin-border) bg-(--admin-surface)/95 p-4 shadow-lg backdrop-blur-md">
-        <div>
-          {saveSuccess ? (
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-              <Check size={16} /> Đã lưu thành công lên máy chủ!
-            </span>
-          ) : (
-            <span className="text-xs text-(--admin-ink)/60">
-              Nhấn lưu để đồng bộ dữ liệu form đề xuất ra website người dùng.
-            </span>
-          )}
-        </div>
-
-        <AdminButton
-          type="submit"
-          variant="primary"
-          size="md"
-          icon={Save}
-          loading={isSaving}
-        >
-          {isSaving ? "Đang lưu cấu hình..." : "Lưu cấu hình Đề xuất & Form"}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        type="submit"
+        isSaving={isSaving}
+        saveSuccess={saveSuccess}
+        successMessage="Đã lưu thành công lên máy chủ!"
+        hintMessage="Nhấn lưu để đồng bộ dữ liệu form đề xuất ra website người dùng."
+        buttonText="Lưu cấu hình Đề xuất & Form"
+        savingText="Đang lưu cấu hình..."
+      />
     </form>
   );
 }

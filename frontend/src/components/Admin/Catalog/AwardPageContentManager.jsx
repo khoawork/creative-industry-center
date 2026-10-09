@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { AwardAPI } from "../../../api/awardApi.js";
 import { UploadAPI } from "../../../api/uploadApi.js";
-import { AdminCard, AdminButton } from "../Common/index.js";
+import { AdminCard, AdminButton, AdminStickySaveBar } from "../Common/index.js";
 
 const emptyHeader = { tittle: "", sub_title: "", description: "" };
 const emptyHonor = {
@@ -210,60 +210,72 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
 
       {/* Tab 1: Header & Tiêu đề */}
       {activeSection === "header" && (
-        <AdminCard
-          title="Cấu hình Header & Tiêu đề"
-          subtitle="Tiêu đề chính, tiêu đề phụ và nội dung mô tả phần đầu trang Giải thưởng"
-        >
-          <form id="award-header" onSubmit={saveHeader} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label>
-                <span className={labelClass}>Tiêu đề header</span>
-                <input
-                  value={header.tittle}
-                  onChange={(event) =>
-                    setHeader({ ...header, tittle: event.target.value })
-                  }
-                  className={inputClass}
-                />
-              </label>
-              <label>
-                <span className={labelClass}>Tiêu đề phụ</span>
-                <input
-                  value={header.sub_title}
-                  onChange={(event) =>
-                    setHeader({ ...header, sub_title: event.target.value })
-                  }
-                  className={inputClass}
-                />
-              </label>
-              <label className="md:col-span-2">
-                <span className={labelClass}>Mô tả header</span>
-                <textarea
-                  value={header.description}
-                  onChange={(event) =>
-                    setHeader({ ...header, description: event.target.value })
-                  }
-                  rows={3}
-                  className={inputClass}
-                />
-              </label>
-            </div>
-            <div className="flex justify-end pt-2">
+        <>
+          <AdminCard
+            title="Cấu hình Header & Tiêu đề"
+            subtitle="Tiêu đề chính, tiêu đề phụ và nội dung mô tả phần đầu trang Giải thưởng"
+            actions={
               <AdminButton
                 type="submit"
+                form="award-header"
                 variant="primary"
+                size="sm"
                 loading={saving}
                 icon={Check}
               >
                 Lưu header
               </AdminButton>
-            </div>
-          </form>
-        </AdminCard>
+            }
+          >
+            <form id="award-header" onSubmit={saveHeader} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label>
+                  <span className={labelClass}>Tiêu đề header</span>
+                  <input
+                    value={header.tittle}
+                    onChange={(event) =>
+                      setHeader({ ...header, tittle: event.target.value })
+                    }
+                    className={inputClass}
+                  />
+                </label>
+                <label>
+                  <span className={labelClass}>Tiêu đề phụ</span>
+                  <input
+                    value={header.sub_title}
+                    onChange={(event) =>
+                      setHeader({ ...header, sub_title: event.target.value })
+                    }
+                    className={inputClass}
+                  />
+                </label>
+                <label className="md:col-span-2">
+                  <span className={labelClass}>Mô tả header</span>
+                  <textarea
+                    value={header.description}
+                    onChange={(event) =>
+                      setHeader({ ...header, description: event.target.value })
+                    }
+                    rows={3}
+                    className={inputClass}
+                  />
+                </label>
+              </div>
+            </form>
+          </AdminCard>
+          <AdminStickySaveBar
+            form="award-header"
+            type="submit"
+            isSaving={saving}
+            buttonText="Lưu header"
+            hintMessage="Nhấn lưu để đồng bộ thông tin tiêu đề trang Giải thưởng ra website."
+          />
+        </>
       )}
 
       {/* Tab 2: Award hiển thị */}
       {activeSection === "selection" && (
+        <>
         <AdminCard
           title={`Award hiển thị (${selectedAwardIds.length} / ${awards.length})`}
           subtitle="Chọn các giải thưởng xuất hiện trong danh sách hiển thị công khai trên website"
@@ -346,6 +358,14 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
             </div>
           </div>
         </AdminCard>
+        <AdminStickySaveBar
+          type="button"
+          isSaving={saving}
+          buttonText="Lưu lựa chọn"
+          hintMessage={`Đã chọn ${selectedAwardIds.length} giải thưởng để hiển thị trên website.`}
+          onSave={saveAwardSelection}
+        />
+        </>
       )}
 
       {/* Tab 3: Bảng vàng vinh danh */}

@@ -9,7 +9,7 @@ import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, req
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
-import { AdminPageHeader, AdminTabs, AdminToast } from '../../components/Admin/Common/index.js'
+import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common/index.js'
 
 function clone(value) {
   return structuredClone(value)
@@ -510,7 +510,7 @@ export default function AdminContact() {
     const categories = Array.isArray(draftProps?.contactCategories) ? draftProps.contactCategories : []
     const fieldNames = { fullName: 'Họ và tên', email: 'Địa chỉ Email', phone: 'Số điện thoại liên hệ', category: 'Lĩnh vực quan tâm', message: 'Nội dung lời nhắn / Đề xuất chi tiết' }
     const fieldTypes = { text: 'Văn bản', email: 'Email', tel: 'Số điện thoại', select: 'Danh sách chọn', textarea: 'Văn bản dài' }
-    return <form onSubmit={save} className="space-y-5">
+    return <form id="contact-form-editor" onSubmit={save} className="space-y-5">
       <div className="space-y-5 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]">
         <div>
           <h2 className="text-lg font-semibold text-(--admin-title)">Cấu hình Form liên hệ</h2>
@@ -582,9 +582,15 @@ export default function AdminContact() {
           <ContactForm categories={draftProps?.contactCategories || []} contact={draftProps?.contact || { phoneHref: '', emails: [''] }} form={form} preview />
         </div>
       </section>
-      <div className="flex justify-end border-t border-(--admin-border) pt-4">
-        <button type="submit" className={adminPrimaryButton} disabled={saving || !dirty}><Save size={16} />{saving ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
-      </div>
+      <AdminStickySaveBar
+        form="contact-form-editor"
+        type="submit"
+        isSaving={saving}
+        disabled={saving || !dirty}
+        buttonText="Lưu thay đổi"
+        savingText="Đang lưu…"
+        hintMessage="Nhấn lưu để đồng bộ cấu hình form liên hệ ra ngoài website."
+      />
     </form>
   }
 
@@ -602,7 +608,7 @@ export default function AdminContact() {
       : [{ number: contact.phone || '', href: contact.phoneHref || '' }]
     const emails = Array.isArray(contact.emails) && contact.emails.length ? contact.emails : ['']
     const sectionClass = 'space-y-4 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]'
-    return <form onSubmit={save} className="space-y-5">
+    return <form id="contact-info-editor" onSubmit={save} className="space-y-5">
       <section className={sectionClass}>
         <div><h2 className="text-lg font-semibold text-(--admin-title)">Đầu trang Liên hệ</h2><p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">Chỉnh các nội dung hiển thị ở phần đầu trang Contact.</p></div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -704,9 +710,15 @@ export default function AdminContact() {
         <ContactField label="Địa chỉ bản đồ" required multiline value={mapLocation.address || mapLocation.mapAddress} onChange={updateMapAddress} placeholder="Ví dụ: 16/1 Đặng Văn Ngữ, Phường 10..." />
       </section>
 
-      <div className="flex justify-end border-t border-(--admin-border) pt-4">
-        <button type="submit" className={adminPrimaryButton} disabled={saving || !dirty}><Save size={16} />{saving ? 'Đang lưu…' : 'Lưu thay đổi'}</button>
-      </div>
+      <AdminStickySaveBar
+        form="contact-info-editor"
+        type="submit"
+        isSaving={saving}
+        disabled={saving || !dirty}
+        buttonText="Lưu thay đổi"
+        savingText="Đang lưu…"
+        hintMessage="Nhấn lưu để đồng bộ thông tin liên hệ và văn phòng đại diện ra ngoài website."
+      />
     </form>
   }
 
@@ -716,6 +728,21 @@ export default function AdminContact() {
         badge="Khu vực quản trị"
         title="Quản lý Liên hệ"
         subtitle="Quản lý cấu hình biểu mẫu liên hệ, thông tin tiếp nhận hồ sơ và hộp thư liên hệ."
+        actions={
+          activeTab.id !== 'inbox' && (
+            <AdminButton
+              type="submit"
+              form={activeTab.id === 'form' ? 'contact-form-editor' : 'contact-info-editor'}
+              variant="primary"
+              size="sm"
+              icon={Save}
+              loading={saving}
+              disabled={saving || !dirty}
+            >
+              {saving ? 'Đang lưu…' : 'Lưu thay đổi'}
+            </AdminButton>
+          )
+        }
       />
 
       <AdminTabs

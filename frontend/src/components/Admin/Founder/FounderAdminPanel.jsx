@@ -18,6 +18,7 @@ import {
   AdminToast,
   AdminLoadingModal,
   AdminConfirmModal,
+  AdminStickySaveBar,
 } from '../Common/index.js';
 
 const tabs = [
@@ -165,7 +166,7 @@ function HeroEditor({ hero, saving, onSave }) {
   const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
 
   return (
-    <form onSubmit={(event) => { event.preventDefault(); onSave({ ...form, number_of_founders: Number(form.number_of_founders) }); }} className="space-y-5">
+    <form id="founder-hero-form" onSubmit={(event) => { event.preventDefault(); onSave({ ...form, number_of_founders: Number(form.number_of_founders) }); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Tiêu đề chính" name="title" value={form.title} onChange={(value) => update('title', value)} />
         <Field label="Tên nhóm Founder" name="name" value={form.name} onChange={(value) => update('name', value)} />
@@ -175,16 +176,13 @@ function HeroEditor({ hero, saving, onSave }) {
       <Field label="Mô tả mở đầu" name="description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
       <Field label="Mô tả bổ trợ" name="subdescription" type="textarea" value={form.subdescription} onChange={(value) => update('subdescription', value)} />
       
-      <div className="flex justify-end pt-2">
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={saving}
-          icon={Save}
-        >
-          {hero ? 'Lưu Hero Banner' : 'Tạo Hero Banner'}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        form="founder-hero-form"
+        type="submit"
+        isSaving={saving}
+        buttonText={hero ? 'Lưu Hero Banner' : 'Tạo Hero Banner'}
+        hintMessage="Nhấn lưu để đồng bộ thông tin Hero Banner ra trang Chuyện nhà sáng nghiệp."
+      />
     </form>
   );
 }
@@ -230,7 +228,7 @@ function SectionEditor({ section, saving, onSave, onCancel }) {
   }));
 
   return (
-    <form onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
+    <form id="founder-section-form" onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Tên Founder" name="name" value={form.name} onChange={(value) => update('name', value)} />
         <Field label="Chức danh / Major" name="major" value={form.major} onChange={(value) => update('major', value)} />
@@ -293,25 +291,25 @@ function SectionEditor({ section, saving, onSave, onCancel }) {
         <Field label="Mô tả Profile" name="profile-description" type="textarea" value={form.founder_profile.description} onChange={(value) => updateProfile('description', value)} />
       </fieldset>
 
-      <div className="flex items-center justify-end gap-3 pt-2">
-        {section && (
-          <AdminButton
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-          >
-            Hủy chỉnh sửa
-          </AdminButton>
-        )}
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={saving}
-          icon={Save}
-        >
-          {section ? 'Lưu Founder' : 'Tạo Founder mới'}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        form="founder-section-form"
+        type="submit"
+        isSaving={saving}
+        buttonText={section ? 'Lưu Founder' : 'Tạo Founder mới'}
+        hintMessage="Nhấn lưu để đồng bộ thông tin Founder ra ngoài website."
+        extraActions={
+          section ? (
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={onCancel}
+            >
+              Hủy chỉnh sửa
+            </AdminButton>
+          ) : null
+        }
+      />
     </form>
   );
 }
@@ -328,7 +326,7 @@ function CtaEditor({ cta, saving, onSave }) {
   const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
 
   return (
-    <form onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
+    <form id="founder-cta-form" onSubmit={(event) => { event.preventDefault(); onSave(form); }} className="space-y-5">
       <div className="grid gap-5 md:grid-cols-2">
         <Field label="Tiêu đề phụ (Subtitle)" name="cta-subtitle" value={form.subtitle} onChange={(value) => update('subtitle', value)} />
         <Field label="Tiêu đề chính (Title)" name="cta-title" value={form.title} onChange={(value) => update('title', value)} />
@@ -337,16 +335,13 @@ function CtaEditor({ cta, saving, onSave }) {
       </div>
       <Field label="Mô tả CTA" name="cta-description" type="textarea" value={form.description} onChange={(value) => update('description', value)} />
       
-      <div className="flex justify-end pt-2">
-        <AdminButton
-          type="submit"
-          variant="primary"
-          loading={saving}
-          icon={Save}
-        >
-          {cta ? 'Lưu CTA' : 'Tạo CTA mới'}
-        </AdminButton>
-      </div>
+      <AdminStickySaveBar
+        form="founder-cta-form"
+        type="submit"
+        isSaving={saving}
+        buttonText={cta ? 'Lưu CTA' : 'Tạo CTA mới'}
+        hintMessage="Nhấn lưu để đồng bộ thông tin CTA ra ngoài website."
+      />
     </form>
   );
 }
@@ -673,6 +668,18 @@ export default function FounderAdminPanel() {
         <AdminCard
           title="Cấu hình Hero Banner"
           subtitle="Thông tin tiêu đề, lời mở đầu và số lượng nhà sáng lập"
+          actions={
+            <AdminButton
+              type="submit"
+              form="founder-hero-form"
+              variant="primary"
+              size="sm"
+              loading={saving}
+              icon={Save}
+            >
+              Lưu thay đổi
+            </AdminButton>
+          }
         >
           <HeroEditor
             key={page?.props?.hero_section?.id || 'new'}
@@ -752,6 +759,18 @@ export default function FounderAdminPanel() {
           <AdminCard
             title={selectedSection ? `Chỉnh sửa: ${selectedSection.name}` : 'Tạo mới hồ sơ Founder'}
             subtitle="Thiết lập thông tin cá nhân, tiểu sử và profile chi tiết"
+            actions={
+              <AdminButton
+                type="submit"
+                form="founder-section-form"
+                variant="primary"
+                size="sm"
+                loading={saving}
+                icon={Save}
+              >
+                {selectedSection ? 'Lưu Founder' : 'Tạo Founder mới'}
+              </AdminButton>
+            }
           >
             <SectionEditor
               key={selectedSectionId || 'new'}
@@ -770,6 +789,18 @@ export default function FounderAdminPanel() {
           <AdminCard
             title="Cấu hình Khối Kêu gọi hành động (CTA)"
             subtitle="Nội dung kêu gọi đăng ký và hợp tác cuối trang Founder"
+            actions={
+              <AdminButton
+                type="submit"
+                form="founder-cta-form"
+                variant="primary"
+                size="sm"
+                loading={saving}
+                icon={Save}
+              >
+                {cta ? 'Lưu CTA' : 'Tạo CTA mới'}
+              </AdminButton>
+            }
           >
             <CtaEditor
               key={cta?.id || 'new'}

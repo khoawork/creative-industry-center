@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Trophy,
   Plus,
@@ -13,31 +13,31 @@ import {
   Layers,
   Sparkles,
   ExternalLink,
-} from 'lucide-react';
-import { RecordAPI } from '../../../api/recordsApi.js';
+} from "lucide-react";
+import { RecordAPI } from "../../../api/recordsApi.js";
 
 export default function RecordTableManager() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
 
   // Modal Thêm / Sửa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
-    id: '',
-    rank: '',
-    title: '',
-    subtitle: '',
-    category: '',
-    cycle: '',
-    icon: 'flare',
-    criteria: [''],
+    id: "",
+    rank: "",
+    title: "",
+    subtitle: "",
+    category: "",
+    cycle: "",
+    icon: "flare",
+    criteria: [""],
     action: {
-      nomination: 'Đề Cử / Nộp Hồ Sơ',
-      download: 'QuyChe_DeCuKyLuc.pdf',
+      nomination: "Đề Cử / Nộp Hồ Sơ",
+      download: "QuyChe_DeCuKyLuc.pdf",
     },
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -49,7 +49,7 @@ export default function RecordTableManager() {
   // Toast
   const [toast, setToast] = useState(null);
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   };
@@ -63,13 +63,13 @@ export default function RecordTableManager() {
       const items = Array.isArray(response?.data)
         ? response.data
         : Array.isArray(response)
-        ? response
-        : [];
+          ? response
+          : [];
       setRecords(items);
-      if (isManual) showToast('Đã làm mới danh sách kỷ lục!');
+      if (isManual) showToast("Đã làm mới danh sách kỷ lục!");
     } catch (error) {
-      console.error('Lỗi khi tải kỷ lục:', error);
-      showToast('Không thể kết nối API Kỷ lục.', 'error');
+      console.error("Lỗi khi tải kỷ lục:", error);
+      showToast("Không thể kết nối API Kỷ lục.", "error");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -93,7 +93,7 @@ export default function RecordTableManager() {
   const filteredRecords = useMemo(() => {
     return records.filter((rec) => {
       const matchesCategory =
-        categoryFilter === 'ALL' || rec.category === categoryFilter;
+        categoryFilter === "ALL" || rec.category === categoryFilter;
       if (!matchesCategory) return false;
 
       if (!searchQuery) return true;
@@ -110,17 +110,17 @@ export default function RecordTableManager() {
   const handleOpenAdd = () => {
     setEditingItem(null);
     setFormData({
-      id: '',
-      rank: '',
-      title: '',
-      subtitle: '',
-      category: '',
-      cycle: 'Chu kỳ: Thường niên',
-      icon: 'flare',
-      criteria: [''],
+      id: "",
+      rank: "",
+      title: "",
+      subtitle: "",
+      category: "",
+      cycle: "Chu kỳ: Thường niên",
+      icon: "flare",
+      criteria: [""],
       action: {
-        nomination: 'Đề Cử / Nộp Hồ Sơ',
-        download: 'QuyChe_DeCuKyLuc.pdf',
+        nomination: "Đề Cử / Nộp Hồ Sơ",
+        download: "QuyChe_DeCuKyLuc.pdf",
       },
     });
     setIsModalOpen(true);
@@ -129,22 +129,22 @@ export default function RecordTableManager() {
   const handleOpenEdit = (item) => {
     setEditingItem(item);
     setFormData({
-      id: item.id || '',
-      rank: item.rank || '',
-      title: item.title || '',
-      subtitle: item.subtitle || '',
-      category: item.category || '',
-      cycle: item.cycle || '',
-      icon: item.icon || 'flare',
+      id: item.id || "",
+      rank: item.rank || "",
+      title: item.title || "",
+      subtitle: item.subtitle || "",
+      category: item.category || "",
+      cycle: item.cycle || "",
+      icon: item.icon || "flare",
       criteria:
         Array.isArray(item.criteria) && item.criteria.length
           ? [...item.criteria]
-          : [''],
+          : [""],
       action: item.action
         ? { ...item.action }
         : {
-            nomination: 'Đề Cử / Nộp Hồ Sơ',
-            download: 'QuyChe_DeCuKyLuc.pdf',
+            nomination: "Đề Cử / Nộp Hồ Sơ",
+            download: "QuyChe_DeCuKyLuc.pdf",
           },
     });
     setIsModalOpen(true);
@@ -153,7 +153,7 @@ export default function RecordTableManager() {
   const handleAddCriteria = () => {
     setFormData((prev) => ({
       ...prev,
-      criteria: [...prev.criteria, ''],
+      criteria: [...prev.criteria, ""],
     }));
   };
 
@@ -175,16 +175,18 @@ export default function RecordTableManager() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      showToast('Vui lòng nhập tên đề cử kỷ lục.', 'error');
+      showToast("Vui lòng nhập tên đề cử kỷ lục.", "error");
       return;
     }
 
     setIsSaving(true);
-    const cleanCriteria = formData.criteria.filter((c) => c && c.trim() !== '');
+    const cleanCriteria = formData.criteria.filter((c) => c && c.trim() !== "");
 
     const payload = {
       ...formData,
-      criteria: cleanCriteria.length ? cleanCriteria : ['Tiêu chí đạt chuẩn Viện Kỷ lục'],
+      criteria: cleanCriteria.length
+        ? cleanCriteria
+        : ["Tiêu chí đạt chuẩn Viện Kỷ lục"],
     };
 
     try {
@@ -202,9 +204,10 @@ export default function RecordTableManager() {
       setIsModalOpen(false);
       await fetchRecords();
     } catch (error) {
-      console.error('Lỗi khi lưu kỷ lục:', error);
-      const msg = error.response?.data?.message || 'Có lỗi xảy ra khi lưu kỷ lục.';
-      showToast(msg, 'error');
+      console.error("Lỗi khi lưu kỷ lục:", error);
+      const msg =
+        error.response?.data?.message || "Có lỗi xảy ra khi lưu kỷ lục.";
+      showToast(msg, "error");
     } finally {
       setIsSaving(false);
     }
@@ -220,9 +223,10 @@ export default function RecordTableManager() {
       setDeletingItem(null);
       await fetchRecords();
     } catch (error) {
-      console.error('Lỗi khi xóa kỷ lục:', error);
-      const msg = error.response?.data?.message || 'Có lỗi xảy ra khi xóa kỷ lục.';
-      showToast(msg, 'error');
+      console.error("Lỗi khi xóa kỷ lục:", error);
+      const msg =
+        error.response?.data?.message || "Có lỗi xảy ra khi xóa kỷ lục.";
+      showToast(msg, "error");
     } finally {
       setIsDeleting(false);
     }
@@ -233,7 +237,7 @@ export default function RecordTableManager() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3 shadow-lg animate-bounce">
-          {toast.type === 'error' ? (
+          {toast.type === "error" ? (
             <AlertTriangle className="size-5 text-red-500 shrink-0" />
           ) : (
             <Check className="size-5 text-emerald-500 shrink-0" />
@@ -281,13 +285,13 @@ export default function RecordTableManager() {
             disabled={refreshing}
             className="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-heading)] hover:bg-[var(--admin-background)] transition cursor-pointer"
           >
-            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
             Làm mới
           </button>
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-[var(--admin-accent)] text-white hover:opacity-90 transition cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg bg-(--admin-accent) text-(--admin-black) hover:opacity-90 transition cursor-pointer shadow-xs"
           >
             <Plus size={14} />
             Thêm Kỷ Lục
@@ -303,80 +307,128 @@ export default function RecordTableManager() {
           </div>
         ) : filteredRecords.length === 0 ? (
           <div className="py-16 text-center text-gray-500">
-            <Trophy className="mx-auto size-12 text-gray-300" strokeWidth={1.5} />
-            <p className="mt-2 text-sm font-semibold">Chưa có kỷ lục nào phù hợp</p>
+            <Trophy
+              className="mx-auto size-12 text-gray-300"
+              strokeWidth={1.5}
+            />
+            <p className="mt-2 text-sm font-semibold">
+              Chưa có kỷ lục nào phù hợp
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-sm">
+          <div className="overflow-x-auto rounded-lg border border-(--admin-border)">
+            <table className="w-full border-collapse text-left text-sm">
               <thead>
-                <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-background)]/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <th className="w-48 px-4 py-3">Thứ hạng / Danh hiệu</th>
-                  <th className="px-4 py-3">Tiêu đề đề cử</th>
-                  <th className="px-4 py-3">Nhóm đối tượng</th>
-                  <th className="w-36 px-4 py-3">Chu kỳ xét duyệt</th>
-                  <th className="px-4 py-3">Tiêu chí</th>
-                  <th className="py-3 px-4 text-right">Thao tác</th>
+                <tr className="border-b border-(--admin-border) bg-(--admin-background) text-sm font-semibold uppercase tracking-wider text-(--admin-muted)">
+                  <th className="w-52 whitespace-nowrap px-5 py-4">
+                    Thứ hạng / Danh hiệu
+                  </th>
+                  <th className="min-w-[240px] px-5 py-4">Tiêu đề đề cử</th>
+                  <th className="min-w-[160px] px-5 py-4">Nhóm đối tượng</th>
+                  <th className="w-44 whitespace-nowrap px-5 py-4">
+                    Chu kỳ xét duyệt
+                  </th>
+                  <th className="min-w-[240px] px-5 py-4">Tiêu chí</th>
+                  <th className="whitespace-nowrap px-5 py-4 text-right">
+                    Thao tác
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--admin-border)]">
+
+              <tbody className="divide-y divide-(--admin-border)">
                 {filteredRecords.map((item) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-[var(--admin-background)]/40 transition-colors"
+                    className="transition-colors hover:bg-(--admin-background)/60"
                   >
-                    <td className="px-4 py-3">
-                      <span className="inline-block rounded-md border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-bold text-amber-500 uppercase">
-                        {item.rank || 'CHƯA PHÂN HẠNG'}
+                    {/* Thứ hạng */}
+                    <td className="px-5 py-5 align-top">
+                      <span className="inline-flex max-w-full rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm font-bold uppercase text-(--admin-title)">
+                        {item.rank || "CHƯA PHÂN HẠNG"}
                       </span>
+
                       {item.subtitle && (
-                        <div className="text-[11px] text-gray-400 mt-1 line-clamp-1 italic">
+                        <div
+                          className="mt-2 line-clamp-2 text-sm italic text-(--admin-muted)"
+                          title={item.subtitle}
+                        >
                           {item.subtitle}
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-[var(--admin-title)]">
-                      <div className="truncate max-w-xs">{item.title}</div>
-                      <div className="text-xs text-gray-400 font-normal flex items-center gap-1.5 mt-0.5">
-                        <span>Icon: {item.icon || 'flare'}</span>
-                        <span>•</span>
-                        <span>Nộp: {item.action?.nomination || 'Đề cử'}</span>
+
+                    {/* Tiêu đề */}
+                    <td className="px-5 py-5 align-top">
+                      <div
+                        className="line-clamp-2 text-base font-semibold text-(--admin-title)"
+                        title={item.title}
+                      >
+                        {item.title || "Chưa có tiêu đề"}
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-(--admin-muted)">
+                        <span>Icon: {item.icon || "flare"}</span>
+                        <span className="text-(--admin-border)">•</span>
+                        <span>Nộp: {item.action?.nomination || "Đề cử"}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-block rounded-md border border-[var(--admin-border)] bg-[var(--admin-background)] px-2.5 py-1 text-xs font-medium text-gray-300">
-                        {item.category || 'Chung'}
+
+                    {/* Nhóm đối tượng */}
+                    <td className="px-5 py-5 align-top">
+                      <span className="inline-flex rounded-md border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-sm font-medium text-(--admin-ink)">
+                        {item.category || "Chung"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">
-                      {item.cycle || 'Thường niên'}
+
+                    {/* Chu kỳ */}
+                    <td className="px-5 py-5 align-top">
+                      <span className="text-sm text-(--admin-ink)">
+                        {item.cycle || "Thường niên"}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 max-w-xs">
+
+                    {/* Tiêu chí */}
+                    <td className="max-w-[360px] px-5 py-5 align-top">
                       {item.criteria && item.criteria.length > 0 ? (
-                        <span className="text-xs text-gray-400 line-clamp-2">
-                          {item.criteria[0]}
-                          {item.criteria.length > 1 && ` (+${item.criteria.length - 1} tiêu chí)`}
-                        </span>
+                        <div>
+                          <p
+                            className="line-clamp-3 text-sm leading-6 text-(--admin-muted)"
+                            title={item.criteria.join("\n")}
+                          >
+                            {item.criteria[0]}
+                          </p>
+
+                          {item.criteria.length > 1 && (
+                            <span className="mt-1 inline-block text-xs font-medium text-(--admin-accent)">
+                              +{item.criteria.length - 1} tiêu chí khác
+                            </span>
+                          )}
+                        </div>
                       ) : (
-                        <span className="text-xs text-gray-500 italic">Chưa có tiêu chí</span>
+                        <span className="text-sm italic text-(--admin-muted)">
+                          Chưa có tiêu chí
+                        </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="inline-flex items-center gap-1.5">
+
+                    {/* Thao tác */}
+                    <td className="px-5 py-5 text-right align-top">
+                      <div className="inline-flex items-center justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(item)}
-                          className="px-2.5 py-1 text-xs font-semibold rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-heading)] hover:bg-[var(--admin-background)] transition cursor-pointer"
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-sm font-semibold text-(--admin-title) transition-colors hover:bg-(--admin-background) hover:text-(--admin-accent)"
                         >
-                          <Pencil size={13} className="inline mr-1" />
+                          <Pencil size={16} />
                           Sửa
                         </button>
+
                         <button
                           type="button"
                           onClick={() => setDeletingItem(item)}
-                          className="px-2.5 py-1 text-xs font-semibold rounded-md border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
+                          className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-sm font-semibold text-rose-500 transition-colors hover:bg-rose-500/10"
                         >
-                          <Trash2 size={13} className="inline mr-1" />
+                          <Trash2 size={16} />
                           Xóa
                         </button>
                       </div>
@@ -395,7 +447,7 @@ export default function RecordTableManager() {
           <div className="w-full max-w-2xl border border-[var(--admin-border)] bg-[var(--admin-surface)] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-[var(--admin-border)] px-6 py-4">
               <h3 className="text-base font-bold text-[var(--admin-title)]">
-                {editingItem ? 'Chỉnh sửa Kỷ Lục' : 'Thêm Mới Kỷ Lục'}
+                {editingItem ? "Chỉnh sửa Kỷ Lục" : "Thêm Mới Kỷ Lục"}
               </h3>
               <button
                 type="button"
@@ -406,7 +458,10 @@ export default function RecordTableManager() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <form
+              onSubmit={handleSubmit}
+              className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase text-[var(--admin-heading)]">
@@ -416,7 +471,9 @@ export default function RecordTableManager() {
                     type="text"
                     required
                     value={formData.rank}
-                    onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rank: e.target.value })
+                    }
                     placeholder="VD: HẠNG MỤC TỐI CAO, HUY CHƯƠNG VÀNG..."
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -429,7 +486,9 @@ export default function RecordTableManager() {
                   <input
                     type="text"
                     value={formData.icon}
-                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, icon: e.target.value })
+                    }
                     placeholder="VD: flare, trophy, handyman, military_tech"
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -443,7 +502,9 @@ export default function RecordTableManager() {
                     type="text"
                     required
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     placeholder="VD: Kỷ Lục Đỉnh Cao Sáng Nghiệp Việt Nam"
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -456,7 +517,9 @@ export default function RecordTableManager() {
                   <input
                     type="text"
                     value={formData.subtitle}
-                    onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, subtitle: e.target.value })
+                    }
                     placeholder="VD: Biểu tượng ngọn hải đăng bằng đồng mạ vàng"
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -469,7 +532,9 @@ export default function RecordTableManager() {
                   <input
                     type="text"
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     placeholder="VD: Doanh nhân & Nhà sáng lập"
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -482,7 +547,9 @@ export default function RecordTableManager() {
                   <input
                     type="text"
                     value={formData.cycle}
-                    onChange={(e) => setFormData({ ...formData, cycle: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cycle: e.target.value })
+                    }
                     placeholder="VD: Chu kỳ: Thường niên (Tháng 12)"
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
@@ -501,7 +568,7 @@ export default function RecordTableManager() {
                     </label>
                     <input
                       type="text"
-                      value={formData.action?.nomination || ''}
+                      value={formData.action?.nomination || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -521,7 +588,7 @@ export default function RecordTableManager() {
                     </label>
                     <input
                       type="text"
-                      value={formData.action?.download || ''}
+                      value={formData.action?.download || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -556,13 +623,17 @@ export default function RecordTableManager() {
                 <div className="space-y-2">
                   {formData.criteria.map((crit, cIdx) => (
                     <div key={cIdx} className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400 font-bold">{cIdx + 1}.</span>
+                      <span className="text-xs text-gray-400 font-bold">
+                        {cIdx + 1}.
+                      </span>
                       <input
                         type="text"
                         value={crit}
-                        onChange={(e) => handleCriteriaChange(cIdx, e.target.value)}
+                        onChange={(e) =>
+                          handleCriteriaChange(cIdx, e.target.value)
+                        }
                         placeholder={`Nội dung tiêu chí ${cIdx + 1}...`}
-                        className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)] flex-1"
+                        className="w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm text-(--admin-ink) outline-none focus:border-(--admin-accent) flex-1"
                       />
                       <button
                         type="button"
@@ -578,21 +649,25 @@ export default function RecordTableManager() {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--admin-border)]">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-(--admin-border)">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-lg border border-[var(--admin-border)] hover:bg-[var(--admin-background)] transition cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-lg border border-(--admin-border) hover:bg-(--admin-background) transition cursor-pointer text-(--admin-heading)"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold rounded-lg bg-[var(--admin-accent)] text-white hover:opacity-90 transition cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold rounded-lg bg-(--admin-accent) text-(--admin-black) hover:opacity-90 transition cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   <Check size={14} />
-                  {isSaving ? 'Đang lưu...' : editingItem ? 'Lưu thay đổi' : 'Tạo kỷ lục'}
+                  {isSaving
+                    ? "Đang lưu..."
+                    : editingItem
+                      ? "Lưu thay đổi"
+                      : "Tạo kỷ lục"}
                 </button>
               </div>
             </form>
@@ -611,10 +686,10 @@ export default function RecordTableManager() {
               Xác nhận xóa kỷ lục
             </h3>
             <p className="text-xs text-gray-400 mb-6">
-              Bạn có chắc chắn muốn xóa kỷ lục{' '}
+              Bạn có chắc chắn muốn xóa kỷ lục{" "}
               <strong className="text-[var(--admin-title)]">
                 "{deletingItem.title}"
-              </strong>{' '}
+              </strong>{" "}
               ? Hành động này không thể hoàn tác.
             </p>
             <div className="flex items-center justify-center gap-3">
@@ -631,7 +706,7 @@ export default function RecordTableManager() {
                 disabled={isDeleting}
                 className="px-4 py-2 text-xs font-semibold rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition cursor-pointer disabled:opacity-50"
               >
-                {isDeleting ? 'Đang xóa...' : 'Xóa kỷ lục'}
+                {isDeleting ? "Đang xóa..." : "Xóa kỷ lục"}
               </button>
             </div>
           </div>
