@@ -16,15 +16,14 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
 
-        # 1. Ưu tiên lấy từ Header Authorization nếu có
+        # 1. Nếu có Header Authorization: Chỉ chấp nhận raw JWT token chuẩn
         if "Authorization" in request.headers:
             auth_header = request.headers.get("Authorization", "")
             if auth_header.startswith("Bearer "):
-                raw_header_val = auth_header.split(" ", 1)[1].strip()
-                # Có thể là raw JWT hoặc sealed token
-                token = unseal_cookie_token(raw_header_val) or raw_header_val
+                # Header Bearer chỉ nhận raw JWT token trực tiếp, không nhận token cookie mã hóa
+                token = auth_header.split(" ", 1)[1].strip()
 
-        # 2. Nếu Header không có, lấy từ Cookie 'admin_token' (đã được seal/mã hóa)
+        # 2. Nếu Header không có, lấy từ HttpOnly Cookie 'admin_token' (bắt buộc phải unseal giải mã)
         if not token and "admin_token" in request.cookies:
             raw_cookie_val = request.cookies.get("admin_token")
             token = unseal_cookie_token(raw_cookie_val)

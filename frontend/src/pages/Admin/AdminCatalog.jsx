@@ -86,7 +86,7 @@ export default function AdminCatalog({ defaultTab }) {
     setActiveTab(tabId);
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const lastSeg = pathSegments[pathSegments.length - 1];
-    if (['events', 'awards', 'training', 'projects', 'records'].includes(lastSeg)) {
+    if (['events', 'awards', 'training', 'trainings', 'projects', 'records'].includes(lastSeg)) {
       navigate(`/admin/${tabId}`);
     } else {
       setSearchParams({ tab: tabId });
@@ -113,7 +113,7 @@ export default function AdminCatalog({ defaultTab }) {
       <div className="min-h-[400px]">
         {activeTab === 'events' && <EventTableManager />}
         {activeTab === 'awards' && <AwardTableManager />}
-        {activeTab === 'training' && <TrainingTableManager />}
+        {(activeTab === 'training' || activeTab === 'trainings') && <TrainingTableManager />}
         {activeTab === 'projects' && <ProjectTableManager />}
         {activeTab === 'records' && <RecordTableManager />}
       </div>

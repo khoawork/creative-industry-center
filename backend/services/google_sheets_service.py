@@ -4,11 +4,15 @@ import json
 import logging
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+try:
+    from dotenv import load_dotenv
+    BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    load_dotenv(os.path.join(BACKEND_DIR, ".env"))
+    load_dotenv()
+except Exception:
+    BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Thư mục gốc backend
-BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_CREDENTIALS_PATH = os.path.join(BACKEND_DIR, "service_account.json")
+logger = logging.getLogger(__name__)
 
 # Scope cần thiết cho Google Sheets & Drive API
 SCOPES = [
@@ -29,7 +33,6 @@ def extract_spreadsheet_id(url_or_id: str) -> str:
     match = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url_or_id)
     if match:
         return match.group(1)
-    # Nếu không phải URL, có thể người dùng đã nhập trực tiếp ID
     if re.match(r"^[a-zA-Z0-9-_]{20,}$", url_or_id):
         return url_or_id
     return url_or_id
@@ -37,55 +40,45 @@ def extract_spreadsheet_id(url_or_id: str) -> str:
 
 def get_service_account_credentials_info():
     """
-    Kiểm tra và lấy thông tin Google Service Account.
-    Ưu tiên 1: Biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON (chuỗi JSON)
-    Ưu tiên 2: Biến môi trường GOOGLE_SERVICE_ACCOUNT_FILE (đường dẫn file)
-    Ưu tiên 3: File service_account.json trong thư mục backend/
+    Kiểm tra và lấy thông tin Google Service Account từ biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON.
+    Hoàn toàn không sử dụng file service_account.json vật lý.
     """
     env_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
     if env_json:
         try:
-            data = json.loads(env_json)
+            raw_str = env_json.strip()
+            # Loại bỏ các cặp dấu nháy đơn hoặc nháy kép bao bọc nếu có từ .env
+            if (raw_str.startswith("'") and raw_str.endswith("'")) or (
+                raw_str.startswith('"') and raw_str.endswith('"')
+            ):
+                raw_str = raw_str[1:-1].strip()
+
+            data = json.loads(raw_str)
+            client_email = data.get("client_email", "")
             return {
-                "configured": True,
+                "configured": bool(client_email),
                 "type": "env_json",
-                "email": data.get("client_email", ""),
+                "email": client_email,
                 "data": data,
                 "path": None,
             }
         except Exception as e:
-            logger.error(f"Lỗi phân tích cú pháp GOOGLE_SERVICE_ACCOUNT_JSON: {e}")
+            logger.error(f"Lỗi phân tích cú pháp GOOGLE_SERVICE_ACCOUNT_JSON từ .env: {e}")
 
-    file_path = (
-        os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE") or DEFAULT_CREDENTIALS_PATH
-    )
-    if os.path.isfile(file_path):
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                return {
-                    "configured": True,
-                    "type": "file",
-                    "email": data.get("client_email", ""),
-                    "data": data,
-                    "path": file_path,
-                }
-        except Exception as e:
-            logger.error(f"Lỗi đọc file service_account.json: {e}")
-
-    # Chưa cấu hình, trả về email bot placeholder hướng dẫn
+    # Chưa cấu hình trong env
     return {
         "configured": False,
         "type": "none",
-        "email": "cic-service-bot@cic-creative-center.iam.gserviceaccount.com",
+        "email": "",
         "data": None,
-        "path": DEFAULT_CREDENTIALS_PATH,
+        "path": None,
     }
 
 
 def get_gspread_client():
     """
-    Khởi tạo và trả về client gspread đã được xác thực bằng Service Account.
+    Khởi tạo và trả về client gspread đã được xác thực bằng Service Account
+    lấy từ biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON.
     """
     try:
         import gspread
@@ -96,18 +89,13 @@ def get_gspread_client():
         ) from e
 
     info = get_service_account_credentials_info()
-    if not info["configured"]:
+    if not info["configured"] or not info["data"]:
         raise ValueError(
-            f"Chưa tìm thấy file cấu hình Service Account. Vui lòng đặt file 'service_account.json' vào thư mục backend ({DEFAULT_CREDENTIALS_PATH}) hoặc cấu hình biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON."
+            "Chưa cấu hình biến môi trường GOOGLE_SERVICE_ACCOUNT_JSON trong file .env. "
+            "Vui lòng thiết lập biến GOOGLE_SERVICE_ACCOUNT_JSON để kết nối với Google Sheet."
         )
 
-    if info["data"]:
-        credentials = Credentials.from_service_account_info(info["data"], scopes=SCOPES)
-    elif info["path"]:
-        credentials = Credentials.from_service_account_file(info["path"], scopes=SCOPES)
-    else:
-        raise ValueError("Không có thông tin xác thực Service Account hợp lệ.")
-
+    credentials = Credentials.from_service_account_info(info["data"], scopes=SCOPES)
     client = gspread.authorize(credentials)
     return client, info["email"]
 
@@ -484,3 +472,68 @@ def append_row_to_google_sheet(
         "rowCount": worksheet.row_count,
         "matchedColumns": len(sheet_headers),
     }
+
+
+def fetch_rows_from_google_sheet(sheet_url_or_id: str, sheet_name: str = ""):
+    """
+    Lấy toàn bộ dữ liệu từ Google Sheet (file excel) về theo đúng cấu trúc mẫu hiện tại:
+    - Row 1: Header tên cột
+    - Row 2 trở đi: Dữ liệu đã gửi của biểu mẫu
+    """
+    spreadsheet_id = extract_spreadsheet_id(sheet_url_or_id)
+    if not spreadsheet_id:
+        return {
+            "success": False,
+            "message": "Đường dẫn Google Sheet không hợp lệ hoặc thiếu Sheet ID!",
+        }
+
+    try:
+        client, bot_email = get_gspread_client()
+        spreadsheet = client.open_by_key(spreadsheet_id)
+
+        target_name = sanitize_worksheet_title(sheet_name)
+        worksheet = None
+        if target_name:
+            try:
+                worksheet = spreadsheet.worksheet(target_name)
+            except Exception:
+                pass
+        if not worksheet:
+            worksheet = spreadsheet.sheet1
+
+        all_values = worksheet.get_all_values()
+        if not all_values or len(all_values) == 0:
+            return {
+                "success": True,
+                "spreadsheetTitle": spreadsheet.title,
+                "worksheetTitle": worksheet.title,
+                "headers": [],
+                "rows": [],
+                "total": 0,
+            }
+
+        headers = [h.strip() for h in all_values[0]]
+        raw_rows = all_values[1:]
+        rows = []
+        for idx, r in enumerate(raw_rows, start=2):
+            row_dict = {"_rowIndex": idx}
+            for col_idx, col_name in enumerate(headers):
+                if col_name:
+                    row_dict[col_name] = r[col_idx] if col_idx < len(r) else ""
+            rows.append(row_dict)
+
+        return {
+            "success": True,
+            "spreadsheetTitle": spreadsheet.title,
+            "worksheetTitle": worksheet.title,
+            "headers": headers,
+            "rows": rows,
+            "total": len(rows),
+        }
+    except Exception as e:
+        logger.error(f"Lỗi đọc dữ liệu từ Google Sheet: {e}")
+        return {
+            "success": False,
+            "message": f"Không thể lấy dữ liệu từ Google Sheet: {str(e)}",
+        }
+

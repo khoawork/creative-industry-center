@@ -62,11 +62,20 @@
         "required": false,
         "colSpan": 2,
         "options": []
+      },
+      {
+        "key": "truong_7",
+        "label": "Trường thông tin #7",
+        "type": "checkbox",
+        "placeholder": "đồng ý",
+        "required": false,
+        "colSpan": 1,
+        "options": []
       }
     ],
     "lastSyncedAt": "2026-10-06T14:54:00.292Z",
     "syncedSheetName": "DangKySuKien",
-    "updatedAt": "2026-10-09T02:27:05.293Z",
+    "updatedAt": "2026-10-09T07:00:19.129Z",
     "button_text": "Xác Nhận Đăng Ký Thông Báo"
   },
   "event_registration": {
@@ -375,8 +384,8 @@
   },
   "project_proposal": {
     "id": "project_proposal",
-    "title": "Gửi Đề Xuất Dự Án Mới",
-    "subtitle": "Ban Thư ký Hội đồng Khoa học sẽ phản hồi văn bản trong vòng 03 ngày làm việc.",
+    "title": "Thông tin đề xuất",
+    "subtitle": "Vui lòng để lại thông tin và mô tả dự án.",
     "pagePath": "/projects",
     "componentName": "ProjectProposal",
     "badgeText": "CỔNG ĐỀ XUẤT DỰ ÁN",
@@ -442,8 +451,8 @@
       }
     ],
     "lastSyncedAt": "2026-10-08T08:12:46.811Z",
-    "updatedAt": "2026-10-08T08:12:46.811Z",
-    "submitButtonText": "Gửi Hồ Sơ Dự Án",
+    "updatedAt": "2026-10-09T07:27:00.393Z",
+    "submitButtonText": "GỬI HỒ SƠ ĐỀ XUẤT DỰ ÁN",
     "syncedSheetName": "DeXuatDuAn"
   },
   "forum_registration": {
