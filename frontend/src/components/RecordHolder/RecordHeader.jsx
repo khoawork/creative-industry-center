@@ -7,14 +7,27 @@ export default function RecordHeader({ header }) {
     <header className="relative w-full bg-record-primary-container text-record-on-primary overflow-hidden shadow-xl">
       <div className="absolute inset-0 bg-gradient-to-r from-record-primary via-record-primary-container to-record-tertiary-container opacity-90"></div>
       <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-around">
-        <RecordHolderIcon name="military_tech" size={320} className="text-record-secondary-fixed" />
-        <RecordHolderIcon name="workspace_premium" size={280} className="text-record-secondary-fixed lg:-translate-x-14" />
+        <RecordHolderIcon
+          name="military_tech"
+          size={320}
+          className="text-record-secondary-fixed"
+        />
+        <RecordHolderIcon
+          name="workspace_premium"
+          size={280}
+          className="text-record-secondary-fixed lg:-translate-x-14"
+        />
       </div>
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-20 flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-2">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-record-surface-container-lowest/10 backdrop-blur-md shadow-sm">
-              <RecordHolderIcon name={header.icon || "stars"} size={20} filled className="text-record-secondary-container" />
+              <RecordHolderIcon
+                name={header.icon || "stars"}
+                size={20}
+                filled
+                className="text-record-secondary-container"
+              />
               <span className="text-record-secondary-fixed font-label-sm text-label-sm uppercase tracking-widest font-bold">
                 {header.subtitle}
               </span>

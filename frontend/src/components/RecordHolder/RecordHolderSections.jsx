@@ -14,8 +14,8 @@ export default function RecordHolderBody({ onNominate }) {
   const [honorRollsData, setHonorRollsData] = useState(null);
   const [processData, setProcessData] = useState(null);
   const [recordsConfig, setRecordsConfig] = useState({
-    title: "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC",
-    subtitle: "DANH MỤC ĐỀ CỬ KỶ LỤC",
+    title: "",
+    subtitle: "",
   });
   const [error, setError] = useState(null);
 
@@ -74,8 +74,8 @@ export default function RecordHolderBody({ onNominate }) {
         
         setProcessData(processVal || pageProps.process || null);
         setRecordsConfig({
-          title: pageProps.record_section_title || "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC",
-          subtitle: pageProps.record_section_subtitle || "DANH MỤC ĐỀ CỬ KỶ LỤC",
+          title: pageProps.record_section_title ,
+          subtitle: pageProps.record_section_subtitle,
         });
       } catch (err) {
         console.error("Lỗi khi tải dữ liệu trang Kỷ lục:", err);

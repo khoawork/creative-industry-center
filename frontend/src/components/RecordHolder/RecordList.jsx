@@ -3,8 +3,8 @@ import RecordHolderIcon from "./RecordHolderIcon.jsx";
 export default function RecordList({
   records,
   error,
-  title = "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC",
-  subtitle = "DANH MỤC ĐỀ CỬ KỶ LỤC",
+  title  ,
+  subtitle ,
   onNominate,
   onDownloadDoc,
 }) {
@@ -17,10 +17,10 @@ export default function RecordList({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-record-secondary font-label-sm text-label-sm uppercase tracking-widest font-bold">
-              <RecordHolderIcon name="military_tech" size={18} /> {subtitle || "DANH MỤC ĐỀ CỬ KỶ LỤC"}
+              <RecordHolderIcon name="military_tech" size={18} /> {subtitle}
             </div>
             <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
-              {title || "DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC"}
+              {title}
             </h2>
           </div>
         </div>

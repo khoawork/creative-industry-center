@@ -69,8 +69,8 @@ export default function RecordAdminManager() {
   const [header, setHeader] = useState({});
   const [governance, setGovernance] = useState({});
   const [records, setRecords] = useState([]);
-  const [recordsTitle, setRecordsTitle] = useState("DANH MỤC HẠNG MỤC ĐỀ CỬ KỶ LỤC");
-  const [recordsSubtitle, setRecordsSubtitle] = useState("DANH MỤC ĐỀ CỬ KỶ LỤC");
+  const [recordsTitle, setRecordsTitle] = useState("");
+  const [recordsSubtitle, setRecordsSubtitle] = useState("");
   const [selectedRecordIds, setSelectedRecordIds] = useState([]);
   const [honorRolls, setHonorRolls] = useState([]);
   const [process, setProcess] = useState({});
