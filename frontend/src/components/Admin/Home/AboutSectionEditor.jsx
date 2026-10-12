@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Plus, Trash2, Save, Sparkles, Check, Image as ImageIcon, Upload } from 'lucide-react';
 import { AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import { IconDropdown, DynamicIcon } from '../../icons/index.js';
 
 export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -106,7 +107,7 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
       ...prev,
       core_values: [
         ...prev.core_values,
-        { icon: 'star', title: 'Giá trị mới', description: 'Mô tả chi tiết giá trị này...' },
+        { icon: 'Star', title: 'Giá trị mới', description: 'Mô tả chi tiết giá trị này...' },
       ],
     }));
   };
@@ -325,14 +326,13 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
                     <Trash2 size={14} />
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <div>
-                    <input
-                      type="text"
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-start">
+                  <div className="sm:col-span-1">
+                    <IconDropdown
                       value={cv.icon}
-                      onChange={(e) => handleCoreValueChange(index, 'icon', e.target.value)}
-                      placeholder="Icon (VD: landmark, star)"
-                      className="w-full px-3 py-1.5 text-xs bg-(--admin-surface) border border-(--admin-border) rounded-md outline-none text-(--admin-ink)"
+                      onChange={(iconName) => handleCoreValueChange(index, 'icon', iconName)}
+                      placeholder="Chọn biểu tượng..."
+                      size="sm"
                     />
                   </div>
                   <div className="sm:col-span-2">
@@ -340,8 +340,8 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
                       type="text"
                       value={cv.title}
                       onChange={(e) => handleCoreValueChange(index, 'title', e.target.value)}
-                      placeholder="Tiêu đề"
-                      className="w-full px-3 py-1.5 text-xs bg-(--admin-surface) border border-(--admin-border) rounded-md outline-none text-(--admin-ink) font-semibold"
+                      placeholder="Tiêu đề giá trị"
+                      className="w-full px-3 py-2 text-xs bg-(--admin-surface) border border-(--admin-border) rounded-xl outline-none text-(--admin-ink) font-semibold"
                     />
                   </div>
                 </div>
@@ -465,11 +465,14 @@ export default function AboutSectionEditor({ initialData, onSave, isSaving }) {
                 Giá trị cốt lõi
               </span>
               {formData.core_values.map((cv, idx) => (
-                <div key={idx} className="p-2 rounded bg-gray-50 border border-gray-100 text-left">
-                  <div className="text-xs font-bold text-[#710008] flex items-center gap-1.5">
-                    <span>❖</span> {cv.title}
+                <div key={idx} className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 text-left">
+                  <div className="text-xs font-bold text-[#710008] flex items-center gap-2">
+                    <div className="size-5 rounded-md bg-[#710008]/10 text-[#710008] flex items-center justify-center shrink-0">
+                      <DynamicIcon name={cv.icon || 'Star'} size={12} strokeWidth={2.2} />
+                    </div>
+                    <span>{cv.title || 'Chưa có tiêu đề'}</span>
                   </div>
-                  <div className="text-[11px] text-gray-600 mt-0.5 line-clamp-2">
+                  <div className="text-[11px] text-gray-600 mt-1 line-clamp-2">
                     {cv.description}
                   </div>
                 </div>
