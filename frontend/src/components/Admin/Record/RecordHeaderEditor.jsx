@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus, Trash2, Layout, Sparkles } from "lucide-react";
 import { AdminCard, AdminButton, AdminInput } from "../Common";
+import { IconDropdown } from "../../icons/index.js";
 
 export default function RecordHeaderEditor({ data = {}, onChange }) {
   const header = {
@@ -59,11 +60,11 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
           </div>
 
           <div>
-            <AdminInput
-              label="Biểu tượng Icon (Lucide Icon Name)"
-              value={header.icon || ""}
-              onChange={(e) => handleFieldChange("icon", e?.target?.value ?? e)}
-              placeholder="VD: Trophy, Award, Sparkles"
+            <IconDropdown
+              label="Biểu tượng Icon"
+              value={header.icon || "military_tech"}
+              onChange={(val) => handleFieldChange("icon", val)}
+              placeholder="Chọn biểu tượng danh hiệu..."
             />
           </div>
 

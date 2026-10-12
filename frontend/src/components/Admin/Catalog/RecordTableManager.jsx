@@ -15,6 +15,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { RecordAPI } from "../../../api/recordsApi.js";
+import { IconDropdown } from "../../icons/index.js";
+import RecordHolderIcon from "../../RecordHolder/RecordHolderIcon.jsx";
 
 export default function RecordTableManager() {
   const [records, setRecords] = useState([]);
@@ -367,7 +369,10 @@ export default function RecordTableManager() {
                       </div>
 
                       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-(--admin-muted)">
-                        <span>Icon: {item.icon || "flare"}</span>
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-(--admin-background) border border-(--admin-border) text-xs font-medium text-(--admin-heading)">
+                          <RecordHolderIcon name={item.icon || "flare"} size={14} className="text-amber-500" />
+                          <span>{item.icon || "flare"}</span>
+                        </span>
                         <span className="text-(--admin-border)">•</span>
                         <span>Nộp: {item.action?.nomination || "Đề cử"}</span>
                       </div>
@@ -480,17 +485,13 @@ export default function RecordTableManager() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-[var(--admin-heading)]">
-                    Icon biểu tượng
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.icon}
-                    onChange={(e) =>
-                      setFormData({ ...formData, icon: e.target.value })
+                  <IconDropdown
+                    label="Icon biểu tượng"
+                    value={formData.icon || "trophy"}
+                    onChange={(val) =>
+                      setFormData({ ...formData, icon: val })
                     }
-                    placeholder="VD: flare, trophy, handyman, military_tech"
-                    className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
+                    placeholder="Chọn biểu tượng danh hiệu..."
                   />
                 </div>
 

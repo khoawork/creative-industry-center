@@ -67,6 +67,7 @@ class ContactChannelDTO(Schema):
     id = fields.Str(required=True, validate=_not_blank)
     label = fields.Str(required=True, validate=_not_blank)
     href = fields.Str(allow_none=True, load_default=None)
+    icon = fields.Str(allow_none=True, load_default=None)
 
 
 class ContactMapDTO(Schema):

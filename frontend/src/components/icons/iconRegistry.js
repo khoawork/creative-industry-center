@@ -33,6 +33,8 @@ import {
   BadgeCheck,
   ShieldCheck,
   ShieldAlert,
+  Gavel,
+  Scale,
 
   // Liên hệ & Truyền thông
   Mail,
@@ -66,9 +68,11 @@ import {
   Palette,
   Brush,
   Scroll,
+  ScrollText,
   Rocket,
 
   // Công cụ & Hành động
+  Hammer,
   Search,
   Plus,
   Check,
@@ -325,6 +329,20 @@ export const iconList = [
     category: "awards",
     keywords: ["shield", "canh bao", "bao mat"],
   },
+  {
+    name: "Gavel",
+    label: "Búa hội đồng / Thẩm định",
+    icon: Gavel,
+    category: "awards",
+    keywords: ["gavel", "bua", "hoi dong", "tham dinh", "toa an", "phap ly"],
+  },
+  {
+    name: "Scale",
+    label: "Cán cân / Chuẩn mực pháp lý",
+    icon: Scale,
+    category: "awards",
+    keywords: ["scale", "can can", "cong ly", "quy che", "chuan muc", "phap ly"],
+  },
 
   // --- Liên hệ & Truyền thông ---
   {
@@ -521,6 +539,13 @@ export const iconList = [
     keywords: ["scroll", "di san", "chieu chi", "phap ly"],
   },
   {
+    name: "ScrollText",
+    label: "Bằng chứng nhận / Văn kiện",
+    icon: ScrollText,
+    category: "creative",
+    keywords: ["scroll", "chung nhan", "bang khen", "nghi quyet", "van kien"],
+  },
+  {
     name: "Rocket",
     label: "Đột phá / Khởi nghiệp",
     icon: Rocket,
@@ -529,6 +554,13 @@ export const iconList = [
   },
 
   // --- Công cụ & Hành động ---
+  {
+    name: "Hammer",
+    label: "Búa chế tác / Tinh hoa nghề",
+    icon: Hammer,
+    category: "actions",
+    keywords: ["hammer", "bua", "che tac", "nghe nhan", "handyman", "lang nghe"],
+  },
   {
     name: "Search",
     label: "Tìm kiếm",
@@ -755,6 +787,11 @@ export const iconMap = Object.fromEntries(
   iconList.map((item) => [item.name, item])
 );
 
+const iconAliases = {
+  bank: "Landmark",
+  "shield-check": "ShieldCheck",
+};
+
 /**
  * Lấy Icon component theo tên
  * @param {string} name Tên icon (vd: "Award", "Trophy")
@@ -762,7 +799,10 @@ export const iconMap = Object.fromEntries(
  */
 export const getIconComponent = (name) => {
   if (!name) return HelpCircle;
-  return iconMap[name]?.icon || HelpCircle;
+  const normalizedName = iconAliases[name] || name;
+  const iconItem = iconMap[normalizedName]
+    || iconMap[normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)];
+  return iconItem?.icon || HelpCircle;
 };
 
 /**
@@ -792,4 +832,3 @@ export const searchIcons = (query = "", category = "all") => {
     return item.keywords.some((kw) => kw.includes(cleanQuery));
   });
 };
-

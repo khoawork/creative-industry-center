@@ -91,6 +91,7 @@ export const about = {
   caption: aboutData?.featured_image?.caption_text || '',
   missionTitle: mission?.title || '',
   mission: mission?.description || '',
+  missionIcon: mission?.icon || 'landmark',
   values: coreValues.slice(1),
   actionButton: {
     text: aboutData?.action_button?.text || '',

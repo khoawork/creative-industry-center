@@ -1,11 +1,7 @@
 import { Building2, Clock3, Mail, MessageCircle, PhoneCall, Play } from 'lucide-react'
 import Icon from '../shared/Icon.jsx'
+import { DynamicIcon } from '../icons/index.js'
 
-const channelIcons = {
-  zalo: <MessageCircle size={20} aria-hidden="true" />,
-  facebook: <Icon name="globe" />,
-  youtube: <Play size={20} aria-hidden="true" />,
-}
 const linkClass = 'rounded-sm font-medium text-[var(--contact-red)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--contact-gold)]'
 const channelClass = 'flex min-w-0 flex-col items-center justify-center gap-1 rounded-[4px] bg-[var(--contact-cream)] p-2 text-center text-xs font-semibold'
 const badgeClass = 'flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--contact-cream)] text-[var(--contact-gold)]'
@@ -86,7 +82,16 @@ export default function ContactInfo({ contact, offices, hours, channels }) {
         <h3 className="mb-2 text-xs font-bold tracking-wider uppercase">Kênh Thông Tin Điện Tử</h3>
         <div className="grid grid-cols-3 gap-2">
           {channels.map((channel) => {
-            const content = <><span className="text-[var(--contact-red)]">{channelIcons[channel.id] || <Icon name="globe" />}</span><span>{channel.label}</span></>
+            const defaultIcon = channel.id === 'facebook' ? 'Globe' : channel.id === 'zalo' ? 'MessageCircle' : channel.id === 'youtube' ? 'Play' : 'Globe'
+            const iconName = channel.icon || defaultIcon
+            const content = (
+              <>
+                <span className="text-[var(--contact-red)]">
+                  <DynamicIcon name={iconName} size={18} fallback="Globe" />
+                </span>
+                <span>{channel.label}</span>
+              </>
+            )
             const href = externalHref(channel.href)
             return href ? (
               <a key={channel.id} href={href} target="_blank" rel="noopener noreferrer" className={`${channelClass} hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--contact-gold)]`}>{content}</a>

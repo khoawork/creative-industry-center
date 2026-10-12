@@ -8,6 +8,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { AdminCard, AdminButton, AdminBadge, AdminInput } from "../Common/index.js";
+import RecordHolderIcon from "../../RecordHolder/RecordHolderIcon.jsx";
 
 export default function RecordItemsEditor({
   records = [],
@@ -194,8 +195,9 @@ export default function RecordItemsEditor({
                 <div>
                   {/* Top row: Rank badge + Checkbox */}
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                      {item.rank || "HẠNG MỤC KỶ LỤC"}
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <RecordHolderIcon name={item.icon || "flare"} size={13} className="shrink-0" />
+                      <span>{item.rank || "HẠNG MỤC KỶ LỤC"}</span>
                     </span>
                     <div
                       className={`w-5 h-5 rounded-md flex items-center justify-center transition ${

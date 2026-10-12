@@ -6,11 +6,12 @@ import { FormBuilder } from '../../components/Admin/Base/index.js'
 import ContactAvailabilityMessage from '../../components/Contact/ContactAvailabilityMessage.jsx'
 import ContactForm from '../../components/Contact/ContactForm.jsx'
 import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, requireContactData } from '../../api/contactApi.js'
+import { DashboardAPI } from '../../api/dashboardApi.js'
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
-import { DashboardAPI } from '../../api/dashboardApi.js'
 import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common/index.js'
+import { IconDropdown } from '../../components/icons/index.js'
 
 function clone(value) {
   return structuredClone(value)
@@ -390,7 +391,7 @@ export default function AdminContact() {
   function addSocialChannel() {
     setDraftProps((current) => ({
       ...current,
-      socialChannels: [...(current.socialChannels || []), { id: `channel_${Date.now()}`, label: '', href: null }],
+      socialChannels: [...(current.socialChannels || []), { id: `channel_${Date.now()}`, label: '', href: null, icon: 'Globe' }],
     }))
     setToast(null)
   }
@@ -713,15 +714,17 @@ export default function AdminContact() {
 
       <section className={sectionClass}>
         <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-(--admin-title)">Kênh thông tin điện tử</h2><button type="button" className={adminButton} onClick={addSocialChannel}><Plus size={16} />Thêm kênh</button></div>
-        <div className="grid gap-3 border-b border-(--admin-border) pb-2 text-sm font-semibold text-(--admin-heading) sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+        <div className="grid gap-3 border-b border-(--admin-border) pb-2 text-sm font-semibold text-(--admin-heading) sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px_auto]">
           <span>Tên kênh <span className="text-(--admin-accent)">*</span></span>
           <span>Đường dẫn kênh</span>
+          <span>Biểu tượng</span>
           <span aria-hidden="true" />
         </div>
         <div className="space-y-3">
-          {socialChannels.map((channel, index) => <div key={channel.id || index} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+          {socialChannels.map((channel, index) => <div key={channel.id || index} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px_auto] sm:items-end">
             <ContactField label="Tên kênh" hideLabel required value={channel.label} onChange={(value) => updateListItem('socialChannels', index, 'label', value)} placeholder="Ví dụ: Zalo OA" />
             <ContactField label="Đường dẫn kênh" hideLabel value={channel.href || ''} onChange={(value) => updateListItem('socialChannels', index, 'href', value || null)} placeholder="Ví dụ: https://zalo.me/..." />
+            <IconDropdown label="Biểu tượng" value={channel.icon || 'Globe'} onChange={(value) => updateListItem('socialChannels', index, 'icon', value)} placeholder="Chọn icon..." size="sm" />
             <button type="button" className={adminButton} onClick={() => removeSocialChannel(index)}><Trash2 size={15} />Xóa</button>
           </div>)}
         </div>

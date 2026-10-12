@@ -4,6 +4,7 @@ import Field from './EventField.jsx'
 import EventStatusMultiSelect from './EventStatusMultiSelect.jsx'
 import { FormBuilder } from '../Base/index.js'
 import EventNewsletter from '../../event-actis/EventNewsletter.jsx'
+import { IconDropdown } from '../../icons/index.js'
 import { adminButton } from '../../../config/Admin/adminEvents.js'
 import { fetchFormConfig, DEFAULT_FORM_CONFIGS } from '../../../services/googleSheetService.js'
 
@@ -91,9 +92,13 @@ export default function PageSectionFields({ section, value, onChange }) {
           <button type="button" className={adminButton} aria-label={`Xóa thống kê ${index + 1}`} onClick={() => update('statistics', statistics.filter((_, i) => i !== index))}><Trash2 size={14} /></button>
         </div></div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Biểu tượng" value={stat.icon} onChange={(icon) => update('statistics', statistics.map((item, i) => i === index ? { ...item, icon } : item))}>
-            <option value="calendar">Lịch</option><option value="users">Đại biểu</option><option value="certificate">Chứng nhận</option><option value="building">Tổ chức</option>
-          </Field>
+          <IconDropdown
+            label="Biểu tượng"
+            value={stat.icon}
+            onChange={(icon) => update('statistics', statistics.map((item, i) => i === index ? { ...item, icon } : item))}
+            placeholder="Chọn biểu tượng..."
+            size="sm"
+          />
           {['value', 'label'].map((key) => <Field key={key} label={key === 'value' ? 'Giá trị' : 'Nhãn thống kê'} required value={stat[key]} onChange={(next) => update('statistics', statistics.map((item, i) => i === index ? { ...item, [key]: next } : item))} />)}
         </div>
       </div>)}

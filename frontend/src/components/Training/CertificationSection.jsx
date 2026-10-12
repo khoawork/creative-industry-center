@@ -1,44 +1,34 @@
-import {
-  FaCheckCircle,
-  FaAward,
-  FaIdBadge,
-  FaUsers,
-  FaHandshake,
-} from "react-icons/fa";
+import { DynamicIcon } from "../icons/index.js";
 
 const defaultCertifications = [
   {
-    icon: FaAward,
+    icon: "Award",
     title: "Chứng nhận Quốc gia",
-    description:
-      "Ký duyệt trực tiếp bởi lãnh đạo Viện Kỷ lục Việt Nam.",
+    description: "Ký duyệt trực tiếp bởi lãnh đạo Viện Kỷ lục Việt Nam.",
   },
   {
-    icon: FaIdBadge,
+    icon: "BadgeCheck",
     title: "Mã số Tra cứu Toàn quốc",
-    description:
-      "Tích hợp mã định danh điện tử trên cổng tra cứu hồ sơ quốc gia.",
+    description: "Tích hợp mã định danh điện tử trên cổng tra cứu hồ sơ quốc gia.",
   },
   {
-    icon: FaUsers,
+    icon: "Users",
     title: "Mạng lưới Kỷ lục gia",
-    description:
-      "Quyền tham gia Câu lạc bộ Sáng tạo & Kỷ lục gia doanh nghiệp.",
+    description: "Quyền tham gia Câu lạc bộ Sáng tạo & Kỷ lục gia doanh nghiệp.",
   },
   {
-    icon: FaHandshake,
+    icon: "Handshake",
     title: "Cố vấn Dự án Thực tế",
-    description:
-      "Hỗ trợ kết nối chuyên gia đồng hành 6 tháng sau đào tạo.",
+    description: "Hỗ trợ kết nối chuyên gia đồng hành 6 tháng sau đào tạo.",
   },
 ];
 
-const iconMap = {
-  award: FaAward,
-  'id-badge': FaIdBadge,
-  users: FaUsers,
-  handshake: FaHandshake,
-  check: FaCheckCircle,
+const aliasMap = {
+  award: "Award",
+  "id-badge": "BadgeCheck",
+  users: "Users",
+  handshake: "Handshake",
+  check: "CheckCircle",
 };
 
 
@@ -58,7 +48,7 @@ export default function CertificationSection({ certificationData }) {
   const items =
     Array.isArray(certificationData?.items) && certificationData.items.length > 0
       ? certificationData.items.map((it) => ({
-          icon: iconMap[it.icon] || FaAward,
+          icon: aliasMap[it.icon] || it.icon || "Award",
           title: it.title,
           description: it.description,
         }))
@@ -70,8 +60,8 @@ export default function CertificationSection({ certificationData }) {
         <div className="rounded-lg bg-white p-12 shadow-sm">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             <div className="lg:col-span-8">
-              <div className="mb-2 inline-flex items-center gap-1 text-[12px] leading-4 font-semibold uppercase text-[#805600]">
-                <FaCheckCircle className="text-[18px]" />
+              <div className="mb-2 inline-flex items-center gap-1.5 text-[12px] leading-4 font-semibold uppercase text-[#805600]">
+                <DynamicIcon name="CheckCircle" size={18} />
                 {tag}
               </div>
 
@@ -86,15 +76,17 @@ export default function CertificationSection({ certificationData }) {
 
               <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
                 {items.map((item, idx) => {
-                  const Icon = item.icon || FaAward;
-
-
                   return (
                     <div
-                      key={item.title}
+                      key={item.title || idx}
                       className="flex items-start gap-2"
                     >
-                      <Icon className="mt-0.5 shrink-0 text-[22px] text-[#805600]" />
+                      <DynamicIcon
+                        name={item.icon}
+                        size={22}
+                        className="mt-0.5 shrink-0 text-[#805600]"
+                        fallback="Award"
+                      />
 
                       <div>
                         <h4 className="text-[18px] leading-6 font-bold text-[#1a1c1b]">
@@ -113,7 +105,7 @@ export default function CertificationSection({ certificationData }) {
 
             <div className="flex flex-col items-center rounded-lg bg-[#e9e8e6] p-6 text-center lg:col-span-4">
               <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-white text-[#490003] shadow-sm">
-                <FaAward className="text-[40px] text-[#805600]" />
+                <DynamicIcon name="Award" size={40} className="text-[#805600]" fallback="Award" />
               </div>
 
               <span className="mb-1 text-[18px] leading-6 font-bold text-[#490003]">

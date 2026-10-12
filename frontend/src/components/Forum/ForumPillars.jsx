@@ -1,17 +1,17 @@
 import React from 'react';
-import { BadgeCheck, Globe2, Layers3, Network, Shield, TrendingUp, Award } from 'lucide-react';
+import { DynamicIcon } from '../icons/index.js';
 
-const icons = {
-  trending_up: TrendingUp,
-  'trending-up': TrendingUp,
-  hub: Network,
-  network: Network,
-  public: Globe2,
-  globe: Globe2,
-  shield: Shield,
-  layers: Layers3,
-  award: Award,
-  verified: BadgeCheck,
+const aliasMap = {
+  trending_up: "TrendingUp",
+  "trending-up": "TrendingUp",
+  hub: "Network",
+  network: "Network",
+  public: "Globe",
+  globe: "Globe",
+  shield: "ShieldCheck",
+  layers: "Layers",
+  award: "Award",
+  verified: "BadgeCheck",
 };
 
 export default function ForumPillars({ data }) {
@@ -38,14 +38,14 @@ export default function ForumPillars({ data }) {
 
         <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-2 xl:grid-cols-4">
           {pillars.map((pillar, index) => {
-            const Icon = icons[pillar.icon] || BadgeCheck;
+            const iconName = aliasMap[pillar.icon] || pillar.icon || "BadgeCheck";
             return (
               <article
                 key={pillar.id || index}
                 className="flex min-h-[166px] flex-col rounded-md border border-slate-100 bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-3.5"
               >
                 <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-md bg-[#f0f4f8] text-[#164c91]">
-                  <Icon size={20} />
+                  <DynamicIcon name={iconName} size={20} fallback="BadgeCheck" />
                 </div>
                 <span className="mb-1 text-[18px] font-semibold uppercase tracking-wide text-blue-700">
                     {pillar.pillar_no}

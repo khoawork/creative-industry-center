@@ -45,10 +45,6 @@ function getIntroduceSections(props) {
     if (key === 'hero_section') {
       section.quote = text(source.quote)
       section.quote_author = text(source.quote_author)
-      section.breadcrumbs = list(source.breadcrumbs)
-        .filter((item) => isObject(item) && text(item.text)
-          && (item.link === null || text(item.link)))
-        .map((item) => ({ text: item.text, link: item.link }))
     } else if (key === 'core_values_section') {
       section.description = text(source.description)
       section.items = items(source.items)

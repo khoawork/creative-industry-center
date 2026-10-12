@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  Award,
-  Scroll,
-  Share2,
   Sparkles,
-  ShieldCheck,
-  Users,
-  FileCheck,
   CheckCircle,
   Play,
   Send,
   Loader2,
   AlertCircle,
 } from "lucide-react";
+import { DynamicIcon } from "../icons/index.js";
 import {
   fetchFormConfig,
   submitFormToBackend,
@@ -208,23 +203,20 @@ export default function ProjectForm({ formData }) {
   };
 
   const renderBenefitIcon = (iconKey) => {
-    switch (iconKey) {
-      case "badge":
-      case "award":
-        return <Award className="text-[#f59e0b] shrink-0" size={20} />;
-      case "scroll":
-      case "file":
-      case "legal":
-        return <Scroll className="text-[#f59e0b] shrink-0" size={20} />;
-      case "network":
-      case "users":
-      case "share":
-        return <Share2 className="text-[#f59e0b] shrink-0" size={20} />;
-      case "shield":
-        return <ShieldCheck className="text-[#f59e0b] shrink-0" size={20} />;
-      default:
-        return <CheckCircle className="text-[#f59e0b] shrink-0" size={20} />;
-    }
+    const aliasMap = {
+      badge: "Award",
+      award: "Award",
+      scroll: "Scroll",
+      file: "FileText",
+      legal: "Scale",
+      network: "Share2",
+      users: "Users",
+      share: "Share2",
+      shield: "ShieldCheck",
+      check: "CheckCircle",
+    };
+    const iconName = aliasMap[iconKey] || iconKey || "CheckCircle";
+    return <DynamicIcon name={iconName} className="text-[#f59e0b] shrink-0" size={20} fallback="CheckCircle" />;
   };
 
   return (
