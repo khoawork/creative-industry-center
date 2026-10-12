@@ -22,11 +22,23 @@ import {
 import { AdminConfirmModal } from '../Common/index.js';
 
 export default function NavSectionsEditor({
-  navSections = [],
+  navSections: navSectionsProp,
+  initialData,
   onSaveSection,
+  onSave,
   onDeleteSection,
+  onDelete,
+  pageId,
   isSaving,
 }) {
+  const navSections = Array.isArray(navSectionsProp)
+    ? navSectionsProp
+    : Array.isArray(initialData)
+    ? initialData
+    : [];
+  const handleSaveCallback = onSaveSection || onSave;
+  const handleDeleteCallback = onDeleteSection || onDelete;
+
   const [, setContentDataVersion] = useState(0);
   const [editingId, setEditingId] = useState(null); // null, 'new', or number
   const [activeForm, setActiveForm] = useState({
@@ -114,7 +126,9 @@ export default function NavSectionsEditor({
   const handleSave = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    await onSaveSection(activeForm);
+    if (handleSaveCallback) {
+      await handleSaveCallback(activeForm);
+    }
     setEditingId(null);
     setStatusMessage('Đã lưu chuyên mục thành công!');
     setTimeout(() => setStatusMessage(null), 3000);
@@ -436,6 +450,11 @@ export default function NavSectionsEditor({
                         onDeleteSection(nav.id);
                       },
                     });
+                    if (confirm(`Bạn có chắc muốn xóa chuyên mục "${nav.title_main}"?`)) {
+                      if (handleDeleteCallback) {
+                        handleDeleteCallback(nav.id);
+                      }
+                    }
                   }}
                   className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 cursor-pointer"
                   title="Xóa chuyên mục"

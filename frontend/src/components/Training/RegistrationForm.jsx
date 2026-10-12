@@ -122,6 +122,7 @@ export default function RegistrationForm({ training = {} }) {
   }
 
   return (
+    <div className="flex flex-col justify-center bg-[#f4f3f1] p-8 lg:col-span-5 rounded-sx">
     <div className="flex flex-col justify-center bg-[#f4f3f1] p-6 sm:p-8 lg:col-span-5 rounded-2xl border border-amber-900/10 shadow-xs">
       <div className="mb-4">
         <span className="text-[12px] leading-4 font-bold uppercase tracking-[0.05em] text-[#490003]">
@@ -233,6 +234,7 @@ export default function RegistrationForm({ training = {} }) {
           </button>
         </form>
       )}
+    </div>
     </div>
   );
 }

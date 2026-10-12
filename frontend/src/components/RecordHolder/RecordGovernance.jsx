@@ -9,11 +9,11 @@ export default function RecordGovernance({ governance }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 text-record-secondary font-label-sm text-label-sm uppercase tracking-widest font-bold">
+              <div className="inline-flex items-center gap-4 text-record-secondary font-label-sm text-label-sm uppercase tracking-widest font-bold">
                 <span className="w-2 h-2 rounded-full bg-record-secondary-container"></span>
                 {governance.subtitle}
               </div>
-              <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
+              <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold ">
                 {governance.title}
               </h2>
             </div>

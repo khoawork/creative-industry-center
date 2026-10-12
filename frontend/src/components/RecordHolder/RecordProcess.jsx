@@ -27,6 +27,9 @@ export default function RecordProcess({ process }) {
             <span className="w-2 h-2 rounded-full bg-record-primary"></span>
             {process.subtitle || "QUY TRÌNH CHUẨN HÓA"}
           </div>
+          <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold py-4">
+            {process.title}
+            </h2>
           <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
             {process.title || "QUY TRÌNH 4 BƯỚC THẨM ĐỊNH & XÁC LẬP ĐỀ CỬ KỶ LỤC"}
           </h2>
@@ -35,7 +38,7 @@ export default function RecordProcess({ process }) {
           </p>
         </div>
 
-        {/* Lưới các bước quy trình */}
+        {/* Lưới 4 bước quy trình */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {process.cards?.map((card, idx) => {
             const stepNum = String(idx + 1).padStart(2, "0");

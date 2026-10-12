@@ -11,13 +11,13 @@ export default function ForumAwards({ data, dbAwards = [] }) {
     <section id="giai-thuong" className="scroll-mt-24 bg-[#f1f4f8] px-4 py-12 text-slate-800 sm:px-6 lg:py-16">
       <div className="mx-auto max-w-6xl">
         <header className="mx-auto mb-8 max-w-3xl text-center">
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
+          <p className="mb-2 text-xl font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-[14px]">
             {section.tag}
           </p>
           <h2 className="text-2xl font-bold leading-tight text-[#092d63] sm:text-3xl">
             {section.title}
           </h2>
-          <p className="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
+          <p className="mt-2 text-base leading-relaxed text-slate-600 sm:text-sm">
             {section.description}
           </p>
         </header>
@@ -54,12 +54,12 @@ export default function ForumAwards({ data, dbAwards = [] }) {
                 <h3 className="mx-auto max-w-sm text-sm font-bold leading-snug text-[#092d63]">
                   {name}
                 </h3>
-                <p className="mt-2 text-[10px] leading-relaxed text-slate-600">
+                <p className="mt-2 text-[12px] leading-relaxed text-slate-600">
                   {description}
                 </p>
                 {criteria.length > 0 && (
                   <div className="mt-auto pt-3 text-left">
-                    <p className="border-t border-slate-100 pt-2 text-[9px] font-bold text-slate-700">
+                    <p className="border-t border-slate-100 pt-2 text-[12px] font-bold text-slate-700">
                       Tiêu chí then chốt:
                     </p>
                     <ul className="mt-1 list-inside list-disc space-y-0.5 text-left text-[9px] leading-relaxed text-slate-600">

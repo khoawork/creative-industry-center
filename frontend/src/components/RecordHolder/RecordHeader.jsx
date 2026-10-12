@@ -11,16 +11,6 @@ export default function RecordHeader({ header }) {
         <RecordHolderIcon name="workspace_premium" size={280} className="text-record-secondary-fixed lg:-translate-x-14" />
       </div>
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-20 flex flex-col gap-6">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-record-surface-container-high font-label-md text-label-md">
-          <a className="hover:text-record-secondary-container transition-colors flex items-center gap-1" href="/trang-chu">
-            <RecordHolderIcon name="home" size={18} />
-            Trang chủ
-          </a>
-          <span className="opacity-40">/</span>
-          <span className="text-record-secondary-fixed font-semibold tracking-wide">
-            {header.title}
-          </span>
-        </nav>
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-2">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-record-surface-container-lowest/10 backdrop-blur-md shadow-sm">
@@ -29,7 +19,7 @@ export default function RecordHeader({ header }) {
                 {header.subtitle}
               </span>
             </div>
-            <h1 className="font-display-lg text-display-lg text-record-on-primary tracking-tight leading-tight uppercase drop-shadow-sm">
+            <h1 className="font-display-lg text-display-lg text-record-on-primary  tracking-tight leading-tight uppercase drop-shadow-sm">
               {header.title}
             </h1>
             {header.slogan && (

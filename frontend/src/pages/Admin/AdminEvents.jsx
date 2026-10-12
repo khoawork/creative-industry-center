@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { AlertCircle, CheckCircle2, Save, X } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { AlertCircle, ArrowRight, CheckCircle2, Save, X } from "lucide-react";
 import { EventAPI } from "../../api/eventApi.js";
 import {
   eventsAdminTabs,
@@ -14,7 +14,6 @@ import {
 } from "../../config/Admin/adminEvents.js";
 import { eventError, requireEventData } from "../../api/eventApi.js";
 import PageSectionFields from "../../components/Admin/Events/PageSectionFields.jsx";
-import EventCategories from "../../components/Admin/Events/EventCategories.jsx";
 import EventManager from "../../components/Admin/Events/EventManager.jsx";
 import { AdminPageHeader, AdminTabs, AdminToast, AdminCard, AdminButton, AdminStickySaveBar } from "../../components/Admin/Common/index.js";
 
@@ -338,14 +337,21 @@ export default function AdminEvents() {
                   </>
                 )}
                 {tab.key === "filter_section" && (
-                  <AdminCard
-                    title="Quản lý Chuyên mục Sự kiện"
-                    subtitle="Tạo và sắp xếp các nhóm chuyên mục để phân loại sự kiện."
-                  >
-                    <EventCategories
-                      onCreated={() => setListVersion((value) => value + 1)}
-                    />
-                  </AdminCard>
+                  <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-sm text-blue-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-blue-950">Quản lý Chuyên mục Sự kiện</p>
+                      <p className="text-xs text-blue-700 mt-0.5">
+                        Tính năng thêm, sửa, xóa chuyên mục sự kiện đã được chuyển sang mục <strong>Danh mục Dữ liệu &gt; Sự kiện &gt; Quản lý Chuyên mục</strong>.
+                      </p>
+                    </div>
+                    <Link
+                      to="/admin/catalog?tab=events&view=categories"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-blue-700 transition shrink-0 shadow-2xs"
+                    >
+                      <span>Mở Quản lý Chuyên mục</span>
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
                 )}
               </div>
             )

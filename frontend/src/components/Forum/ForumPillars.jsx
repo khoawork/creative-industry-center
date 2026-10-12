@@ -24,14 +24,14 @@ export default function ForumPillars({ data }) {
       <div className="mx-auto max-w-6xl">
         <div className="mb-5 grid grid-cols-1 items-end gap-3 md:grid-cols-[1.2fr_1fr] md:gap-8">
           <div>
-            <p className="mb-1 text-[8px] font-bold uppercase tracking-[0.12em] text-blue-700 sm:text-[9px]">
+            <p className="mb-1 text-xl font-bold uppercase tracking-[0.12em] text-blue-700 sm:text-[14px]">
               {section.tag}
             </p>
-            <h2 className="text-xl font-bold leading-tight text-[#092d63] sm:text-2xl">
+            <h2 className="text-3xl font-bold leading-tight text-[#092d63] sm:text-2xl">
               {section.title}
             </h2>
           </div>
-          <p className="text-[10px] leading-relaxed text-slate-600 sm:text-xs">
+          <p className="text-[14px] leading-relaxed text-slate-600 sm:text-sm">
             {section.description}
           </p>
         </div>
@@ -45,19 +45,19 @@ export default function ForumPillars({ data }) {
                 className="flex min-h-[166px] flex-col rounded-md border border-slate-100 bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-3.5"
               >
                 <div className="mb-2.5 flex h-8 w-8 items-center justify-center rounded-md bg-[#f0f4f8] text-[#164c91]">
-                  <Icon size={17} />
+                  <Icon size={20} />
                 </div>
-                <span className="mb-1 text-[8px] font-semibold uppercase tracking-wide text-blue-700">
+                <span className="mb-1 text-[18px] font-semibold uppercase tracking-wide text-blue-700">
                     {pillar.pillar_no}
                 </span>
-                <h3 className="text-[11px] font-bold leading-snug text-[#092d63] sm:text-xs">
+                <h3 className="text-[16px] font-bold leading-snug text-[#092d63] sm:text-xs">
                   {pillar.title}
                 </h3>
-                <p className="mt-1.5 text-[9px] leading-relaxed text-slate-600">
+                <p className="mt-1.5 text-[14px] leading-relaxed text-slate-600">
                   {pillar.description}
                 </p>
                 {pillar.action_text && (
-                  <span className="mt-auto pt-2 text-[8px] font-semibold text-blue-700">
+                  <span className="mt-auto pt-2 text-[14px] font-semibold text-blue-700">
                     {pillar.action_text} <span aria-hidden="true">›</span>
                   </span>
                 )}

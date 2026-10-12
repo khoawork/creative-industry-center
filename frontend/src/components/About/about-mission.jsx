@@ -8,7 +8,7 @@ export default function AboutMission({ section }) {
         {section.items.length > 0 && (
           <div className="space-y-4 pt-2">
             {section.items.map((item, index) => (
-              <article key={index} className="flex flex-col items-start gap-3 rounded-lg border border-black/10 bg-white p-4 shadow-sm sm:flex-row sm:gap-4 sm:p-5">
+              <article key={index} className="flex flex-col items-start gap-3 rounded-sm border border-black/10 bg-white p-4 shadow-sm sm:flex-row sm:gap-4 sm:p-5">
                 <AboutIcon code={item.icon} className="rounded-full border border-[#d49520]/40 bg-[#710008] p-3 text-[#d49520]" />
                 <div className="min-w-0">
                   <h3 className="mb-1 text-lg font-bold text-[#710008]">{item.title}</h3>

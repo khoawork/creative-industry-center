@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import routes, { adminRoute } from "./routes";
 import Header from "./layout/Header";
@@ -6,8 +7,11 @@ import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 import { AuthProvider } from "./context/AuthContext";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import ForumPage from "./pages/ForumPage.jsx";
+import { initializeWow } from "./wow.js";
 
 function App() {
+  useEffect(() => initializeWow(), []);
+
   return (
     <AuthProvider>
       <SiteSettingsProvider>

@@ -236,7 +236,6 @@ export default function ProjectForm({ formData }) {
         {/* Cột trái: Thông tin giới thiệu & Quyền lợi */}
         <div className="lg:col-span-7 space-y-6">
           <div className="inline-flex items-center gap-2 bg-[#ffffff18] border border-amber-300/30 text-amber-200 px-3.5 py-1.5 rounded-md text-xs font-semibold tracking-wider uppercase backdrop-blur-xs">
-            <Sparkles size={14} className="text-amber-300" />
             <span>{tag}</span>
           </div>
 

@@ -24,7 +24,7 @@ export default function ForumPartners({ data }) {
     <section id="doi-tac" className="scroll-mt-24 bg-[#f7fafe] px-4 py-12 text-slate-800 sm:px-6 lg:py-16">
       <div className="mx-auto max-w-6xl">
         <div className="mb-5 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
+          <p className="text-xl font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-[14px]">
             {section.organizers_tag}
           </p>
         </div>
@@ -38,17 +38,17 @@ export default function ForumPartners({ data }) {
                 <PartnerMark image={partner.image} name={partner.name} small />
               </span>
               <span className="min-w-0 text-left">
-                <span className="block text-[10px] font-extrabold leading-snug text-[#092d63]">
+                <span className="block text-[12px] font-extrabold leading-snug text-[#092d63]">
                   {partner.name}
                 </span>
-                <span className="mt-1 block text-[9px] text-slate-500">{partner.desc || partner.tier}</span>
+                <span className="mt-1 block text-[12px] text-slate-500">{partner.desc || partner.tier}</span>
               </span>
             </article>
           ))}
         </div>
 
         <div className="mb-5 mt-8 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-xs">
+          <p className="text-xl font-bold uppercase tracking-[0.14em] text-blue-700 sm:text-[14px]">
             {section.sponsors_tag}
           </p>
         </div>
@@ -61,17 +61,14 @@ export default function ForumPartners({ data }) {
               <span className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
                 <PartnerMark image={partner.image} name={partner.name} small />
               </span>
-              <span className="text-[9px] font-bold leading-snug text-[#092d63]">{partner.name}</span>
+              <span className="text-[12px] font-bold leading-snug text-[#092d63]">{partner.name}</span>
               {partner.tier && (
-                <span className="mt-1 text-[8px] text-slate-500">{partner.tier}</span>
+                <span className="mt-1 text-[10px] text-slate-500">{partner.tier}</span>
               )}
             </article>
           ))}
         </div>
-        <div className="mt-6 flex items-center justify-center gap-2 text-[9px] font-medium text-slate-500">
-          <ShieldCheck size={13} className="text-blue-700" />
-          Cùng kiến tạo và lan tỏa những giá trị Việt Nam
-        </div>
+       
       </div>
     </section>
   );

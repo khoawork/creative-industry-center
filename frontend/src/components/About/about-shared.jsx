@@ -35,7 +35,7 @@ export function AboutLink({ href, className = '', children }) {
 export function AboutHeading({ tag, title }) {
   return (
     <>
-      {tag && <p className="inline-flex rounded-full border border-[#d49520]/40 bg-[#d49520]/15 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[#710008]">{tag}</p>}
+      {tag && <p className="inline-flex rounded-xl border border-[#d49520]/40 bg-[#d49520]/15 px-4 py-3 text-xs font-bold uppercase tracking-wide text-[#710008]">{tag}</p>}
       <h2 className="text-2xl font-extrabold leading-tight text-[#710008] lg:text-3xl">{title}</h2>
       <div aria-hidden="true" className="h-1.5 w-20 rounded-full bg-[#d49520]" />
     </>
@@ -47,7 +47,7 @@ export function AboutImage({ image }) {
   const url = getSafeUrl(image?.url);
   const unavailable = !url || failedUrl === url;
   return (
-    <figure className="relative isolate grid min-h-72 overflow-hidden rounded-xl border-2 border-[#d49520]/50 bg-[#f4f3f1] shadow-xl sm:min-h-[450px]">
+    <figure className="relative isolate grid min-h-72 overflow-hidden rounded-sm border-2 border-[#d49520]/50 bg-[#f4f3f1] shadow-xl sm:min-h-[450px]">
       {unavailable ? (
         <div role="img" aria-label={image?.alt || 'Ảnh chưa có'} className="flex min-h-72 flex-col items-center justify-center gap-2 px-6 py-12 text-center text-black/70">
           <p className="font-semibold">Không thể hiển thị ảnh</p>

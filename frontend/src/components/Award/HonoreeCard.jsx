@@ -58,7 +58,7 @@ export const HonoreeCard = ({ honoree, onSelectHonoree }) => {
       {/* Card Footer: Date & Code */}
       <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-[11px]">
         <span className="text-[#58413f]">
-          {honoree.date}
+          Ngày trao: {honoree.date}
         </span>
         <span className="rounded bg-[#710008]/10 px-2 py-0.5 font-mono font-bold text-[#710008]">
           {honoree.code}

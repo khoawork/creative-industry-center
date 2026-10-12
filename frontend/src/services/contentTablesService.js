@@ -13,8 +13,15 @@ export const DEFAULT_TABLE_DATA = {
 };
 
 export async function fetchNavSections(pageId) {
-  const response = await HomeAPI.getAllNavs(pageId);
-  return Array.isArray(response?.data) ? response.data : [];
+  try {
+    const response = await HomeAPI.getAllNavs(pageId);
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response)) return response;
+    return [];
+  } catch (error) {
+    console.warn('Lỗi khi fetchNavSections:', error);
+    return [];
+  }
 }
 
 export function detectTableForNav(nav) {
@@ -23,6 +30,15 @@ export function detectTableForNav(nav) {
   const text =
     `${nav.tag || ""} ${nav.title_main || ""} ${nav.action_button?.text || ""}`.toLowerCase();
 
+  if (
+    link.includes("award") ||
+    text.includes("giải thưởng") ||
+    text.includes("vinh danh") ||
+    text.includes("danh vị") ||
+    text.includes("bảng vàng") ||
+    text.includes("kỷ lục")
+  )
+    return "awards";
   if (
     link.includes("project") ||
     text.includes("dự án") ||
@@ -36,13 +52,6 @@ export function detectTableForNav(nav) {
     text.includes("khóa")
   )
     return "trainings";
-  if (
-    link.includes("award") ||
-    text.includes("giải thưởng") ||
-    text.includes("vinh danh") ||
-    text.includes("kỷ lục")
-  )
-    return "awards";
   if (
     link.includes("event") ||
     text.includes("sự kiện") ||
@@ -103,7 +112,7 @@ export async function fetchTableItems(tableKey) {
         tag: award.decision_number || "",
         decision: award.decision_number || "",
         image: award.image || "",
-      }));
+      }));  
     } else {
       items = [];
     }

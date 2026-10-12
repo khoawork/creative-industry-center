@@ -23,7 +23,7 @@ export const AwardList = ({
         <button
           type="button"
           onClick={onOpenRegulationModal}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#710008] px-3.5 py-2 text-xs font-bold text-[#710008] transition hover:bg-[#710008] hover:text-white"
+          className="bg-[#ece0df] inline-flex shrink-0 items-center gap-1.5 rounded-lg cursor-pointer  px-3.5 py-2 text-xs font-bold text-[#710008] transition hover:bg-[#710008] hover:text-white"
         >
           <FileDown className="w-3.5 h-3.5" />
           <span>Quy chế xét tặng &amp; đề cử [PDF]</span>

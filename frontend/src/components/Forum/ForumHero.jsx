@@ -29,14 +29,14 @@ export default function ForumHero({ data }) {
         <h1 className="mx-auto text-3xl font-extrabold leading-tight tracking-tight text-[#052f6b] sm:text-4xl md:text-5xl">
           {title}
         </h1>
-        <p className="mt-1 text-sm font-bold tracking-wide text-[#0874d1] sm:text-xl">
+        <p className="mt-1 text-sm font-bold tracking-wide text-[#0058bc] sm:text-xl">
           {subtitle}
         </p>
-        <p className="mt-3 text-xs italic text-slate-600 sm:text-sm">{motto}</p>
+        <p className="mt-3 text-xs italic text-black-800 sm:text-sm">{motto}</p>
 
-        <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-md bg-white px-4 py-2.5 text-[11px] font-medium text-slate-800 shadow-sm sm:text-xs">
+        <div className="mx-auto mt-4 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-md bg-white px-4 py-3 text-[11px] font-medium text-slate-800 shadow-sm sm:text-xs">
           <span className="inline-flex items-center gap-2">
-            <CalendarDays size={15} className="text-blue-600" />
+            <CalendarDays size={15} className="text-blue-600" /> 
             {eventDate}
           </span>
           <span className="inline-flex items-center gap-2">

@@ -129,7 +129,7 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
         isScrolled ? 'py-1.5 shadow-md' : 'py-0'
       }`}
     >
-      <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-8 lg:pr-16">
         <div
           className={`flex items-center justify-between motion-safe:transition-all motion-safe:duration-300 gap-3 xl:gap-6 ${
             isScrolled ? 'min-h-[50px] md:min-h-[60px]' : 'min-h-[80px] md:min-h-[90px]'
@@ -142,7 +142,7 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
           {/* Show the full navigation only when all links fit on one row. */}
           <nav
             aria-label="Điều hướng chính"
-            className="hidden 2xl:flex items-center gap-3.5 min-[1760px]:gap-5 justify-end"
+            className="hidden 2xl:flex items-center gap-3.5 min-[1760px]:gap-5 justify-end "
           >
             {navItems.map((item) => {
               const active = isLinkActive(item);
@@ -188,26 +188,12 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
               );
             })}
 
-            <button
-              type="button"
-              className="ml-1 w-8 h-8 rounded-full bg-[#680007] hover:bg-[#850009] text-white flex items-center justify-center shrink-0 shadow-xs transition-all cursor-pointer"
-              title="Tài khoản đại biểu"
-              aria-label="Tài khoản đại biểu"
-            >
-              <Icon name="person" size={18} />
-            </button>
+
           </nav>
 
           {/* Compact navigation for smaller screens. */}
           <div className="flex shrink-0 2xl:hidden items-center gap-1">
-            <button
-              type="button"
-              className="w-11 h-11 rounded-full bg-[#710008] text-white flex items-center justify-center shrink-0 shadow-xs"
-              title="Tài khoản đại biểu"
-              aria-label="Tài khoản đại biểu"
-            >
-              <Icon name="person" size={18} />
-            </button>
+     
 
             <button
               type="button"
