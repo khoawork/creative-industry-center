@@ -4,7 +4,7 @@ export default function AboutMission({ section }) {
   return (
     <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
       <div className="min-w-0 space-y-6 lg:col-span-7">
-        <AboutHeading tag={section.tag} title={section.title_main} />
+        <AboutHeading tag={section.tag} title={section.title_main} icon={section.tag_icon} />
         {section.items.length > 0 && (
           <div className="space-y-4 pt-2">
             {section.items.map((item, index) => (

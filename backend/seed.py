@@ -145,9 +145,9 @@ CONTACT_PAGE_PROPS = {
         {"days": "Thứ Bảy", "time": "08:00 – 12:00"},
     ],
     "socialChannels": [
-        {"id": "zalo", "label": "Zalo OA", "href": None},
-        {"id": "facebook", "label": "Fanpage", "href": None},
-        {"id": "youtube", "label": "Sáng Tạo Việt", "href": None},
+        {"id": "zalo", "label": "Zalo OA", "href": None, "icon": "MessageCircle"},
+        {"id": "facebook", "label": "Fanpage", "href": None, "icon": "Globe"},
+        {"id": "youtube", "label": "Sáng Tạo Việt", "href": None, "icon": "Play"},
     ],
     "mapLocation": {
         "label": "Trụ sở VIETKINGS — TTCN Sáng Tạo",
@@ -1624,6 +1624,7 @@ def seed_record_page():
                         "title": "Nghệ nhân Trần Duy Long",
                         "description": "Làng nghề Gốm Bát Tràng, Hà Nội",
                         "category": "nghe-nhan",
+                        "icon": "handyman",
                         "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
                     },
                     {
@@ -1631,6 +1632,7 @@ def seed_record_page():
                         "title": "Bà Nguyễn Hồng Trang",
                         "description": "Chủ tịch HĐQT Tập đoàn Dược Liệu Tự Nhiên",
                         "category": "doanh-nhan",
+                        "icon": "flare",
                         "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
                     },
                     {
@@ -1638,6 +1640,7 @@ def seed_record_page():
                         "title": "Công ty CP Di Sản Số Đông Dương",
                         "description": "Dự án Số hóa 3D Đại Nội Huế",
                         "category": "doanh-nhan",
+                        "icon": "account_balance",
                         "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
                     },
                     {
@@ -1645,6 +1648,7 @@ def seed_record_page():
                         "title": "Nghệ nhân Đỗ Quang Hùng",
                         "description": "Lụa Vạn Phúc - Hà Đông",
                         "category": "nghe-nhan",
+                        "icon": "trophy",
                         "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80",
                     },
                 ],

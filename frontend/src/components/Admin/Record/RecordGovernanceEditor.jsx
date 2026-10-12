@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus, Trash2, ShieldCheck, CreditCard, Users } from "lucide-react";
 import { AdminCard, AdminButton, AdminInput } from "../Common";
+import { IconDropdown } from "../../icons/index.js";
 
 export default function RecordGovernanceEditor({ data = {}, onChange }) {
   const governance = {
@@ -166,11 +167,12 @@ export default function RecordGovernanceEditor({ data = {}, onChange }) {
                   </button>
                 </div>
                 <div>
-                  <AdminInput
-                    label="Icon"
-                    value={card.icon || ""}
-                    onChange={(e) => handleCardChange(idx, "icon", e.target.value)}
-                    placeholder="VD: verified_user, public, balance"
+                  <IconDropdown
+                    label="Icon biểu tượng"
+                    value={card.icon || "verified_user"}
+                    onChange={(val) => handleCardChange(idx, "icon", val)}
+                    placeholder="Chọn icon..."
+                    size="sm"
                   />
                 </div>
                 <div>
@@ -244,11 +246,11 @@ export default function RecordGovernanceEditor({ data = {}, onChange }) {
                     onChange={(e) => handleCtaChange(ctaIdx, "title", e.target.value)}
                     placeholder="VD: Hội Đồng Khoa Học Độc Lập"
                   />
-                  <AdminInput
-                    label="Icon"
-                    value={ctaItem.icon || ""}
-                    onChange={(e) => handleCtaChange(ctaIdx, "icon", e.target.value)}
-                    placeholder="VD: gavel"
+                  <IconDropdown
+                    label="Icon biểu tượng"
+                    value={ctaItem.icon || "gavel"}
+                    onChange={(val) => handleCtaChange(ctaIdx, "icon", val)}
+                    placeholder="Chọn icon..."
                   />
                   <AdminInput
                     label="Số quyết định"

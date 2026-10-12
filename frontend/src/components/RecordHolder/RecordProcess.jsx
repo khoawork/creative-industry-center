@@ -29,12 +29,10 @@ export default function RecordProcess({ process }) {
           </div>
           <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold py-4">
             {process.title}
-            </h2>
-          <h2 className="font-headline-lg text-headline-lg text-record-primary uppercase font-bold">
-            {process.title || "QUY TRÌNH 4 BƯỚC THẨM ĐỊNH & XÁC LẬP ĐỀ CỬ KỶ LỤC"}
           </h2>
           <p className="font-body-md text-body-md text-record-on-surface-variant">
-            {process.description || "Đảm bảo tính pháp lý, độc lập tuyệt đối và đánh giá giá trị sáng tạo theo quy chế Viện Kỷ lục Việt Nam."}
+            {process.description ||
+              "Đảm bảo tính pháp lý, độc lập tuyệt đối và đánh giá giá trị sáng tạo theo quy chế Viện Kỷ lục Việt Nam."}
           </p>
         </div>
 
@@ -42,19 +40,23 @@ export default function RecordProcess({ process }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {process.cards?.map((card, idx) => {
             const stepNum = String(idx + 1).padStart(2, "0");
-            const isLastStep = idx === (process.cards.length - 1);
+            const isLastStep = idx === process.cards.length - 1;
 
             // Xác định màu nền số bước dựa trên card.color
             const colorKey = card.color ? String(card.color).toLowerCase() : "";
-            const isCustomHex = colorKey.startsWith("#") || colorKey.startsWith("rgb");
+            const isCustomHex =
+              colorKey.startsWith("#") || colorKey.startsWith("rgb");
             const mappedColorClass = STEP_COLOR_MAP[colorKey];
 
             const fallbackClass = isLastStep
               ? "bg-record-secondary-container text-record-on-secondary-container"
               : "bg-record-primary text-record-on-primary";
 
-            const stepColorClass = mappedColorClass || (isCustomHex ? "text-white" : fallbackClass);
-            const customStyle = isCustomHex ? { backgroundColor: card.color, color: "#ffffff" } : undefined;
+            const stepColorClass =
+              mappedColorClass || (isCustomHex ? "text-white" : fallbackClass);
+            const customStyle = isCustomHex
+              ? { backgroundColor: card.color, color: "#ffffff" }
+              : undefined;
 
             return (
               <div
@@ -71,10 +73,23 @@ export default function RecordProcess({ process }) {
                       {stepNum}
                     </span>
                     <RecordHolderIcon
-                      name={card.icon || (idx === 0 ? "description" : idx === 1 ? "psychology" : idx === 2 ? "travel_explore" : "military_tech")}
+                      name={
+                        card.icon ||
+                        (idx === 0
+                          ? "description"
+                          : idx === 1
+                            ? "psychology"
+                            : idx === 2
+                              ? "travel_explore"
+                              : "military_tech")
+                      }
                       size={28}
                       filled={isLastStep}
-                      className={isLastStep ? "text-record-primary" : "text-record-secondary"}
+                      className={
+                        isLastStep
+                          ? "text-record-primary"
+                          : "text-record-secondary"
+                      }
                     />
                   </div>
                   <h3 className="font-headline-sm text-headline-sm text-record-primary font-bold">
@@ -90,7 +105,10 @@ export default function RecordProcess({ process }) {
                   <div className="pt-4 bg-record-surface-container-low p-3 rounded-lg text-label-sm text-record-on-surface-variant">
                     {card.info.map((inf, i) => (
                       <div key={i} className="leading-snug">
-                        <strong className="text-record-primary">{inf.label}:</strong> {inf.value}
+                        <strong className="text-record-primary">
+                          {inf.label}:
+                        </strong>{" "}
+                        {inf.value}
                       </div>
                     ))}
                   </div>
@@ -103,3 +121,4 @@ export default function RecordProcess({ process }) {
     </section>
   );
 }
+

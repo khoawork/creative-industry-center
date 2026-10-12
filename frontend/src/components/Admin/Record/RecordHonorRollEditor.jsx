@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { UploadAPI } from "../../../api/uploadApi.js";
 import { AdminCard, AdminButton, AdminToast, AdminLoadingModal, AdminConfirmModal } from "../Common/index.js";
+import { IconDropdown } from "../../icons/index.js";
+import RecordHolderIcon from "../../RecordHolder/RecordHolderIcon.jsx";
 
 const inputClass =
   "min-h-10 w-full rounded-lg border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm text-(--admin-ink) outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/30";
@@ -566,7 +568,7 @@ export default function RecordHonorRollEditor({ data = {}, onChange, onSaveAll }
                         </p>
 
                         <div className="mt-1.5 flex items-center gap-1.5 text-xs text-(--admin-accent)">
-                          <Trophy size={13} className="shrink-0" />
+                          <RecordHolderIcon name={card.icon || "trophy"} size={13} className="shrink-0" />
                           <span className="truncate font-semibold">{card.award_title || "Kỷ lục"}</span>
                         </div>
                       </div>
@@ -800,21 +802,15 @@ export default function RecordHonorRollEditor({ data = {}, onChange, onSaveAll }
                   />
                 </label>
 
-                <label className="space-y-1">
-                  <span className={labelClass}>Biểu tượng icon</span>
-                  <select
+                <div className="space-y-1">
+                  <IconDropdown
+                    label="Biểu tượng icon"
                     value={cardForm.icon || "trophy"}
-                    onChange={(e) => setCardForm({ ...cardForm, icon: e.target.value })}
-                    className={inputClass}
-                  >
-                    <option value="trophy">trophy (Cúp vàng)</option>
-                    <option value="flare">flare (Ngọn hải đăng)</option>
-                    <option value="account_balance">account_balance (Di sản)</option>
-                    <option value="handyman">handyman (Tinh hoa nghề)</option>
-                    <option value="military_tech">military_tech (Huy chương)</option>
-                    <option value="award">award (Giải thưởng)</option>
-                  </select>
-                </label>
+                    onChange={(val) => setCardForm({ ...cardForm, icon: val })}
+                    placeholder="Chọn biểu tượng..."
+                    size="sm"
+                  />
+                </div>
               </div>
             </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Plus, Trash2 } from 'lucide-react';
 import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import { IconDropdown } from '../../icons/index.js';
 
 export default function ForumPillarsEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -200,15 +201,12 @@ export default function ForumPillarsEditor({ initialData, onSave, isSaving }) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                    Mã icon (verified, trending_up, hub, public)
-                  </label>
-                  <input
-                    type="text"
+                  <IconDropdown
+                    label="Biểu tượng trụ cột"
                     value={pillar.icon || 'verified'}
-                    onChange={(e) => handlePillarChange(index, 'icon', e.target.value)}
-                    placeholder="verified"
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-800"
+                    onChange={(val) => handlePillarChange(index, 'icon', val)}
+                    placeholder="Chọn biểu tượng..."
+                    size="sm"
                   />
                 </div>
               </div>

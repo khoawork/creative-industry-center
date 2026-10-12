@@ -1,5 +1,3 @@
-import { AboutLink } from './about-shared.jsx';
-
 export default function AboutHero({ section }) {
   return (
     <section className="w-full border-b-4 border-[#d49520] bg-[#710008] px-6   text-white shadow-xl lg:px-12 ">

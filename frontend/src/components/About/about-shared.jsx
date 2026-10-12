@@ -32,10 +32,16 @@ export function AboutLink({ href, className = '', children }) {
     : <a href={url} className={classes}>{children}</a>;
 }
 
-export function AboutHeading({ tag, title }) {
+export function AboutHeading({ tag, title, icon }) {
+  const iconName = icon ? (getAboutIconName(icon) || icon) : null;
   return (
     <>
-      {tag && <p className="inline-flex rounded-xl border border-[#d49520]/40 bg-[#d49520]/15 px-4 py-3 text-xs font-bold uppercase tracking-wide text-[#710008]">{tag}</p>}
+      {tag && (
+        <p className="inline-flex items-center gap-2 rounded-xl border border-[#d49520]/40 bg-[#d49520]/15 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-[#710008]">
+          {iconName && <Icon name={iconName} size={16} className="shrink-0 text-[#710008]" />}
+          <span>{tag}</span>
+        </p>
+      )}
       <h2 className="text-2xl font-extrabold leading-tight text-[#710008] lg:text-3xl">{title}</h2>
       <div aria-hidden="true" className="h-1.5 w-20 rounded-full bg-[#d49520]" />
     </>

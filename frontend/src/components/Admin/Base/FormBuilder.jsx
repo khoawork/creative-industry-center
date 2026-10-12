@@ -24,6 +24,7 @@ import {
 import { AdminConfirmModal } from '../Common/index.js';
 import DynamicFormRenderer from '../../shared/DynamicFormRenderer.jsx';
 import { syncFieldsToSheet, getFormConfig } from '../../../services/googleSheetService.js';
+import { IconDropdown } from '../../icons/index.js';
 
 /**
  * Hàm chuẩn hóa nhãn tiếng Việt thành mã khóa slug ASCII an toàn
@@ -121,6 +122,7 @@ export default function FormBuilder({
     width: f.width || (f.colSpan === 1 ? 'half' : 'full'),
     options: Array.isArray(f.options) ? f.options : [],
     helpText: f.helpText || '',
+    icon: f.icon || '',
     readOnly: Boolean(f.readOnly),
   }));
 
@@ -156,6 +158,7 @@ export default function FormBuilder({
       colSpan: field.width === 'half' ? 1 : 2,
       width: field.width,
       options: field.options,
+      icon: field.icon || '',
     }));
 
     const nextValue = {
@@ -198,6 +201,7 @@ export default function FormBuilder({
       required: false,
       width: 'full',
       helpText: '',
+      icon: '',
       isAutoSlug: true,
     };
     setHasModified(true);
@@ -663,7 +667,7 @@ export default function FormBuilder({
                     {/* Form Chi Tiết Của Trường */}
                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
                       {/* Tên Nhãn (Label) */}
-                      <div className="sm:col-span-5">
+                      <div className="sm:col-span-4">
                         <label className="block text-[11px] font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
                           Tên trường (Nhãn) <span className="text-red-500">*</span>
                         </label>
@@ -691,7 +695,7 @@ export default function FormBuilder({
                       </div>
 
                       {/* Loại ô nhập (Field Type) */}
-                      <div className="sm:col-span-3">
+                      <div className="sm:col-span-4">
                         <label className="block text-[11px] font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
                           Loại ô nhập
                         </label>
@@ -706,6 +710,18 @@ export default function FormBuilder({
                             </option>
                           ))}
                         </select>
+                      </div>
+
+                      {/* Biểu tượng ô nhập (Icon) */}
+                      <div className="sm:col-span-5">
+                        <IconDropdown
+                          label="Biểu tượng ô nhập"
+                          value={field.icon || ''}
+                          onChange={(iconName) => handleFieldChange(idx, 'icon', iconName)}
+                          placeholder="Mặc định theo loại ô"
+                          size="sm"
+                          allowClear
+                        />
                       </div>
 
                       {/* Độ rộng Layout (Grid Width) */}

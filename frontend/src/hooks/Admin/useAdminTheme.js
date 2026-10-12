@@ -14,13 +14,18 @@ export default function useAdminTheme() {
   useEffect(() => {
     try {
       window.localStorage.setItem(themeStorageKey, theme);
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.toggle('light', theme === 'light');
+      }
     } catch {
       // Theme switching still works when browser storage is unavailable.
     }
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark');
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'));
   }, []);
 
   return { theme, toggleTheme };

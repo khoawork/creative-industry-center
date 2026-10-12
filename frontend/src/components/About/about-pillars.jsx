@@ -7,7 +7,7 @@ export default function AboutPillars({ coreValues, actions }) {
         {coreValues && (
           <>
             <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-              <AboutHeading tag={coreValues.tag} title={coreValues.title_main} />
+              <AboutHeading tag={coreValues.tag} title={coreValues.title_main} icon={coreValues.tag_icon} />
               {coreValues.description && <p className="whitespace-pre-line text-xl leading-relaxed text-black/80">{coreValues.description}</p>}
             </div>
             {coreValues.items.length > 0 && (

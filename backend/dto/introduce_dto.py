@@ -67,6 +67,7 @@ class HeroSectionResponse(BaseSchema):
 
 class OverviewSectionRequestDTO(BaseSchema):
     tag = fields.Str(required=True, validate=_not_blank)
+    tag_icon = fields.Str(load_default="")
     title_main = fields.Str(required=True, validate=_not_blank)
     paragraphs = fields.List(
         fields.Str(validate=_not_blank), required=True, validate=validate.Length(min=1)
@@ -77,6 +78,7 @@ class OverviewSectionRequestDTO(BaseSchema):
 
 class OverviewSectionResponse(BaseSchema):
     tag = fields.Str(dump_only=True)
+    tag_icon = fields.Str(dump_only=True, dump_default="")
     title_main = fields.Str(dump_only=True)
     paragraphs = fields.List(fields.Str(), dump_only=True)
     featured_image = fields.Nested(IntroduceImageDTO, dump_only=True)
@@ -85,6 +87,7 @@ class OverviewSectionResponse(BaseSchema):
 
 class VisionSectionRequestDTO(BaseSchema):
     tag = fields.Str(required=True, validate=_not_blank)
+    tag_icon = fields.Str(load_default="")
     title_main = fields.Str(required=True, validate=_not_blank)
     paragraphs = fields.List(
         fields.Str(validate=_not_blank), required=True, validate=validate.Length(min=1)
@@ -97,6 +100,7 @@ class VisionSectionRequestDTO(BaseSchema):
 
 class VisionSectionResponse(BaseSchema):
     tag = fields.Str(dump_only=True)
+    tag_icon = fields.Str(dump_only=True, dump_default="")
     title_main = fields.Str(dump_only=True)
     paragraphs = fields.List(fields.Str(), dump_only=True)
     featured_image = fields.Nested(IntroduceImageDTO, dump_only=True)
@@ -105,6 +109,7 @@ class VisionSectionResponse(BaseSchema):
 
 class MissionSectionRequestDTO(BaseSchema):
     tag = fields.Str(required=True, validate=_not_blank)
+    tag_icon = fields.Str(load_default="")
     title_main = fields.Str(required=True, validate=_not_blank)
     featured_image = fields.Nested(IntroduceImageDTO, required=True)
     items = fields.List(
@@ -114,6 +119,7 @@ class MissionSectionRequestDTO(BaseSchema):
 
 class MissionSectionResponse(BaseSchema):
     tag = fields.Str(dump_only=True)
+    tag_icon = fields.Str(dump_only=True, dump_default="")
     title_main = fields.Str(dump_only=True)
     featured_image = fields.Nested(IntroduceImageDTO, dump_only=True)
     items = fields.List(fields.Nested(IntroduceItemDTO), dump_only=True)
@@ -121,6 +127,7 @@ class MissionSectionResponse(BaseSchema):
 
 class CoreValuesSectionRequestDTO(BaseSchema):
     tag = fields.Str(required=True, validate=_not_blank)
+    tag_icon = fields.Str(load_default="")
     title_main = fields.Str(required=True, validate=_not_blank)
     description = fields.Str(required=True, validate=_not_blank)
     items = fields.List(
@@ -130,6 +137,7 @@ class CoreValuesSectionRequestDTO(BaseSchema):
 
 class CoreValuesSectionResponse(BaseSchema):
     tag = fields.Str(dump_only=True)
+    tag_icon = fields.Str(dump_only=True, dump_default="")
     title_main = fields.Str(dump_only=True)
     description = fields.Str(dump_only=True)
     items = fields.List(fields.Nested(IntroduceItemDTO), dump_only=True)

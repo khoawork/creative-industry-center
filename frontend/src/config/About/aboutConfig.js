@@ -15,8 +15,11 @@ export const aboutIconNames = {
 }
 
 export function getAboutIconName(code) {
-  if (typeof code !== 'string' || !Object.hasOwn(aboutIconNames, code)) return null
+  if (typeof code !== 'string' || !code) return null
 
-  const name = aboutIconNames[code]
-  return Object.hasOwn(iconPaths, name) ? name : null
+  if (Object.hasOwn(aboutIconNames, code)) {
+    const name = aboutIconNames[code]
+    return Object.hasOwn(iconPaths, name) ? name : code
+  }
+  return code
 }

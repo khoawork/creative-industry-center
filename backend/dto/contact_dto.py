@@ -49,6 +49,7 @@ class ContactDetailsDTO(Schema):
     phoneHref = fields.Str(required=True, validate=_tel_href_format)
     phones = fields.List(fields.Nested(ContactPhoneDTO), load_default=list, dump_default=list, validate=validate.Length(min=1))
     emails = fields.List(fields.Email(), required=True, validate=validate.Length(min=1))
+    offices_icon = fields.Str(allow_none=True, load_default="", dump_default="")
 
 
 class ContactOfficeDTO(Schema):
@@ -56,6 +57,7 @@ class ContactOfficeDTO(Schema):
     label = fields.Str(required=True, validate=_not_blank)
     city = fields.Str(required=True, validate=_not_blank)
     address = fields.Str(required=True, validate=_not_blank)
+    icon = fields.Str(allow_none=True, load_default="", dump_default="")
 
 
 class ContactWorkingHourDTO(Schema):
@@ -67,6 +69,7 @@ class ContactChannelDTO(Schema):
     id = fields.Str(required=True, validate=_not_blank)
     label = fields.Str(required=True, validate=_not_blank)
     href = fields.Str(allow_none=True, load_default=None)
+    icon = fields.Str(allow_none=True, load_default=None)
 
 
 class ContactMapDTO(Schema):
@@ -91,6 +94,7 @@ class ContactFormFieldDTO(Schema):
     options = fields.List(fields.Str(), load_default=list)
     required = fields.Bool(load_default=False)
     width = fields.Str(load_default="full", validate=validate.OneOf(["full", "half"]))
+    icon = fields.Str(allow_none=True, load_default="", dump_default="")
 
 
 class ContactFormDTO(Schema):
@@ -99,6 +103,7 @@ class ContactFormDTO(Schema):
     button_text = fields.Str(required=True, validate=_not_blank)
     availability_text = fields.Str(required=True, validate=_not_blank)
     privacy_text = fields.Str(required=True, validate=_not_blank)
+    badge_icon = fields.Str(allow_none=True, load_default="", dump_default="")
     form_fields = fields.List(fields.Nested(ContactFormFieldDTO), required=True)
 
 

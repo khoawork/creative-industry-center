@@ -16,11 +16,15 @@ import {
   CheckSquare,
   Lock,
 } from 'lucide-react';
+import { DynamicIcon } from '../icons/index.js';
 
 /**
  * Helper ánh xạ icon theo tên hoặc loại trường
  */
 function getFieldIcon(field) {
+  if (field?.icon) {
+    return <DynamicIcon name={field.icon} size={18} />;
+  }
   const key = String(field.key || field.id || '').toLowerCase();
   const type = String(field.type || '').toLowerCase();
 

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import { IconDropdown } from '../../icons/index.js';
 
 const ICON_OPTIONS = [
   { value: 'award', label: 'Chứng nhận / Giải thưởng (Award)', icon: Award },
@@ -250,20 +251,13 @@ export default function TrainingCertificationEditor({ initialData, onSave, isSav
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
-                      Biểu tượng
-                    </label>
-                    <select
+                    <IconDropdown
+                      label="Biểu tượng"
                       value={item.icon || 'award'}
-                      onChange={(e) => handleItemChange(idx, 'icon', e.target.value)}
-                      className="w-full px-2.5 py-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title) outline-none focus:border-(--admin-accent)"
-                    >
-                      {ICON_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => handleItemChange(idx, 'icon', val)}
+                      placeholder="Chọn biểu tượng..."
+                      size="sm"
+                    />
                   </div>
 
                   <div className="sm:col-span-2">

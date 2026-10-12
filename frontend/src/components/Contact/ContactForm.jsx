@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import Icon from "../shared/Icon.jsx";
+import { DynamicIcon } from "../icons/index.js";
 import {
   fetchFormConfig,
   submitFormToBackend,
@@ -180,8 +181,10 @@ export default function ContactForm({
     const type = field.type || "text";
     const error = errors[name];
     const isHalf = field.width === "half";
-    const icon = fieldIcons[name] || (
-      <MessageSquareText size={20} aria-hidden="true" />
+    const icon = field.icon ? (
+      <DynamicIcon name={field.icon} size={20} aria-hidden="true" fallback="FileText" />
+    ) : (
+      fieldIcons[name] || <MessageSquareText size={20} aria-hidden="true" />
     );
     const options =
       name === "category" && Array.isArray(categories) && categories.length
@@ -273,10 +276,12 @@ export default function ContactForm({
       </div>
       <div className="pb-6">
         <p className="mb-1 flex items-center gap-2 text-xs font-bold tracking-wider text-[var(--contact-red)] uppercase">
-          <FilePenLine
+          <DynamicIcon
+            name={form.badge_icon || "FilePenLine"}
             size={20}
             aria-hidden="true"
             className="shrink-0 text-[var(--contact-gold)]"
+            fallback="FilePenLine"
           />
           Cổng Tiếp Nhận Trực Tuyến
         </p>
@@ -302,7 +307,18 @@ export default function ContactForm({
             id="contact-message"
             label="Nội dung lời nhắn / Đề xuất chi tiết"
             required
-            icon={<MessageSquareText size={20} aria-hidden="true" />}
+            icon={
+              formFields.find((f) => f.id === "message" || f.key === "message")?.icon ? (
+                <DynamicIcon
+                  name={formFields.find((f) => f.id === "message" || f.key === "message").icon}
+                  size={20}
+                  aria-hidden="true"
+                  fallback="MessageSquareText"
+                />
+              ) : (
+                <MessageSquareText size={20} aria-hidden="true" />
+              )
+            }
             error={errors.message}
           >
             <textarea

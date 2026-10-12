@@ -5,7 +5,7 @@ export default function AboutVision({ section }) {
     <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
       <div className="order-2 min-w-0 lg:order-1 lg:col-span-5"><AboutImage image={section.featured_image} /></div>
       <div className="order-1 min-w-0 space-y-6 lg:order-2 lg:col-span-7">
-        <AboutHeading tag={section.tag} title={section.title_main} />
+        <AboutHeading tag={section.tag} title={section.title_main} icon={section.tag_icon} />
         {section.paragraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line text-lg leading-relaxed text-black/80 sm:text-xl">{paragraph}</p>)}
         {section.items.length > 0 && (
           <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">

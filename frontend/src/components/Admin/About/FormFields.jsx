@@ -1,9 +1,9 @@
 import { useId, useState, useRef } from 'react'
 import { ArrowDown, ArrowUp, Plus, Trash2, Upload, Loader2, AlertCircle } from 'lucide-react'
-import { aboutIconNames } from '../../../config/About/aboutConfig.js'
 import { aboutAdminButton, aboutAdminIconButton } from '../../../config/Admin/adminAbout.js'
 import AdminImagePreview from '../Common/AdminImagePreview.jsx'
 import { SiteSettingsAPI } from '../../../api/siteSettingsApi.js'
+import { IconDropdown } from '../../icons/index.js'
 
 function fieldError(errors, path) {
   const error = errors[path] ?? path.split('.').reduce((value, key) => value?.[key], errors)
@@ -27,20 +27,41 @@ export function Field({ label, value, onChange, path, errors = {}, multiline = f
   </div>
 }
 
-export function IconField(props) {
-  const unknown = typeof props.value === 'string' && props.value && !Object.hasOwn(aboutIconNames, props.value)
-  return <Field {...props} required={Boolean(props.required)} label="Biểu tượng" validationMessage={unknown ? 'Vui lòng chọn biểu tượng khác.' : ''}>
-    <option value="">{props.required ? 'Chọn biểu tượng' : 'Không dùng biểu tượng'}</option>
-    {unknown && <option value={props.value}>{props.value} (chưa hỗ trợ)</option>}
-    {Object.keys(aboutIconNames).map((icon) => <option key={icon} value={icon}>{icon}</option>)}
-  </Field>
+export function IconField({ value, onChange, label = 'Biểu tượng', required = false, errors = {}, path = 'icon' }) {
+  const error = fieldError(errors, path)
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <IconDropdown
+        label={label + (required ? ' *' : '')}
+        value={value}
+        onChange={(iconName) => onChange(iconName)}
+        placeholder={required ? 'Chọn biểu tượng...' : 'Không dùng biểu tượng'}
+        allowClear={!required}
+        size="md"
+        error={error}
+      />
+    </div>
+  )
 }
 
 export function HeadingFields({ value, onChange, errors }) {
-  return <div className="grid gap-5 sm:grid-cols-2">
-    <Field label="Nhãn" path="tag" value={value.tag} errors={errors} onChange={(tag) => onChange({ ...value, tag })} />
-    <Field label="Tiêu đề" path="title_main" value={value.title_main} errors={errors} onChange={(title_main) => onChange({ ...value, title_main })} />
-  </div>
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Nhãn (Tag / Badge)" path="tag" value={value.tag} errors={errors} onChange={(tag) => onChange({ ...value, tag })} />
+        <Field label="Tiêu đề" path="title_main" value={value.title_main} errors={errors} onChange={(title_main) => onChange({ ...value, title_main })} />
+      </div>
+      <div className="max-w-md">
+        <IconField
+          label="Biểu tượng nhãn (Tag Icon)"
+          path="tag_icon"
+          value={value.tag_icon || ''}
+          onChange={(tag_icon) => onChange({ ...value, tag_icon })}
+          errors={errors}
+        />
+      </div>
+    </div>
+  )
 }
 
 export function ListFields({ label, path, value, onChange, errors = {}, min = 1, createItem, children }) {

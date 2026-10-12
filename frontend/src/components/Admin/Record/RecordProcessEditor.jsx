@@ -6,6 +6,8 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { AdminCard, AdminButton, AdminInput, AdminConfirmModal } from "../Common";
+import { IconDropdown } from "../../icons/index.js";
+import RecordHolderIcon from "../../RecordHolder/RecordHolderIcon.jsx";
 
 const COLOR_OPTIONS = [
   { value: "primary", label: "Đỏ đô Kỷ lục (Primary)", badge: "border-red-900/30 text-red-900 bg-red-900/10" },
@@ -191,8 +193,9 @@ export default function RecordProcessEditor({ data = {}, onChange }) {
                   {/* Card Header & Controls */}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--admin-border) pb-3">
                     <div className="flex items-center gap-2.5">
-                      <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border ${selectedColor.badge}`}>
-                        Bước {String(idx + 1).padStart(2, "0")}
+                      <span className={`px-2.5 py-1 text-xs font-bold rounded-lg border flex items-center gap-1.5 ${selectedColor.badge}`}>
+                        <RecordHolderIcon name={card.icon || "FileText"} size={14} />
+                        <span>Bước {String(idx + 1).padStart(2, "0")}</span>
                       </span>
                       <span className="text-sm font-bold text-(--admin-title) truncate max-w-xs sm:max-w-md">
                         {card.title || "Chưa đặt tiêu đề"}
@@ -231,7 +234,7 @@ export default function RecordProcessEditor({ data = {}, onChange }) {
 
                   {/* Card Edit Fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                    <div className="sm:col-span-8">
+                    <div className="sm:col-span-5">
                       <AdminInput
                         label="Tiêu đề bước"
                         value={card.title || ""}
@@ -242,6 +245,16 @@ export default function RecordProcessEditor({ data = {}, onChange }) {
                     </div>
 
                     <div className="sm:col-span-4">
+                      <IconDropdown
+                        label="Biểu tượng bước"
+                        value={card.icon || "FileText"}
+                        onChange={(val) => handleCardChange(idx, "icon", val)}
+                        placeholder="Chọn biểu tượng..."
+                        size="sm"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
                       <label className="block text-xs font-bold text-(--admin-ink) uppercase tracking-wider mb-1.5">
                         Tông màu hiển thị
                       </label>

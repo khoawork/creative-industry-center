@@ -24,6 +24,7 @@ import {
   AdminBadge,
   AdminStickySaveBar,
 } from "../Common/index.js";
+import { IconDropdown, DynamicIcon } from "../../icons/index.js";
 
 // Bộ icon biểu tượng cam kết hỗ trợ
 const BENEFIT_ICON_OPTIONS = [
@@ -305,18 +306,15 @@ export default function ProjectProposalEditor({
   };
 
   const renderIconComponent = (iconKey) => {
-    switch (iconKey) {
-      case "badge":
-        return <Award size={18} className="text-amber-500" />;
-      case "scroll":
-        return <Scroll size={18} className="text-amber-500" />;
-      case "network":
-        return <Share2 size={18} className="text-amber-500" />;
-      case "shield":
-        return <ShieldCheck size={18} className="text-amber-500" />;
-      default:
-        return <CheckCircle size={18} className="text-amber-500" />;
-    }
+    const aliasMap = {
+      badge: "Award",
+      scroll: "Scroll",
+      network: "Share2",
+      shield: "ShieldCheck",
+      check: "CheckCircle",
+    };
+    const iconName = aliasMap[iconKey] || iconKey || "Award";
+    return <DynamicIcon name={iconName} size={18} className="text-amber-500" fallback="Award" />;
   };
 
   return (
@@ -418,27 +416,13 @@ export default function ProjectProposalEditor({
 
                   {/* Chọn icon */}
                   <div>
-                    <label className="block text-[10px] font-semibold text-(--admin-ink)/60 uppercase mb-1">
-                      Biểu tượng Icon
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <div className="p-1.5 rounded-lg bg-(--admin-surface) border border-(--admin-border) flex items-center justify-center shrink-0">
-                        {renderIconComponent(b.icon)}
-                      </div>
-                      <select
-                        value={b.icon || "badge"}
-                        onChange={(e) =>
-                          handleBenefitIconChange(idx, e.target.value)
-                        }
-                        className="w-full rounded-lg border border-(--admin-border) bg-(--admin-surface) px-2.5 py-1.5 text-xs text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
-                      >
-                        {BENEFIT_ICON_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <IconDropdown
+                      label="Biểu tượng Icon"
+                      value={b.icon || "Award"}
+                      onChange={(val) => handleBenefitIconChange(idx, val)}
+                      placeholder="Chọn biểu tượng..."
+                      size="sm"
+                    />
                   </div>
 
                   {/* Nhập text */}
@@ -725,11 +709,11 @@ export default function ProjectProposalEditor({
                 <span>{formData.tag}</span>
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold uppercase  leading-tight">
+              <h3 className="text-xl sm:text-2xl font-bold uppercase leading-tight">
                 {formData.title}
               </h3>
 
-              <p className="text-xs sm:text-sm text-[#f7c2b6] leading-relaxed max-w-xl font-light">
+              <p className="text-xs sm:text-sm text-[#f7c2b6] leading-relaxed max-w-xl font-normal">
                 {formData.description}
               </p>
 

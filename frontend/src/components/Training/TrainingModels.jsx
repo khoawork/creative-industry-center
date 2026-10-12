@@ -1,14 +1,10 @@
-import {
-  FaProjectDiagram,
-  FaAward,
-  FaStore,
-  FaChevronRight,
-} from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
+import { DynamicIcon } from "../icons/index.js";
 
-const icons = {
-  hub: FaProjectDiagram,
-  workspace: FaAward,
-  storefront: FaStore,
+const aliasMap = {
+  hub: "Layers",
+  workspace: "Briefcase",
+  storefront: "Building2",
 };
 
 export default function TrainingModels({ models }) {
@@ -20,8 +16,7 @@ export default function TrainingModels({ models }) {
     <section className="relative z-10 mx-auto -mt-8 w-full max-w-[75rem] px-6">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {models.map((model) => {
-          const Icon = icons[model.icon] || FaProjectDiagram;
-
+          const iconName = aliasMap[model.icon] || model.icon || "Layers";
 
           return (
             <div
@@ -30,7 +25,7 @@ export default function TrainingModels({ models }) {
             >
               <div>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#f4f3f1] text-[#490003]">
-                  <Icon className="text-[26px]" />
+                  <DynamicIcon name={iconName} size={26} fallback="Layers" />
                 </div>
 
                 <span className="text-[12px] leading-4 font-semibold uppercase text-[#805600]">

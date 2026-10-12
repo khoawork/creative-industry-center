@@ -75,7 +75,7 @@
     ],
     "lastSyncedAt": "2026-10-06T14:54:00.292Z",
     "syncedSheetName": "DangKySuKien",
-    "updatedAt": "2026-10-09T07:00:19.129Z",
+    "updatedAt": "2026-10-12T08:16:16.272Z",
     "button_text": "Xác Nhận Đăng Ký Thông Báo"
   },
   "event_registration": {
@@ -206,8 +206,8 @@
   },
   "contact_feedback": {
     "id": "contact_feedback",
-    "title": "Liên Hệ & Đề Xuất Tư Vấn Trực Tuyến",
-    "subtitle": "Cổng tiếp nhận thông tin phản hồi, nguyện vọng hợp tác và yêu cầu tư vấn từ cộng đồng.",
+    "title": "Gửi phản hồi hoặc yêu cầu tư vấn",
+    "subtitle": "Quý vị vui lòng để lại thông tin và nội dung cần tư vấn để Ban Thư ký Trung tâm hỗ trợ.",
     "pagePath": "/contact",
     "componentName": "ContactForm",
     "badgeText": "TIẾP NHẬN LIÊN HỆ",
@@ -216,47 +216,63 @@
     "fields": [
       {
         "key": "fullName",
-        "label": "Họ và tên người gửi",
+        "label": "Họ và tên",
         "type": "text",
-        "placeholder": "Nguyễn Văn A",
+        "placeholder": "Ví dụ: Nguyễn Văn An",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": [],
+        "icon": "House"
       },
       {
         "key": "email",
         "label": "Địa chỉ Email",
         "type": "email",
-        "placeholder": "email@tochuc.vn",
+        "placeholder": "name@domain.com",
         "required": true,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": [],
+        "icon": ""
       },
       {
         "key": "phone",
-        "label": "Số điện thoại",
+        "label": "Số điện thoại liên hệ",
         "type": "tel",
-        "placeholder": "0912 345 678",
+        "placeholder": "Ví dụ: 0912 345 678",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": [],
+        "icon": ""
       },
       {
         "key": "category",
         "label": "Lĩnh vực quan tâm",
-        "type": "text",
-        "placeholder": "Đề cử kỷ lục / Hợp tác sáng tạo / Khác",
+        "type": "select",
+        "placeholder": "Vui lòng chọn lĩnh vực",
         "required": false,
-        "colSpan": 1
+        "colSpan": 1,
+        "options": [
+          "Đề cử kỷ lục sáng tạo",
+          "Khóa đào tạo & Phát triển kỹ năng",
+          "Hợp tác truyền thông & Sự kiện",
+          "Hoạt động / Yêu cầu khác"
+        ],
+        "icon": ""
       },
       {
         "key": "message",
         "label": "Nội dung lời nhắn / Đề xuất chi tiết",
         "type": "textarea",
-        "placeholder": "Mô tả tóm tắt nội dung đề xuất hoặc nguyện vọng hợp tác...",
+        "placeholder": "Quý vị vui lòng mô tả tóm tắt nội dung đề xuất, nguyện vọng hợp tác, hoặc các thông số đề cử kỷ lục cụ thể để Ban Thư ký chuẩn bị phương án tốt nhất...",
         "required": true,
-        "colSpan": 2
+        "colSpan": 2,
+        "options": [],
+        "icon": "House"
       }
     ],
     "lastSyncedAt": "2026-10-08T07:32:46.429051+00:00",
-    "updatedAt": "2026-10-08T07:33:22.885Z"
+    "updatedAt": "2026-10-12T09:04:01.932Z",
+    "button_text": "GỬI LỜI NHẮN NGAY"
   },
   "record_nomination": {
     "id": "record_nomination",

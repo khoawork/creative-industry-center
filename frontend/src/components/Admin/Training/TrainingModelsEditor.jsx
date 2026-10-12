@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Layers, Check } from 'lucide-react';
 import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import { IconDropdown } from '../../icons/index.js';
 
 const ICON_OPTIONS = [
   { value: 'hub', label: 'Liên kết mạng lưới (Hub)' },
@@ -142,20 +143,13 @@ export default function TrainingModelsEditor({ initialData, onSave, isSaving }) 
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
-                      Biểu tượng Icon
-                    </label>
-                    <select
+                    <IconDropdown
+                      label="Biểu tượng Icon"
                       value={model.icon || 'hub'}
-                      onChange={(e) => handleModelChange(idx, 'icon', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-title) outline-none focus:border-(--admin-accent)"
-                    >
-                      {ICON_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => handleModelChange(idx, 'icon', val)}
+                      placeholder="Chọn biểu tượng..."
+                      size="sm"
+                    />
                   </div>
 
                   <div>

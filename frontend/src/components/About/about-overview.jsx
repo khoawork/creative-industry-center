@@ -4,7 +4,7 @@ export default function AboutOverview({ section }) {
   return (
     <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
       <div className="min-w-0 space-y-6 lg:col-span-7">
-        <AboutHeading tag={section.tag} title={section.title_main} />
+        <AboutHeading tag={section.tag} title={section.title_main} icon={section.tag_icon} />
         {section.paragraphs.map((paragraph, index) => <p key={index} className="whitespace-pre-line text-lg leading-relaxed text-black/80 sm:text-xl">{paragraph}</p>)}
         {section.statistics.length > 0 && (
           <dl className="flex flex-wrap gap-6 pt-2">

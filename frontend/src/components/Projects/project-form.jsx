@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Award,
-  Scroll,
-  Share2,
   Sparkles,
-  ShieldCheck,
-  Users,
-  FileCheck,
   CheckCircle,
   Play,
   Send,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { DynamicIcon } from "../icons/index.js";
+import {
+  fetchFormConfig,
+  submitFormToBackend,
+  DEFAULT_FORM_CONFIGS,
+} from "../../services/googleSheetService.js";
 
 // Danh sách trường mặc định nếu chưa được cấu hình
 const DEFAULT_FORM_FIELDS = [
@@ -71,6 +73,24 @@ const DEFAULT_BENEFITS = [
 ];
 
 export default function ProjectForm({ formData }) {
+  const [formConfig, setFormConfig] = useState(DEFAULT_FORM_CONFIGS.project_proposal);
+  const [formValues, setFormValues] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Tải cấu hình form động từ Backend / Service
+  useEffect(() => {
+    fetchFormConfig("project_proposal").then((loaded) => {
+      if (loaded) {
+        setFormConfig((prev) => ({
+          ...prev,
+          ...loaded,
+        }));
+      }
+    });
+  }, []);
+
   const tag = formData?.tag || "HỢP TÁC PHÁT TRIỂN & ĐỒNG HÀNH CHIẾN LƯỢC";
   const title =
     formData?.title || "ĐỀ XUẤT DỰ ÁN SÁNG TẠO HOẶC ĐĂNG KÝ ĐỒNG HÀNH CÙNG TRUNG TÂM";
@@ -98,19 +118,30 @@ export default function ProjectForm({ formData }) {
     };
   });
 
-  const formTitle = formData?.form_title || "Gửi Đề Xuất Dự Án Mới";
+  const formTitle =
+    formData?.form_title || formConfig?.title || "Gửi Đề Xuất Dự Án Mới";
   const formDescription =
     formData?.form_description ||
+    formConfig?.subtitle ||
     "Ban Thư ký Hội đồng Khoa học sẽ phản hồi văn bản trong vòng 03 ngày làm việc.";
-  const buttonText = formData?.button_text || "Gửi Hồ Sơ Dự Án";
+  const buttonText =
+    formData?.button_text ||
+    formConfig?.submitButtonText ||
+    "Gửi Hồ Sơ Dự Án";
 
-  const formFields =
+  const rawFields =
     Array.isArray(formData?.form_fields) && formData.form_fields.length > 0
       ? formData.form_fields
+      : Array.isArray(formConfig?.fields) && formConfig.fields.length > 0
+      ? formConfig.fields
       : DEFAULT_FORM_FIELDS;
 
-  const [formValues, setFormValues] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const formFields = rawFields.map((field, idx) => ({
+    ...field,
+    key: field.key || field.id || `field_${idx}`,
+    id: field.id || field.key || `field_${idx}`,
+    label: field.label || field.placeholder || field.key || field.id || `Trường ${idx + 1}`,
+  }));
 
   const handleInputChange = (fieldKey, value) => {
     setFormValues((prev) => ({
@@ -119,33 +150,73 @@ export default function ProjectForm({ formData }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormValues({});
-    }, 4500);
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const activeSheetUrl =
+        formConfig?.sheetUrl ||
+        DEFAULT_FORM_CONFIGS.project_proposal?.sheetUrl ||
+        "https://docs.google.com/spreadsheets/d/10mOoSt_NiyKXnLRPbmw3MgI9Rf6T0zcsADYZBY50Zq8/edit?usp=drive_link";
+      const activeSheetName =
+        formConfig?.sheetName ||
+        DEFAULT_FORM_CONFIGS.project_proposal?.sheetName ||
+        "DeXuatDuAn";
+
+      const effectiveConfig = {
+        ...formConfig,
+        sheetUrl: activeSheetUrl,
+        sheetName: activeSheetName,
+        fields: formFields.map((f) => ({
+          key: f.key,
+          label: f.label,
+          type: f.type || "text",
+          placeholder: f.placeholder || "",
+          required: Boolean(f.required),
+          options: f.options || [],
+        })),
+      };
+
+      const res = await submitFormToBackend("project_proposal", formValues, effectiveConfig);
+
+      if (res?.success) {
+        setSubmitted(true);
+        setFormValues({});
+        setTimeout(() => {
+          setSubmitted(false);
+        }, 5000);
+      } else {
+        setErrorMessage(
+          res?.message || "Không thể gửi đề xuất lúc này. Quý vị vui lòng thử lại sau!"
+        );
+      }
+    } catch (err) {
+      console.error("Lỗi khi gửi đề xuất dự án:", err);
+      setErrorMessage(
+        "Có lỗi xảy ra hoặc chưa thể kết nối máy chủ. Quý vị vui lòng thử lại sau."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderBenefitIcon = (iconKey) => {
-    switch (iconKey) {
-      case "badge":
-      case "award":
-        return <Award className="text-[#f59e0b] shrink-0" size={20} />;
-      case "scroll":
-      case "file":
-      case "legal":
-        return <Scroll className="text-[#f59e0b] shrink-0" size={20} />;
-      case "network":
-      case "users":
-      case "share":
-        return <Share2 className="text-[#f59e0b] shrink-0" size={20} />;
-      case "shield":
-        return <ShieldCheck className="text-[#f59e0b] shrink-0" size={20} />;
-      default:
-        return <CheckCircle className="text-[#f59e0b] shrink-0" size={20} />;
-    }
+    const aliasMap = {
+      badge: "Award",
+      award: "Award",
+      scroll: "Scroll",
+      file: "FileText",
+      legal: "Scale",
+      network: "Share2",
+      users: "Users",
+      share: "Share2",
+      shield: "ShieldCheck",
+      check: "CheckCircle",
+    };
+    const iconName = aliasMap[iconKey] || iconKey || "CheckCircle";
+    return <DynamicIcon name={iconName} className="text-[#f59e0b] shrink-0" size={20} fallback="CheckCircle" />;
   };
 
   return (
@@ -160,11 +231,11 @@ export default function ProjectForm({ formData }) {
             <span>{tag}</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold leading-tight uppercase  tracking-tight text-white">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight uppercase tracking-tight text-white">
             {title}
           </h2>
 
-          <p className="text-sm sm:text-base text-[#ffb4ac] leading-relaxed max-w-2xl font-light">
+          <p className="text-sm sm:text-base text-amber-100/90 leading-relaxed max-w-2xl font-normal">
             {description}
           </p>
 
@@ -190,10 +261,10 @@ export default function ProjectForm({ formData }) {
 
         {/* Cột phải: Form nộp hồ sơ */}
         <div className="bg-white text-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl lg:col-span-5 w-full border border-white/20">
-          <h3 className="text-xl sm:text-2xl font-bold text-[#710008] mb-1.5">
+          <h3 className="text-xl sm:text-2xl font-bold text-[#710008] tracking-tight mb-1.5">
             {formTitle}
           </h3>
-          <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+          <p className="text-xs sm:text-sm text-gray-600 mb-5 leading-relaxed">
             {formDescription}
           </p>
 
@@ -209,9 +280,16 @@ export default function ProjectForm({ formData }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMessage && (
+                <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2.5 leading-relaxed">
+                  <AlertCircle size={16} className="shrink-0 text-red-600" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               <div className="grid grid-cols-12 gap-3.5">
                 {formFields.map((field, idx) => {
-                  const fieldKey = field.id || `field_${idx}`;
+                  const fieldKey = field.key || field.id || `field_${idx}`;
                   const isRequired = Boolean(field.required);
                   const colSpan =
                     field.width === 'half' || field.colSpan === 1
@@ -229,7 +307,7 @@ export default function ProjectForm({ formData }) {
                       key={fieldKey}
                       className={colSpan}
                     >
-                      <label className="block font-bold text-gray-700 uppercase tracking-wide mb-1.5 text-[11px]">
+                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">
                         {field.label}
                         {isRequired && <span className="text-red-500 ml-1">*</span>}
                       </label>
@@ -242,7 +320,7 @@ export default function ProjectForm({ formData }) {
                             onChange={(e) =>
                               handleInputChange(fieldKey, e.target.value)
                             }
-                            className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-xs appearance-none focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
+                            className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-sm appearance-none focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
                           >
                             <option value="">
                               {field.placeholder || "Chọn " + field.label}
@@ -267,8 +345,21 @@ export default function ProjectForm({ formData }) {
                           onChange={(e) =>
                             handleInputChange(fieldKey, e.target.value)
                           }
-                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-xs placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
+                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
                         />
+                      ) : field.type === "checkbox" ? (
+                        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer pt-2">
+                          <input
+                            type="checkbox"
+                            required={isRequired}
+                            checked={Boolean(formValues[fieldKey])}
+                            onChange={(e) =>
+                              handleInputChange(fieldKey, e.target.checked)
+                            }
+                            className="rounded border-amber-300 text-[#710008] focus:ring-[#710008]"
+                          />
+                          <span>{field.placeholder || field.label}</span>
+                        </label>
                       ) : (
                         <input
                           type={field.type || "text"}
@@ -278,7 +369,7 @@ export default function ProjectForm({ formData }) {
                           onChange={(e) =>
                             handleInputChange(fieldKey, e.target.value)
                           }
-                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-sm px-3.5 py-2.5 text-gray-800 text-xs placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
+                          className="w-full bg-[#fdfaf5] border border-amber-200/60 rounded-lg px-3.5 py-2.5 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-[#710008] focus:ring-1 focus:ring-[#710008] transition"
                         />
                       )}
                     </div>
@@ -288,13 +379,23 @@ export default function ProjectForm({ formData }) {
 
               <button
                 type="submit"
-                className="w-full bg-[#710008] hover:bg-[#560006] text-white font-bold py-3.5 px-5 rounded-xl transition-all duration-200 uppercase tracking-wider text-xs shadow-md mt-3 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
+                disabled={isSubmitting}
+                className="w-full bg-[#710008] hover:bg-[#560006] disabled:opacity-75 disabled:cursor-not-allowed text-white font-bold py-3.5 px-5 rounded-xl transition-all duration-200 uppercase tracking-wider text-sm shadow-md mt-3 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-[0.99]"
               >
-                <Play
-                  size={13}
-                  className="fill-white text-white transform group-hover:translate-x-0.5 transition-transform"
-                />
-                <span>{buttonText}</span>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-white" />
+                    <span>Đang gửi hồ sơ...</span>
+                  </>
+                ) : (
+                  <>
+                    <Play
+                      size={13}
+                      className="fill-white text-white transform group-hover:translate-x-0.5 transition-transform"
+                    />
+                    <span>{buttonText}</span>
+                  </>
+                )}
               </button>
             </form>
           )}

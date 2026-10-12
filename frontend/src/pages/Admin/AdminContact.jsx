@@ -6,11 +6,12 @@ import { FormBuilder } from '../../components/Admin/Base/index.js'
 import ContactAvailabilityMessage from '../../components/Contact/ContactAvailabilityMessage.jsx'
 import ContactForm from '../../components/Contact/ContactForm.jsx'
 import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, requireContactData } from '../../api/contactApi.js'
+import { DashboardAPI } from '../../api/dashboardApi.js'
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
-import { DashboardAPI } from '../../api/dashboardApi.js'
 import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common/index.js'
+import { IconDropdown } from '../../components/icons/index.js'
 
 function clone(value) {
   return structuredClone(value)
@@ -358,7 +359,7 @@ export default function AdminContact() {
   function addOffice() {
     setDraftProps((current) => ({
       ...current,
-      offices: [...(current.offices || []), { id: `office_${Date.now()}`, label: '', city: '', address: '' }],
+      offices: [...(current.offices || []), { id: `office_${Date.now()}`, label: '', city: '', address: '', icon: 'Building2' }],
     }))
     setToast(null)
   }
@@ -390,7 +391,7 @@ export default function AdminContact() {
   function addSocialChannel() {
     setDraftProps((current) => ({
       ...current,
-      socialChannels: [...(current.socialChannels || []), { id: `channel_${Date.now()}`, label: '', href: null }],
+      socialChannels: [...(current.socialChannels || []), { id: `channel_${Date.now()}`, label: '', href: null, icon: 'Globe' }],
     }))
     setToast(null)
   }
@@ -502,6 +503,7 @@ export default function AdminContact() {
             required: Boolean(f.required),
             colSpan: f.width === 'half' ? 1 : 2,
             options: f.options,
+            icon: f.icon || '',
           })),
         });
       } catch (syncErr) {
@@ -542,9 +544,16 @@ export default function AdminContact() {
           <h2 className="text-lg font-semibold text-(--admin-title)">Cấu hình Form liên hệ</h2>
           <p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">Các ô cơ bản của form được cố định như form Sự kiện. Bạn chỉ chỉnh nhãn và gợi ý nhập; ô bổ sung được thêm ở phần bên dưới.</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <ContactField label="Tiêu đề khối Form" required value={form.form_title} error={formErrors.form_title} onChange={(value) => updateForm({ form_title: value })} placeholder="Ví dụ: Gửi phản hồi hoặc yêu cầu tư vấn" />
           <ContactField label="Chữ trên nút gửi" required value={form.button_text} error={formErrors.button_text} onChange={(value) => updateForm({ button_text: value })} placeholder="Ví dụ: GỬI LỜI NHẮN NGAY" />
+          <IconDropdown
+            label="Biểu tượng nhãn cổng (Badge Icon)"
+            value={form.badge_icon || 'FilePenLine'}
+            onChange={(value) => updateForm({ badge_icon: value })}
+            placeholder="Chọn biểu tượng nhãn..."
+            size="sm"
+          />
         </div>
         <ContactField label="Mô tả Form" required multiline value={form.form_description} error={formErrors.form_description} onChange={(value) => updateForm({ form_description: value })} placeholder="Ví dụ: Quý vị vui lòng để lại thông tin..." />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -552,7 +561,7 @@ export default function AdminContact() {
           <ContactField label="Thông báo thông tin liên hệ" required multiline value={privacyText} error={formErrors.privacy_text} onChange={(value) => updateForm({ privacy_text: value })} placeholder="Ví dụ: Nội dung đang nhập chỉ được giữ trên trang..." />
         </div>
         <div className="space-y-4 border-t border-(--admin-border) pt-5">
-          <div><h3 className="text-base font-semibold text-(--admin-title)">Các ô cố định</h3><p className="mt-1 text-xs text-(--admin-ink)/70">Các ô này luôn hiển thị trên form và không thể xóa hoặc đổi loại.</p></div>
+          <div><h3 className="text-base font-semibold text-(--admin-title)">Các ô cố định</h3><p className="mt-1 text-xs text-(--admin-ink)/70">Các ô này luôn hiển thị trên form và không thể xóa hoặc đổi loại. Bạn có thể chọn biểu tượng tương ứng cho từng ô.</p></div>
           {fixedFields.map((field) => <div key={field.id} className="grid gap-4 rounded-lg border border-(--admin-border) p-4 sm:grid-cols-2">
             <div className="sm:col-span-2 flex flex-wrap items-center gap-2">
               <span className="text-sm font-semibold text-(--admin-title)">{fieldNames[field.id] || field.label}</span>
@@ -564,6 +573,16 @@ export default function AdminContact() {
             </div>
             <ContactField label="Nhãn hiển thị" required value={field.label} error={formErrors[`field_label_${field.id}`]} onChange={(value) => updateFixedFormField(field.id, 'label', value)} placeholder={fieldNames[field.id]} />
             <ContactField label="Gợi ý nhập liệu" value={field.placeholder} onChange={(value) => updateFixedFormField(field.id, 'placeholder', value)} placeholder="Ví dụ: Nhập thông tin..." />
+            <div className="sm:col-span-2">
+              <IconDropdown
+                label="Biểu tượng ô nhập (Icon)"
+                value={field.icon || ''}
+                onChange={(icon) => updateFixedFormField(field.id, 'icon', icon)}
+                placeholder="Chọn biểu tượng hiển thị trong ô nhập này..."
+                size="sm"
+                allowClear
+              />
+            </div>
           </div>)}
         </div>
       </div>
@@ -676,11 +695,33 @@ export default function AdminContact() {
       </section>
 
       <section className={sectionClass}>
-        <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-(--admin-title)">Hệ thống văn phòng</h2><button type="button" className={adminButton} onClick={addOffice}><Plus size={16} />Thêm văn phòng</button></div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-(--admin-title)">Hệ thống văn phòng</h2>
+            <p className="mt-1 text-xs text-(--admin-ink)/70">Quản lý danh sách văn phòng đại diện và biểu tượng hiển thị.</p>
+          </div>
+          <button type="button" className={adminButton} onClick={addOffice}><Plus size={16} />Thêm văn phòng</button>
+        </div>
+        <div className="max-w-md pt-2">
+          <IconDropdown
+            label="Biểu tượng tiêu đề khối văn phòng"
+            value={contact.offices_icon || 'Landmark'}
+            onChange={(value) => updateContact('offices_icon', value)}
+            placeholder="Mặc định: Landmark (Tòa nhà)"
+            size="sm"
+          />
+        </div>
         {offices.map((office, index) => <div key={office.id || index} className="space-y-4 rounded-lg border border-(--admin-border) p-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <ContactField label="Nhãn văn phòng" required value={office.label} onChange={(value) => updateListItem('offices', index, 'label', value)} placeholder="Ví dụ: TRỤ SỞ CHÍNH" />
             <ContactField label="Thành phố" required value={office.city} onChange={(value) => updateListItem('offices', index, 'city', value)} placeholder="Ví dụ: TP. Hà Nội" />
+            <IconDropdown
+              label="Biểu tượng văn phòng"
+              value={office.icon || (office.id === 'ho-chi-minh' ? 'Briefcase' : 'Building2')}
+              onChange={(value) => updateListItem('offices', index, 'icon', value)}
+              placeholder="Chọn biểu tượng..."
+              size="sm"
+            />
           </div>
           <ContactField label="Địa chỉ văn phòng" required multiline value={office.address} onChange={(value) => updateListItem('offices', index, 'address', value)} placeholder="Ví dụ: Tầng 6, Tòa nhà..." />
           <div className="flex justify-end">
@@ -713,15 +754,17 @@ export default function AdminContact() {
 
       <section className={sectionClass}>
         <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-semibold text-(--admin-title)">Kênh thông tin điện tử</h2><button type="button" className={adminButton} onClick={addSocialChannel}><Plus size={16} />Thêm kênh</button></div>
-        <div className="grid gap-3 border-b border-(--admin-border) pb-2 text-sm font-semibold text-(--admin-heading) sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+        <div className="grid gap-3 border-b border-(--admin-border) pb-2 text-sm font-semibold text-(--admin-heading) sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px_auto]">
           <span>Tên kênh <span className="text-(--admin-accent)">*</span></span>
           <span>Đường dẫn kênh</span>
+          <span>Biểu tượng</span>
           <span aria-hidden="true" />
         </div>
         <div className="space-y-3">
-          {socialChannels.map((channel, index) => <div key={channel.id || index} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
+          {socialChannels.map((channel, index) => <div key={channel.id || index} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_160px_auto] sm:items-end">
             <ContactField label="Tên kênh" hideLabel required value={channel.label} onChange={(value) => updateListItem('socialChannels', index, 'label', value)} placeholder="Ví dụ: Zalo OA" />
             <ContactField label="Đường dẫn kênh" hideLabel value={channel.href || ''} onChange={(value) => updateListItem('socialChannels', index, 'href', value || null)} placeholder="Ví dụ: https://zalo.me/..." />
+            <IconDropdown label="Biểu tượng" value={channel.icon || 'Globe'} onChange={(value) => updateListItem('socialChannels', index, 'icon', value)} placeholder="Chọn icon..." size="sm" />
             <button type="button" className={adminButton} onClick={() => removeSocialChannel(index)}><Trash2 size={15} />Xóa</button>
           </div>)}
         </div>

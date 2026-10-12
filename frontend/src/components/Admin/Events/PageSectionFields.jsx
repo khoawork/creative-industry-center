@@ -4,6 +4,7 @@ import Field from './EventField.jsx'
 import EventStatusMultiSelect from './EventStatusMultiSelect.jsx'
 import { FormBuilder } from '../Base/index.js'
 import EventNewsletter from '../../event-actis/EventNewsletter.jsx'
+import { IconDropdown } from '../../icons/index.js'
 import { adminButton } from '../../../config/Admin/adminEvents.js'
 import { fetchFormConfig, DEFAULT_FORM_CONFIGS } from '../../../services/googleSheetService.js'
 
@@ -41,7 +42,6 @@ export default function PageSectionFields({ section, value, onChange }) {
       ? {}
       : {}
   const statistics = value.statistics || []
-  const breadcrumbs = value.breadcrumbs || []
   const statusFilters = (value.status_filters || []).map((filter) => ({
     ...filter,
     statuses: Array.isArray(filter.statuses) ? filter.statuses : filter.status ? [filter.status] : [],
@@ -53,17 +53,6 @@ export default function PageSectionFields({ section, value, onChange }) {
     update('statistics', next)
   }
   return <div className="space-y-5">
-    {section === 'hero_section' && <fieldset className="space-y-4 border-b border-(--admin-border) pb-5">
-      <legend className="mb-3 font-semibold">Đường dẫn điều hướng</legend>
-      {breadcrumbs.map((item, index) => <div key={index} className="space-y-3 rounded-lg border border-(--admin-border) p-4">
-        <div className="flex items-center justify-between gap-2"><span>Mục {index + 1}</span><button type="button" className={adminButton} aria-label={`Xóa điều hướng ${index + 1}`} onClick={() => update('breadcrumbs', breadcrumbs.filter((_, i) => i !== index))}><Trash2 size={14} /></button></div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="Tên mục điều hướng" required value={item.text} onChange={(text) => update('breadcrumbs', breadcrumbs.map((old, i) => i === index ? { ...old, text } : old))} />
-          <Field label="Liên kết điều hướng" value={item.link || ''} placeholder="Để trống cho trang hiện tại" onChange={(link) => update('breadcrumbs', breadcrumbs.map((old, i) => i === index ? { ...old, link: link || null } : old))} />
-        </div>
-      </div>)}
-      <button type="button" className={adminButton} disabled={breadcrumbs.length >= 8} onClick={() => update('breadcrumbs', [...breadcrumbs, { text: '', link: null }])}><Plus size={16} />Thêm mục điều hướng</button>
-    </fieldset>}
     {Object.entries(labels).map(([key, label]) => <Field key={key} label={label} required multiline={key === 'description'} value={value[key] || ''} onChange={(next) => update(key, next)} />)}
     {section === 'filter_section' && <fieldset className="space-y-4 border-t border-(--admin-border) pt-4">
       <legend className="pr-3 font-semibold">Bộ lọc trạng thái</legend>
@@ -91,9 +80,13 @@ export default function PageSectionFields({ section, value, onChange }) {
           <button type="button" className={adminButton} aria-label={`Xóa thống kê ${index + 1}`} onClick={() => update('statistics', statistics.filter((_, i) => i !== index))}><Trash2 size={14} /></button>
         </div></div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Biểu tượng" value={stat.icon} onChange={(icon) => update('statistics', statistics.map((item, i) => i === index ? { ...item, icon } : item))}>
-            <option value="calendar">Lịch</option><option value="users">Đại biểu</option><option value="certificate">Chứng nhận</option><option value="building">Tổ chức</option>
-          </Field>
+          <IconDropdown
+            label="Biểu tượng"
+            value={stat.icon}
+            onChange={(icon) => update('statistics', statistics.map((item, i) => i === index ? { ...item, icon } : item))}
+            placeholder="Chọn biểu tượng..."
+            size="sm"
+          />
           {['value', 'label'].map((key) => <Field key={key} label={key === 'value' ? 'Giá trị' : 'Nhãn thống kê'} required value={stat[key]} onChange={(next) => update('statistics', statistics.map((item, i) => i === index ? { ...item, [key]: next } : item))} />)}
         </div>
       </div>)}

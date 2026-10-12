@@ -1,5 +1,5 @@
-import Button from '../shared/Button.jsx'
-import Icon from '../shared/Icon.jsx'
+import Button from "../shared/Button.jsx";
+import Icon from "../shared/Icon.jsx";
 import {
   about,
   advisory,
@@ -11,26 +11,34 @@ import {
   projects,
   projectsSection,
   trainingSection,
-} from '../../data/homeData.js'
-import { sectionIds } from '../../config/shared/site.js'
+} from "../../data/homeData.js";
+import { sectionIds } from "../../config/shared/site.js";
 
 function SectionHeading({ eyebrow, title, light = false, left = false }) {
   return (
-    <div className={`wow animate__slideInDown flex flex-col ${left ? 'items-start text-left' : 'items-center text-center'} mb-12 lg:mb-12`}>
-      <span className={`text-xs font-bold tracking-[0.2em] uppercase mb-4 ${light ? 'text-secondary-bright' : 'text-secondary'}`}>
+    <div
+      className={`wow animate__slideInDown flex flex-col ${left ? "items-start text-left" : "items-center text-center"} mb-12 lg:mb-12`}
+    >
+      <span
+        className={`text-xs font-bold tracking-[0.2em] uppercase mb-4 ${light ? "text-secondary-bright" : "text-secondary"}`}
+      >
         {eyebrow}
       </span>
-      <h2 className={`text-3xl md:text-4xl font-bold uppercase tracking-tight ${light ? 'text-white' : 'text-primary'}`}>
+      <h2
+        className={`text-3xl md:text-4xl font-bold uppercase tracking-tight ${light ? "text-white" : "text-primary"}`}
+      >
         {title}
       </h2>
-      
     </div>
-  )
+  );
 }
 
 export function AboutSection() {
   return (
-    <section className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.about}>
+    <section
+      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      id={sectionIds.about}
+    >
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         <SectionHeading eyebrow={about.eyebrow} title={about.title} />
 
@@ -46,11 +54,16 @@ export function AboutSection() {
                   className="w-full h-full object-cover"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+              <div
+                className="absolute inset-0 bg-gradient-to-t from-primary/85 via-transparent to-transparent pointer-events-none"
+                aria-hidden="true"
+              />
               {(about.captionTitle || about.caption) && (
                 <div className="absolute bottom-6 left-6 right-6 p-5 rounded-xl bg-white/95 backdrop-blur-sm shadow-md border-l-4 border-secondary">
                   {about.captionTitle && (
-                    <h3 className="text-lg font-bold text-primary">{about.captionTitle}</h3>
+                    <h3 className="text-lg font-bold text-primary">
+                      {about.captionTitle}
+                    </h3>
                   )}
                   {about.caption && (
                     <p className="text-xs text-on-surface-variant font-normal mt-1 leading-relaxed">
@@ -68,9 +81,11 @@ export function AboutSection() {
               <article className="p-8 rounded-2xl bg-surface-container-low border border-[#ebe5dc] shadow-sm space-y-4">
                 <div className="flex items-center gap-3">
                   <span className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm shrink-0">
-                    <Icon name="landmark" size={22} />
+                    <Icon name={about.missionIcon} size={22} />
                   </span>
-                  <h3 className="text-xl font-bold text-primary">{about.missionTitle}</h3>
+                  <h3 className="text-xl font-bold text-primary">
+                    {about.missionTitle}
+                  </h3>
                 </div>
                 <p className="text-base text-on-surface leading-relaxed font-normal">
                   {about.mission}
@@ -81,11 +96,20 @@ export function AboutSection() {
             {Array.isArray(about.values) && about.values.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {about.values.map((value) => (
-                  <article className="p-6 rounded-xl bg-white border border-[#ebe5dc] shadow-sm flex flex-col justify-between" key={value.title}>
+                  <article
+                    className="p-6 rounded-xl bg-white border border-[#ebe5dc] shadow-sm flex flex-col justify-between"
+                    key={value.title}
+                  >
                     <div>
                       <div className="flex items-center gap-3 mb-2.5">
-                        <Icon name={value.icon || 'check'} size={24} className="text-secondary shrink-0" />
-                        <h4 className="text-base font-bold text-primary">{value.title}</h4>
+                        <Icon
+                          name={value.icon || "check"}
+                          size={24}
+                          className="text-secondary shrink-0"
+                        />
+                        <h4 className="text-base font-bold text-primary">
+                          {value.title}
+                        </h4>
                       </div>
                       <p className="text-sm text-on-surface-variant leading-relaxed">
                         {value.description}
@@ -114,33 +138,44 @@ export function AboutSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 export function EventsSection() {
   return (
-    <section className="w-full py-20 lg:py-24 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.events}>
+    <section
+      className="w-full py-20 lg:py-24 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]"
+      id={sectionIds.events}
+    >
       <div className="max-w-7xl mx-auto flex flex-col">
         {/* Section Header with Alignment */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-12 gap-6">
-          <SectionHeading eyebrow={eventsSection.tag} title={eventsSection.title_main} left />
-          {eventsSection.action_button?.text && eventsSection.action_button?.link && (
-            <Button
-              href={eventsSection.action_button.link}
-              variant="text"
-              icon="arrow"
-              iconPosition="end"
-              className="wow animate__slideInRight inline-flex items-center gap-2 text-sm text-primary hover:text-secondary font-bold uppercase tracking-wider transition-colors mb-2 md:mb-8"
-            >
-              {eventsSection.action_button.text}
-            </Button>
-          )}
+          <SectionHeading
+            eyebrow={eventsSection.tag}
+            title={eventsSection.title_main}
+            left
+          />
+          {eventsSection.action_button?.text &&
+            eventsSection.action_button?.link && (
+              <Button
+                href={eventsSection.action_button.link}
+                variant="text"
+                icon="arrow"
+                iconPosition="end"
+                className="wow animate__slideInRight inline-flex items-center gap-2 text-sm text-primary hover:text-secondary font-bold uppercase tracking-wider transition-colors mb-2 md:mb-8"
+              >
+                {eventsSection.action_button.text}
+              </Button>
+            )}
         </div>
 
         {/* 3-Column Event Grid */}
         <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
-            <article className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-[#e8dfd3] transition-all duration-300 group" key={event.id}>
+            <article
+              className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-[#e8dfd3] transition-all duration-300 group"
+              key={event.id}
+            >
               {event.image && (
                 <button
                   type="button"
@@ -193,20 +228,31 @@ export function EventsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 export function AwardsSection() {
-  const eyebrow = awardsSection.tag || 'HỆ THỐNG DANH VỊ DANH DỰ'
-  const title = awardsSection.title_main || 'Giải thưởng & Tôn vinh Danh hiệu'
-  const buttonText = awardsSection.action_button?.text || 'Xem chi tiết danh mục giải thưởng'
-  const buttonLink = awardsSection.action_button?.link || `/${sectionIds.awards}`
+  const eyebrow = awardsSection.tag || "HỆ THỐNG DANH VỊ DANH DỰ";
+  const title = awardsSection.title_main || "Giải thưởng & Tôn vinh Danh hiệu";
+  const buttonText =
+    awardsSection.action_button?.text || "Xem chi tiết danh mục giải thưởng";
+  const buttonLink =
+    awardsSection.action_button?.link || `/${sectionIds.awards}`;
 
   return (
-    <section className="w-full py-20 lg:py-24 bg-primary-dark text-white px-6 lg:px-12 relative overflow-hidden border-t-2 border-secondary/50" id={sectionIds.awards}>
+    <section
+      className="w-full py-20 lg:py-24 bg-primary-dark text-white px-6 lg:px-12 relative overflow-hidden border-t-2 border-secondary/50"
+      id={sectionIds.awards}
+    >
       {/* Decorative gold glow behind header */}
-      <div className="absolute -right-32 -top-32 w-96 h-96 rounded-full bg-secondary/15 blur-3xl pointer-events-none" aria-hidden="true" />
-      <div className="max-w-7xl mx-auto flex flex-col items-center relative z-10 w-full" id={sectionIds.records}>
+      <div
+        className="absolute -right-32 -top-32 w-96 h-96 rounded-full bg-secondary/15 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+      <div
+        className="max-w-7xl mx-auto flex flex-col items-center relative z-10 w-full"
+        id={sectionIds.records}
+      >
         <SectionHeading eyebrow={eyebrow} title={title} light />
 
         <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-stretch">
@@ -215,24 +261,24 @@ export function AwardsSection() {
               key={award.id}
               className={`p-8 rounded-2xl flex flex-col items-center text-center space-y-6 justify-between transition-all duration-300 ${
                 award.featured
-                  ? 'bg-[#5d0208] border-2 border-secondary shadow-2xl relative transform md:-translate-y-4'
-                  : 'bg-tertiary border border-secondary/30 shadow-lg'
+                  ? "bg-[#5d0208] border-2 border-secondary shadow-2xl relative transform md:-translate-y-4"
+                  : "bg-tertiary border border-secondary/30 shadow-lg"
               }`}
             >
               {award.featured && (
                 <div className="absolute -top-4 bg-secondary text-primary-dark font-extrabold px-5 py-1.5 rounded-full text-xs uppercase tracking-widest shadow-md">
-                  {award.featuredLabel || 'Biểu Trưng Danh Giá Nhất'}
+                  {award.featuredLabel || "Biểu Trưng Danh Giá Nhất"}
                 </div>
               )}
               <div className="flex flex-col items-center text-center space-y-6 w-full">
                 <div
                   className={`w-20 h-20 rounded-full flex items-center justify-center shrink-0 ${
                     award.featured
-                      ? 'bg-secondary text-primary-dark shadow-md mt-2'
-                      : 'bg-secondary/15 border border-secondary/40 text-secondary-bright'
+                      ? "bg-secondary text-primary-dark shadow-md mt-2"
+                      : "bg-secondary/15 border border-secondary/40 text-secondary-bright"
                   }`}
                 >
-                  <Icon name={award.icon || 'trophy'} size={38} />
+                  <Icon name={award.icon || "trophy"} size={38} />
                 </div>
                 <h3 className="text-lg font-bold text-white leading-snug">
                   {award.title}
@@ -246,11 +292,13 @@ export function AwardsSection() {
 
               {award.tag ? (
                 <div className="pt-2">
-                  <span className={`inline-block px-4 py-1.5 rounded-full text-xs tracking-wider uppercase font-bold ${
-                    award.featured
-                      ? 'bg-secondary/20 text-secondary-bright border border-secondary/40'
-                      : 'bg-white/10 border border-secondary/30 text-secondary-bright'
-                  }`}>
+                  <span
+                    className={`inline-block px-4 py-1.5 rounded-full text-xs tracking-wider uppercase font-bold ${
+                      award.featured
+                        ? "bg-secondary/20 text-secondary-bright border border-secondary/40"
+                        : "bg-white/10 border border-secondary/30 text-secondary-bright"
+                    }`}
+                  >
                     {award.tag}
                   </span>
                 </div>
@@ -258,7 +306,7 @@ export function AwardsSection() {
                 <div className="pt-2">
                   <Button
                     href={award.href}
-                    variant={award.featured ? 'gold' : 'gold-outline'}
+                    variant={award.featured ? "gold" : "gold-outline"}
                     size="pill-sm"
                     icon="arrow"
                     iconPosition="end"
@@ -288,14 +336,20 @@ export function AwardsSection() {
         )}
       </div>
     </section>
-  )
+  );
 }
 
 export function ProjectsSection() {
   return (
-    <section className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.projects}>
+    <section
+      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      id={sectionIds.projects}
+    >
       <div className="max-w-7xl mx-auto flex flex-col">
-        <SectionHeading eyebrow={projectsSection.tag} title={projectsSection.title_main} />
+        <SectionHeading
+          eyebrow={projectsSection.tag}
+          title={projectsSection.title_main}
+        />
         {/* Dual Mosaic Grid (Project vs Patriarch/Founder) */}
         <div className="wow animate__slideInUp grid grid-cols-1 lg:grid-cols-2 gap-10">
           {projects.map((project) => (
@@ -305,12 +359,20 @@ export function ProjectsSection() {
               key={project.id}
             >
               <div className="space-y-4">
-                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded ${
-                  project.featured
-                    ? 'bg-primary text-white'
-                    : 'bg-secondary/15 text-primary-dark'
-                } font-bold text-xs uppercase tracking-wider`}>
-                  <Icon name={project.icon || 'architecture'} size={16} className={project.featured ? 'text-secondary' : 'text-secondary'} />
+                <div
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded ${
+                    project.featured
+                      ? "bg-primary text-white"
+                      : "bg-secondary/15 text-primary-dark"
+                  } font-bold text-xs uppercase tracking-wider`}
+                >
+                  <Icon
+                    name={project.icon || "architecture"}
+                    size={16}
+                    className={
+                      project.featured ? "text-secondary" : "text-secondary"
+                    }
+                  />
                   {project.category}
                 </div>
                 <h3 className="text-xl font-bold text-primary leading-snug">
@@ -359,25 +421,32 @@ export function ProjectsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-
-
 
 export function TrainingSection() {
   return (
-    <section className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]" id={sectionIds.training}>
+    <section
+      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      id={sectionIds.training}
+    >
       <div className="max-w-7xl mx-auto flex flex-col">
-        <SectionHeading eyebrow={trainingSection.tag} title={trainingSection.title_main} />
+        <SectionHeading
+          eyebrow={trainingSection.tag}
+          title={trainingSection.title_main}
+        />
         <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((program) => (
-    
             <article
               className="p-8 rounded-2xl bg-surface-container-low border border-[#e8dfd3] flex flex-col justify-between shadow-sm space-y-6 hover:border-secondary transition-colors"
               key={program.id}
             >
               <div className="space-y-4">
-                <Icon name={program.icon || 'cap'} size={32} className="text-secondary" />
+                <Icon
+                  name={program.icon || "cap"}
+                  size={32}
+                  className="text-secondary"
+                />
                 <h3 className="text-lg font-bold text-primary leading-snug">
                   {program.title}
                 </h3>
@@ -416,8 +485,12 @@ export function TrainingSection() {
               <Icon name="headset" size={40} />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-primary">{advisory.title}</h4>
-              <p className="text-sm text-on-surface-variant leading-relaxed mt-1">{advisory.description}</p>
+              <h4 className="text-lg font-bold text-primary">
+                {advisory.title}
+              </h4>
+              <p className="text-sm text-on-surface-variant leading-relaxed mt-1">
+                {advisory.description}
+              </p>
             </div>
           </div>
           {advisory.actionButton?.text && advisory.actionButton?.href && (
@@ -434,5 +507,5 @@ export function TrainingSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
