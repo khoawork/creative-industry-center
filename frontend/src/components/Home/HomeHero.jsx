@@ -41,7 +41,7 @@ export default function HomeHero({ onNavigate }) {
         <div className="w-36 h-1.5 bg-secondary mb-6 rounded-full mx-auto" aria-hidden="true" />
 
         {hero.subtitle && (
-          <p className="wow animate__zoomIn text-lg md:text-xl text-on-surface-variant max-w-3xl font-semibold mb-7 uppercase tracking-wider">
+          <p className="wow animate__zoomIn text-sm md:text-base text-[#000000] max-w-3xl font-semibold mb-7 uppercase tracking-wider italic">
             {hero.subtitle}
           </p>
         )}
@@ -78,23 +78,25 @@ export default function HomeHero({ onNavigate }) {
         </div>
 
         {/* Key Stat Pillars */}
-        {statistics.length > 0 && (
-          <div className="wow animate__slideInUp grid grid-cols-2 md:grid-cols-4 gap-6 w-full mt-16 pt-8 bg-white border border-[#e8dfd3] rounded-2xl p-6 shadow-sm" aria-label="Thành tựu nổi bật">
-            {statistics.map((stat, index) => (
-              <div
-                className={`flex flex-col items-center p-3 ${
-                  index % 2 !== 0 ? 'border-l border-[#e8dfd3]' : ''
-                } ${index > 0 ? 'md:border-l md:border-[#e8dfd3]' : ''}`}
-                key={stat.label}
-              >
-                <span className="text-3xl md:text-4xl font-extrabold text-primary">{stat.value}</span>
-                <span className="text-xs md:text-sm text-on-surface-variant font-semibold text-center mt-1 uppercase tracking-wide">
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+      {statistics.length > 0 && (
+  <div className="wow animate__slideInUp grid grid-cols-2 md:grid-cols-4 gap-6 w-full mt-16 pt-8 bg-white border border-[#e8dfd3] rounded-2xl p-6 shadow-sm" aria-label="Thành tựu nổi bật">
+    {statistics.map((stat, index) => (
+      <div
+        className={`flex flex-col items-center p-3 ${
+          index % 2 !== 0 ? 'border-l border-[#e8dfd3]' : ''
+        } ${index > 0 ? 'md:border-l md:border-[#e8dfd3]' : ''}`}
+        key={stat.label}
+      >
+        <span className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+          {stat.value}
+        </span>
+        <span className="text-xs md:text-sm text-on-surface-variant font-semibold text-center mt-1 uppercase tracking-wide">
+          {stat.label}
+        </span>
+      </div>
+    ))}
+  </div>
+)}
       </div>
     </section>
   )

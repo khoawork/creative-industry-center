@@ -32,9 +32,11 @@ def _tel_href_format(value):
 
 
 class ContactIntroDTO(Schema):
-    badge = fields.Str(required=True, validate=_not_blank)
+    badge = fields.Str(allow_none=True, load_default="", dump_default="")
     title = fields.Str(required=True, validate=_not_blank)
     description = fields.Str(required=True, validate=_not_blank)
+    logo = fields.Str(allow_none=True, load_default="", dump_default="")
+    image = fields.Str(allow_none=True, load_default="", dump_default="")
 
 
 class ContactPhoneDTO(Schema):

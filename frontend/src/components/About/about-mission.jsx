@@ -12,7 +12,7 @@ export default function AboutMission({ section }) {
                 <AboutIcon code={item.icon} className="rounded-full border border-[#d49520]/40 bg-[#710008] p-3 text-[#d49520]" />
                 <div className="min-w-0">
                   <h3 className="mb-1 text-lg font-bold text-[#710008]">{item.title}</h3>
-                  <p className="whitespace-pre-line text-base leading-relaxed text-black/80 sm:text-lg">{item.description}</p>
+                  <p className="whitespace-pre-line text-base leading-relaxed text-black/80 sm:text-base">{item.description}</p>
                 </div>
               </article>
             ))}

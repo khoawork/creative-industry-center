@@ -25,8 +25,6 @@ export const Introduction = ({ totalStories = 54, hero }) => {
               {hero?.name || 'CHUYỆN NHÀ SÁNG NGHIỆP'}
             </h1>
 
-            {/* Đường gạch ngang */}
-            <div className="bg-[#710008] h-[6px] w-[100px] rounded-lg"></div>
 
             {/* Khối chứa Paragraph và Thẻ Stats nằm ngang hàng */}
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 pt-2">

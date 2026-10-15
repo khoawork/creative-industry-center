@@ -58,7 +58,7 @@ export default function RecordList({
                       {rec.category}
                     </span>
                     <span className="px-2.5 py-1 rounded bg-record-surface-container-high text-record-on-surface-variant font-semibold">
-                      Chu kỳ: {rec.cycle}
+                       {rec.cycle}
                     </span>
                   </div>
                   <h3 className="font-headline-lg text-headline-lg text-record-primary font-bold pt-1">

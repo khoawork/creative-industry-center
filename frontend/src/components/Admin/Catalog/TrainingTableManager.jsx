@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   GraduationCap,
   Plus,
@@ -15,8 +15,14 @@ import {
   Monitor,
   Award as CertificateIcon,
   CheckCircle,
+  Image as ImageIcon,
+  Upload,
+  LoaderCircle,
+  ExternalLink,
 } from "lucide-react";
 import { TrainingAPI } from "../../../api/trainingApi.js";
+import { UploadAPI } from "../../../api/uploadApi.js";
+import { IconDropdown, DynamicIcon } from "../../icons/index.js";
 
 const DEFAULT_BENEFITS = [
   "Bảo chứng chuẩn mực Viện Kỷ lục",
@@ -30,6 +36,9 @@ export default function TrainingTableManager() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const fileInputRef = useRef(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   // Modal thêm / sửa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -42,6 +51,11 @@ export default function TrainingTableManager() {
     description: "",
     benefits: [...DEFAULT_BENEFITS],
     format: "Trực tiếp kết hợp Trực tuyến",
+    image: "",
+    icon: "GraduationCap",
+    info_highlight: "",
+    btn_action: "Xem chi tiết",
+    link: "/training",
     placeholderName: "Ví dụ: Nguyễn Văn A",
     placeholderPhone: "0987 xxx xxx",
     placeholderEmail: "contact@domain.vn",
@@ -59,6 +73,37 @@ export default function TrainingTableManager() {
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
+  };
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      showToast("Chỉ hỗ trợ file ảnh JPG, PNG hoặc WEBP.", "error");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Ảnh không được vượt quá 5MB.", "error");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const url = await UploadAPI.uploadImage(file, "training");
+      if (!url) throw new Error("Không nhận được URL ảnh.");
+      setFormData((prev) => ({ ...prev, image: url }));
+      showToast("Tải ảnh khóa học lên thành công!");
+    } catch (err) {
+      console.error("Lỗi tải ảnh:", err);
+      showToast(
+        err.response?.data?.message || err.message || "Tải ảnh thất bại.",
+        "error"
+      );
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const fetchTrainings = async (isManual = false) => {
@@ -100,6 +145,11 @@ export default function TrainingTableManager() {
       description: "",
       benefits: [...DEFAULT_BENEFITS],
       format: "Trực tiếp kết hợp Trực tuyến",
+      image: "",
+      icon: "GraduationCap",
+      info_highlight: "",
+      btn_action: "Xem chi tiết",
+      link: "/training",
       placeholderName: "Ví dụ: Nguyễn Văn A",
       placeholderPhone: "0987 xxx xxx",
       placeholderEmail: "contact@domain.vn",
@@ -142,6 +192,11 @@ export default function TrainingTableManager() {
         props.format ||
         (Array.isArray(props.locations) ? props.locations.join(", ") : "") ||
         "Trực tiếp kết hợp Trực tuyến",
+      image: props.image || props.bg_image || item.image || "",
+      icon: props.icon || item.icon || "GraduationCap",
+      info_highlight: props.info_highlight || item.detail || "",
+      btn_action: props.btn_action || item.action || "Xem chi tiết",
+      link: props.link || item.href || "/training",
       placeholderName: props.placeholderName || "Ví dụ: Nguyễn Văn A",
       placeholderPhone: props.placeholderPhone || "0987 xxx xxx",
       placeholderEmail: props.placeholderEmail || "contact@domain.vn",
@@ -212,6 +267,12 @@ export default function TrainingTableManager() {
         format: formData.format.trim(),
         locations: [formData.format.trim()],
         certificate: formData.certificate.trim(),
+        image: formData.image.trim(),
+        bg_image: formData.image.trim(),
+        icon: formData.icon.trim() || "GraduationCap",
+        info_highlight: formData.info_highlight.trim(),
+        btn_action: formData.btn_action.trim() || "Xem chi tiết",
+        link: formData.link.trim() || "/training",
         placeholderName:
           formData.placeholderName.trim() || "Ví dụ: Nguyễn Văn A",
         placeholderPhone: formData.placeholderPhone.trim() || "0987 xxx xxx",
@@ -349,15 +410,16 @@ export default function TrainingTableManager() {
             <table className="w-full border-collapse text-left text-base">
               <thead>
                 <tr className="border-b border-(--admin-border) bg-(--admin-background) text-sm font-semibold uppercase tracking-wider text-(--admin-muted)">
-                  <th className="w-36 whitespace-nowrap px-5 py-4">Mã khóa</th>
+                  <th className="w-28 whitespace-nowrap px-4 py-4">Mã khóa</th>
+                  <th className="w-24 whitespace-nowrap px-4 py-4">Hình ảnh</th>
                   <th className="min-w-[280px] px-5 py-4">Tên khóa đào tạo</th>
-                  <th className="min-w-[200px] px-5 py-4">
+                  <th className="min-w-[180px] px-4 py-4">
                     Thời lượng & Đối tượng
                   </th>
-                  <th className="min-w-[220px] px-5 py-4">Chứng chỉ</th>
-                  <th className="min-w-[200px] px-5 py-4">Hình thức đào tạo</th>
-                  <th className="min-w-[150px] px-5 py-4">Quyền lợi</th>
-                  <th className="w-28 whitespace-nowrap px-5 py-4 text-right">
+                  <th className="min-w-[200px] px-4 py-4">Chứng chỉ</th>
+                  <th className="min-w-[180px] px-4 py-4">Hình thức đào tạo</th>
+                  <th className="min-w-[140px] px-4 py-4">Quyền lợi</th>
+                  <th className="w-24 whitespace-nowrap px-4 py-4 text-right">
                     Thao tác
                   </th>
                 </tr>
@@ -391,29 +453,60 @@ export default function TrainingTableManager() {
                       className="transition-colors hover:bg-(--admin-background)/50"
                     >
                       {/* Mã khóa */}
-                      <td className="px-5 py-5 align-top">
-                        <span className="inline-flex min-w-[88px] justify-center rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 font-mono text-sm font-bold text-(--admin-accent)">
+                      <td className="px-4 py-5 align-top">
+                        <span className="inline-flex min-w-[72px] justify-center rounded-md border border-(--admin-border) bg-(--admin-background) px-2.5 py-1.5 font-mono text-xs font-bold text-(--admin-accent)">
                           {item.id}
                         </span>
                       </td>
 
-                      {/* Tên khóa */}
-                      <td className="px-5 py-5 align-top">
-                        <div
-                          className="line-clamp-2 text-base font-semibold text-(--admin-title)"
-                          title={item.name}
-                        >
-                          {item.name}
-                        </div>
-
-                        {item.props?.description && (
-                          <p
-                            className="mt-2 line-clamp-3 text-sm leading-6 text-(--admin-muted)"
-                            title={item.props.description}
-                          >
-                            {item.props.description}
-                          </p>
+                      {/* Hình ảnh */}
+                      <td className="px-4 py-5 align-top">
+                        {item.props?.image || item.props?.bg_image || item.image ? (
+                          <img
+                            src={item.props?.image || item.props?.bg_image || item.image}
+                            alt={item.name}
+                            className="h-12 w-18 rounded-lg object-cover border border-(--admin-border) shadow-xs"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-18 items-center justify-center rounded-lg border border-dashed border-(--admin-border) bg-(--admin-background) text-gray-400">
+                            <ImageIcon size={18} />
+                          </div>
                         )}
+                      </td>
+
+                      {/* Tên khóa & Icon */}
+                      <td className="px-5 py-5 align-top">
+                        <div className="flex items-start gap-2.5">
+                          {item.props?.icon && (
+                            <span
+                              className="mt-0.5 inline-flex p-1.5 rounded-md border border-(--admin-border) bg-(--admin-background) text-(--admin-accent) shrink-0"
+                              title={`Biểu tượng: ${item.props.icon}`}
+                            >
+                              <DynamicIcon name={item.props.icon} size={16} />
+                            </span>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div
+                              className="line-clamp-2 text-base font-semibold text-(--admin-title)"
+                              title={item.name}
+                            >
+                              {item.name}
+                            </div>
+                            {item.props?.info_highlight && (
+                              <span className="inline-block mt-1 px-2 py-0.5 text-[11px] font-bold rounded bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                {item.props.info_highlight}
+                              </span>
+                            )}
+                            {item.props?.description && (
+                              <p
+                                className="mt-2 line-clamp-2 text-sm leading-6 text-(--admin-muted)"
+                                title={item.props.description}
+                              >
+                                {item.props.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
                       {/* Thời lượng & đối tượng */}
@@ -559,7 +652,158 @@ export default function TrainingTableManager() {
                 </div>
               </div>
 
-              {/* Hàng 2: Thời lượng & Đối tượng tham gia */}
+              {/* Hàng 2: Biểu tượng Icon & Điểm nổi bật */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <IconDropdown
+                    label="Biểu tượng Icon"
+                    value={formData.icon || "GraduationCap"}
+                    onChange={(val) =>
+                      setFormData({ ...formData, icon: val })
+                    }
+                    placeholder="Chọn icon đại diện..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
+                    Điểm nổi bật / Chi tiết ngắn (Badge thẻ)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.info_highlight}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        info_highlight: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+                    placeholder="Ví dụ: Khai giảng hàng tháng / 3 buổi chuyên sâu"
+                  />
+                </div>
+              </div>
+
+              {/* Hàng 3: Nút bấm hành động & Đường dẫn liên kết */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
+                    Chữ nút hành động
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.btn_action}
+                    onChange={(e) =>
+                      setFormData({ ...formData, btn_action: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+                    placeholder="Mặc định: Xem chi tiết"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-1">
+                    Đường dẫn liên kết (Link)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.link}
+                    onChange={(e) =>
+                      setFormData({ ...formData, link: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-(--admin-border) bg-(--admin-background) text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+                    placeholder="Mặc định: /training"
+                  />
+                </div>
+              </div>
+
+              {/* Hàng 4: Hình ảnh minh họa làm nền khối (Background) */}
+              <div className="p-4 rounded-xl border border-(--admin-border) bg-(--admin-background)/40 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider">
+                    Hình ảnh minh họa làm nền khối (Background Image)
+                  </label>
+                  {formData.image && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, image: "" })}
+                      className="text-[11px] text-red-500 hover:underline cursor-pointer"
+                    >
+                      Xóa ảnh nền
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg border border-(--admin-border) bg-(--admin-surface) text-(--admin-title) hover:bg-(--admin-background) transition cursor-pointer disabled:opacity-60"
+                  >
+                    {uploadingImage ? (
+                      <LoaderCircle
+                        size={15}
+                        className="animate-spin text-(--admin-accent)"
+                      />
+                    ) : (
+                      <Upload size={15} className="text-(--admin-accent)" />
+                    )}
+                    {uploadingImage ? "Đang tải ảnh..." : "Tải ảnh từ thiết bị"}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleImageFileChange}
+                    className="sr-only"
+                  />
+                  <input
+                    type="url"
+                    value={formData.image}
+                    onChange={(e) =>
+                      setFormData({ ...formData, image: e.target.value })
+                    }
+                    placeholder="Hoặc dán URL hình ảnh minh họa (https://...)"
+                    className="flex-1 min-w-[200px] px-3 py-2 text-xs rounded-lg border border-(--admin-border) bg-(--admin-surface) text-(--admin-title) focus:outline-none focus:border-(--admin-accent)"
+                  />
+                </div>
+
+                {/* Xem trước nền khối thu nhỏ */}
+                {formData.image ? (
+                  <div className="relative isolate overflow-hidden rounded-xl border border-(--admin-border) h-36 w-full max-w-md flex flex-col justify-end p-4 shadow-inner">
+                    <img
+                      src={formData.image}
+                      alt="Nền khối khóa học"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/40 pointer-events-none" />
+                    <div className="relative z-10 text-white space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-amber-400">
+                        Xem trước nền khối trang chủ (Độ tối &amp; chữ hiển thị)
+                      </span>
+                      <p className="text-sm font-bold line-clamp-1">
+                        {formData.name || "Tiêu đề khóa học"}
+                      </p>
+                      {formData.info_highlight && (
+                        <span className="text-[11px] text-amber-300 font-semibold block">
+                          {formData.info_highlight}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-(--admin-border) bg-(--admin-surface)/50 text-gray-400 gap-2 text-xs">
+                    <ImageIcon size={18} />
+                    <span>
+                      Chưa chọn ảnh minh họa nền (sẽ hiển thị ảnh minh họa mặc
+                      định)
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Hàng 5: Thời lượng & Đối tượng tham gia */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-1">

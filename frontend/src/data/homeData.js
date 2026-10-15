@@ -151,16 +151,28 @@ export const projects = projectRecords === null
       href: project.project_info?.link || '',
     }))
 
+const defaultTrainingImages = [
+  'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
+]
+
 export const programs = trainingRecords === null
   ? []
-  : selectNavItems(trainingRecords, findNavSection(navSections, 'train')).map((program) => ({
+  : selectNavItems(trainingRecords, findNavSection(navSections, 'train')).map((program, idx) => ({
       id: program.id,
-      icon: program.props?.icon || '',
+      icon: program.props?.icon || 'GraduationCap',
       title: program.name || '',
       description: program.props?.description || '',
       detail: program.props?.info_highlight || program.time || '',
-      action: program.props?.btn_action || '',
-      href: program.props?.link || '',
+      action: program.props?.btn_action || 'Xem chi tiết',
+      href: program.props?.link || '/training',
+      image:
+        program.props?.image ||
+        program.props?.bg_image ||
+        program.image ||
+        defaultTrainingImages[idx % defaultTrainingImages.length],
     }))
 
 const supportText = homeProps.support_banner?.text

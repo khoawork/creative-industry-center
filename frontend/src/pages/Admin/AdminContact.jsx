@@ -1,12 +1,15 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AlertCircle, CheckCircle2, Eye, Plus, Save, Trash2, X } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Eye, Plus, Save, Trash2, X, Upload, Image as ImageIcon, LoaderCircle } from 'lucide-react'
 import AdminContactInbox from '../../components/Admin/AdminContactInbox.jsx'
 import { FormBuilder } from '../../components/Admin/Base/index.js'
 import ContactAvailabilityMessage from '../../components/Contact/ContactAvailabilityMessage.jsx'
 import ContactForm from '../../components/Contact/ContactForm.jsx'
 import { CONTACT_PAGE_ID, ContactAPI, contactError, contactValidationErrors, requireContactData } from '../../api/contactApi.js'
 import { DashboardAPI } from '../../api/dashboardApi.js'
+import { UploadAPI } from '../../api/uploadApi.js'
+import { useSiteSettings } from '../../context/SiteSettingsContext.jsx'
+import defaultLogo from '../../assets/shared/logo/creative-industry-center-logo.png'
 import { adminContactTabs, contactFixedFieldIds } from '../../config/Admin/adminContact.js'
 import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.js'
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
@@ -118,6 +121,35 @@ export default function AdminContact() {
   const [attempt, setAttempt] = useState(0)
   const [formErrors, setFormErrors] = useState({})
   const [messages, setMessages] = useState([])
+  const { settings } = useSiteSettings()
+  const logoInputRef = useRef(null)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'].includes(file.type)) {
+      setToast({ type: 'error', message: 'Chỉ hỗ trợ file ảnh JPG, PNG, WEBP hoặc SVG.' })
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setToast({ type: 'error', message: 'Ảnh không được vượt quá 5MB.' })
+      return
+    }
+    setUploadingLogo(true)
+    try {
+      const url = await UploadAPI.uploadImage(file, 'contact')
+      if (!url) throw new Error('Không nhận được URL ảnh.')
+      updateSection('intro', 'logo', url)
+      setToast({ type: 'success', message: 'Tải ảnh logo đầu trang thành công!' })
+    } catch (err) {
+      console.error('Lỗi tải logo:', err)
+      setToast({ type: 'error', message: err.response?.data?.message || err.message || 'Tải ảnh thất bại.' })
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
 
   const loadSubmissions = () => {
     DashboardAPI.getSubmissions()
@@ -435,7 +467,6 @@ export default function AdminContact() {
       else if (!isValidEmail(email)) errors[`email_${index}`] = 'Email không đúng định dạng.'
     })
     const intro = draftProps?.intro || {}
-    if (!String(intro.badge || '').trim()) errors.badge = 'Nhãn đầu trang không được để trống.'
     if (!String(intro.title || '').trim()) errors.title = 'Tiêu đề đầu trang không được để trống.'
     if (!String(intro.description || '').trim()) errors.introDescription = 'Mô tả đầu trang không được để trống.'
     ;(draftProps?.offices || []).forEach((office, index) => {
@@ -648,6 +679,10 @@ export default function AdminContact() {
     const workingHours = draftProps?.workingHours || []
     const socialChannels = draftProps?.socialChannels || []
     const mapLocation = draftProps?.mapLocation || {}
+    const siteLogo = settings?.logo && settings.logo.trim() && !settings.logo.endsWith('creative-industry-center-logo.png')
+      ? settings.logo
+      : defaultLogo
+    const currentLogoSrc = intro.logo?.trim() || siteLogo
     const phones = Array.isArray(contact.phones) && contact.phones.length
       ? contact.phones
       : [{ number: contact.phone || '', href: contact.phoneHref || '' }]
@@ -655,12 +690,103 @@ export default function AdminContact() {
     const sectionClass = 'space-y-4 rounded-xl border border-(--admin-border) bg-(--admin-surface) p-6 shadow-[var(--admin-panel-shadow)]'
     return <form id="contact-info-editor" onSubmit={save} className="space-y-5">
       <section className={sectionClass}>
-        <div><h2 className="text-lg font-semibold text-(--admin-title)">Đầu trang Liên hệ</h2><p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">Chỉnh các nội dung hiển thị ở phần đầu trang Contact.</p></div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ContactField label="Nhãn đầu trang" required value={intro.badge} onChange={(value) => updateSection('intro', 'badge', value)} placeholder="Ví dụ: BAN THƯ KÝ & TIẾP NHẬN HỒ SƠ" />
-          <ContactField label="Tiêu đề" required value={intro.title} onChange={(value) => updateSection('intro', 'title', value)} placeholder="Ví dụ: LIÊN HỆ" />
+        <div>
+          <h2 className="text-lg font-semibold text-(--admin-title)">Đầu trang Liên hệ</h2>
+          <p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">
+            Chỉnh sửa logo / hình ảnh biểu trưng và nội dung hiển thị ở phần đầu trang Contact.
+          </p>
         </div>
-        <ContactField label="Mô tả đầu trang" required multiline value={intro.description} onChange={(value) => updateSection('intro', 'description', value)} placeholder="Ví dụ: Trung tâm luôn sẵn sàng lắng nghe và đồng hành..." />
+
+        {/* Cấu hình Logo / Hình ảnh đầu trang thay cho Ban thư ký & Tiếp nhận hồ sơ */}
+        <div className="space-y-3 rounded-xl border border-(--admin-border) bg-(--admin-background)/40 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-(--admin-heading)">
+              Logo / Hình ảnh biểu trưng đầu trang (Thay thế nhãn Ban thư ký)
+            </label>
+            {intro.logo && (
+              <button
+                type="button"
+                onClick={() => updateSection('intro', 'logo', '')}
+                className="text-xs font-medium text-(--admin-accent) hover:underline cursor-pointer"
+              >
+                Khôi phục logo mặc định của website
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => logoInputRef.current?.click()}
+              disabled={uploadingLogo}
+              className="inline-flex items-center gap-2 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs font-semibold text-(--admin-title) hover:bg-(--admin-background) disabled:opacity-60 cursor-pointer"
+            >
+              {uploadingLogo ? (
+                <LoaderCircle size={15} className="animate-spin text-(--admin-accent)" />
+              ) : (
+                <Upload size={15} className="text-(--admin-accent)" />
+              )}
+              {uploadingLogo ? 'Đang tải ảnh...' : 'Tải ảnh từ thiết bị'}
+            </button>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+              onChange={handleLogoUpload}
+              className="sr-only"
+            />
+            <input
+              type="text"
+              value={intro.logo || ''}
+              onChange={(e) => updateSection('intro', 'logo', e.target.value)}
+              placeholder="Hoặc dán URL ảnh (để trống sẽ tự động lấy logo website)"
+              className="min-w-[240px] flex-1 rounded-lg border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-xs text-(--admin-title) focus:border-(--admin-accent) focus:outline-none"
+            />
+          </div>
+
+          {/* Xem trước Logo */}
+          <div className="flex items-center gap-4 pt-1">
+            <div className="flex h-20 w-36 items-center justify-center rounded-lg border border-(--admin-border) bg-white p-2 shadow-xs">
+              <img
+                src={currentLogoSrc}
+                alt="Logo xem trước"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+            <div className="text-xs text-(--admin-ink)/70 space-y-1">
+              <p className="font-semibold text-(--admin-title)">
+                {intro.logo ? 'Đang dùng logo tùy chỉnh cho trang Liên hệ' : 'Đang dùng logo mặc định của website'}
+              </p>
+              <p className="text-[11px] text-(--admin-ink)/60">
+                Hình ảnh này sẽ hiển thị trang trọng ngay phía trên tiêu đề "{intro.title || 'LIÊN HỆ'}" của trang Contact.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ContactField
+            label="Tiêu đề"
+            required
+            value={intro.title}
+            onChange={(value) => updateSection('intro', 'title', value)}
+            placeholder="Ví dụ: LIÊN HỆ"
+          />
+          <ContactField
+            label="Nhãn phụ / Badge (Tùy chọn)"
+            value={intro.badge || ''}
+            onChange={(value) => updateSection('intro', 'badge', value)}
+            placeholder="Để trống nếu không hiển thị"
+          />
+        </div>
+        <ContactField
+          label="Mô tả đầu trang"
+          required
+          multiline
+          value={intro.description}
+          onChange={(value) => updateSection('intro', 'description', value)}
+          placeholder="Ví dụ: Trung tâm luôn sẵn sàng lắng nghe và đồng hành..."
+        />
       </section>
 
       <section className={sectionClass}>

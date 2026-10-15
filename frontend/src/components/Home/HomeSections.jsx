@@ -36,7 +36,7 @@ function SectionHeading({ eyebrow, title, light = false, left = false }) {
 export function AboutSection() {
   return (
     <section
-      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      className="w-full py-8 lg:py-12 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
       id={sectionIds.about}
     >
       <div className="max-w-7xl mx-auto flex flex-col items-center">
@@ -144,7 +144,7 @@ export function AboutSection() {
 export function EventsSection() {
   return (
     <section
-      className="w-full py-20 lg:py-24 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]"
+      className="w-full py-8 lg:py-12 bg-surface-container-low px-6 lg:px-12 border-t border-[#f0ebe1]"
       id={sectionIds.events}
     >
       <div className="max-w-7xl mx-auto flex flex-col">
@@ -241,7 +241,7 @@ export function AwardsSection() {
 
   return (
     <section
-      className="w-full py-20 lg:py-24 bg-primary-dark text-white px-6 lg:px-12 relative overflow-hidden border-t-2 border-secondary/50"
+      className="w-full py-8 lg:py-12 bg-primary-dark text-white px-6 lg:px-12 relative overflow-hidden border-t-2 border-secondary/50"
       id={sectionIds.awards}
     >
       {/* Decorative gold glow behind header */}
@@ -342,7 +342,7 @@ export function AwardsSection() {
 export function ProjectsSection() {
   return (
     <section
-      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      className="w-full py-8 lg:py-12 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
       id={sectionIds.projects}
     >
       <div className="max-w-7xl mx-auto flex flex-col">
@@ -427,7 +427,7 @@ export function ProjectsSection() {
 export function TrainingSection() {
   return (
     <section
-      className="w-full py-20 lg:py-24 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
+      className="w-full py-8 lg:py-12 bg-white px-6 lg:px-12 border-t border-[#f0ebe1]"
       id={sectionIds.training}
     >
       <div className="max-w-7xl mx-auto flex flex-col">
@@ -438,27 +438,48 @@ export function TrainingSection() {
         <div className="wow animate__slideInUp grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((program) => (
             <article
-              className="p-8 rounded-2xl bg-surface-container-low border border-[#e8dfd3] flex flex-col justify-between shadow-sm space-y-6 hover:border-secondary transition-colors"
+              className="group relative isolate overflow-hidden rounded-2xl border border-white/10 p-8 flex flex-col justify-between shadow-lg min-h-[400px] md:min-h-[440px] transition-all duration-300 hover:shadow-2xl hover:border-secondary hover:-translate-y-1"
               key={program.id}
             >
-              <div className="space-y-4">
-                <Icon
-                  name={program.icon || "cap"}
-                  size={32}
-                  className="text-secondary"
+              {/* Background Image */}
+              {program.image && (
+                <img
+                  src={program.image}
+                  alt={program.title}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
-                <h3 className="text-lg font-bold text-primary leading-snug">
+              )}
+
+              {/* Dark Gradient Overlay */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t cursor-pointer from-black/20 via-black/45 to-black/30 transition-colors duration-300 group-hover:from-black/60 group-hover:via-black/50 group-hover:to-black/30"
+              />
+
+              {/* Card Header & Content */}
+              <div className="relative z-10 space-y-5">
+                <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-secondary shadow-sm">
+                  <Icon
+                    name={program.icon || "cap"}
+                    size={32}
+                    className="text-secondary"
+                  />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-white leading-snug drop-shadow-sm group-hover:text-secondary transition-colors">
                   {program.title}
                 </h3>
                 {program.description && (
-                  <p className="text-sm text-on-surface-variant leading-relaxed">
+                  <p className="text-sm md:text-base text-white/85 leading-relaxed line-clamp-3">
                     {program.description}
                   </p>
                 )}
               </div>
-              <div className="pt-4 border-t border-[#e8dfd3] flex flex-col gap-3">
+
+              {/* Card Footer */}
+              <div className="relative z-10 pt-5 border-t border-white/20 flex flex-col gap-3 mt-6">
                 {program.detail && (
-                  <span className="text-xs text-primary font-bold block">
+                  <span className="text-xs md:text-sm text-secondary font-bold block uppercase tracking-wider">
                     {program.detail}
                   </span>
                 )}
@@ -468,7 +489,7 @@ export function TrainingSection() {
                     variant="text"
                     icon="arrow"
                     iconPosition="end"
-                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary hover:text-primary transition-colors self-start"
+                    className="inline-flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-wider !text-secondary hover:!text-white transition-colors self-start"
                   >
                     {program.action}
                   </Button>

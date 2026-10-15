@@ -41,6 +41,7 @@ export default function RecordProcess({ process }) {
           {process.cards?.map((card, idx) => {
             const stepNum = String(idx + 1).padStart(2, "0");
             const isLastStep = idx === process.cards.length - 1;
+            const isEvenStep = (idx + 1) % 2 === 0; // Kiểm tra xem có phải số thứ tự chẵn hay không (2, 4,...)
 
             // Xác định màu nền số bước dựa trên card.color
             const colorKey = card.color ? String(card.color).toLowerCase() : "";
@@ -52,9 +53,12 @@ export default function RecordProcess({ process }) {
               ? "bg-record-secondary-container text-record-on-secondary-container"
               : "bg-record-primary text-record-on-primary";
 
-            const stepColorClass =
-              mappedColorClass || (isCustomHex ? "text-white" : fallbackClass);
-            const customStyle = isCustomHex
+            // Nếu là số chẵn, ưu tiên đổi thành màu vàng (ví dụ: bg-amber-400 text-black hoặc tùy chỉnh)
+            const stepColorClass = isEvenStep
+              ? "bg-amber-400 text-black font-bold"
+              : (mappedColorClass || (isCustomHex ? "text-white" : fallbackClass));
+
+            const customStyle = isCustomHex && !isEvenStep
               ? { backgroundColor: card.color, color: "#ffffff" }
               : undefined;
 
@@ -65,7 +69,7 @@ export default function RecordProcess({ process }) {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    {/* Ô Nền Số Bước — Nhận giá trị màu từ cấu hình admin */}
+                    {/* Ô Nền Số Bước — Nhận giá trị màu từ cấu hình admin hoặc đổi thành vàng nếu là số chẵn */}
                     <span
                       style={customStyle}
                       className={`w-10 h-10 rounded-lg font-headline-sm text-headline-sm font-bold flex items-center justify-center shadow-sm transition-colors ${stepColorClass}`}

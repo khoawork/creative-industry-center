@@ -101,6 +101,8 @@ export async function fetchTableItems(tableKey) {
         certificate: training.certificate || "",
         duration: (training.props?.highlights || []).join(", "),
         time: training.time || "",
+        image: training.props?.image || training.props?.bg_image || training.image || "",
+        icon: training.props?.icon || "",
       }));
     } else if (tableKey === "awards") {
       response = await AwardAPI.getAwards({ per_page: 100 });

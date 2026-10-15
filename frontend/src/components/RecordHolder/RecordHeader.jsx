@@ -44,7 +44,7 @@ export default function RecordHeader({ header }) {
           <div className="flex flex-row sm:flex-col gap-6 p-6 rounded-xl bg-record-surface-container-lowest/10 backdrop-blur-md shadow-inner text-right min-w-[240px]">
             {header.metrics?.map((metric, index) => (
               <div key={index}>
-                <div className="font-display-lg text-display-lg text-record-secondary-container font-bold leading-none">
+                <div className="font-display-lg text-display-lg font-bold leading-none bg-gradient-to-r from-amber-300 via-orange-400 to-red-500 bg-clip-text text-transparent">
                   {metric.value}
                 </div>
                 <div className="font-label-sm text-label-sm text-record-surface-container uppercase tracking-wider mt-1">

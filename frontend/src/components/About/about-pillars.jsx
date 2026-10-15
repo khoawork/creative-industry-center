@@ -8,7 +8,7 @@ export default function AboutPillars({ coreValues, actions }) {
           <>
             <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
               <AboutHeading tag={coreValues.tag} title={coreValues.title_main} icon={coreValues.tag_icon} />
-              {coreValues.description && <p className="whitespace-pre-line text-xl leading-relaxed text-black/80">{coreValues.description}</p>}
+              {coreValues.description && <p className="whitespace-pre-line text-base leading-relaxed text-black/80">{coreValues.description}</p>}
             </div>
             {coreValues.items.length > 0 && (
               <div className="mt-8 grid grid-cols-1 gap-6 sm:mt-12 sm:grid-cols-2 xl:mt-16 xl:grid-cols-4 xl:gap-8">
@@ -16,7 +16,7 @@ export default function AboutPillars({ coreValues, actions }) {
                   <article key={index} className="flex min-w-0 flex-col items-center rounded-xl border border-black/10 border-t-4 border-t-[#710008] bg-white p-8 text-center shadow-lg">
                     <AboutIcon code={item.icon} size={40} className="mb-6 rounded-full border border-[#d49520]/40 bg-[#710008]/10 p-5 text-[#710008]" />
                     <h3 className="mb-3 text-lg font-extrabold tracking-wide text-[#710008]">{item.title}</h3>
-                    <p className="whitespace-pre-line leading-relaxed text-black/80">{item.description}</p>
+                    <p className="text-base whitespace-pre-line leading-relaxed text-black/80">{item.description}</p>
                   </article>
                 ))}
               </div>
