@@ -8,7 +8,7 @@ export default function AboutHero({ section }) {
   }}
 >
       <div className="mx-auto flex max-w-5xl flex-col items-center text-center pt-12">
-        <h1 className="max-w-4xl text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
+        <h1 className="max-w-4xl text-3xl font-bold leading-tight tracking-tight md:text-5xl">
           {section.title_main}
         </h1>
         <div
