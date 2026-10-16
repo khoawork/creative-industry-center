@@ -103,25 +103,33 @@ export default function CertificationSection({ certificationData }) {
               </div>
             </div>
 
-            <div className="flex flex-col items-center rounded-lg bg-[#e9e8e6] p-6 text-center lg:col-span-4">
-              <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-white text-[#490003] shadow-sm">
-                <DynamicIcon name="Award" size={40} className="text-[#805600]" fallback="Award" />
-              </div>
+            {/* Khối VIETKINGS SEAL bao quanh viền gradient vàng gold */}
+            <div className="relative rounded-2xl p-[3px] bg-gradient-to-br from-[#ffd54f] via-[#d49520] to-[#805600] shadow-[0_8px_30px_rgba(212,149,32,0.18)] lg:col-span-4 transition-all duration-300 hover:shadow-[0_12px_36px_rgba(212,149,32,0.28)] hover:-translate-y-0.5">
+              <div className="flex h-full flex-col items-center rounded-[13px] bg-gradient-to-b from-[#fdfbf7] to-[#f7f3ea] p-6 sm:p-7 text-center">
+                <div className="mb-3.5 flex h-20 w-20 items-center justify-center rounded-full bg-white text-[#490003] shadow-md border-2 border-[#d49520]/40">
+                  <DynamicIcon
+                    name="Award"
+                    size={40}
+                    className="text-[#805600]"
+                    fallback="Award"
+                  />
+                </div>
 
-              <span className="mb-1 text-[18px] leading-6 font-bold text-[#490003]">
-                {sealTitle}
-              </span>
+                <span className="mb-1 text-[20px] leading-6 font-extrabold uppercase tracking-tight text-[#490003]">
+                  {sealTitle}
+                </span>
 
-              <span className="mb-4 text-[12px] leading-4 uppercase tracking-[0.05em] text-[#58413f]">
-                {sealSubtitle}
-              </span>
+                <span className="mb-4 text-[12px] leading-4 font-semibold uppercase tracking-[0.08em] text-[#805600]">
+                  {sealSubtitle}
+                </span>
 
-              <p className="mb-4 text-[14px] leading-[22px] text-[#58413f]">
-                {sealDescription}
-              </p>
+                <p className="mb-5 text-[14px] leading-[22px] text-[#58413f]">
+                  {sealDescription}
+                </p>
 
-              <div className="w-full rounded bg-white py-2 text-[14px] leading-5 font-bold text-[#805600] shadow-sm">
-                {sealBadge}
+                <div className="w-full rounded-xl bg-white border border-[#d49520]/40 py-2.5 px-4 text-[14px] leading-5 font-bold text-[#805600] shadow-sm">
+                  {sealBadge}
+                </div>
               </div>
             </div>
 

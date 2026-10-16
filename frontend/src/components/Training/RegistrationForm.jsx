@@ -122,8 +122,7 @@ export default function RegistrationForm({ training = {} }) {
   }
 
   return (
-    <div className="flex flex-col justify-center bg-[#f4f3f1] p-8 lg:col-span-5 rounded-sx">
-    <div className="flex flex-col justify-center bg-[#f4f3f1] p-6 sm:p-8 lg:col-span-5 rounded-2xl border border-amber-900/10 shadow-xs">
+    <div className="flex flex-col justify-center bg-[#f8f7f5] p-6 sm:p-8 lg:col-span-5 border-t lg:border-t-0 lg:border-l border-amber-900/10">
       <div className="mb-4">
         <span className="text-[12px] leading-4 font-bold uppercase tracking-[0.05em] text-[#490003]">
           {config.badgeText || "Đăng ký tham gia"}
@@ -234,7 +233,6 @@ export default function RegistrationForm({ training = {} }) {
           </button>
         </form>
       )}
-    </div>
     </div>
   );
 }

@@ -447,7 +447,7 @@ export function TrainingSection() {
                   src={program.image}
                   alt={program.title}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="absolute cursor-pointer inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               )}
 

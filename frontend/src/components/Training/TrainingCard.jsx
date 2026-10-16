@@ -7,6 +7,22 @@ import {
 
 import RegistrationForm from "./RegistrationForm";
 
+const DEFAULT_TRAINING_IMAGES = [
+  "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+];
+
+function getDefaultImage(key = "") {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash + key.charCodeAt(i)) % DEFAULT_TRAINING_IMAGES.length;
+  }
+  return DEFAULT_TRAINING_IMAGES[hash];
+}
+
 export default function TrainingCard({ training }) {
   const code = training.id || training.code || training.props?.code || "VK";
   const title = training.name || training.title || "";
@@ -32,6 +48,13 @@ export default function TrainingCard({ training }) {
     "Trực tiếp kết hợp Trực tuyến";
   const certificate = training.certificate || training.props?.certificate || "Chứng nhận VIETKINGS";
 
+  const cardBgImage =
+    training.props?.image ||
+    training.props?.bg_image ||
+    training.image ||
+    training.bg_image ||
+    getDefaultImage(code || title);
+
   const trainingAdapter = {
     ...training,
     code,
@@ -47,42 +70,63 @@ export default function TrainingCard({ training }) {
     placeholderEmail: training.props?.placeholderEmail || training.placeholderEmail || "contact@domain.vn",
   };
 
-
   return (
-    <div className="grid grid-cols-1 overflow-hidden rounded-lg bg-white shadow-sm lg:grid-cols-12">
-      {/* Content */}
-      <div className="flex flex-col justify-between p-8 lg:col-span-7">
-        <div>
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded bg-[#e9e8e6] px-2 py-1 text-[12px] leading-4 font-bold uppercase text-[#490003]">
+    <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-white shadow-lg border border-[#e8dfd3] lg:grid-cols-12 transition-all">
+      {/* Content Side with Background Illustration */}
+      <div className="cursor-pointer  group relative isolate overflow-hidden p-8 lg:col-span-7 flex flex-col justify-between min-h-[420px] bg-slate-900 text-white">
+        {/* Background Image */}
+        {cardBgImage && (
+          <img
+            src={cardBgImage}
+            alt={title}
+            loading="lazy"
+            className="absolute cursor-pointer inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        )}
+
+        {/* Dark Gradient Overlay - softened to make image brighter and clearer */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/20 transition-colors duration-300 group-hover:from-black/70 group-hover:via-black/40 group-hover:to-black/15"
+        />
+
+        {/* Content Top */}
+        <div className="relative z-10">
+          <div className="mb-4 flex flex-wrap items-center gap-2.5">
+            <span className="rounded-md bg-black/50 backdrop-blur-md border border-white/30 px-2.5 py-1 text-[12px] leading-4 font-bold uppercase tracking-wide text-white shadow-sm">
               Mã khóa: {code}
             </span>
 
-            <span className="inline-flex items-center gap-1 text-[12px] leading-4 text-[#58413f]">
-              <FaClock className="text-[14px] text-[#805600]" />
-              {duration}
-            </span>
+            {duration && (
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-black/50 backdrop-blur-xs border border-white/20 px-2.5 py-1 text-[12px] leading-4 text-white">
+                <FaClock className="text-[13px] text-amber-300" />
+                {duration}
+              </span>
+            )}
 
-            <span className="inline-flex items-center gap-1 text-[12px] leading-4 text-[#58413f]">
-              <FaUserTie className="text-[14px] text-[#805600]" />
-              {audience}
-            </span>
+            {audience && (
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-black/50 backdrop-blur-xs border border-white/20 px-2.5 py-1 text-[12px] leading-4 text-white">
+                <FaUserTie className="text-[13px] text-amber-300" />
+                {audience}
+              </span>
+            )}
           </div>
 
-          <h3 className="mb-3 text-[22px] leading-[30px] font-bold text-[#490003]">
+          <h3 className="mb-3 text-[24px] md:text-[28px] leading-[34px] md:leading-[38px] font-extrabold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] group-hover:text-amber-300 transition-colors">
             {title}
           </h3>
 
-          <p className="mb-4 text-[16px] leading-[26px] text-[#58413f]">
-            {description}
-          </p>
+          {description && (
+            <p className="mb-5 text-[15px] md:text-[16px] leading-[26px] text-white/95 font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+              {description}
+            </p>
+          )}
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {benefits.map((benefit, idx) => (
-              <div key={idx} className="flex items-start gap-2">
-                <FaCheckCircle className="mt-0.5 shrink-0 text-[16px] text-[#805600]" />
-
-                <span className="text-[14px] leading-[22px] text-[#1a1c1b]">
+              <div key={idx} className="flex items-start gap-2.5">
+                <FaCheckCircle className="mt-1 shrink-0 text-[15px] text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
+                <span className="text-[14px] leading-[22px] text-white font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                   {benefit}
                 </span>
               </div>
@@ -90,12 +134,13 @@ export default function TrainingCard({ training }) {
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-between border-t border-[#e0bfbb] pt-4">
-          <span className="text-[12px] leading-4 text-[#58413f]">
+        {/* Content Bottom / Footer */}
+        <div className="relative z-10 mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/25 pt-4">
+          <span className="text-[13px] leading-5 text-white font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             {format}
           </span>
 
-          <span className="text-[14px] leading-5 font-bold text-[#805600]">
+          <span className="text-[14px] leading-5 font-bold text-amber-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             Chứng chỉ: {certificate}
           </span>
         </div>
