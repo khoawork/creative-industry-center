@@ -87,9 +87,16 @@ export default function HomeHero({ onNavigate }) {
         } ${index > 0 ? 'md:border-l md:border-[#e8dfd3]' : ''}`}
         key={stat.label}
       >
-        <span className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-          {stat.value}
-        </span>
+      <span 
+  className="text-3xl md:text-4xl font-extrabold"
+  style={{
+    backgroundImage: "linear-gradient(to right, #d49520, #680007)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
+  }}
+>
+  {stat.value}
+</span>
         <span className="text-xs md:text-sm text-on-surface-variant font-semibold text-center mt-1 uppercase tracking-wide">
           {stat.label}
         </span>

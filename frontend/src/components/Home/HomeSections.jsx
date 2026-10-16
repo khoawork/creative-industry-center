@@ -149,7 +149,7 @@ export function EventsSection() {
     >
       <div className="max-w-7xl mx-auto flex flex-col">
         {/* Section Header with Alignment */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-12 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between  gap-6">
           <SectionHeading
             eyebrow={eventsSection.tag}
             title={eventsSection.title_main}
