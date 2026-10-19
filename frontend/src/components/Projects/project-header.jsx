@@ -1,4 +1,5 @@
 import React from "react";
+import CounterNumber from "../shared/CounterNumber.jsx";
 
 export default function ProjectHeader({ headerData }) {
   const title = headerData?.title ;
@@ -34,7 +35,7 @@ export default function ProjectHeader({ headerData }) {
           {stat.label}
         </span>
         <span className="text-2xl font-bold text-[#4a0000] flex items-baseline gap-1 mt-0.5">
-          {stat.value}
+          <CounterNumber value={stat.value} duration={1800} />
           {stat.sublabel && (
             <span className="text-base font-normal text-[#4a0000]">
               {stat.sublabel}

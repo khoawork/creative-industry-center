@@ -1,4 +1,5 @@
 import React from "react";
+import CounterNumber from "../shared/CounterNumber.jsx";
 
 export default function HeroSection({ headerData }) {
   const title = headerData?.title || "HỢP TÁC & ĐÀO TẠO";
@@ -35,7 +36,7 @@ export default function HeroSection({ headerData }) {
           {statistics.map((stat, idx) => (
             <div key={idx} className="flex flex-col rounded-lg bg-white/10 p-4 backdrop-blur-md">
               <span className="text-[28px] md:text-[32px] leading-10 font-bold text-[#ffba45]">
-                {stat.value}
+                <CounterNumber value={stat.value} duration={1800} />
               </span>
 
               <span className="text-[11px] md:text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffdad6]">

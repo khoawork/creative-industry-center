@@ -1,4 +1,5 @@
 import { DynamicIcon } from "../icons/index.js";
+import CounterNumber from "../shared/CounterNumber.jsx";
 
 const aliasMap = {
   calendar: "Calendar",
@@ -37,7 +38,7 @@ export const EventHero = ({ section }) => (
                 </span>
                 <div>
                   <strong className="block text-base font-extrabold leading-tight md:text-lg">
-                    {stat.value}
+                    <CounterNumber value={stat.value} duration={1800} />
                   </strong>
                   <span className="text-xs font-semibold text-white/85">
                     {stat.label}

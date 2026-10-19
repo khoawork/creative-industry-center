@@ -1,5 +1,6 @@
 import Button from '../shared/Button.jsx'
 import Icon from '../shared/Icon.jsx'
+import CounterNumber from '../shared/CounterNumber.jsx'
 import { hero, statistics } from '../../data/homeData.js'
 import { sectionIds } from '../../config/shared/site.js'
 
@@ -88,15 +89,15 @@ export default function HomeHero({ onNavigate }) {
         key={stat.label}
       >
       <span 
-  className="text-3xl md:text-4xl font-extrabold"
-  style={{
-    backgroundImage: "linear-gradient(to right, #d49520, #680007)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent"
-  }}
->
-  {stat.value}
-</span>
+        className="text-3xl md:text-4xl font-extrabold"
+        style={{
+          backgroundImage: "linear-gradient(to right, #d49520, #680007)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
+        }}
+      >
+        <CounterNumber value={stat.value} duration={2000} />
+      </span>
         <span className="text-xs md:text-sm text-on-surface-variant font-semibold text-center mt-1 uppercase tracking-wide">
           {stat.label}
         </span>
