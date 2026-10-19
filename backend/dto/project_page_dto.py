@@ -9,7 +9,7 @@ class StatisticItemDTO(BaseSchema):
 
 
 class HeaderSectionRequestDTO(BaseSchema):
-    badge = fields.Str(required=True, error_messages={"required": "badge danh mục là bắt buộc"})
+    badge = fields.Str(allow_none=True, load_default="", dump_default="")
     title = fields.Str(required=True, error_messages={"required": "tiêu đề chính là bắt buộc"})
     description = fields.Str(required=True, error_messages={"required": "mô tả dự án là bắt buộc"})
     statistics = fields.List(

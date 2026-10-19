@@ -19,8 +19,45 @@ export default function RecordHolderBody({ onNominate }) {
   });
   const [error, setError] = useState(null);
 
-  function onDownloadDoc(filename) {
-    window.alert(`Tài liệu ${filename} chưa được cung cấp.`);
+  function onDownloadDoc(docUrlOrName, recordTitle) {
+    if (!docUrlOrName) {
+      window.alert(
+        `Hồ sơ tiêu chí đề cử cho hạng mục "${recordTitle || "này"}" đang được cập nhật.`
+      );
+      return;
+    }
+
+    const isHttp =
+      docUrlOrName.startsWith("http://") ||
+      docUrlOrName.startsWith("https://") ||
+      docUrlOrName.startsWith("/");
+
+    if (isHttp) {
+      let downloadUrl = docUrlOrName;
+      // If Cloudinary URL, inject fl_attachment to force direct file download
+      if (
+        downloadUrl.includes("res.cloudinary.com") &&
+        !downloadUrl.includes("fl_attachment")
+      ) {
+        downloadUrl = downloadUrl.replace("/upload/", "/upload/fl_attachment/");
+      }
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      const filename =
+        docUrlOrName.split("/").pop() ||
+        `${recordTitle ? recordTitle.replace(/\s+/g, "_") : "Ho_So_Tieu_Chi"}.pdf`;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.alert(
+        `Tài liệu "${docUrlOrName}" đang được hoàn thiện cập nhật trên hệ thống.`
+      );
+    }
   }
 
   useEffect(() => {

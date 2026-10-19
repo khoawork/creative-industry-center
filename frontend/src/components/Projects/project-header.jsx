@@ -1,8 +1,6 @@
 import React from "react";
-import { FaFolder } from "react-icons/fa";
 
 export default function ProjectHeader({ headerData }) {
-  const badge = headerData?.badge ;
   const title = headerData?.title ;
   const description = headerData?.description ;
   const statistics = Array.isArray(headerData?.statistics) && headerData.statistics.length > 0
@@ -14,16 +12,9 @@ export default function ProjectHeader({ headerData }) {
 
   return (
     <div className="mb-8 px-6 md:px-20 py-10 bg-gradient-to-r from-[#580006]/5 via-[#710008]/10 to-transparent">
-      <div className="flex items-center gap-2">
-        <FaFolder className="text-[#7d5900] text-xl shrink-0" />
-        <p className="text-xl md:text-2xl font-semibold tracking-wider text-[#7d5900] uppercase m-0">
-          {badge}
-        </p>
-      </div>
-
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mt-2">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-6xl py-4 font-semibold text-[#4a0000] uppercase tracking-tight">
+          <h1 className="text-4xl md:text-6xl py-4 font-bold text-[#4a0000] uppercase tracking-tight">
             {title}
           </h1>
           <p className="text-base md:text-lg text-[#433b35] mt-2 leading-relaxed">

@@ -30,7 +30,6 @@ export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) 
 
   const validate = () => {
     const errs = {};
-    if (!formData.badge.trim()) errs.badge = 'Badge danh mục là bắt buộc';
     if (!formData.title.trim()) errs.title = 'Tiêu đề chính là bắt buộc';
     if (!formData.description.trim()) errs.description = 'Mô tả là bắt buộc';
     if (formData.statistics.length === 0) {
@@ -83,7 +82,7 @@ export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) 
       {/* Thông tin chính */}
       <AdminCard
         title="Thông tin Header & Giới thiệu Đào tạo"
-        subtitle="Cấu hình danh hiệu huy hiệu, tiêu đề chính và mô tả tóm tắt đầu trang"
+        subtitle="Cấu hình tiêu đề chính và mô tả tóm tắt đầu trang"
         actions={
           <AdminButton
             type="submit"
@@ -97,20 +96,6 @@ export default function TrainingHeaderEditor({ initialData, onSave, isSaving }) 
         }
       >
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-2">
-              Huy hiệu phân loại (Badge) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.badge}
-              onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-              placeholder="Ví dụ: Chuẩn mực VIETKINGS Quốc tế"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-(--admin-border) bg-(--admin-background) text-sm text-(--admin-title) placeholder:text-(--admin-body)/40 outline-none transition focus:border-(--admin-accent) focus:ring-2 focus:ring-(--admin-accent)/10"
-            />
-            {errors.badge && <p className="text-xs text-red-500 mt-1">{errors.badge}</p>}
-          </div>
-
           <div>
             <label className="block text-xs font-bold text-(--admin-heading) uppercase tracking-wider mb-2">
               Tiêu đề chính <span className="text-red-500">*</span>

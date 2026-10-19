@@ -1,8 +1,6 @@
 import React from "react";
-import { FaCheckCircle } from "react-icons/fa";
 
 export default function HeroSection({ headerData }) {
-  const badge = headerData?.badge || "Chuẩn mực VIETKINGS Quốc tế";
   const title = headerData?.title || "HỢP TÁC & ĐÀO TẠO";
   const description =
     headerData?.description ||
@@ -24,14 +22,6 @@ export default function HeroSection({ headerData }) {
 
       <div className="relative mx-auto flex max-w-[75rem] flex-col items-start justify-between gap-8 px-6 py-[72px] md:flex-row md:items-center">
         <div className="max-w-2xl">
-          <div className="mb-4 inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 backdrop-blur-md">
-            <FaCheckCircle className="text-[18px] text-[#ffba45]" />
-
-            <span className="text-[12px] leading-4 font-semibold uppercase tracking-[0.05em] text-[#ffba45]">
-              {badge}
-            </span>
-          </div>
-
           <h1 className="mb-3 text-[40px] md:text-[56px] leading-[48px] md:leading-[68px] font-bold tracking-[-0.02em] text-white uppercase">
             {title}
           </h1>

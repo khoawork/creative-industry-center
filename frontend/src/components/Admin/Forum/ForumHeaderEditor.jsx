@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Check, Plus, Trash2, Link as LinkIcon, Compass, Phone } from 'lucide-react';
 import { AdminCard, AdminButton, AdminStickySaveBar } from '../Common/index.js';
+import ForumImageUploadField from './ForumImageUploadField.jsx';
 
 export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
-    top_back_text: initialData?.top_back_text || 'Quay lại Cổng TTCN Sáng tạo',
-    top_back_link: initialData?.top_back_link || '/',
-    top_slogan: initialData?.top_slogan || 'Chứng thực giá trị • Kiến tạo tài sản • Trao truyền ý chí',
-    top_hotline: initialData?.top_hotline || '028.3847.7899',
-    logo_image: initialData?.logo_image || '',
-    brand_title: initialData?.brand_title || 'DIỄN ĐÀN KINH TẾ KỶ LỤC',
-    brand_subtitle: initialData?.brand_subtitle || 'Vietnam Record Economic Forum',
+    top_back_text: initialData?.top_back_text ,
+    top_back_link: initialData?.top_back_link ,
+    top_slogan: initialData?.top_slogan ,
+    top_hotline: initialData?.top_hotline,
+    logo_image: initialData?.logo_image ,
+    brand_title: initialData?.brand_title ,
+    brand_subtitle: initialData?.brand_subtitle ,
     nav_items: Array.isArray(initialData?.nav_items) && initialData.nav_items.length > 0
       ? [...initialData.nav_items]
       : [
@@ -30,13 +31,13 @@ export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        top_back_text: initialData.top_back_text || 'Quay lại Cổng TTCN Sáng tạo',
-        top_back_link: initialData.top_back_link || '/',
-        top_slogan: initialData.top_slogan || 'Chứng thực giá trị • Kiến tạo tài sản • Trao truyền ý chí',
-        top_hotline: initialData.top_hotline || '028.3847.7899',
-        logo_image: initialData.logo_image || '',
-        brand_title: initialData.brand_title || 'DIỄN ĐÀN KINH TẾ KỶ LỤC',
-        brand_subtitle: initialData.brand_subtitle || 'Vietnam Record Economic Forum',
+        top_back_text: initialData.top_back_text ,
+        top_back_link: initialData.top_back_link,
+        top_slogan: initialData.top_slogan ,
+        top_hotline: initialData.top_hotline,
+        logo_image: initialData.logo_image ,
+        brand_title: initialData.brand_title ,
+        brand_subtitle: initialData.brand_subtitle ,
         nav_items: Array.isArray(initialData.nav_items) && initialData.nav_items.length > 0
           ? [...initialData.nav_items]
           : [
@@ -180,26 +181,12 @@ export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-(--admin-heading) mb-1.5">
-              Đường dẫn hình ảnh Logo (URL)
-            </label>
-            <input
-              type="text"
-              name="logo_image"
-              value={formData.logo_image}
-              onChange={handleChange}
-              placeholder="https://..."
-              className="w-full px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs sm:text-sm text-(--admin-ink) focus:outline-none focus:border-(--admin-accent)"
+            <ForumImageUploadField
+              label="Hình ảnh Logo Diễn đàn"
+              folder="forum/logo"
+              value={formData.logo_image || ''}
+              onChange={(value) => setFormData((current) => ({ ...current, logo_image: value }))}
             />
-            {formData.logo_image && (
-              <div className="mt-2.5 p-2 bg-slate-50 border border-slate-200 rounded-lg inline-block">
-                <img
-                  src={formData.logo_image}
-                  alt="Logo Preview"
-                  className="h-10 w-auto object-contain"
-                />
-              </div>
-            )}
           </div>
 
           <div>
@@ -211,7 +198,7 @@ export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
               name="brand_title"
               value={formData.brand_title}
               onChange={handleChange}
-              placeholder="DIỄN ĐÀN KINH TẾ KỶ LỤC"
+              placeholder=""
               className="w-full px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs sm:text-sm text-(--admin-ink) focus:outline-none focus:border-(--admin-accent)"
             />
           </div>
@@ -225,7 +212,7 @@ export default function ForumHeaderEditor({ initialData, onSave, isSaving }) {
               name="brand_subtitle"
               value={formData.brand_subtitle}
               onChange={handleChange}
-              placeholder="Vietnam Record Economic Forum"
+              placeholder=""
               className="w-full px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs sm:text-sm text-(--admin-ink) focus:outline-none focus:border-(--admin-accent)"
             />
           </div>

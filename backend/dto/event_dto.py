@@ -89,7 +89,7 @@ class EventPageBreadcrumbDTO(Schema):
 
 class EventPageHeroDTO(Schema):
     breadcrumbs = fields.List(fields.Nested(EventPageBreadcrumbDTO), load_default=list, validate=validate.Length(max=8))
-    badge = fields.String(required=True, validate=_not_blank)
+    badge = fields.String(allow_none=True, load_default="", dump_default="")
     title = fields.String(required=True, validate=_not_blank)
     description = fields.String(required=True, validate=_not_blank)
     statistics = fields.List(fields.Nested(EventPageStatisticDTO), required=True, validate=validate.Length(max=8))

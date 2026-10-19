@@ -5,7 +5,7 @@ from .BaseModel import BaseModel
 class Record(BaseModel):
     __tablename__ = "record"
     id = Column(String(50), primary_key=True)
-    rank = Column(String(50), nullable=False)
+    rank = Column(String(50), nullable=True)
     title = Column(String(255), nullable=False)
     subtitle = Column(String(255), nullable=True)
     cycle = Column(String(50), nullable=True)
@@ -13,3 +13,4 @@ class Record(BaseModel):
     category = Column(String(255), nullable=True)
     icon = Column(String(255), nullable=True)
     action = Column(JSON, nullable=True)
+    image = Column(String(500), nullable=True)

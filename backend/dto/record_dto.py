@@ -17,12 +17,15 @@ class RecordResquestDto(BaseSchema):
     subtitle = Field.String(
         validate=Field.validate.Length(min=1, max=255), allow_none=True
     )
-    rank = Field.String(required=True, validate=Field.validate.Length(min=1, max=50))
+    rank = Field.String(
+        validate=Field.validate.Length(max=50), allow_none=True, load_default=""
+    )
     icon = Field.String(validate=Field.validate.Length(min=1, max=255), allow_none=True)
     category = Field.String(
         validate=Field.validate.Length(min=1, max=255), allow_none=True
     )
-    cycle = Field.String(validate=Field.validate.Length(min=1, max=50), allow_none=True)
+    cycle = Field.String(validate=Field.validate.Length(max=50), allow_none=True, load_default="")
+    image = Field.String(validate=Field.validate.Length(max=500), allow_none=True, load_default="")
     criteria = Field.List(
         Field.String(validate=Field.validate.Length(min=1, max=255)), allow_none=True
     )
@@ -41,9 +44,9 @@ class RecordMetricsDto(BaseSchema):
 class RecordHeaderDto(BaseSchema):
     title = Field.String(required=True, validate=Field.validate.Length(min=1, max=255))
     subtitle = Field.String(
-        validate=Field.validate.Length(min=1, max=255), allow_none=True
+        validate=Field.validate.Length(max=255), allow_none=True, load_default=""
     )
-    icon = Field.String(validate=Field.validate.Length(min=1, max=255), allow_none=True)
+    icon = Field.String(validate=Field.validate.Length(max=255), allow_none=True, load_default="")
     slogan = Field.String(
         validate=Field.validate.Length(min=1, max=255), allow_none=True
     )

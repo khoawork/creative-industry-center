@@ -228,7 +228,7 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
             }
           >
             <form id="award-header" onSubmit={saveHeader} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <label>
                   <span className={labelClass}>Tiêu đề header</span>
                   <input
@@ -240,16 +240,6 @@ export default function AwardPageContentManager({ activeSection = "header" }) {
                   />
                 </label>
                 <label>
-                  <span className={labelClass}>Tiêu đề phụ</span>
-                  <input
-                    value={header.sub_title}
-                    onChange={(event) =>
-                      setHeader({ ...header, sub_title: event.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </label>
-                <label className="md:col-span-2">
                   <span className={labelClass}>Mô tả header</span>
                   <textarea
                     value={header.description}

@@ -21,18 +21,7 @@ export default function RecordHeader({ header }) {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-20 flex flex-col gap-6">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-2">
           <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-record-surface-container-lowest/10 backdrop-blur-md shadow-sm">
-              <RecordHolderIcon
-                name={header.icon || "stars"}
-                size={20}
-                filled
-                className="text-record-secondary-container"
-              />
-              <span className="text-record-secondary-fixed font-label-sm text-label-sm uppercase tracking-widest font-bold">
-                {header.subtitle}
-              </span>
-            </div>
-            <h1 className="font-display-lg text-display-lg text-record-on-primary  tracking-tight leading-tight uppercase drop-shadow-sm">
+            <h1 className=" text-display-lg text-record-on-primary font-bold tracking-tight leading-tight uppercase drop-shadow-sm">
               {header.title}
             </h1>
             {header.slogan && (

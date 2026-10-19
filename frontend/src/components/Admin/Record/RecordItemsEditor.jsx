@@ -225,11 +225,6 @@ export default function RecordItemsEditor({
                         {item.category}
                       </span>
                     )}
-                    {item.cycle && (
-                      <span className="px-2 py-0.5 rounded bg-(--admin-background) border border-(--admin-border) text-(--admin-body)/70 text-[11px]">
-                        {item.cycle}
-                      </span>
-                    )}
                   </div>
 
                   {item.criteria && item.criteria.length > 0 && (

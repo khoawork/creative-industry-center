@@ -49,7 +49,7 @@ export default function ForumHeader({ data, onRegister }) {
               <img
                 src={header.logo_image}
                 alt=""
-                className="h-11 w-12 shrink-0 object-contain"
+                className="h-20 py-2 shrink-0 object-contain"
               />
             ) : (
               <span className="flex h-11 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#0756a8]">
@@ -72,7 +72,7 @@ export default function ForumHeader({ data, onRegister }) {
                 key={`${item.href}-${item.label}-${index}`}
                 href={item.href}
                 onClick={(event) => handleAnchorClick(event, item.href)}
-                className="max-w-24 text-center text-[10px] font-semibold leading-tight text-slate-700 transition-colors hover:text-[#0756a8] 2xl:max-w-40 2xl:text-sm"
+                className="max-w-24 text-center text-[24px] font-semibold leading-tight text-slate-700 transition-colors hover:text-[#0756a8] 2xl:max-w-46 2xl:text-base"
               >
                 {item.label}
               </a>

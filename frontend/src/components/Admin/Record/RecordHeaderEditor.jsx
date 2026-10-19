@@ -1,7 +1,6 @@
 import React from "react";
 import { Plus, Trash2, Layout, Sparkles } from "lucide-react";
 import { AdminCard, AdminButton, AdminInput } from "../Common";
-import { IconDropdown } from "../../icons/index.js";
 
 export default function RecordHeaderEditor({ data = {}, onChange }) {
   const header = {
@@ -39,8 +38,8 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
         title="Cấu hình Header & Tiêu đề trang"
         subtitle="Chỉnh sửa thông tin biểu ngữ chính, khẩu hiệu và các chỉ số thống kê của trang Đề cử Kỷ lục."
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="md:col-span-2">
+        <div className="space-y-5">
+          <div>
             <AdminInput
               label="Tiêu đề chính (Title) *"
               value={header.title || ""}
@@ -51,24 +50,6 @@ export default function RecordHeaderEditor({ data = {}, onChange }) {
           </div>
 
           <div>
-            <AdminInput
-              label="Nhãn phụ / Badge (Subtitle)"
-              value={header.subtitle || ""}
-              onChange={(e) => handleFieldChange("subtitle", e?.target?.value ?? e)}
-              placeholder="VD: VIỆN KỶ LỤC VIỆT NAM — VIETKINGS"
-            />
-          </div>
-
-          <div>
-            <IconDropdown
-              label="Biểu tượng Icon"
-              value={header.icon || "military_tech"}
-              onChange={(val) => handleFieldChange("icon", val)}
-              placeholder="Chọn biểu tượng danh hiệu..."
-            />
-          </div>
-
-          <div className="md:col-span-2">
             <AdminInput
               label="Khẩu hiệu / Slogan chính"
               multiline

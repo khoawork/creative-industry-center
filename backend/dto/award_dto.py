@@ -92,7 +92,9 @@ class AwardHeaderPageDto(BaseSchema):
     title = fields.String(
         allow_none=True, load_default=None, validate=validate.Length(min=1, max=255)
     )
-    sub_title = fields.String(required=True, validate=validate.Length(min=1, max=255))
+    sub_title = fields.String(
+        allow_none=True, load_default="", dump_default="", validate=validate.Length(max=255)
+    )
     description = fields.String(required=True)
 
 

@@ -1430,7 +1430,7 @@ RECORDS_SEED_DATA = [
         "title": "Đề Cử Ngọn Hải Đăng Sáng Nghiệp",
         "subtitle": "Biểu tượng ngọn hải đăng bằng đồng mạ vàng",
         "category": "Doanh nhân & Nhà sáng lập",
-        "cycle": "Chu kỳ: Thường niên (Tháng 12)",
+        "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
         "icon": "flare",
         "criteria": [
             "Doanh nghiệp sở hữu tối thiểu 01 giải pháp hoặc sản phẩm có tính đột phá độc bản trên thị trường.",
@@ -1439,7 +1439,7 @@ RECORDS_SEED_DATA = [
         ],
         "action": {
             "nomination": "Đề Cử / Nộp Hồ Sơ",
-            "download": "QuyChe_HaiDangSangNghiep_2025.pdf",
+            "download": "https://res.cloudinary.com/ds11ggie4/raw/upload/v1792382205/records/documents/records/documents/QuyChe_TieuChi_DeCu_KyLuc.pdf",
         },
     },
     {
@@ -1448,7 +1448,7 @@ RECORDS_SEED_DATA = [
         "title": "Huy Hiệu Tinh Hoa Nghề Truyền Thống",
         "subtitle": "Đúc kim hoàn truyền thống chạm nổi",
         "category": "Nghệ nhân & Làng nghề Di sản",
-        "cycle": "Chu kỳ: Định kỳ 2 năm một lần",
+        "image": "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
         "icon": "handyman",
         "criteria": [
             "Thời gian gắn bó và cống hiến liên tục tối thiểu 20 năm cho nghề thủ công di sản.",
@@ -1457,7 +1457,7 @@ RECORDS_SEED_DATA = [
         ],
         "action": {
             "nomination": "Đề Cử / Nộp Hồ Sơ",
-            "download": "QuyChe_TinhHoaNgheTruyenThong.pdf",
+            "download": "https://res.cloudinary.com/ds11ggie4/raw/upload/v1792382205/records/documents/records/documents/QuyChe_TieuChi_DeCu_KyLuc.pdf",
         },
     },
     {
@@ -1466,7 +1466,7 @@ RECORDS_SEED_DATA = [
         "title": "Bằng Chứng Nhận Kỷ Lục Sáng Tạo Quốc Gia",
         "subtitle": "Bằng da đính ấn tín vàng Hoàng Gia",
         "category": "Nhà Khoa học, Viện nghiên cứu, Sáng chế",
-        "cycle": "Chu kỳ: Thường xuyên theo đợt thẩm định",
+        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
         "icon": "history_edu",
         "criteria": [
             "Có bằng độc quyền sáng chế hoặc giải pháp hữu ích đã được Cục Sở hữu Trí tuệ cấp văn bằng bảo hộ.",
@@ -1475,7 +1475,7 @@ RECORDS_SEED_DATA = [
         ],
         "action": {
             "nomination": "Đề Cử / Nộp Hồ Sơ",
-            "download": "QuyChe_KyLucSangTaoQuocGia.pdf",
+            "download": "https://res.cloudinary.com/ds11ggie4/raw/upload/v1792382205/records/documents/records/documents/QuyChe_TieuChi_DeCu_KyLuc.pdf",
         },
     },
     {
@@ -1484,7 +1484,7 @@ RECORDS_SEED_DATA = [
         "title": "Đề Cử Đổi Mới Sáng Tạo Di Sản Việt",
         "subtitle": "Cúp Pha lê Đế Gỗ Quý Khảm Đồng",
         "category": "Doanh nghiệp Di sản, Du lịch Văn hóa & Nghệ thuật",
-        "cycle": "Chu kỳ: Thường niên (Tháng 10)",
+        "image": "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80",
         "icon": "account_balance",
         "criteria": [
             "Sản phẩm lấy chất liệu văn hóa di sản vật thể hoặc phi vật thể của Việt Nam làm nguồn cảm hứng cốt lõi.",
@@ -1493,7 +1493,7 @@ RECORDS_SEED_DATA = [
         ],
         "action": {
             "nomination": "Đề Cử / Nộp Hồ Sơ",
-            "download": "QuyChe_SangTaoDiSanViet.pdf",
+            "download": "https://res.cloudinary.com/ds11ggie4/raw/upload/v1792382205/records/documents/records/documents/QuyChe_TieuChi_DeCu_KyLuc.pdf",
         },
     },
     {
@@ -1502,7 +1502,7 @@ RECORDS_SEED_DATA = [
         "title": "Cúp Vinh Danh Nghệ Nhân Bàn Tay Vàng Kỷ Lục",
         "subtitle": "Cúp bàn tay vàng đúc đồng nguyên khối",
         "category": "Nghệ nhân Chế tác & Điêu khắc Điển hình",
-        "cycle": "Chu kỳ: Thường niên tại Đại hội Kỷ lục",
+        "image": "https://images.unsplash.com/photo-1569683795645-b62e50fbf103?auto=format&fit=crop&w=800&q=80",
         "icon": "trophy",
         "criteria": [
             "Là tác giả trực tiếp của tối thiểu 01 tác phẩm xác lập Kỷ lục Quốc gia hoặc Châu Á.",
@@ -1511,7 +1511,7 @@ RECORDS_SEED_DATA = [
         ],
         "action": {
             "nomination": "Đề Cử / Nộp Hồ Sơ",
-            "download": "QuyChe_BanTayVangKyLuc.pdf",
+            "download": "https://res.cloudinary.com/ds11ggie4/raw/upload/v1792382205/records/documents/records/documents/QuyChe_TieuChi_DeCu_KyLuc.pdf",
         },
     },
 ]

@@ -37,7 +37,7 @@ export default function PageSectionFields({ section, value, onChange }) {
   }, [section])
 
   const labels = section === 'hero_section'
-    ? { badge: 'Nhãn đầu trang', title: 'Tiêu đề', description: 'Mô tả' }
+    ? { title: 'Tiêu đề', description: 'Mô tả' }
     : section === 'filter_section'
       ? {}
       : {}

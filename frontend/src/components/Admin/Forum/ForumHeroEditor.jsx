@@ -5,16 +5,14 @@ import ForumImageUploadField from './ForumImageUploadField.jsx';
 
 export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
   const [formData, setFormData] = useState({
-    badge: initialData?.badge ,
     title: initialData?.title,
     subtitle: initialData?.subtitle,
     motto: initialData?.motto,
-    event_date: initialData?.event_date ,
+    event_date: initialData?.event_date,
     event_location: initialData?.event_location,
-    top_logo_image: initialData?.top_logo_image,
-    banner_image: initialData?.banner_image ,
+    banner_image: initialData?.banner_image,
     primary_button_text: initialData?.primary_button_text,
-    primary_button_link: initialData?.primary_button_link ,
+    primary_button_link: initialData?.primary_button_link,
     secondary_button_text: initialData?.secondary_button_text,
     secondary_button_link: initialData?.secondary_button_link,
   });
@@ -24,13 +22,11 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        badge: initialData.badge ?? '',
         title: initialData.title ?? '',
         subtitle: initialData.subtitle ?? '',
         motto: initialData.motto ?? '',
         event_date: initialData.event_date ?? '',
         event_location: initialData.event_location ?? '',
-        top_logo_image: initialData.top_logo_image ?? '',
         banner_image: initialData.banner_image ?? '',
         primary_button_text: initialData.primary_button_text ?? '',
         primary_button_link: initialData.primary_button_link ?? '',
@@ -56,7 +52,7 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <AdminCard
-        title="Tiêu đề & Thông điệp Thượng đỉnh"
+        title="Tiêu đề & Thông điệp Diễn đàn"
         subtitle="Cấu hình thông điệp chiến lược, khẩu hiệu hành động và thời gian địa điểm diễn đàn."
         actions={
           <AdminButton
@@ -70,20 +66,6 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
         }
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="block text-xs font-semibold text-(--admin-heading) mb-1.5">
-              Badge nhận diện / Huy hiệu đầu trang
-            </label>
-            <input
-              type="text"
-              name="badge"
-              value={formData.badge}
-              onChange={handleChange}
-              placeholder="Hội nghị Thượng đỉnh Kinh tế Kỷ lục Toàn quốc"
-              className="w-full px-3 py-2 rounded-lg border border-(--admin-border) bg-(--admin-background) text-xs sm:text-sm text-(--admin-ink) focus:outline-none focus:border-(--admin-accent)"
-            />
-          </div>
-
           <div>
             <label className="block text-xs font-semibold text-(--admin-heading) mb-1.5">
               Tiêu đề chính (Tiếng Việt)
@@ -164,8 +146,8 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
       </AdminCard>
 
       <AdminCard
-        title="Nút Hành Động & Ảnh Bìa Sự Kiện"
-        subtitle="Đường dẫn nút bấm và hình ảnh hội nghị hiển thị ở khung banner chính."
+        title="Nút Hành Động & Ảnh / Video Banner Sự Kiện"
+        subtitle="Đường dẫn nút bấm và hình ảnh hoặc video hội nghị hiển thị ở khung banner chính."
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -224,16 +206,11 @@ export default function ForumHeroEditor({ initialData, onSave, isSaving }) {
             />
           </div>
 
-          <div className="md:col-span-2 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="md:col-span-2">
             <ForumImageUploadField
-              label="Logo nhỏ trên khu vực Hero"
+              label="Ảnh hoặc Video banner Hero Diễn đàn"
               folder="forum/hero"
-              value={formData.top_logo_image || ''}
-              onChange={(value) => setFormData((current) => ({ ...current, top_logo_image: value }))}
-            />
-            <ForumImageUploadField
-              label="Ảnh banner Hero"
-              folder="forum/hero"
+              allowVideo={true}
               value={formData.banner_image || ''}
               onChange={(value) => setFormData((current) => ({ ...current, banner_image: value }))}
             />

@@ -21,13 +21,11 @@ DEFAULT_FORUM_HEADER = {
 }
 
 DEFAULT_FORUM_HERO = {
-    "badge": "HỘI NGHỊ THƯỢNG ĐỈNH KINH TẾ KỶ LỤC TOÀN QUỐC",
     "title": "DIỄN ĐÀN KINH TẾ KỶ LỤC 2026",
     "subtitle": "RECORD ECONOMIC FORUM",
     "motto": "“Chứng thực giá trị – Kiến tạo tài sản – Trao truyền ý chí”",
     "event_date": "Tháng 10/2026 (Phiên Toàn thể)",
     "event_location": "Trung tâm Hội nghị Quốc gia",
-    "top_logo_image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDsDJlGgOB3I3cw5G9GnuTFV_gYRilNrpep9_oTJ4gGyLoIAcH5db0gCUdMKWvsSKIRxI-ittCGulqOvVQf3Btj3pWOfkFHPn8dbBp87IW8KAx7xmioBz7D56ZSOh2RSuRrkm7LiImKyPamQyYHY0uRgy16hnuUUvsLX61AWTBgHIKuMZDyoP6jtlm2XD4KKCOwShzDi6_pPkSJkucZQN4wdFCJoXlErze1lqpBht-R2ee_Cvde2hrN1HxyKKG_M7wUpQ",
     "banner_image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDsDJlGgOB3I3cw5G9GnuTFV_gYRilNrpep9_oTJ4gGyLoIAcH5db0gCUdMKWvsSKIRxI-ittCGulqOvVQf3Btj3pWOfkFHPn8dbBp87IW8KAx7xmioBz7D56ZSOh2RSuRrkm7LiImKyPamQyYHY0uRgy16hnuUUvsLX61AWTBgHIKuMZDyoP6jtlm2XD4KKCOwShzDi6_pPkSJkucZQN4wdFCJoXlErze1lqpBht-R2ee_Cvde2hrN1HxyKKG_M7wUpQ",
     "primary_button_text": "Đăng ký tham dự",
     "primary_button_link": "#dang-ky",

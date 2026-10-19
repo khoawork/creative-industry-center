@@ -1,4 +1,3 @@
-import { BadgeCheck } from "lucide-react";
 import { DynamicIcon } from "../icons/index.js";
 
 const aliasMap = {
@@ -14,13 +13,7 @@ export const EventHero = ({ section }) => (
       className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-tr from-black/30 via-transparent to-(--color-brand-gold)/15"
     />
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      {section?.badge && (
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-(--color-brand-gold)/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-(--color-brand-cream)">
-          <BadgeCheck size={16} aria-hidden="true" />
-          {section.badge}
-        </div>
-      )}
-      <h1 className="text-3xl font-extrabold uppercase tracking-tight sm:text-4xl lg:text-[56px] lg:leading-tight">
+      <h1 className="text-3xl font-bold uppercase tracking-tight sm:text-4xl lg:text-[56px] lg:leading-tight">
         {section?.title || "Sự kiện và hoạt động"}
       </h1>
       {section?.description && (

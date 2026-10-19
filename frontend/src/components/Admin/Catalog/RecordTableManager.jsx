@@ -13,8 +13,10 @@ import {
   Layers,
   Sparkles,
   ExternalLink,
+  Upload,
 } from "lucide-react";
 import { RecordAPI } from "../../../api/recordsApi.js";
+import { UploadAPI } from "../../../api/uploadApi.js";
 import { IconDropdown } from "../../icons/index.js";
 import RecordHolderIcon from "../../RecordHolder/RecordHolderIcon.jsx";
 
@@ -28,13 +30,17 @@ export default function RecordTableManager() {
   // Modal Thêm / Sửa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const fileInputRef = React.useRef(null);
+  const docInputRef = React.useRef(null);
   const [formData, setFormData] = useState({
     id: "",
     rank: "",
     title: "",
     subtitle: "",
     category: "",
-    cycle: "",
+    image: "",
     icon: "flare",
     criteria: [""],
     action: {
@@ -117,7 +123,7 @@ export default function RecordTableManager() {
       title: "",
       subtitle: "",
       category: "",
-      cycle: "Chu kỳ: Thường niên",
+      image: "",
       icon: "flare",
       criteria: [""],
       action: {
@@ -136,7 +142,7 @@ export default function RecordTableManager() {
       title: item.title || "",
       subtitle: item.subtitle || "",
       category: item.category || "",
-      cycle: item.cycle || "",
+      image: item.image || "",
       icon: item.icon || "flare",
       criteria:
         Array.isArray(item.criteria) && item.criteria.length
@@ -150,6 +156,54 @@ export default function RecordTableManager() {
           },
     });
     setIsModalOpen(true);
+  };
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const url = await UploadAPI.uploadImage(file, "records");
+      if (url) {
+        setFormData((prev) => ({ ...prev, image: url }));
+        showToast("Tải ảnh lên thành công!");
+      }
+    } catch (err) {
+      console.error("Lỗi upload ảnh:", err);
+      showToast("Lỗi khi tải ảnh lên.", "error");
+    } finally {
+      setUploadingImage(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleDocFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      showToast("Chỉ hỗ trợ tệp tài liệu định dạng PDF.", "error");
+      return;
+    }
+    try {
+      setUploadingDoc(true);
+      const url = await UploadAPI.uploadDocument(file, "records/documents");
+      if (url) {
+        setFormData((prev) => ({
+          ...prev,
+          action: {
+            ...(prev.action || {}),
+            download: url,
+          },
+        }));
+        showToast("Tải tệp PDF lên thành công!");
+      }
+    } catch (err) {
+      console.error("Lỗi upload PDF:", err);
+      showToast(err.response?.data?.message || "Lỗi khi tải tệp PDF lên.", "error");
+    } finally {
+      setUploadingDoc(false);
+      if (e.target) e.target.value = "";
+    }
   };
 
   const handleAddCriteria = () => {
@@ -322,14 +376,11 @@ export default function RecordTableManager() {
             <table className="w-full border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-(--admin-border) bg-(--admin-background) text-sm font-semibold uppercase tracking-wider text-(--admin-muted)">
-                  <th className="w-52 whitespace-nowrap px-5 py-4">
-                    Thứ hạng / Danh hiệu
+                  <th className="w-28 whitespace-nowrap px-5 py-4">
+                    Hình ảnh
                   </th>
                   <th className="min-w-[240px] px-5 py-4">Tiêu đề đề cử</th>
                   <th className="min-w-[160px] px-5 py-4">Nhóm đối tượng</th>
-                  <th className="w-44 whitespace-nowrap px-5 py-4">
-                    Chu kỳ xét duyệt
-                  </th>
                   <th className="min-w-[240px] px-5 py-4">Tiêu chí</th>
                   <th className="whitespace-nowrap px-5 py-4 text-right">
                     Thao tác
@@ -343,18 +394,17 @@ export default function RecordTableManager() {
                     key={item.id}
                     className="transition-colors hover:bg-(--admin-background)/60"
                   >
-                    {/* Thứ hạng */}
+                    {/* Hình ảnh */}
                     <td className="px-5 py-5 align-top">
-                      <span className="inline-flex max-w-full rounded-md border border-(--admin-border) bg-(--admin-background) px-3 py-2 text-sm font-bold uppercase text-(--admin-title)">
-                        {item.rank || "CHƯA PHÂN HẠNG"}
-                      </span>
-
-                      {item.subtitle && (
-                        <div
-                          className="mt-2 line-clamp-2 text-sm italic text-(--admin-muted)"
-                          title={item.subtitle}
-                        >
-                          {item.subtitle}
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="h-14 w-20 rounded-lg object-cover border border-(--admin-border) shadow-xs"
+                        />
+                      ) : (
+                        <div className="flex h-14 w-20 items-center justify-center rounded-lg border border-dashed border-(--admin-border) bg-(--admin-surface) text-xs text-(--admin-muted)">
+                          <RecordHolderIcon name={item.icon || "flare"} size={22} className="text-amber-500/60" />
                         </div>
                       )}
                     </td>
@@ -375,6 +425,15 @@ export default function RecordTableManager() {
                         </span>
                         <span className="text-(--admin-border)">•</span>
                         <span>Nộp: {item.action?.nomination || "Đề cử"}</span>
+                        {item.action?.download && (
+                          <>
+                            <span className="text-(--admin-border)">•</span>
+                            <span className="inline-flex items-center gap-1 text-xs text-emerald-500 dark:text-emerald-400 font-medium">
+                              <FileDown size={12} />
+                              File PDF
+                            </span>
+                          </>
+                        )}
                       </div>
                     </td>
 
@@ -382,13 +441,6 @@ export default function RecordTableManager() {
                     <td className="px-5 py-5 align-top">
                       <span className="inline-flex rounded-md border border-(--admin-border) bg-(--admin-surface) px-3 py-2 text-sm font-medium text-(--admin-ink)">
                         {item.category || "Chung"}
-                      </span>
-                    </td>
-
-                    {/* Chu kỳ */}
-                    <td className="px-5 py-5 align-top">
-                      <span className="text-sm text-(--admin-ink)">
-                        {item.cycle || "Thường niên"}
                       </span>
                     </td>
 
@@ -468,13 +520,76 @@ export default function RecordTableManager() {
               className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Hình ảnh đại diện (Phủ bì) */}
+                <div className="md:col-span-2 space-y-2 p-4 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-background)]">
+                  <label className="block text-xs font-semibold uppercase text-[var(--admin-heading)]">
+                    Hình ảnh đại diện (Phủ bì thẻ kỷ lục)
+                  </label>
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    {formData.image ? (
+                      <div className="relative h-28 w-44 rounded-lg overflow-hidden border border-[var(--admin-border)] bg-[var(--admin-surface)] shrink-0">
+                        <img
+                          src={formData.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, image: "" }))}
+                          className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-black/80 text-white rounded-full transition cursor-pointer"
+                          title="Xóa ảnh"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex h-28 w-44 items-center justify-center rounded-lg border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-muted)] shrink-0">
+                        Chưa có hình ảnh
+                      </div>
+                    )}
+
+                    <div className="flex-1 w-full space-y-2">
+                      <input
+                        type="text"
+                        value={formData.image}
+                        onChange={(e) =>
+                          setFormData({ ...formData, image: e.target.value })
+                        }
+                        placeholder="Dán đường dẫn URL ảnh (https://...)"
+                        className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
+                      />
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleImageFileChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          disabled={uploadingImage}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-[var(--admin-surface)] border border-[var(--admin-border)] hover:bg-[var(--admin-background)] text-[var(--admin-ink)] transition cursor-pointer"
+                        >
+                          {uploadingImage ? (
+                            <RefreshCw className="size-3.5 animate-spin" />
+                          ) : (
+                            <Upload className="size-3.5" />
+                          )}
+                          <span>{uploadingImage ? "Đang tải ảnh..." : "Tải ảnh từ thiết bị"}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div>
                   <label className="mb-1 block text-xs font-semibold uppercase text-[var(--admin-heading)]">
-                    Thứ hạng / Danh hiệu (Rank) *
+                    Thứ hạng / Danh hiệu (Rank)
                   </label>
                   <input
                     type="text"
-                    required
                     value={formData.rank}
                     onChange={(e) =>
                       setFormData({ ...formData, rank: e.target.value })
@@ -526,7 +641,7 @@ export default function RecordTableManager() {
                   />
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="mb-1 block text-xs font-semibold uppercase text-[var(--admin-heading)]">
                     Nhóm đối tượng (Category)
                   </label>
@@ -540,29 +655,14 @@ export default function RecordTableManager() {
                     className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
                   />
                 </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase text-[var(--admin-heading)]">
-                    Chu kỳ trao tặng (Cycle)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.cycle}
-                    onChange={(e) =>
-                      setFormData({ ...formData, cycle: e.target.value })
-                    }
-                    placeholder="VD: Chu kỳ: Thường niên (Tháng 12)"
-                    className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-background)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
-                  />
-                </div>
               </div>
 
               {/* Action buttons config */}
               <div className="p-4 rounded-xl bg-[var(--admin-background)] border border-[var(--admin-border)] space-y-3">
                 <span className="text-xs font-bold uppercase text-[var(--admin-heading)] block">
-                  Cấu hình nút hành động (Actions)
+                  Cấu hình nút hành động & Hồ sơ tiêu chí (Actions & Documents)
                 </span>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
                       Tên nút Nộp hồ sơ
@@ -584,24 +684,92 @@ export default function RecordTableManager() {
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-400 mb-1 block">
-                      Tệp quy chế tải về (Download file)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.action?.download || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          action: {
-                            ...formData.action,
-                            download: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="VD: QuyChe_HaiDangSangNghiep_2025.pdf"
-                      className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)]"
-                    />
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-semibold text-gray-400">
+                        Hồ sơ tiêu chí đề cử (File PDF)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => docInputRef.current?.click()}
+                        disabled={uploadingDoc}
+                        className={`inline-flex items-center gap-1 text-[11px] font-bold text-[var(--admin-accent)] hover:underline cursor-pointer ${
+                          uploadingDoc ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {uploadingDoc ? (
+                          <>
+                            <RefreshCw size={11} className="animate-spin" />
+                            Đang tải...
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={11} />
+                            Tải file PDF lên
+                          </>
+                        )}
+                      </button>
+                      <input
+                        ref={docInputRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleDocFileChange}
+                        disabled={uploadingDoc}
+                        className="hidden"
+                      />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formData.action?.download || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            action: {
+                              ...formData.action,
+                              download: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="VD: https://... hoặc tải file PDF từ máy"
+                        className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-ink)] outline-none focus:border-[var(--admin-accent)] pr-8"
+                      />
+                      {formData.action?.download && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              action: {
+                                ...formData.action,
+                                download: "",
+                              },
+                            })
+                          }
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500"
+                          title="Xóa đường dẫn PDF"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                    {formData.action?.download && (
+                      <div className="mt-1.5 flex items-center justify-between text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 rounded border border-emerald-500/20">
+                        <span className="truncate max-w-[240px] flex items-center gap-1 font-medium">
+                          <FileDown size={13} className="shrink-0" />
+                          {formData.action.download.split("/").pop()}
+                        </span>
+                        {formData.action.download.startsWith("http") && (
+                          <a
+                            href={formData.action.download}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 text-[11px] underline hover:text-emerald-300 ml-2"
+                          >
+                            Xem <ExternalLink size={10} />
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

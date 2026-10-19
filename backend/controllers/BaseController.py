@@ -249,17 +249,17 @@ def reorder_pages():
 
 @base_api.route("/upload", methods=["POST"])
 def upload_image_endpoint():
-    """Tải ảnh lên Cloudinary và trả về URL ảnh"""
-    file = request.files.get("file") or request.files.get("image")
+    """Tải ảnh hoặc tài liệu (PDF) lên Cloudinary và trả về URL"""
+    file = request.files.get("file") or request.files.get("image") or request.files.get("document")
     if not file:
-        return error_response(message="Không tìm thấy file ảnh tải lên.", status_code=400)
+        return error_response(message="Không tìm thấy file tải lên.", status_code=400)
     folder = request.form.get("folder", "catalog")
     try:
-        from services.image_storage_service import upload_image
-        image_url = upload_image(file, folder=folder)
+        from services.image_storage_service import upload_image_or_file
+        file_url = upload_image_or_file(file, folder=folder)
         return success_response(
-            data={"url": image_url},
-            message="Tải ảnh lên thành công",
+            data={"url": file_url},
+            message="Tải file lên thành công",
             status_code=200
         )
     except Exception as e:

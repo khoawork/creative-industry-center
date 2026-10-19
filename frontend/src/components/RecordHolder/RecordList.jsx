@@ -35,46 +35,45 @@ export default function RecordList({
           {safeRecords.map((rec) => (
             <article
               key={rec.id}
-              className="bg-record-surface-container-lowest rounded-xl p-6 lg:p-8 shadow-md hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center"
+              className="bg-record-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col lg:flex-row lg:items-stretch border border-black/5"
             >
-              <div className="lg:col-span-3 flex flex-col items-center justify-center p-6 rounded-xl bg-gradient-to-b from-record-surface-container-low to-record-surface-container text-center shadow-inner">
-                <div className="w-24 h-24 rounded-full bg-record-secondary-container/20 flex items-center justify-center text-record-secondary mb-3 shadow-sm">
-                  <RecordHolderIcon name={rec.icon || "flare"} size={54} filled className="text-record-secondary" />
-                </div>
-                <span className="font-label-sm text-label-sm text-record-primary font-bold uppercase tracking-widest">
-                  {rec.rank}
-                </span>
-                {rec.subtitle && (
-                  <span className="font-label-sm text-label-sm text-record-on-surface-variant mt-1">
-                    {rec.subtitle}
-                  </span>
+              {/* Cột 1: Ảnh bao phủ sát mép thẻ */}
+              <div className="w-full lg:w-72 xl:w-80 shrink-0 min-h-[220px] lg:min-h-0 relative overflow-hidden bg-record-surface-container">
+                {rec.image ? (
+                  <img
+                    src={rec.image}
+                    alt={rec.title || "Kỷ lục"}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full min-h-[220px] flex items-center justify-center bg-gradient-to-b from-record-surface-container-low to-record-surface-container">
+                    <RecordHolderIcon name={rec.icon || "flare"} size={54} className="text-record-secondary/40" />
+                  </div>
                 )}
               </div>
 
-              <div className="lg:col-span-6 flex flex-col gap-4">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2 text-label-sm">
-                    <span className="px-2.5 py-1 rounded bg-record-secondary-fixed text-record-on-secondary-fixed font-bold uppercase">
+              {/* Cột 2: Nội dung chính với khoảng đệm thoải mái */}
+              <div className="flex-1 p-6 lg:py-8 lg:px-8 flex flex-col justify-center gap-3.5">
+                <div className="space-y-2">
+                  {rec.category && (
+                    <span className="inline-block px-3 py-1 rounded-md bg-[#faeed8] text-[#8a4b08] text-xs font-bold uppercase tracking-wider">
                       {rec.category}
                     </span>
-                    <span className="px-2.5 py-1 rounded bg-record-surface-container-high text-record-on-surface-variant font-semibold">
-                       {rec.cycle}
-                    </span>
-                  </div>
-                  <h3 className="font-headline-lg text-headline-lg text-record-primary font-bold pt-1">
+                  )}
+                  <h3 className="text-2xl lg:text-3xl font-extrabold text-[#4a0008] leading-snug tracking-tight">
                     {rec.title}
                   </h3>
                 </div>
-                
-                {rec.criteria && (
+
+                {rec.criteria && rec.criteria.length > 0 && (
                   <div className="space-y-2 pt-1">
-                    <div className="font-label-md text-label-md text-record-primary font-bold uppercase tracking-wide">
+                    <div className="text-xs font-bold uppercase tracking-wider text-[#4a0008]">
                       Tiêu chí xét duyệt cốt lõi:
                     </div>
-                    <ul className="space-y-1.5 font-body-sm text-body-sm text-record-on-surface">
+                    <ul className="space-y-2 text-sm text-[#374151] leading-relaxed">
                       {rec.criteria.map((crit, cIdx) => (
-                        <li key={cIdx} className="flex items-start gap-2">
-                          <RecordHolderIcon name="star" size={18} filled className="text-record-secondary shrink-0 mt-0.5" />
+                        <li key={cIdx} className="flex items-start gap-2.5">
+                          <RecordHolderIcon name="star" size={17} filled={false} className="text-[#b45309] shrink-0 mt-0.5" />
                           <span>{crit}</span>
                         </li>
                       ))}
@@ -83,21 +82,22 @@ export default function RecordList({
                 )}
               </div>
 
-              <div className="lg:col-span-3 flex flex-col gap-3 justify-center lg:pl-6 bg-record-surface-container-low/50 p-6 rounded-xl">
+              {/* Cột 3: Nút hành động trực tiếp trên nền thẻ */}
+              <div className="w-full lg:w-64 xl:w-72 shrink-0 p-6 lg:p-8 flex flex-col justify-center gap-3">
                 <button
                   type="button"
-                  className="w-full py-3 px-4 rounded-lg bg-record-primary text-record-on-primary font-label-md text-label-md font-bold uppercase tracking-wider hover:bg-record-tertiary transition-all shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-4 rounded-lg bg-[#4a0008] hover:bg-[#680007] text-white text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                   onClick={() => onNominate(rec.action?.nomination || rec.title)}
                 >
-                  <RecordHolderIcon name="assignment_turned_in" size={18} />
-                  Đề Cử / Nộp Hồ Sơ
+                  <RecordHolderIcon name="help" size={16} />
+                  {rec.action?.nomination || "Đề Cử / Nộp Hồ Sơ"}
                 </button>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 rounded-lg bg-record-surface-container text-record-primary font-label-md text-label-md font-semibold tracking-wider hover:bg-record-surface-container-high transition-all flex items-center justify-center gap-2"
-                  onClick={() => onDownloadDoc(rec.action?.download || "Document.pdf")}
+                  className="w-full py-3.5 px-4 rounded-lg bg-[#f3f4f6] hover:bg-[#e5e7eb] text-[#1f2937] text-xs font-semibold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={() => onDownloadDoc(rec.action?.download, rec.title)}
                 >
-                  <RecordHolderIcon name="download" size={18} />
+                  <RecordHolderIcon name="download" size={16} />
                   Tải Hồ Sơ Tiêu Chí Đề Cử
                 </button>
               </div>

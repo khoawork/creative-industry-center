@@ -15,11 +15,6 @@ export const Introduction = ({ totalStories = 54, hero }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           
           <div className="w-full space-y-4">
-            {/* Badge phía trên */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#4d0105]/80 border border-[#d49520]/30 rounded-md text-xs md:text-sm tracking-wider uppercase">
-              <span className="text-[#d49520] font-semibold">✪ CHUYÊN TRANG NHÂN VẬT • VIETKINGS ARCHIVE</span>
-            </div>
-
             {/* Tiêu đề chính */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white uppercase drop-shadow-sm leading-tight">
               {hero?.name || 'CHUYỆN NHÀ SÁNG NGHIỆP'}

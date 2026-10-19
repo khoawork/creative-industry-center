@@ -36,9 +36,9 @@ export const siteLinks = {
   events: { label: 'Sự kiện', href: '/events' },
   awards: { label: 'Giải thưởng', href: '/awards' },
   projects: { label: 'Dự án nổi bật', href: '/projects' },
-  stories: { label: 'Chuyện nhà sáng nghiệp', href: '/stories' },
+  stories: { label: 'Chuyện nhà sáng nghiệp', href: '/founder' },
   records: { label: 'Đề cử kỷ lục', href: '/records' },
-  training: { label: 'Hợp tác & Đào tạo', href: '/training' },
+  training: { label: 'Hợp tác & Đào tạo', href: '/trainings' },
   forum: { label: 'Diễn đàn Kinh tế Kỷ lục', href: '/forum' },
   contact: { label: 'Liên hệ', href: '/contact', icon: 'person' },
 }

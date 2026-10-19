@@ -14,4 +14,26 @@ export const UploadAPI = {
     });
     return response.data?.data?.url || response.data?.url;
   },
+  uploadDocument: async (file, folder = 'documents') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+    const response = await axios.post(`${API_BASE_URL}/pages/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data?.data?.url || response.data?.url;
+  },
+  uploadVideo: async (file, folder = 'videos') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', folder);
+    const response = await axios.post(`${API_BASE_URL}/pages/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data?.data?.url || response.data?.url;
+  },
 };

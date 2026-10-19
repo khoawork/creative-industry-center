@@ -28,7 +28,6 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
 
   const validate = () => {
     const errs = {};
-    if (!formData.badge?.trim()) errs.badge = 'Badge danh mục là bắt buộc';
     if (!formData.title?.trim()) errs.title = 'Tiêu đề chính là bắt buộc';
     if (!formData.description?.trim()) errs.description = 'Mô tả là bắt buộc';
     if (!formData.statistics || formData.statistics.length === 0) {
@@ -96,15 +95,6 @@ export default function ProjectHeaderEditor({ initialData, onSave, isSaving }) {
         }
       >
         <div className="space-y-4">
-          <AdminInput
-            label="Huy hiệu danh mục (Badge)"
-            required
-            value={formData.badge}
-            onChange={(e) => setFormData({ ...formData, badge: getVal(e) })}
-            placeholder="Ví dụ: DANH MỤC DỰ ÁN TRỌNG ĐIỂM"
-            error={errors.badge}
-          />
-
           <AdminInput
             label="Tiêu đề chính"
             required

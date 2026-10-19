@@ -2,7 +2,6 @@ import React from 'react';
 
 export const AwardHero = ({ header = {} }) => {
   const title = header.tittle || header.title || 'GIẢI THƯỞNG';
-  const subTitle = header.sub_title || 'Hệ thống tôn vinh thường niên';
   const description = header.description || 'Hệ thống giải thưởng và tôn vinh thường niên do Trung tâm Công nghiệp Sáng tạo & Viện Kỷ lục Việt Nam (VIETKINGS) chủ trì, nhằm ghi nhận những cống hiến xuất sắc trong bảo tồn di sản, đổi mới sáng tạo và xác lập giá trị kỷ lục Việt Nam.';
 
   return (
@@ -24,14 +23,9 @@ export const AwardHero = ({ header = {} }) => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Top Header Badge */}
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#710008]/20 bg-[#710008]/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#710008]">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-[#710008]"></span>
-          <span>{subTitle}</span>
-        </div>
 
         {/* Main Title */}
-        <h1 className="mb-4 text-4xl font-extrabold uppercase leading-tight tracking-tight text-[#710008] sm:text-5xl md:text-[2.75rem]">
+        <h1 className="mb-4 text-4xl font-bold uppercase leading-tight tracking-tight text-[#710008] sm:text-5xl md:text-[2.75rem]">
           {title}
         </h1>
 
