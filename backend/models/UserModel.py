@@ -13,6 +13,7 @@ class RoleEnum(str, Enum):
 class User(BaseModel):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    keycloak_id = db.Column(db.String(64), unique=True, nullable=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -43,6 +44,7 @@ class User(BaseModel):
     def to_dict(self) -> dict:
         return {
             "id": self.id,
+            "keycloak_id": self.keycloak_id,
             "username": self.username,
             "email": self.email,
             "full_name": self.full_name or self.username,

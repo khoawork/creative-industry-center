@@ -81,6 +81,11 @@ def create_app():
                     "is_read",
                     "ALTER TABLE form_submission ADD COLUMN is_read BOOLEAN NOT NULL DEFAULT FALSE",
                 ),
+                (
+                    "user",
+                    "keycloak_id",
+                    "ALTER TABLE `user` ADD COLUMN keycloak_id VARCHAR(64) UNIQUE NULL AFTER id",
+                ),
             ]
             for table, col, sql in migrations:
                 try:

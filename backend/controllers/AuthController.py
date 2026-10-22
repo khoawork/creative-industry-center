@@ -269,3 +269,65 @@ def get_current_user_profile():
         message="Lấy thông tin tài khoản thành công",
         status_code=200,
     )
+
+
+@auth_api.route("/sso-callback", methods=["POST"])
+def sso_callback():
+    """
+    Tiếp nhận yêu cầu callback SSO từ Frontend và thiết lập phiên đăng nhập
+    """
+    from services import sso_service
+    from utils.error import AppError
+
+    data = request.get_json() or {}
+    code = (data.get("code") or "").strip()
+    redirect_uri = (data.get("redirect_uri") or "").strip()
+    code_verifier = (data.get("code_verifier") or "").strip() or None
+
+    try:
+        result = sso_service.handle_sso_login(
+            code=code,
+            redirect_uri=redirect_uri,
+            code_verifier=code_verifier,
+        )
+    except AppError as e:
+        return error_response(
+            message=e.message,
+            status_code=e.status_code,
+            error_code=e.error_code,
+        )
+
+    user = result["user"]
+    response_payload = {
+        "success": True,
+        "message": f"Chào mừng {user.full_name or user.username} đăng nhập qua SSO thành công!",
+        "data": {
+            "token": result["access_token"],
+            "refresh_token": result["refresh_token"],
+            "user": user.to_dict(),
+        },
+    }
+
+    resp = make_response(response_payload, 200)
+
+    # Set HttpOnly Cookies cho phiên làm việc Admin
+    resp.set_cookie(
+        key="admin_token",
+        value=result["sealed_access_token"],
+        max_age=REFRESH_TOKEN_EXPIRATION_SECONDS,
+        httponly=True,
+        samesite="Lax",
+        secure=False,
+        path="/",
+    )
+    resp.set_cookie(
+        key="admin_refresh_token",
+        value=result["sealed_refresh_token"],
+        max_age=REFRESH_TOKEN_EXPIRATION_SECONDS,
+        httponly=True,
+        samesite="Lax",
+        secure=False,
+        path="/",
+    )
+
+    return resp

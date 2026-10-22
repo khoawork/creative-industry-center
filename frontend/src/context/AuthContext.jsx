@@ -36,6 +36,15 @@ export function AuthProvider({ children }) {
     return response;
   };
 
+  const loginWithSSO = async (code, redirectUri, codeVerifier) => {
+    const response = await AuthAPI.ssoCallback(code, redirectUri, codeVerifier);
+    const userData = response?.data?.user;
+    if (userData) {
+      setUser(userData);
+    }
+    return response;
+  };
+
   const logout = async () => {
     try {
       await AuthAPI.logout();
@@ -66,6 +75,7 @@ export function AuthProvider({ children }) {
     canCreateUser,
     canConfigureSystem,
     login,
+    loginWithSSO,
     logout,
     refreshUser: checkAuth,
   };

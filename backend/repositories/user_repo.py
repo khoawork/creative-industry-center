@@ -80,3 +80,58 @@ def toggle_admin_access(user: User) -> User:
     db.session.commit()
     return user
 
+
+def get_user_by_keycloak_id(keycloak_id: str) -> Optional[User]:
+    """Tìm người dùng theo keycloak_id"""
+    if not keycloak_id:
+        return None
+    return User.query.filter_by(keycloak_id=keycloak_id).first()
+
+
+def find_or_provision_sso_user(
+    keycloak_id: str,
+    email: str,
+    username: str,
+    full_name: Optional[str] = None,
+    default_role: str = RoleEnum.ADMIN.value
+) -> User:
+    """
+    Tìm người dùng hiện tại hoặc tự động tạo mới (Just-In-Time Provisioning)
+    """
+    from datetime import datetime
+
+    user = User.query.filter(
+        (User.keycloak_id == keycloak_id) | (User.email == email) | (User.username == username)
+    ).first()
+
+    if not user:
+        user = User(
+            keycloak_id=keycloak_id,
+            username=username,
+            email=email,
+            full_name=full_name or username,
+            role=default_role,
+            is_active=True,
+            can_admin_access=True,
+            last_login_at=datetime.utcnow()
+        )
+        db.session.add(user)
+    else:
+        if not user.keycloak_id:
+            user.keycloak_id = keycloak_id
+        if not user.can_admin_access:
+            user.can_admin_access = True
+        user.last_login_at = datetime.utcnow()
+
+    db.session.commit()
+    return user
+
+
+def update_login_session(user: User, refresh_token_hash: str) -> None:
+    """Cập nhật hash refresh token và thời gian đăng nhập"""
+    from datetime import datetime
+    user.refresh_token_hash = refresh_token_hash
+    user.last_login_at = datetime.utcnow()
+    db.session.commit()
+
+

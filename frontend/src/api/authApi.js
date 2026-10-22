@@ -42,4 +42,20 @@ export const AuthAPI = {
     const response = await authClient.get('/auth/me');
     return response.data;
   },
+
+  ssoCallback: async (code, redirectUri, codeVerifier) => {
+    const response = await authClient.post('/auth/sso-callback', {
+      code,
+      redirect_uri: redirectUri,
+      code_verifier: codeVerifier,
+    });
+    const payload = response.data?.data;
+    if (payload?.token) {
+      localStorage.setItem('admin_token', payload.token);
+    }
+    if (payload?.refresh_token) {
+      localStorage.setItem('admin_refresh_token', payload.refresh_token);
+    }
+    return response.data;
+  },
 };
