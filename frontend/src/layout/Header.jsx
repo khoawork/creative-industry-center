@@ -4,8 +4,12 @@ import { site, siteLinks } from '../config/shared/site.js';
 import Brand from '../components/shared/Brand.jsx';
 import Icon from '../components/shared/Icon.jsx';
 import { PageAPI } from '../api/pageApi.js';
+import { User } from 'lucide-react';
 
 export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: externalSetMenuOpen }) {
+  const handleSSOClick = () => {
+    window.location.href = '/admin/login';
+  };
   const [internalMenuOpen, setInternalMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -189,10 +193,29 @@ export default function Header({ menuOpen: externalMenuOpen, setMenuOpen: extern
             })}
 
 
+                      {/* Nút đăng nhập SSO kế bên Liên hệ */}
+            <button
+              type="button"
+              onClick={handleSSOClick}
+              title="Đăng nhập tài khoản SSO"
+              aria-label="Đăng nhập tài khoản SSO"
+              className="inline-flex items-center justify-center p-2 rounded-full text-[#4b5563] hover:text-[#680007] hover:bg-[#f4f3f1] transition-colors cursor-pointer ml-1"
+            >
+              <User size={18} className="stroke-[2.2]" />
+            </button>
           </nav>
 
           {/* Compact navigation for smaller screens. */}
           <div className="flex shrink-0 2xl:hidden items-center gap-1">
+            <button
+              type="button"
+              onClick={handleSSOClick}
+              title="Đăng nhập tài khoản SSO"
+              aria-label="Đăng nhập tài khoản SSO"
+              className="p-2.5 rounded-lg text-black hover:text-[#710008] hover:bg-[#f4f3f1] transition-colors cursor-pointer"
+            >
+              <User size={20} className="stroke-[2.2]" />
+            </button>
      
 
             <button
