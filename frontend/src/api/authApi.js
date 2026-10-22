@@ -3,13 +3,11 @@ import { setupAuthInterceptor, performTokenRefresh } from './authInterceptor.js'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-// Tạo instance axios riêng cho Auth
 const authClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
-// Gắn interceptor tự động retry và refresh token
 setupAuthInterceptor(authClient);
 
 export const AuthAPI = {
