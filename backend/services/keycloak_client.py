@@ -15,6 +15,29 @@ KEYCLOAK_USERINFO_URL = os.getenv(
 CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "app-a")
 
 
+def _send_request_with_host_fallback(method: str, url: str, **kwargs) -> requests.Response:
+    """
+    Tự động chuyển đổi giữa localhost và host.docker.internal nếu chạy trong môi trường Docker / container
+    """
+    try:
+        return requests.request(method, url, timeout=10, **kwargs)
+    except requests.exceptions.ConnectionError:
+        # Nếu gọi localhost bị từ chối kết nối (thường do chạy trong container Docker)
+        if "localhost" in url:
+            fallback_url = url.replace("localhost", "host.docker.internal")
+            try:
+                return requests.request(method, fallback_url, timeout=10, **kwargs)
+            except Exception:
+                pass
+        elif "host.docker.internal" in url:
+            fallback_url = url.replace("host.docker.internal", "localhost")
+            try:
+                return requests.request(method, fallback_url, timeout=10, **kwargs)
+            except Exception:
+                pass
+        raise
+
+
 def exchange_code_for_token_data(
     code: str,
     redirect_uri: str,
@@ -33,7 +56,7 @@ def exchange_code_for_token_data(
         payload["code_verifier"] = code_verifier
 
     try:
-        resp = requests.post(KEYCLOAK_TOKEN_URL, data=payload, timeout=10)
+        resp = _send_request_with_host_fallback("POST", KEYCLOAK_TOKEN_URL, data=payload)
     except Exception as e:
         raise AppError(message=f"Không thể kết nối máy chủ SSO Hub: {str(e)}", status_code=502)
 
@@ -70,10 +93,10 @@ def extract_user_profile(token_data: Dict[str, Any]) -> Dict[str, Any]:
         raise AppError(message="SSO Hub không trả về Access Token", status_code=401)
 
     try:
-        resp = requests.get(
+        resp = _send_request_with_host_fallback(
+            "GET",
             KEYCLOAK_USERINFO_URL,
-            headers={"Authorization": f"Bearer {access_token}"},
-            timeout=10
+            headers={"Authorization": f"Bearer {access_token}"}
         )
         if resp.ok:
             return resp.json()
