@@ -13,9 +13,7 @@ from utils.cookie_crypto import seal_cookie_token, hash_token
 
 
 def handle_sso_login(
-    code: str,
-    redirect_uri: str,
-    code_verifier: Optional[str] = None
+    code: str, redirect_uri: str, code_verifier: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Xử lý toàn bộ nghiệp vụ xác thực SSO:
@@ -29,9 +27,7 @@ def handle_sso_login(
 
     # 1. Trao đổi lấy Token data từ Keycloak
     token_data = keycloak_client.exchange_code_for_token_data(
-        code=code,
-        redirect_uri=redirect_uri,
-        code_verifier=code_verifier
+        code=code, redirect_uri=redirect_uri, code_verifier=code_verifier
     )
 
     # 2. Trích xuất thông tin người dùng an toàn
@@ -50,15 +46,21 @@ def handle_sso_login(
         email=kc_email,
         username=kc_username,
         full_name=kc_name,
-        default_role=RoleEnum.ADMIN.value
+        default_role=RoleEnum.ADMIN.value,
     )
 
     if not user.has_admin_access():
-        raise ForbiddenError(message="Tài khoản không có quyền truy cập khu vực quản trị.")
+        raise ForbiddenError(
+            message="Tài khoản không có quyền truy cập khu vực quản trị."
+        )
 
     # 4. Sinh Token và Cookies nội bộ
-    access_token = generate_access_token(user, expires_in=ACCESS_TOKEN_EXPIRATION_SECONDS)
-    refresh_token = generate_refresh_token(user, expires_in=REFRESH_TOKEN_EXPIRATION_SECONDS)
+    access_token = generate_access_token(
+        user, expires_in=ACCESS_TOKEN_EXPIRATION_SECONDS
+    )
+    refresh_token = generate_refresh_token(
+        user, expires_in=REFRESH_TOKEN_EXPIRATION_SECONDS
+    )
 
     # Cập nhật session hash
     user_repo.update_login_session(user, hash_token(refresh_token))
