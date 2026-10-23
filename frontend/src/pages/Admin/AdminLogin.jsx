@@ -54,8 +54,8 @@ export default function AdminLogin() {
       const challenge = base64UrlEncode(hashed);
 
       const redirectUri = window.location.origin + window.location.pathname;
-      const keycloakUrl = 'http://localhost:8888/realms/sso-platform/protocol/openid-connect/auth';
-      const clientId = 'app-a';
+      const keycloakUrl = import.meta.env.VITE_KEYCLOAK_AUTH_URL || 'http://localhost:8888/realms/sso-platform/protocol/openid-connect/auth';
+      const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID || 'app-a';
 
       const authUrl = `${keycloakUrl}?` +
         `client_id=${encodeURIComponent(clientId)}` +

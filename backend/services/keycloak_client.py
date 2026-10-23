@@ -1,8 +1,12 @@
 import os
-from typing import Dict, Any, Optional
+import logging
+import urllib.parse
+from typing import Dict, Any, Optional, List
 import requests
 import jwt
 from utils.error import AppError
+
+logger = logging.getLogger(__name__)
 
 KEYCLOAK_TOKEN_URL = os.getenv(
     "KEYCLOAK_TOKEN_URL",
@@ -14,28 +18,113 @@ KEYCLOAK_USERINFO_URL = os.getenv(
 )
 CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID", "app-a")
 
+# Lưu lại host hoạt động gần nhất để tăng tốc các yêu cầu tiếp theo
+_WORKING_HOST_OVERRIDE: Optional[str] = None
+
+
+def _get_docker_gateway_ip() -> Optional[str]:
+    """
+    Tìm địa chỉ gateway của host khi backend chạy trong môi trường Linux Docker container
+    """
+    try:
+        with open("/proc/net/route", "r") as f:
+            for line in f.readlines()[1:]:
+                parts = line.strip().split()
+                if len(parts) >= 3 and parts[1] == "00000000":
+                    import socket
+                    import struct
+                    return socket.inet_ntoa(struct.pack("<L", int(parts[2], 16)))
+    except Exception:
+        pass
+    return None
+
+
+def _get_candidate_urls(original_url: str) -> List[str]:
+    """
+    Sinh danh sách các URL ứng viên cho Keycloak endpoint nhằm tương thích giữa:
+    - Host Windows / Localhost (localhost:8888, 127.0.0.1:8888)
+    - Docker container trên Windows / Mac (host.docker.internal:8888)
+    - Docker container trên Linux (host gateway IP: 172.17.0.1:8888)
+    - Docker container cùng network (sso-keycloak:8080)
+    """
+    global _WORKING_HOST_OVERRIDE
+
+    parsed = urllib.parse.urlparse(original_url)
+    port = parsed.port
+    port_str = f":{port}" if port else ":8888"
+
+    candidate_netlocs: List[str] = []
+
+    # 1. Host đã hoạt động thành công gần nhất
+    if _WORKING_HOST_OVERRIDE and _WORKING_HOST_OVERRIDE not in candidate_netlocs:
+        candidate_netlocs.append(_WORKING_HOST_OVERRIDE)
+
+    # 2. Host gốc được chỉ định trong cấu hình
+    if parsed.netloc and parsed.netloc not in candidate_netlocs:
+        candidate_netlocs.append(parsed.netloc)
+
+    # 3. Các địa chỉ fallback tiêu chuẩn
+    fallback_candidates = [
+        f"host.docker.internal{port_str}",
+        f"127.0.0.1{port_str}",
+        f"localhost{port_str}",
+        "sso-keycloak:8080",
+    ]
+
+    gw_ip = _get_docker_gateway_ip()
+    if gw_ip:
+        fallback_candidates.append(f"{gw_ip}{port_str}")
+
+    for candidate in fallback_candidates:
+        if candidate not in candidate_netlocs:
+            candidate_netlocs.append(candidate)
+
+    urls: List[str] = []
+    for netloc in candidate_netlocs:
+        u = urllib.parse.urlunparse((
+            parsed.scheme or "http",
+            netloc,
+            parsed.path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment
+        ))
+        if u not in urls:
+            urls.append(u)
+
+    return urls
+
 
 def _send_request_with_host_fallback(method: str, url: str, **kwargs) -> requests.Response:
     """
-    Tự động chuyển đổi giữa localhost và host.docker.internal nếu chạy trong môi trường Docker / container
+    Gửi request với cơ chế tự động thử lần lượt các địa chỉ host khả dĩ.
     """
-    try:
-        return requests.request(method, url, timeout=10, **kwargs)
-    except requests.exceptions.ConnectionError:
-        # Nếu gọi localhost bị từ chối kết nối (thường do chạy trong container Docker)
-        if "localhost" in url:
-            fallback_url = url.replace("localhost", "host.docker.internal")
-            try:
-                return requests.request(method, fallback_url, timeout=10, **kwargs)
-            except Exception:
-                pass
-        elif "host.docker.internal" in url:
-            fallback_url = url.replace("host.docker.internal", "localhost")
-            try:
-                return requests.request(method, fallback_url, timeout=10, **kwargs)
-            except Exception:
-                pass
-        raise
+    global _WORKING_HOST_OVERRIDE
+
+    candidate_urls = _get_candidate_urls(url)
+    timeout = kwargs.pop("timeout", 5)
+    errors = []
+
+    for cand_url in candidate_urls:
+        try:
+            resp = requests.request(method, cand_url, timeout=timeout, **kwargs)
+            # Nếu chạm được máy chủ Keycloak (kể cả HTTP 4xx trả về từ Keycloak)
+            parsed = urllib.parse.urlparse(cand_url)
+            _WORKING_HOST_OVERRIDE = parsed.netloc
+            return resp
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            logger.warning("Kết nối SSO tới %s không thành công (%s), thử endpoint tiếp theo...", cand_url, type(e).__name__)
+            errors.append(f"{cand_url} ({type(e).__name__})")
+            continue
+        except Exception as e:
+            logger.warning("Lỗi bất ngờ khi gọi %s: %s", cand_url, str(e))
+            errors.append(f"{cand_url} ({str(e)})")
+            continue
+
+    err_detail = "; ".join(errors) if errors else "Không có endpoint nào phản hồi"
+    raise requests.exceptions.ConnectionError(
+        f"Không thể kết nối máy chủ SSO Hub qua các địa chỉ: [{err_detail}]"
+    )
 
 
 def exchange_code_for_token_data(
