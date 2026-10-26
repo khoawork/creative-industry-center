@@ -1,11 +1,21 @@
 import re
-
-from marshmallow import Schema, ValidationError, fields, validate
+from marshmallow import Schema, ValidationError, fields, validate, pre_load
 
 
 def _not_blank(value):
     if not value or not value.strip():
         raise ValidationError("Không được để trống.")
+
+
+def _clean_embed_url(value):
+    if not value:
+        return value
+    text = str(value).strip()
+    # Nếu truyền cả thẻ <iframe ... src="..."></iframe> thì tự động trích xuất thuộc tính src
+    iframe_match = re.search(r'<iframe[^>]+src=["\']([^"\']+)["\']', text, re.IGNORECASE)
+    if iframe_match:
+        return iframe_match.group(1).strip()
+    return text
 
 
 def _phone_format(value):
@@ -81,6 +91,13 @@ class ContactMapDTO(Schema):
     mapAddress = fields.Str(required=True, validate=_not_blank)
     embedUrl = fields.URL(required=True, require_tld=False)
     directionsUrl = fields.URL(allow_none=True, load_default=None, require_tld=False)
+
+    @pre_load
+    def clean_map_data(self, data, **kwargs):
+        if isinstance(data, dict):
+            if "embedUrl" in data and data["embedUrl"]:
+                data["embedUrl"] = _clean_embed_url(data["embedUrl"])
+        return data
 
 
 class ContactCategoryDTO(Schema):
