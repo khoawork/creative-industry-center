@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ShieldAlert, RefreshCw, Sparkles, KeyRound } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, ShieldAlert, ArrowRight, RefreshCw, Sparkles, KeyRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import logo from '../../assets/shared/logo/creative-industry-center-logo.png';
 import { site } from '../../config/shared/site.js';
 
-// --- PKCE Helpers cho SSO ---
+// --- PKCE Helpers cho SSO (khi người dùng chủ động nhấn đăng nhập SSO) ---
 function generateRandomString(length = 64) {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
   let result = '';
@@ -31,18 +31,72 @@ function base64UrlEncode(str) {
 }
 
 export default function AdminLogin() {
-  const { loginWithSSO, isAuthenticated } = useAuth();
+  const { login, loginWithSSO, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [ssoLoading, setSsoLoading] = useState(true);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [ssoLoading, setSsoLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const hasTriggeredRedirect = useRef(false);
 
   const from = location.state?.from?.pathname || '/admin';
 
-  // 1. Chuyển hướng sang SSO Hub Keycloak
-  const triggerSSORedirect = async () => {
+  // Tự động chuyển hướng nếu đã đăng nhập; chỉ xử lý SSO khi có ?code= trên URL callback
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+
+    // Chỉ khi có mã code trả về từ Keycloak mới kích hoạt xác thực SSO
+    if (code) {
+      setSsoLoading(true);
+      const redirectUri = window.location.origin + window.location.pathname;
+      const verifier = sessionStorage.getItem('sso_code_verifier') || '';
+
+      loginWithSSO(code, redirectUri, verifier)
+        .then(() => {
+          sessionStorage.removeItem('sso_code_verifier');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          navigate(from, { replace: true });
+        })
+        .catch((error) => {
+          const msg = error.response?.data?.message || 'Xác thực qua SSO Hub không thành công.';
+          setErrorMessage(msg);
+          setSsoLoading(false);
+        });
+    }
+  }, [isAuthenticated, loginWithSSO, navigate, from]);
+
+  // Xử lý đăng nhập thông thường bằng form Username & Password
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    if (!username.trim() || !password) {
+      setErrorMessage('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(username.trim(), password);
+      navigate(from, { replace: true });
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản hoặc mật khẩu.';
+      setErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tùy chọn chuyển hướng sang SSO Hub Keycloak (chỉ khi người dùng chủ động click)
+  const handleSSORedirect = async () => {
     try {
       setSsoLoading(true);
       setErrorMessage('');
@@ -72,42 +126,6 @@ export default function AdminLogin() {
     }
   };
 
-  useEffect(() => {
-    // Nếu đã đăng nhập thì đi thẳng vào trang admin
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-
-    // Nếu Keycloak vừa chuyển hướng về kèm mã code
-    if (code) {
-      setSsoLoading(true);
-      const redirectUri = window.location.origin + window.location.pathname;
-      const verifier = sessionStorage.getItem('sso_code_verifier') || '';
-
-      loginWithSSO(code, redirectUri, verifier)
-        .then(() => {
-          sessionStorage.removeItem('sso_code_verifier');
-          window.history.replaceState({}, document.title, window.location.pathname);
-          navigate(from, { replace: true });
-        })
-        .catch((error) => {
-          const msg = error.response?.data?.message || 'Xác thực qua SSO Hub không thành công.';
-          setErrorMessage(msg);
-          setSsoLoading(false);
-        });
-    } else {
-      // TỰ ĐỘNG CHUYỂN HƯỚNG SANG SSO HUB NGAY LẬP TỨC
-      if (!hasTriggeredRedirect.current) {
-        hasTriggeredRedirect.current = true;
-        triggerSSORedirect();
-      }
-    }
-  }, [isAuthenticated, loginWithSSO, navigate, from]);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#141412] text-[#e9e5da] font-[Inter,sans-serif] p-4 relative overflow-hidden">
       {/* Background Decor */}
@@ -115,56 +133,132 @@ export default function AdminLogin() {
       <div className="absolute -bottom-40 -right-40 size-96 rounded-full bg-[#d49520]/15 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-[#1e1e1a] border border-[#39321f] rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-md text-center">
+        <div className="bg-[#1e1e1a] border border-[#39321f] rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-md">
           
           {/* Header & Logo */}
-          <div className="inline-flex items-center justify-center p-2 rounded-2xl bg-[#0e0e0c] border border-[#39321f] mb-4 shadow-inner">
-            <img src={logo} alt="Logo" className="size-14 object-contain" />
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center p-2 rounded-2xl bg-[#0e0e0c] border border-[#39321f] mb-4 shadow-inner">
+              <img src={logo} alt="Logo" className="size-14 object-contain" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              Đăng nhập Quản trị
+            </h1>
+            <p className="mt-1.5 text-xs text-[#b8aa85]">
+              {site.name} · Cổng thông tin nội bộ
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-            Đăng nhập Quản trị
-          </h1>
-          <p className="mt-1.5 text-xs text-[#b8aa85]">
-            {site.name} · Cổng xác thực tập trung
-          </p>
 
-          {/* Trạng thái lỗi (nếu có) */}
-          {errorMessage ? (
-            <div className="mt-6 text-left">
-              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-950/60 border border-red-800 text-red-300 text-xs leading-relaxed">
+          {/* Form đăng nhập Username & Mật khẩu */}
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {errorMessage && (
+              <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-950/50 border border-red-800/60 text-red-300 text-xs leading-relaxed animate-shake">
                 <ShieldAlert size={16} className="shrink-0 text-red-400 mt-0.5" />
                 <span>{errorMessage}</span>
               </div>
+            )}
 
-              <button
-                type="button"
-                onClick={triggerSSORedirect}
-                className="w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#d49520] to-[#b37a13] hover:from-[#e0a12c] hover:to-[#c48719] text-slate-950 shadow-lg transition-all active:scale-[0.99] cursor-pointer"
-              >
-                <KeyRound size={16} />
-                <span>Thử kết nối lại với SSO Hub</span>
-              </button>
-            </div>
-          ) : (
-            /* Trạng thái Đang Tự Động Kết Nối */
-            <div className="mt-8 py-4 space-y-3">
-              <div className="inline-flex items-center justify-center p-3 rounded-full bg-[#d49520]/10 text-[#d49520]">
-                <RefreshCw size={28} className="animate-spin" />
+            <div>
+              <label className="block text-xs font-semibold text-[#d49520] mb-1.5 uppercase tracking-wider">
+                Tài khoản hoặc Email
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                  <User size={16} />
+                </div>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin hoặc email..."
+                  required
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#141412] border border-[#39321f] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d49520] focus:ring-1 focus:ring-[#d49520] transition"
+                />
               </div>
-              <p className="text-sm font-medium text-white">
-                Đang chuyển hướng sang SSO Hub...
-              </p>
-              <p className="text-xs text-slate-400">
-                Hệ thống đang đồng bộ phiên đăng nhập tập trung
-              </p>
             </div>
-          )}
+
+            <div>
+              <label className="block text-xs font-semibold text-[#d49520] mb-1.5 uppercase tracking-wider">
+                Mật khẩu
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                  <Lock size={16} />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#141412] border border-[#39321f] text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d49520] focus:ring-1 focus:ring-[#d49520] transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-white transition cursor-pointer"
+                  title={showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || ssoLoading}
+              className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#710008] to-[#91131c] hover:from-[#840610] hover:to-[#a31923] text-white shadow-lg shadow-[#710008]/30 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw size={16} className="animate-spin" />
+                  <span>Đang xác thực...</span>
+                </>
+              ) : (
+                <>
+                  <span>Đăng nhập hệ thống</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Phân cách hoặc đăng nhập SSO */}
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#39321f]"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-[#1e1e1a] px-3 text-[#b8aa85]/60 text-[11px]">
+                Hoặc tùy chọn
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSSORedirect}
+            disabled={ssoLoading || loading}
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-medium text-xs bg-[#141412] hover:bg-[#252520] border border-[#39321f] text-[#d49520] hover:text-[#f0b542] transition cursor-pointer disabled:opacity-50"
+          >
+            {ssoLoading ? (
+              <>
+                <RefreshCw size={14} className="animate-spin text-[#d49520]" />
+                <span>Đang kết nối SSO Hub...</span>
+              </>
+            ) : (
+              <>
+                <KeyRound size={15} />
+                <span>Đăng nhập bằng SSO Hub (Keycloak)</span>
+              </>
+            )}
+          </button>
 
           {/* Footer Card */}
-          <div className="mt-8 pt-5 border-t border-[#39321f]/60">
+          <div className="mt-6 pt-5 border-t border-[#39321f]/60 text-center">
             <p className="text-[11px] text-[#b8aa85]/70 flex items-center justify-center gap-1.5">
               <Sparkles size={12} className="text-[#d49520]" />
-              Bảo mật bởi chuẩn xác thực OpenID Connect (OIDC)
+              Khu vực bảo mật riêng biệt của ban quản trị
             </p>
           </div>
         </div>
