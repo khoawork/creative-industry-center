@@ -47,11 +47,7 @@ export default function AdminDashboard() {
         badge="Không gian quản trị"
         title={`Chào mừng, ${displayName}`}
         subtitle={`Theo dõi nội dung, đề cử và các yêu cầu gửi đến ${site.name}.`}
-        actions={
-          <AdminBadge variant={user?.role === 'admin' ? 'primary' : 'accent'} icon={Sparkles}>
-            Vai trò: {user?.role === 'admin' ? 'Quản trị viên (Admin)' : 'Quản lý (Manager)'}
-          </AdminBadge>
-        }
+        
       />
 
       <section aria-label="Thống kê tổng quan hệ thống" className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">

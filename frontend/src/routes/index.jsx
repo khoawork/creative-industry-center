@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import AboutPage from "../pages/AboutPage.jsx";
 import EventActive from "../pages/eventActivePage";
 import FounderStory from "../pages/founder-story";
+import FounderDetailPage from "../pages/founder-detail";
 import ProjectsPage from "../pages/Projects";
 import HomePage from "../pages/Home/Home";
 import RecordHolder from "../pages/RecordHolder/RecordHolder";
@@ -59,6 +60,9 @@ export const routes = [
   { path: "/introduce", name: "introduce", page: AboutPage },
   { path: "/about", name: "about", page: AboutPage },
   { path: "/founder", name: "founder", page: FounderStory },
+  { path: "/founder/:id", name: "founder-detail", page: FounderDetailPage },
+  { path: "/chuyen-nha-sang-nghiep", name: "founder-vn", page: FounderStory },
+  { path: "/chuyen-nha-sang-nghiep/:id", name: "founder-detail-vn", page: FounderDetailPage },
   { path: "/projects", name: "projects", page: ProjectsPage },
   { path: "/contact", name: "contact", page: ContactPage },
   { path: "/awards", name: "awards", page: AwardsPage },

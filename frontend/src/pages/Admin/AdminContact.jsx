@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AlertCircle, CheckCircle2, Eye, Plus, Save, Trash2, X, Upload, Image as ImageIcon, LoaderCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Eye, Plus, Save, Trash2, X, Upload, Image as ImageIcon, LoaderCircle, MapPin, ExternalLink, Info } from 'lucide-react'
 import AdminContactInbox from '../../components/Admin/AdminContactInbox.jsx'
 import { FormBuilder } from '../../components/Admin/Base/index.js'
 import ContactAvailabilityMessage from '../../components/Contact/ContactAvailabilityMessage.jsx'
@@ -15,6 +15,57 @@ import { adminButton, adminPrimaryButton } from '../../config/Admin/adminEvents.
 import { adminMessages } from '../../data/Admin/adminDashboardData.js'
 import { AdminPageHeader, AdminTabs, AdminToast, AdminButton, AdminStickySaveBar } from '../../components/Admin/Common/index.js'
 import { IconDropdown } from '../../components/icons/index.js'
+
+function parseGoogleMapsEmbed(input, fallbackAddress = '') {
+  if (!input || typeof input !== 'string') return { embedUrl: '', address: '', displayEmbedUrl: '' }
+  const raw = input.trim()
+
+  // 1. Trích xuất thuộc tính src nếu dán cả thẻ <iframe ...>
+  let embedUrl = raw
+  const iframeMatch = raw.match(/<iframe[^>]+src=["']([^"']+)["']/i)
+  if (iframeMatch) {
+    embedUrl = iframeMatch[1].trim()
+  }
+
+  // 2. Thử trích xuất địa chỉ / tên vị trí từ !2s hoặc !2z trong chuỗi pb của Google Maps
+  let address = ''
+  try {
+    const match2sz = embedUrl.match(/!2[sz]([A-Za-z0-9+/=_-]+)(?:!|$)/)
+    if (match2sz && match2sz[1]) {
+      let b64 = match2sz[1].replace(/-/g, '+').replace(/_/g, '/')
+      while (b64.length % 4) b64 += '='
+      const binaryStr = atob(b64)
+      const bytes = Uint8Array.from(binaryStr, (c) => c.charCodeAt(0))
+      const decoded = new TextDecoder('utf-8').decode(bytes)
+      if (decoded && decoded.trim().length > 2) {
+        address = decoded.trim()
+      }
+    }
+  } catch {
+    // Bỏ qua nếu không giải mã được
+  }
+
+  // 3. Nếu là link Google Maps Place dạng /place/Địa+Chỉ
+  if (!address) {
+    const placeMatch = embedUrl.match(/\/place\/([^/@?]+)/)
+    if (placeMatch && placeMatch[1]) {
+      try {
+        address = decodeURIComponent(placeMatch[1].replace(/\+/g, ' ')).trim()
+      } catch {
+        // Bỏ qua
+      }
+    }
+  }
+
+  // 4. Chuẩn hóa URL hiển thị an toàn trên iframe
+  let displayEmbedUrl = embedUrl
+  if (embedUrl.includes('maps.app.goo.gl') || embedUrl.includes('goo.gl/maps') || !embedUrl.includes('embed')) {
+    const query = address || fallbackAddress || '229 Đ. Phạm Văn Đồng, Hạnh Thông, Hồ Chí Minh'
+    displayEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=vi&z=16&output=embed`
+  }
+
+  return { embedUrl, address, displayEmbedUrl }
+}
 
 function clone(value) {
   return structuredClone(value)
@@ -124,6 +175,7 @@ export default function AdminContact() {
   const { settings } = useSiteSettings()
   const logoInputRef = useRef(null)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [extractedMapNotice, setExtractedMapNotice] = useState(null)
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0]
@@ -357,6 +409,75 @@ export default function AdminContact() {
     setToast(null)
   }
 
+async function updateMapEmbed(rawValue) {
+    const raw = String(rawValue || '').trim()
+    const currentAddr = draftProps?.mapLocation?.address || draftProps?.mapLocation?.mapAddress || ''
+    const { embedUrl, address, displayEmbedUrl } = parseGoogleMapsEmbed(raw, currentAddr)
+
+    setDraftProps((current) => {
+      const prevMap = current?.mapLocation || {}
+      const nextMap = { ...prevMap, embedUrl: embedUrl || raw }
+
+      if (address) {
+        nextMap.address = address
+        nextMap.mapAddress = address
+        nextMap.directionsUrl = `https://www.google.com/maps/dir/?${new URLSearchParams({ api: '1', destination: address })}`
+      }
+      return {
+        ...current,
+        mapLocation: nextMap,
+      }
+    })
+
+    if (address) {
+      setExtractedMapNotice(`Đã tự động trích xuất vị trí từ mã nhúng: "${address}"`)
+    } else {
+      setExtractedMapNotice(null)
+    }
+    setToast(null)
+
+    // Nếu người dùng dán link rút gọn maps.app.goo.gl hoặc goo.gl/maps, tự động resolve qua backend
+    if (raw.includes('maps.app.goo.gl') || raw.includes('goo.gl/maps')) {
+      try {
+        setExtractedMapNotice('Đang tự động phân giải liên kết rút gọn Google Maps...')
+        const res = await ContactAPI.resolveMapUrl(raw)
+        const resolved = res?.data
+        if (resolved && resolved.embedUrl) {
+          setDraftProps((current) => {
+            const prevMap = current?.mapLocation || {}
+            return {
+              ...current,
+              mapLocation: {
+                ...prevMap,
+                embedUrl: resolved.embedUrl,
+                address: resolved.address || prevMap.address,
+                mapAddress: resolved.address || prevMap.mapAddress,
+                directionsUrl: resolved.directionsUrl || prevMap.directionsUrl,
+              },
+            }
+          })
+          if (resolved.address) {
+            setExtractedMapNotice(`Đã nhận diện vị trí thành công: "${resolved.address}"`)
+          } else {
+            setExtractedMapNotice('Đã tối ưu hóa mã nhúng bản đồ sẵn sàng hiển thị.')
+          }
+        }
+      } catch (err) {
+        // Fallback: nếu lỗi mạng, tạo link embed trực tiếp từ địa chỉ hiện tại
+        const fallbackQuery = currentAddr || '229 Đ. Phạm Văn Đồng, Hạnh Thông, Hồ Chí Minh'
+        const fallbackEmbed = `https://maps.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&hl=vi&z=16&output=embed`
+        setDraftProps((current) => ({
+          ...current,
+          mapLocation: {
+            ...(current?.mapLocation || {}),
+            embedUrl: fallbackEmbed,
+          },
+        }))
+        setExtractedMapNotice(`Đã chuyển đổi thành mã nhúng bản đồ theo địa chỉ: "${fallbackQuery}"`)
+      }
+    }
+  }
+
   function updateMapAddress(value) {
     const directionsUrl = value.trim()
       ? `https://www.google.com/maps/dir/?${new URLSearchParams({ api: '1', destination: value })}`
@@ -482,7 +603,10 @@ export default function AdminContact() {
     const mapLocation = draftProps?.mapLocation || {}
     if (!String(mapLocation.label || '').trim()) errors.mapLabel = 'Nhãn bản đồ không được để trống.'
     if (!String(mapLocation.address || mapLocation.mapAddress || '').trim()) errors.mapAddress = 'Địa chỉ bản đồ không được để trống.'
-    if (!String(mapLocation.embedUrl || '').trim()) errors.embedUrl = 'Đường dẫn nhúng bản đồ không được để trống.'
+    const cleanEmbedUrl = parseGoogleMapsEmbed(mapLocation.embedUrl).embedUrl
+    if (!String(cleanEmbedUrl || "").trim()) {
+      errors.embedUrl = "Đường dẫn nhúng bản đồ không được để trống."
+    }
     showErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -494,6 +618,9 @@ export default function AdminContact() {
     setToast(null)
     try {
       const props = clone(draftProps)
+      if (props.mapLocation?.embedUrl) {
+        props.mapLocation.embedUrl = parseGoogleMapsEmbed(props.mapLocation.embedUrl).embedUrl
+      }
       const currentContact = props.contact || {}
       const phones = Array.isArray(currentContact.phones) && currentContact.phones.length
         ? currentContact.phones
@@ -897,12 +1024,97 @@ export default function AdminContact() {
       </section>
 
       <section className={sectionClass}>
-        <div><h2 className="text-lg font-semibold text-(--admin-title)">Sơ đồ vị trí viện</h2><p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">Chỉnh nội dung hiển thị bên dưới bản đồ và đường dẫn bản đồ.</p></div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ContactField label="Nhãn vị trí" required value={mapLocation.label} onChange={(value) => updateSection('mapLocation', 'label', value)} placeholder="Ví dụ: Trụ sở VIETKINGS — TTCN Sáng Tạo" />
-          <ContactField label="Đường dẫn nhúng bản đồ" required value={mapLocation.embedUrl} onChange={(value) => updateSection('mapLocation', 'embedUrl', value)} placeholder="Ví dụ: https://www.google.com/maps/embed?..." />
+        <div>
+          <h2 className="text-lg font-semibold text-(--admin-title)">Sơ đồ vị trí viện</h2>
+          <p className="mt-2 text-sm leading-6 text-(--admin-ink)/70">
+            Dán mã nhúng <code>&lt;iframe&gt;</code> từ Google Maps để hiển thị bản đồ chỉ dẫn và tự động trích xuất vị trí.
+          </p>
         </div>
-        <ContactField label="Địa chỉ bản đồ" required multiline value={mapLocation.address || mapLocation.mapAddress} onChange={updateMapAddress} placeholder="Ví dụ: 16/1 Đặng Văn Ngữ, Phường 10..." />
+
+        {/* Ô nhập mã nhúng iframe hoặc URL embed */}
+        <div className="space-y-2">
+          <ContactField
+            label="Mã nhúng iframe hoặc Đường dẫn nhúng bản đồ"
+            required
+            multiline
+            value={mapLocation.embedUrl}
+            onChange={updateMapEmbed}
+            placeholder="Dán toàn bộ mã <iframe src=...></iframe> hoặc liên kết https://www.google.com/maps/embed?..."
+            error={formErrors.embedUrl}
+          />
+          <div className="text-[11px] text-(--admin-ink)/70 flex items-start gap-1.5 leading-relaxed bg-(--admin-surface) p-2.5 rounded-lg border border-(--admin-border)">
+            <Info size={14} className="text-(--admin-accent) shrink-0 mt-0.5" />
+            <span>
+              <strong>Cách lấy mã nhúng từ Google Maps:</strong> Mở địa điểm trên Google Maps → Bấm <strong>Chia sẻ (Share)</strong> → Chọn tab <strong>Nhúng bản đồ (Embed a map)</strong> → Bấm <strong>Sao chép HTML (Copy HTML)</strong> rồi dán thẳng vào ô này. Hệ thống sẽ tự động nhận diện iframe và cập nhật vị trí.
+            </span>
+          </div>
+        </div>
+
+        {/* Thông báo trích xuất địa chỉ tự động */}
+        {extractedMapNotice && (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-600/40 bg-emerald-950/20 p-2.5 text-xs text-emerald-300">
+            <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+            <span>{extractedMapNotice}</span>
+          </div>
+        )}
+
+        {/* Hướng dẫn và thông báo hỗ trợ đa dạng liên kết */}
+        <div className="text-[11px] text-(--admin-ink)/70 flex items-start gap-1.5 leading-relaxed bg-(--admin-surface) p-2.5 rounded-lg border border-(--admin-border)">
+          <Info size={14} className="text-(--admin-accent) shrink-0 mt-0.5" />
+          <span>
+            <strong>Định dạng hỗ trợ:</strong> Bạn có thể dán toàn bộ mã <code>&lt;iframe...&gt;&lt;/iframe&gt;</code>, đường dẫn nhúng <code>https://www.google.com/maps/embed?...</code> hoặc liên kết chia sẻ rút gọn <code>https://maps.app.goo.gl/...</code>. Hệ thống sẽ tự động nhận diện và tạo bản đồ hiển thị trực tiếp.
+          </span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ContactField
+            label="Nhãn vị trí"
+            required
+            value={mapLocation.label}
+            onChange={(value) => updateSection('mapLocation', 'label', value)}
+            placeholder="Ví dụ: Trụ sở VIETKINGS — TTCN Sáng Tạo"
+          />
+          <ContactField
+            label="Địa chỉ bản đồ"
+            required
+            value={mapLocation.address || mapLocation.mapAddress}
+            onChange={updateMapAddress}
+            placeholder="Ví dụ: 229 Đ. Phạm Văn Đồng, Hạnh Thông, Hồ Chí Minh..."
+          />
+        </div>
+
+        {/* Xem trước bản đồ trực tiếp */}
+        {mapLocation.embedUrl && !mapLocation.embedUrl.includes('maps.app.goo.gl') && (
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-(--admin-heading)">
+              <span className="flex items-center gap-1.5">
+                <MapPin size={14} className="text-(--admin-accent)" />
+                Xem trước bản đồ nhúng trực tiếp:
+              </span>
+              {(mapLocation.directionsUrl || mapLocation.embedUrl) && (
+                <a
+                  href={mapLocation.directionsUrl || mapLocation.embedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-(--admin-accent) hover:underline"
+                >
+                  <span>Mở chỉ đường ngoài tab mới</span>
+                  <ExternalLink size={12} />
+                </a>
+              )}
+            </div>
+            <div className="relative overflow-hidden rounded-xl border border-(--admin-border) bg-(--admin-background) h-64 sm:h-72 w-full shadow-inner">
+              <iframe
+                src={parseGoogleMapsEmbed(mapLocation.embedUrl, mapLocation.address || mapLocation.mapAddress).displayEmbedUrl}
+                title={`Google Maps — ${mapLocation.mapAddress || mapLocation.address || 'Bản đồ'}`}
+                className="w-full h-full border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       <AdminStickySaveBar

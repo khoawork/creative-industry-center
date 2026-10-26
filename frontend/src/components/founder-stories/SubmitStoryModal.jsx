@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
-import { CATEGORIES } from '../../data/founderStoriesData';
 import {
   fetchFormConfig,
   submitFormToBackend,
   DEFAULT_FORM_CONFIGS,
 } from '../../services/googleSheetService.js';
 
-export const SubmitStoryModal = ({ isOpen, onClose }) => {
+export const SubmitStoryModal = ({ isOpen, onClose, categories = [] }) => {
   const [config, setConfig] = useState(DEFAULT_FORM_CONFIGS.founder_story_submission);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,7 +125,7 @@ export const SubmitStoryModal = ({ isOpen, onClose }) => {
                         >
                           <option value="">{field.placeholder || '-- Chọn --'}</option>
                           {key === 'category' && (!field.options || field.options.length === 0)
-                            ? CATEGORIES.filter((c) => c.id !== 'all').map((cat) => (
+                            ? categories.filter((c) => c.id !== 'all').map((cat) => (
                                 <option key={cat.id} value={cat.id}>
                                   {cat.label}
                                 </option>

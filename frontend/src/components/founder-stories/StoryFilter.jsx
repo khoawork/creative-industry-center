@@ -1,9 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Filter, Search, ChevronRight, Home } from 'lucide-react';
-import { CATEGORIES } from '../../data/founderStoriesData';
 
 export const StoryFilter = ({
-  categories = CATEGORIES,
+  categories = [],
   activeCategory,
   onSelectCategory,
   searchTerm,

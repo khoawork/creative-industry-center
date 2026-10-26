@@ -12,6 +12,13 @@ export const ContactAPI = {
     const response = await axios.put(`${API_BASE_URL}/contact/${pageIndex}`, data, options)
     return response.data
   },
+  resolveMapUrl: async (url, options = {}) => {
+    const response = await axios.get(`${API_BASE_URL}/contact/resolve-map`, {
+      params: { url },
+      ...options,
+    })
+    return response.data
+  },
 }
 
 export function requireContactData(response) {

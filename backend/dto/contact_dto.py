@@ -95,8 +95,13 @@ class ContactMapDTO(Schema):
     @pre_load
     def clean_map_data(self, data, **kwargs):
         if isinstance(data, dict):
+            addr = data.get("address") or data.get("mapAddress") or ""
             if "embedUrl" in data and data["embedUrl"]:
-                data["embedUrl"] = _clean_embed_url(data["embedUrl"])
+                cleaned = _clean_embed_url(data["embedUrl"])
+                if ("maps.app.goo.gl" in cleaned or "goo.gl/maps" in cleaned) and addr:
+                    import urllib.parse
+                    cleaned = f"https://maps.google.com/maps?q={urllib.parse.quote(addr)}&hl=vi&z=16&output=embed"
+                data["embedUrl"] = cleaned
         return data
 
 

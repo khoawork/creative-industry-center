@@ -34,7 +34,7 @@ export function AboutLink({ href, className = '', children }) {
 
 export function AboutHeading({ tag, title, icon }) {
   const iconName = icon ? (getAboutIconName(icon) || icon) : null;
-  return (
+  return (  
     <>
       {tag && (
         <p className="inline-flex items-center gap-2 rounded-xl border border-[#d49520]/40 bg-[#d49520]/15 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-[#710008]">

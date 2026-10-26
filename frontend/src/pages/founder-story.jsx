@@ -5,7 +5,6 @@ import { FounderStoryList } from '../components/founder-stories/FounderStoryList
 import { StoryCTA } from '../components/founder-stories/StoryCTA';
 import { SubmitStoryModal } from '../components/founder-stories/SubmitStoryModal';
 import { RecordEvaluationModal } from '../components/founder-stories/RecordEvaluationModal';
-import { FOUNDER_STORIES } from '../data/founderStoriesData';
 import { FounderAPI } from '../api/founderApi';
 import {
   getFounderCategories,
@@ -20,7 +19,7 @@ export const FounderStory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isEvaluationModalOpen, setIsEvaluationModalOpen] = useState(false);
-  const [stories, setStories] = useState(FOUNDER_STORIES);
+  const [stories, setStories] = useState([]);
   const [hero, setHero] = useState(null);
   const [cta, setCta] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,12 +34,15 @@ export const FounderStory = () => {
         const page = unwrapFounderResponse(result);
         const apiStories = mapFounderPageToStories(page);
 
-        if (apiStories.length > 0) setStories(apiStories);
+        setStories(apiStories);
         setHero(mapFounderPageToHero(page));
         setCta(mapFounderPageToCta(page));
       })
-      .catch(() => {
-        if (isMounted) setApiError('Không thể tải dữ liệu mới nhất, đang hiển thị nội dung dự phòng.');
+      .catch((err) => {
+        if (isMounted) {
+          console.error('Lỗi tải dữ liệu Founder:', err);
+          setApiError('Không thể tải dữ liệu mới nhất. Vui lòng kiểm tra lại kết nối.');
+        }
       })
       .finally(() => {
         if (isMounted) setIsLoading(false);
@@ -65,7 +67,7 @@ export const FounderStory = () => {
         story.title.toLowerCase().includes(normalizedSearch) ||
         story.categoryLabel.toLowerCase().includes(normalizedSearch) ||
         story.badgeText.toLowerCase().includes(normalizedSearch) ||
-        story.tabs.about.content.toLowerCase().includes(normalizedSearch);
+        (story.description || story.tabs?.about?.content || '').toLowerCase().includes(normalizedSearch);
 
       return matchCategory && matchSearch;
     });
@@ -112,6 +114,7 @@ export const FounderStory = () => {
       <SubmitStoryModal
         isOpen={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
+        categories={categories}
       />
 
       <RecordEvaluationModal

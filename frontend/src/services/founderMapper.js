@@ -1,3 +1,15 @@
+export function slugify(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 const DEFAULT_TAB = {
   title: "Chưa cập nhật",
   content: "Nội dung cho bộ lọc này chưa được cập nhật.",
@@ -12,7 +24,7 @@ function toTabContent(title, content, quote, quoteAuthor) {
     content: content || DEFAULT_TAB.content,
     quote: quote || "",
     quoteAuthor: quoteAuthor || "",
-    isAvailable: true,
+    isAvailable: Boolean(content && content.trim()),
   };
 }
 
@@ -34,26 +46,36 @@ export function mapFounderSectionToStory(section) {
     : [];
   const displayCategory = section?.major || "Founder";
   const verifiedLabel = section?.is_verified ? "Đã xác minh" : "Hồ sơ Founder";
+  const desc = profile.description || section?.description || "";
+  const storyName = section?.name || "Founder chưa đặt tên";
+  const slug = slugify(storyName) || String(section?.id || "");
+
   const profileContent = toTabContent(
-    profile.title,
-    profile.description,
+    profile.title || storyName,
+    desc,
     profile.slogan,
-    profile.sub_slogan,
+    profile.sub_slogan || storyName,
   );
   const unavailableContent = { ...DEFAULT_TAB };
 
   return {
     id: section?.id,
+    slug,
     category: displayCategory,
     badgeText: verifiedLabel,
     categoryLabel: displayCategory,
-    name: section?.name || "Founder chưa đặt tên",
+    name: storyName,
     title: section?.major || "Founder",
     image: section?.image || "",
+    description: section?.description || profile.description || "",
+    profileDescription: profile.description || section?.description || "",
+    storyTitle: profile.title || storyName || "",
+    quote: profile.slogan || "",
+    quoteAuthor: profile.sub_slogan || storyName || "",
     profileFilter,
     meta: founderInfo,
     tabs: {
-      about: profileFilter === "bio" ? profileContent : unavailableContent,
+      about: profileFilter === "bio" ? profileContent : (profileContent.isAvailable ? profileContent : unavailableContent),
       journey:
         profileFilter === "projects" ? profileContent : unavailableContent,
       achievements:
